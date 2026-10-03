@@ -158,9 +158,17 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       setExamQuestions(questionsData);
       setEditDuration(examData.duration_minutes || 30);
       setEditMarks(examData.total_marks || 25);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Failed to load exam data in LiveExamBuilder:', error);
       if (isInitial) {
-        toast.error('Failed to load exam data: ' + String(error));
+        const errorMsg =
+          error?.message ||
+          error?.details ||
+          (typeof error === 'string'
+            ? error
+            : error?.error ||
+              'পরীক্ষার প্রশ্ন লোড করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+        toast.error('Failed to load exam data: ' + errorMsg);
       }
     } finally {
       if (isInitial) setIsLoading(false);

@@ -53,10 +53,33 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
   const [userAttempt, setUserAttempt] = useState<LiveExamAttempt | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    fetchLeaderboardData();
-  }, [exam.id, user?.id]);
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const end = new Date(exam.end_time);
+  const lbPubTime = new Date(end.getTime() + 15 * 60 * 1000);
+  const isLbPublished =
+    exam.id.startsWith("mock-") ||
+    exam.is_leaderboard_published === true ||
+    (now >= lbPubTime && exam.is_leaderboard_published !== false);
+
+  useEffect(() => {
+    if (isLbPublished) {
+      fetchLeaderboardData();
+    } else {
+      setIsLoading(false);
+      // Fetch user's own attempt anyway so their score is visible
+      if (user?.id) {
+        getStudentLiveExamDetails(exam.id, user.id).then((details) => {
+          if (details) setUserAttempt(details.attempt);
+        });
+      }
+    }
+  }, [exam.id, user?.id, isLbPublished]);
 
   const fetchLeaderboardData = async () => {
     try {
@@ -169,51 +192,139 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
         )}
       </div>
 
-      {/* Review / Unpublished Banner if admin didn't publish yet */}
-      {exam.is_leaderboard_published === false && (
-        <div className="mb-4 rounded-[16px] bg-[#F59E0B]/12 border border-[#F59E0B]/30 p-4 flex items-center gap-3">
-          <Clock size={20} className="text-[#D97706] shrink-0" />
-          <p className="text-[12px] font-semibold text-[#92400E] dark:text-amber-200 leading-relaxed">
-            মেধা তালিকা পর্যালোচনাধীন রয়েছে। এডমিন কর্তৃক চূড়ান্ত প্রকাশের পর এখানে সকলের তালিকা দৃশ্যমান হবে।
-          </p>
-        </div>
-      )}
-
-      {/* Current User Spotlight Card matching Flutter */}
-      {myEntry && myRank && (
-        <div className="mb-4 rounded-[22px] bg-white dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] p-4.5 shadow-xs flex items-center justify-between gap-3.5">
-          <div className="flex items-center gap-3.5 min-w-0">
-            {/* Big Rank Square */}
-            <div className="w-12 h-12 rounded-[14px] bg-[#E2E8F0] dark:bg-[#27272A] border border-[#CBD5E1] dark:border-[#3F3F46] flex items-center justify-center font-black text-[17px] text-[#0F172A] dark:text-[#F8FAFC] shrink-0">
-              {BanglaNameHelper.toBanglaNumeral(myRank)}
-            </div>
-
-            {/* Info */}
-            <div className="min-w-0">
-              <span className="text-[11px] font-bold text-[#64748B] dark:text-[#A1A1AA] uppercase">
-                তোমার অবস্থান
+      {/* Unpublished / 15-Minute Countdown Screen */}
+      {!isLbPublished ? (
+        <div className="space-y-4">
+          {/* User's own score card if they took the exam */}
+          {userAttempt && (
+            <div className="rounded-[22px] bg-white dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] p-5 shadow-xs">
+              <span className="text-[11px] font-bold text-[#64748B] dark:text-[#A1A1AA] uppercase tracking-wider">
+                তোমার ফলাফল (অফিসিয়াল)
               </span>
-              <h3 className="text-[15.5px] font-black text-[#0F172A] dark:text-[#F8FAFC] truncate">
-                {myEntry.users?.name || "তুমি"}
-              </h3>
-              <p className="text-[11px] text-[#94A3B8] dark:text-[#71717A] truncate">
-                মোট {BanglaNameHelper.toBanglaNumeral(leaderboard.length)} জনের মধ্যে{" "}
-                {BanglaNameHelper.toBanglaNumeral(myRank)}ম স্থান
-              </p>
+              <div className="mt-3 flex items-center justify-around text-center">
+                <div>
+                  <p className="text-[20px] font-black text-[#10B981]">
+                    {BanglaNameHelper.toBanglaNumeral(userAttempt.correct_count || 0)}
+                  </p>
+                  <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">সঠিক</p>
+                </div>
+                <div className="w-px h-8 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+                <div>
+                  <p className="text-[20px] font-black text-[#EF4444]">
+                    {BanglaNameHelper.toBanglaNumeral(userAttempt.wrong_count || 0)}
+                  </p>
+                  <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">ভুল</p>
+                </div>
+                <div className="w-px h-8 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+                <div>
+                  <p className="text-[20px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                    {BanglaNameHelper.toBanglaNumeral(userAttempt.score ?? 0)}
+                  </p>
+                  <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">মোট স্কোর</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Countdown & Notification Hero Box */}
+          <div className="rounded-[22px] bg-gradient-to-br from-white via-white to-blue-50/40 dark:from-[#141417] dark:via-[#141417] dark:to-blue-950/20 border border-blue-200/80 dark:border-blue-900/40 p-6 text-center shadow-xs">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3.5 shadow-xs">
+              <Trophy size={28} className="animate-pulse" />
+            </div>
+
+            <h2 className="text-[18px] sm:text-[20px] font-extrabold text-[#0F172A] dark:text-white">
+              {exam.is_leaderboard_published === false
+                ? "মেধা তালিকা পর্যালোচনাধীন রয়েছে"
+                : "অফিসিয়াল মেধা তালিকা প্রকাশের প্রস্তুতি চলছে"}
+            </h2>
+
+            <p className="mt-2 text-[13px] sm:text-[14px] text-neutral-600 dark:text-neutral-300 max-w-lg mx-auto leading-relaxed">
+              {exam.is_leaderboard_published === false
+                ? "কর্তৃপক্ষ কর্তৃক এই পরীক্ষার মেধা তালিকা সাময়িকভাবে অপ্রকাশিত রাখা হয়েছে। এডমিন চূড়ান্ত অনুমোদন দিলে প্রকাশিত হবে।"
+                : "পরীক্ষা শেষ হওয়ার ১৫ মিনিট পর শীর্ষ মেধাতালিকা এবং সকল শিক্ষার্থীর পূর্ণাঙ্গ র‍্যাংকিং স্বয়ংক্রিয়ভাবে উন্মুক্ত করা হবে।"}
+            </p>
+
+            {/* Countdown Box */}
+            {exam.is_leaderboard_published !== false && (
+              <div className="mt-5 inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300">
+                <Clock size={20} className="animate-spin" style={{ animationDuration: '4s' }} />
+                <div className="text-left">
+                  <p className="text-[11px] font-semibold text-blue-600/80 dark:text-blue-300/80">
+                    প্রকাশ হতে সময় বাকি
+                  </p>
+                  <p className="text-[16px] sm:text-[18px] font-black font-mono">
+                    {(() => {
+                      const diffMs = Math.max(0, lbPubTime.getTime() - now.getTime());
+                      const mins = Math.floor(diffMs / 60000);
+                      const secs = Math.floor((diffMs % 60000) / 1000);
+                      if (diffMs <= 0) return "প্রকাশিত হচ্ছে...";
+                      return `${BanglaNameHelper.toBanglaNumeral(mins)} মিনিট ${BanglaNameHelper.toBanglaNumeral(secs)} সেকেন্ড`;
+                    })()}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex items-center justify-center gap-3 flex-wrap">
+              {onViewSolutions && (
+                <button
+                  type="button"
+                  onClick={onViewSolutions}
+                  className="px-5 py-2.5 rounded-xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-xs sm:text-sm transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText size={15} />
+                  <span>সমাধান ও ব্যাখ্যা দেখুন</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => fetchLeaderboardData()}
+                className="px-5 py-2.5 rounded-xl bg-white dark:bg-[#1E1E22] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 font-bold text-xs sm:text-sm hover:bg-neutral-50 dark:hover:bg-[#25252A] transition-all cursor-pointer"
+              >
+                রিফ্রেশ করুন
+              </button>
             </div>
           </div>
-
-          {/* Score Box */}
-          <div className="px-3.5 py-2 rounded-[12px] bg-[#F1F5F9] dark:bg-[#27272A] border border-[#E2E8F0] dark:border-[#3F3F46] text-center shrink-0">
-            <span className="block text-[17px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
-              {BanglaNameHelper.toBanglaNumeral(myEntry.score)}
-            </span>
-            <span className="text-[10px] font-bold text-[#64748B] dark:text-[#A1A1AA]">
-              মার্কস
-            </span>
-          </div>
         </div>
-      )}
+      ) : (
+        <>
+          {/* Current User Spotlight Card matching Flutter */}
+          {myEntry && myRank && (
+            <div className="mb-4 rounded-[22px] bg-white dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] p-4.5 shadow-xs flex items-center justify-between gap-3.5">
+              <div className="flex items-center gap-3.5 min-w-0">
+                {/* Big Rank Square */}
+                <div className="w-12 h-12 rounded-[14px] bg-[#E2E8F0] dark:bg-[#27272A] border border-[#CBD5E1] dark:border-[#3F3F46] flex items-center justify-center font-black text-[17px] text-[#0F172A] dark:text-[#F8FAFC] shrink-0">
+                  {BanglaNameHelper.toBanglaNumeral(myRank)}
+                </div>
+
+                {/* Info */}
+                <div className="min-w-0">
+                  <span className="text-[11px] font-bold text-[#64748B] dark:text-[#A1A1AA] uppercase">
+                    তোমার অবস্থান
+                  </span>
+                  <h3 className="text-[15.5px] font-black text-[#0F172A] dark:text-[#F8FAFC] truncate">
+                    {myEntry.users?.name || "তুমি"}
+                  </h3>
+                  <p className="text-[11px] text-[#94A3B8] dark:text-[#71717A] truncate">
+                    মোট {BanglaNameHelper.toBanglaNumeral(leaderboard.length)} জনের মধ্যে{" "}
+                    {BanglaNameHelper.toBanglaNumeral(myRank)}ম স্থান
+                  </p>
+                </div>
+              </div>
+
+              {/* Score Box */}
+              <div className="px-3.5 py-2 rounded-[12px] bg-[#F1F5F9] dark:bg-[#27272A] border border-[#E2E8F0] dark:border-[#3F3F46] text-center shrink-0">
+                <span className="block text-[17px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                  {BanglaNameHelper.toBanglaNumeral(myEntry.score)}
+                </span>
+                <span className="text-[10px] font-bold text-[#64748B] dark:text-[#A1A1AA]">
+                  মার্কস
+                </span>
+              </div>
+            </div>
+          )}
 
       {/* Search Input Box matching Flutter 44px pill */}
       <div className="mb-4 h-[44px] rounded-[14px] bg-white dark:bg-[#141417] border border-[#E2E8F0] dark:border-[#27272A] px-3 flex items-center gap-2 shadow-2xs">
@@ -344,6 +455,8 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
             })}
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

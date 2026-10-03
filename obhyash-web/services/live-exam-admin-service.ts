@@ -240,31 +240,75 @@ export async function getLiveExamQuestions(examId: string): Promise<
     } catch (_) {}
   }
 
-  const { data, error } = await supabase
+  // Direct client fallback
+  const { data: rows, error: junctionError } = await supabase
     .from("live_exam_questions")
-    .select(
-      `
-      id,
-      serial,
-      points,
-      question_id,
-      questions (*)
-    `
-    )
+    .select("*")
     .eq("live_exam_id", examId)
     .order("serial", { ascending: true });
 
-  if (error) {
-    console.error("Error fetching live exam questions:", error);
-    throw error;
+  if (junctionError) {
+    console.error("Error fetching live exam questions:", junctionError);
+    throw junctionError;
   }
 
-  return (data || []).map((item: any) => ({
-    mapping_id: item.id,
-    serial: item.serial,
-    points: item.points,
-    question: item.questions,
-  }));
+  const refQuestionIds = (rows || [])
+    .map((r: any) => r.question_id)
+    .filter(Boolean);
+
+  const qMap = new Map<string, any>();
+  if (refQuestionIds.length > 0) {
+    const { data: qData, error: qErr } = await supabase
+      .from("questions")
+      .select("*")
+      .in("id", refQuestionIds);
+
+    if (!qErr && qData) {
+      qData.forEach((q: any) => qMap.set(q.id, q));
+    }
+  }
+
+  return (rows || []).map((item: any) => {
+    let questionObj: any = null;
+    if (item.question_id && qMap.has(item.question_id)) {
+      const q = qMap.get(item.question_id);
+      questionObj = {
+        ...q,
+        points: Number(item.points) || q.points || 1,
+      };
+    } else if (item.question && item.question.trim().length > 0) {
+      const correctIdx = item.correct_answer_index ?? 0;
+      const opts = Array.isArray(item.options) ? item.options : [];
+      questionObj = {
+        id: item.question_id || item.id,
+        question: item.question,
+        options: opts,
+        correctAnswer: opts[correctIdx] || "",
+        correctAnswerIndex: correctIdx,
+        correct_answer_index: correctIdx,
+        correctAnswerIndices: [correctIdx],
+        correct_answer_indices: [correctIdx],
+        explanation: item.explanation || "",
+        subject: item.subject || "",
+        chapter: item.chapter || "",
+        difficulty: item.difficulty || "Medium",
+        points: Number(item.points) || 1,
+        type: "MCQ",
+        status: "Approved",
+        author: "System",
+        createdAt: item.created_at || new Date().toISOString(),
+        version: 1,
+        tags: [],
+      };
+    }
+
+    return {
+      mapping_id: item.id,
+      serial: item.serial,
+      points: item.points,
+      question: questionObj,
+    };
+  });
 }
 
 export async function addQuestionToLiveExam(

@@ -234,6 +234,8 @@ export interface LiveExam {
   negative_marking: number;
   status: "draft" | "published" | "archived";
   is_leaderboard_published?: boolean;
+  is_answer_published?: boolean;
+  is_practice_enabled?: boolean;
   created_at: string;
   updated_at: string;
   created_by?: string;

@@ -517,10 +517,25 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const isUpcoming = now < start;
   const isPast = now > end;
   const isTaken = attempt?.status === "submitted";
-  const pubTime = new Date(new Date(exam.end_time).getTime() + 15 * 60 * 1000);
-  const isResultPublished =
+
+  // Leaderboard publication: Exactly 15 minutes after exam ends, or if explicitly enabled by admin
+  const lbPubTime = new Date(new Date(exam.end_time).getTime() + 15 * 60 * 1000);
+  const isLeaderboardPublished =
     exam.id.startsWith("mock-") ||
-    (now >= pubTime && exam.is_leaderboard_published !== false);
+    exam.is_leaderboard_published === true ||
+    (now >= lbPubTime && exam.is_leaderboard_published !== false);
+
+  // Result & Solution: Available immediately when live exam ends (or if admin explicitly set is_answer_published === true)
+  const isResultAndSolutionAvailable =
+    exam.id.startsWith("mock-") ||
+    isPast ||
+    exam.is_answer_published === true;
+
+  // Practice: Available immediately when live exam ends
+  const isPracticeAvailable =
+    exam.id.startsWith("mock-") ||
+    isPast ||
+    exam.is_practice_enabled !== false;
 
   let statusBadgeText = "Upcoming";
   let statusBadgeColor = "#3B82F6";
@@ -569,9 +584,9 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
   // Solution View Screen
   if (isViewingSolutions) {
-    if (!isResultPublished) {
+    if (!isResultAndSolutionAvailable) {
       handleSolutionsBack();
-      toast.info("ফলাফল ও সমাধান এখনও প্রকাশ করা হয়নি।");
+      toast.info("পরীক্ষা শেষ হওয়ার সাথে সাথে সম্পূর্ণ সমাধান উন্মুক্ত করা হবে।");
       return null;
     }
     return (
@@ -749,10 +764,10 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               </button>
             )
           ) : (
-            isPast || exam.id.startsWith("mock-") ? (
+            isPast || isResultAndSolutionAvailable || exam.id.startsWith("mock-") ? (
               <div className="space-y-3">
-                {/* Solutions Button */}
-                {isResultPublished && (
+                {/* Solutions Button - Available immediately on exam end */}
+                {isResultAndSolutionAvailable && (
                   <button
                     type="button"
                     onClick={handleOpenSolutions}
@@ -763,15 +778,17 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                   </button>
                 )}
 
-                {/* Retake as Practice Button */}
-                <button
-                  type="button"
-                  onClick={() => setIsTakingExam(true)}
-                  className="w-full h-[50px] rounded-2xl bg-white dark:bg-[#141417] border border-[#CBD5E1] dark:border-[#27272A] text-[#0F172A] dark:text-[#E2E8F0] hover:bg-[#F8FAFC] dark:hover:bg-[#1C1C20] font-bold text-[15px] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-99"
-                >
-                  <RotateCcw size={18} />
-                  <span>অনুশীলন পরীক্ষা দিন (Practice)</span>
-                </button>
+                {/* Retake as Practice Button - Available immediately on exam end */}
+                {isPracticeAvailable && (
+                  <button
+                    type="button"
+                    onClick={() => setIsTakingExam(true)}
+                    className="w-full h-[50px] rounded-2xl bg-white dark:bg-[#141417] border border-[#CBD5E1] dark:border-[#27272A] text-[#0F172A] dark:text-[#E2E8F0] hover:bg-[#F8FAFC] dark:hover:bg-[#1C1C20] font-bold text-[15px] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-99"
+                  >
+                    <RotateCcw size={18} />
+                    <span>অনুশীলন পরীক্ষা দিন (Practice)</span>
+                  </button>
+                )}
               </div>
             ) : null
           )}
@@ -880,8 +897,8 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
           </div>
         )}
 
-        {/* Anti-Leakage / Pending Results Banner (When taken and before result publish) */}
-        {isTaken && !isResultPublished && !exam.id.startsWith("mock-") && (
+        {/* Anti-Leakage Banner: Shown only when student submitted early and live exam is still ongoing */}
+        {isTaken && !isResultAndSolutionAvailable && !exam.id.startsWith("mock-") && (
           <div className="mt-5 rounded-[20px] bg-[#F59E0B]/12 border border-[#F59E0B]/30 p-4 flex items-start gap-3">
             <AlertCircle size={20} className="text-[#D97706] shrink-0 mt-0.5" />
             <div>
@@ -889,17 +906,29 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                 উত্তরপত্র সফলভাবে জমা নেওয়া হয়েছে!
               </h4>
               <p className="mt-1 text-[12.5px] leading-relaxed text-[#78350F] dark:text-white/70">
-                পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষা শেষ হওয়ার পর রাত{" "}
-                {BanglaNameHelper.toBanglaNumeral(padZero(pubTime.getHours()))}:
-                {BanglaNameHelper.toBanglaNumeral(padZero(pubTime.getMinutes()))}{" "}
-                মিনিটে সম্পূর্ণ সমাধান ও মেধা তালিকা উন্মুক্ত করা হবে।
+                পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষা শেষ হওয়ার সাথে সাথেই ({formatTime12Hour(end)}) আপনার সম্পূর্ণ সমাধান উন্মুক্ত করা হবে এবং পরীক্ষা সমাপ্তির ১৫ মিনিট পর মেধা তালিকা প্রকাশ পাবে।
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Leaderboard Countdown Notice: Shown when exam has ended, solutions are visible, but leaderboard is within the 15-minute delay */}
+        {isTaken && isPast && !isLeaderboardPublished && !exam.id.startsWith("mock-") && exam.is_leaderboard_published !== false && (
+          <div className="mt-5 rounded-[20px] bg-blue-500/10 border border-blue-500/25 p-4 flex items-start gap-3">
+            <Clock size={20} className="text-blue-500 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-[14px] font-bold text-blue-600 dark:text-blue-400">
+                অফিসিয়াল মেধা তালিকা প্রস্তুত হচ্ছে
+              </h4>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-blue-900/80 dark:text-blue-200/80">
+                পরীক্ষা শেষ হওয়ার ১৫ মিনিট পর ({formatTime12Hour(lbPubTime)}) সম্পূর্ণ মেধা তালিকা ও র‍্যাংকিং স্বয়ংক্রিয়ভাবে প্রকাশিত হবে। আপনি উপরের বাটন থেকে আপনার সমাধান ও ব্যাখ্যা দেখে নিতে পারেন।
               </p>
             </div>
           </div>
         )}
 
         {/* Admin Hidden Leaderboard Banner */}
-        {isTaken && (isPast || exam.id.startsWith("mock-")) && !exam.is_leaderboard_published && (
+        {isTaken && (isPast || exam.id.startsWith("mock-")) && exam.is_leaderboard_published === false && (
           <div className="mt-5 rounded-[20px] bg-[#F4F4F5] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] p-4 flex items-start gap-3">
             <EyeOff size={20} className="text-[#4B5563] dark:text-white/70 shrink-0 mt-0.5" />
             <div>
@@ -913,8 +942,8 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
           </div>
         )}
 
-        {/* Leaderboard Section (Top 5 Rankers) */}
-        {isTaken && isResultPublished && (
+        {/* Leaderboard Section (Top 5 Rankers) - shown only when isLeaderboardPublished is true */}
+        {isTaken && isLeaderboardPublished && (
           <div className="mt-6 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

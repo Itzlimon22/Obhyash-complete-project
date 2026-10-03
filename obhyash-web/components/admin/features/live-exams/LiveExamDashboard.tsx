@@ -18,6 +18,7 @@ import {
   PlusCircle,
   ExternalLink,
   Zap,
+  BookOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LiveExam } from '@/lib/types';
@@ -100,6 +101,32 @@ export default function LiveExamDashboard() {
       fetchExams();
     } catch (error) {
       toast.error('Failed to extend duration');
+    }
+  };
+
+  const handleToggleLeaderboard = async (exam: LiveExam) => {
+    const next = exam.is_leaderboard_published === true ? false : true;
+    try {
+      await updateLiveExam(exam.id, { is_leaderboard_published: next });
+      toast.success(
+        next ? 'মেধা তালিকা উন্মুক্ত করা হয়েছে' : 'মেধা তালিকা লুকানো হয়েছে',
+      );
+      fetchExams();
+    } catch {
+      toast.error('মেধা তালিকা আপডেট করা যায়নি');
+    }
+  };
+
+  const handleToggleAnswers = async (exam: LiveExam) => {
+    const next = exam.is_answer_published === true ? false : true;
+    try {
+      await updateLiveExam(exam.id, { is_answer_published: next });
+      toast.success(
+        next ? 'উত্তর ও সমাধান সবার জন্য উন্মুক্ত করা হয়েছে' : 'সমাধান পরীক্ষা শেষেই দেখা যাবে',
+      );
+      fetchExams();
+    } catch {
+      toast.error('সমাধান আপডেট করা যায়নি');
     }
   };
 
@@ -293,20 +320,33 @@ export default function LiveExamDashboard() {
                       </td>
 
                       <td className="p-4">
-                        {isLiveNow ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                            LIVE NOW
-                          </span>
-                        ) : isUpcoming ? (
-                          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                            Upcoming
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 border border-neutral-200 dark:border-zinc-700">
-                            Ended
-                          </span>
-                        )}
+                        <div className="flex flex-col gap-1 items-start">
+                          {isLiveNow ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                              LIVE NOW
+                            </span>
+                          ) : isUpcoming ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                              Upcoming
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 border border-neutral-200 dark:border-zinc-700">
+                              Ended
+                            </span>
+                          )}
+
+                          {/* Leaderboard publication status */}
+                          {exam.is_leaderboard_published === true ? (
+                            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                              <Trophy size={10} /> মেধা তালিকা উন্মুক্ত
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-neutral-400 dark:text-zinc-500 flex items-center gap-1">
+                              <Clock size={10} /> মেধা: ১৫মি অটো
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       <td className="p-4 text-right">
@@ -322,6 +362,40 @@ export default function LiveExamDashboard() {
                             </button>
                           )}
 
+                          {/* Leaderboard Quick Toggle */}
+                          <button
+                            onClick={() => handleToggleLeaderboard(exam)}
+                            className={`p-2 rounded-xl transition-colors border cursor-pointer ${
+                              exam.is_leaderboard_published === true
+                                ? 'text-amber-500 bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20'
+                                : 'text-zinc-400 hover:text-amber-500 hover:bg-amber-500/10 border-transparent'
+                            }`}
+                            title={
+                              exam.is_leaderboard_published === true
+                                ? 'মেধা তালিকা: উন্মুক্ত (ক্লিক করে বন্ধ করুন)'
+                                : 'মেধা তালিকা এখনই উন্মুক্ত করতে ক্লিক করুন (ডিফল্ট: পরীক্ষা শেষের ১৫ মিনিট পর)'
+                            }
+                          >
+                            <Trophy size={16} />
+                          </button>
+
+                          {/* Solutions Quick Toggle */}
+                          <button
+                            onClick={() => handleToggleAnswers(exam)}
+                            className={`p-2 rounded-xl transition-colors border cursor-pointer ${
+                              exam.is_answer_published === true
+                                ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20'
+                                : 'text-zinc-400 hover:text-emerald-500 hover:bg-emerald-500/10 border-transparent'
+                            }`}
+                            title={
+                              exam.is_answer_published === true
+                                ? 'সমাধান: এখনই উন্মুক্ত (ক্লিক করে অটো মোডে নিন)'
+                                : 'সমাধান এখনই উন্মুক্ত করতে ক্লিক করুন (ডিফল্ট: পরীক্ষা শেষ হওয়ামাত্র)'
+                            }
+                          >
+                            <BookOpen size={16} />
+                          </button>
+
                           {/* Builder */}
                           <Link
                             href={`${basePath}/${exam.id}/builder`}
@@ -331,13 +405,13 @@ export default function LiveExamDashboard() {
                             <List size={16} />
                           </Link>
 
-                          {/* Results */}
+                          {/* Results & Full Controls */}
                           <Link
                             href={`${basePath}/${exam.id}/results`}
                             className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-colors border border-transparent hover:border-blue-500/20"
-                            title="লিডারবোর্ড ও ফলাফল"
+                            title="ফলাফল ও পূর্ণ কন্ট্রোল সেন্টার"
                           >
-                            <Trophy size={16} />
+                            <Users size={16} />
                           </Link>
 
                           {/* Edit */}

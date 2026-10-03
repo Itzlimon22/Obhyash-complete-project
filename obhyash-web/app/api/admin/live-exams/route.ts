@@ -19,25 +19,72 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
     if (questionsForExam) {
-      const { data, error } = await supabaseAdmin
+      const { data: rows, error: junctionError } = await supabaseAdmin
         .from('live_exam_questions')
-        .select(`
-          id,
-          serial,
-          points,
-          question_id,
-          questions (*)
-        `)
+        .select('*')
         .eq('live_exam_id', questionsForExam)
         .order('serial', { ascending: true });
 
-      if (error) throw error;
-      const mapped = (data || []).map((item: any) => ({
-        mapping_id: item.id,
-        serial: item.serial,
-        points: item.points,
-        question: item.questions,
-      }));
+      if (junctionError) throw junctionError;
+
+      const refQuestionIds = (rows || [])
+        .map((r: any) => r.question_id)
+        .filter(Boolean);
+
+      const qMap = new Map<string, any>();
+      if (refQuestionIds.length > 0) {
+        const { data: qData, error: qErr } = await supabaseAdmin
+          .from('questions')
+          .select('*')
+          .in('id', refQuestionIds);
+
+        if (!qErr && qData) {
+          qData.forEach((q: any) => qMap.set(q.id, q));
+        }
+      }
+
+      const mapped = (rows || []).map((item: any) => {
+        let questionObj: any = null;
+        if (item.question_id && qMap.has(item.question_id)) {
+          const q = qMap.get(item.question_id);
+          questionObj = {
+            ...q,
+            points: Number(item.points) || q.points || 1,
+          };
+        } else if (item.question && item.question.trim().length > 0) {
+          const correctIdx = item.correct_answer_index ?? 0;
+          const opts = Array.isArray(item.options) ? item.options : [];
+          questionObj = {
+            id: item.question_id || item.id,
+            question: item.question,
+            options: opts,
+            correctAnswer: opts[correctIdx] || '',
+            correctAnswerIndex: correctIdx,
+            correct_answer_index: correctIdx,
+            correctAnswerIndices: [correctIdx],
+            correct_answer_indices: [correctIdx],
+            explanation: item.explanation || '',
+            subject: item.subject || '',
+            chapter: item.chapter || '',
+            difficulty: item.difficulty || 'Medium',
+            points: Number(item.points) || 1,
+            type: 'MCQ',
+            status: 'Approved',
+            author: 'System',
+            createdAt: item.created_at || new Date().toISOString(),
+            version: 1,
+            tags: [],
+          };
+        }
+
+        return {
+          mapping_id: item.id,
+          serial: item.serial,
+          points: item.points,
+          question: questionObj,
+        };
+      });
+
       return NextResponse.json({ success: true, data: mapped });
     }
 
@@ -233,16 +280,47 @@ export async function POST(request: NextRequest) {
     }
 
     // --- QUESTION MANAGEMENT ACTIONS ---
-    if (action === 'add_question' && body.examId && body.questionId) {
-      const { examId, questionId, serial, points = 1 } = body;
+    if (action === 'add_question' && body.examId) {
+      const { examId, questionId, serial, points = 1, question: inlineQuestion } = body;
+      
+      let payload: any = {
+        live_exam_id: examId,
+        question_id: null,
+        serial: serial || 1,
+        points,
+      };
+
+      if (inlineQuestion) {
+        payload = {
+          ...payload,
+          question: inlineQuestion.question,
+          options: inlineQuestion.options || [],
+          correct_answer_index: inlineQuestion.correct_answer_index ?? inlineQuestion.correctAnswerIndex ?? 0,
+          explanation: inlineQuestion.explanation || '',
+          subject: inlineQuestion.subject || '',
+        };
+      } else if (questionId) {
+        const { data: qData } = await supabaseAdmin
+          .from('questions')
+          .select('*')
+          .eq('id', questionId)
+          .single();
+
+        if (qData) {
+          payload = {
+            ...payload,
+            question: qData.question,
+            options: qData.options || [],
+            correct_answer_index: qData.correct_answer_index ?? qData.correctAnswerIndex ?? (qData.correct_answer_indices?.[0] ?? 0),
+            explanation: qData.explanation || '',
+            subject: qData.subject || '',
+          };
+        }
+      }
+
       const { error: insErr } = await supabaseAdmin
         .from('live_exam_questions')
-        .insert([{
-          live_exam_id: examId,
-          question_id: questionId,
-          serial: serial || 1,
-          points,
-        }]);
+        .insert([payload]);
 
       if (insErr) throw insErr;
 
@@ -266,22 +344,34 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, count: 0 });
       }
 
-      // 1. Fetch existing mappings to avoid duplicates & calculate serial
+      // 1. Fetch existing mappings to avoid duplicate questions & calculate serial
       const { data: existing } = await supabaseAdmin
         .from('live_exam_questions')
-        .select('question_id')
+        .select('id, serial, question')
         .eq('live_exam_id', examId);
 
-      const existingSet = new Set((existing || []).map((e: any) => e.question_id));
-      const toAdd = questionIds.filter((qId: string) => !existingSet.has(qId));
+      const existingQuestionSet = new Set((existing || []).map((e: any) => e.question?.trim()).filter(Boolean));
+
+      // 2. Fetch full question objects from questions table
+      const { data: qList } = await supabaseAdmin
+        .from('questions')
+        .select('*')
+        .in('id', questionIds);
+
+      const toAdd = (qList || []).filter((q: any) => !existingQuestionSet.has(q.question?.trim()));
 
       if (toAdd.length > 0) {
         let currentSerial = (existing?.length || 0) + 1;
-        const inserts = toAdd.map((qId: string) => ({
+        const inserts = toAdd.map((q: any) => ({
           live_exam_id: examId,
-          question_id: qId,
+          question_id: null,
           serial: currentSerial++,
           points,
+          question: q.question,
+          options: q.options || [],
+          correct_answer_index: q.correct_answer_index ?? q.correctAnswerIndex ?? (q.correct_answer_indices?.[0] ?? 0),
+          explanation: q.explanation || '',
+          subject: q.subject || '',
         }));
 
         const { error: insErr } = await supabaseAdmin
@@ -332,9 +422,24 @@ export async function POST(request: NextRequest) {
 
     if (action === 'swap_question' && body.mappingId && body.newQuestionId) {
       const { mappingId, newQuestionId } = body;
+      const { data: newQ } = await supabaseAdmin
+        .from('questions')
+        .select('*')
+        .eq('id', newQuestionId)
+        .single();
+
+      if (!newQ) throw new Error('New question not found');
+
       const { error: swapErr } = await supabaseAdmin
         .from('live_exam_questions')
-        .update({ question_id: newQuestionId })
+        .update({
+          question_id: null,
+          question: newQ.question,
+          options: newQ.options || [],
+          correct_answer_index: newQ.correct_answer_index ?? newQ.correctAnswerIndex ?? (newQ.correct_answer_indices?.[0] ?? 0),
+          explanation: newQ.explanation || '',
+          subject: newQ.subject || '',
+        })
         .eq('id', mappingId);
 
       if (swapErr) throw swapErr;
@@ -359,18 +464,18 @@ export async function POST(request: NextRequest) {
 
       const { data: existing } = await supabaseAdmin
         .from('live_exam_questions')
-        .select('question_id')
+        .select('id, serial, question')
         .eq('live_exam_id', examId);
 
-      const existingSet = new Set((existing || []).map((e: any) => e.question_id));
-      const candidateIdsToAdd: string[] = [];
+      const existingQuestionSet = new Set((existing || []).map((e: any) => e.question?.trim()).filter(Boolean));
+      const candidateQuestionsToAdd: any[] = [];
 
       for (const rule of rules) {
         if (!rule.subject || rule.count <= 0) continue;
 
         let query = supabaseAdmin
           .from('questions')
-          .select('id')
+          .select('*')
           .or('status.eq.Approved,status.eq.published,status.is.null');
 
         const subObj = findHscSubject(rule.subject);
@@ -389,22 +494,28 @@ export async function POST(request: NextRequest) {
 
         const { data: candidates } = await query.limit(rule.count * 4);
         if (candidates && candidates.length > 0) {
-          const filtered = candidates
-            .map((c: any) => c.id)
-            .filter((id: string) => !existingSet.has(id) && !candidateIdsToAdd.includes(id));
+          const filtered = candidates.filter((c: any) =>
+            !existingQuestionSet.has(c.question?.trim()) &&
+            !candidateQuestionsToAdd.some((picked) => picked.id === c.id)
+          );
 
           const picked = filtered.slice(0, rule.count);
-          picked.forEach((id: string) => candidateIdsToAdd.push(id));
+          picked.forEach((c: any) => candidateQuestionsToAdd.push(c));
         }
       }
 
-      if (candidateIdsToAdd.length > 0) {
+      if (candidateQuestionsToAdd.length > 0) {
         let currentSerial = (existing?.length || 0) + 1;
-        const inserts = candidateIdsToAdd.map((qId: string) => ({
+        const inserts = candidateQuestionsToAdd.map((q: any) => ({
           live_exam_id: examId,
-          question_id: qId,
+          question_id: null,
           serial: currentSerial++,
           points: 1,
+          question: q.question,
+          options: q.options || [],
+          correct_answer_index: q.correct_answer_index ?? q.correctAnswerIndex ?? (q.correct_answer_indices?.[0] ?? 0),
+          explanation: q.explanation || '',
+          subject: q.subject || '',
         }));
 
         await supabaseAdmin.from('live_exam_questions').insert(inserts);
@@ -421,7 +532,7 @@ export async function POST(request: NextRequest) {
           .eq('id', examId);
       }
 
-      return NextResponse.json({ success: true, count: candidateIdsToAdd.length });
+      return NextResponse.json({ success: true, count: candidateQuestionsToAdd.length });
     }
 
     if (action === 'reset_attempt' && body.attemptId) {

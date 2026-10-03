@@ -63,6 +63,10 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
       exam?.is_leaderboard_published !== undefined
         ? exam.is_leaderboard_published
         : true,
+    is_answer_published:
+      exam?.is_answer_published !== undefined
+        ? exam.is_answer_published
+        : false,
   });
 
   const handleStartChange = (startVal: string) => {
@@ -337,31 +341,61 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
             </div>
           </div>
 
-          {/* Leaderboard Visibility Control */}
-          <div className="p-3.5 bg-neutral-50 dark:bg-zinc-900/60 rounded-2xl border border-neutral-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
-                <span>📢</span>
-                <span>শিক্ষার্থীদের জন্য মেধা তালিকা উন্মুক্ত রাখুন (Publish Leaderboard)</span>
-              </p>
-              <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-0.5">
-                সক্রিয় থাকলে শিক্ষার্থীরা তাদের র‍্যাংক ও মেধা তালিকা দেখতে পাবে
-              </p>
+          {/* Publication Controls */}
+          <div className="space-y-3 pt-1">
+            {/* Leaderboard Visibility Control */}
+            <div className="p-3.5 bg-neutral-50 dark:bg-zinc-900/60 rounded-2xl border border-neutral-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                  <span>🏆</span>
+                  <span>মেধা তালিকা উন্মুক্ত রাখুন (Leaderboard Published)</span>
+                </p>
+                <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-0.5">
+                  নিয়ম: পরীক্ষা শেষ হওয়ার ১৫ মিনিট পর মেধা তালিকা স্বয়ংক্রিয়ভাবে প্রকাশ পাবে। নিষ্ক্রিয় করলে সবসময় গোপন থাকবে।
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={formData.is_leaderboard_published !== false}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      is_leaderboard_published: e.target.checked,
+                    })
+                  }
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-emerald-600"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer shrink-0">
-              <input
-                type="checkbox"
-                checked={formData.is_leaderboard_published !== false}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    is_leaderboard_published: e.target.checked,
-                  })
-                }
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-emerald-600"></div>
-            </label>
+
+            {/* Answer & Solution Visibility Control */}
+            <div className="p-3.5 bg-neutral-50 dark:bg-zinc-900/60 rounded-2xl border border-neutral-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                  <span>📖</span>
+                  <span>উত্তর ও সমাধান এখনই অগ্রিম উন্মুক্ত করুন (Publish Answers Early)</span>
+                </p>
+                <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-0.5">
+                  নিয়ম: ডিফল্টভাবে পরীক্ষা শেষ হওয়ার সাথে সাথেই ফলাফল ও সমাধান দেখতে পাবে। সক্রিয় করলে এখনই উন্মুক্ত হবে।
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={formData.is_answer_published === true}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      is_answer_published: e.target.checked,
+                    })
+                  }
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
           </div>
 
           {/* Footer Save */}

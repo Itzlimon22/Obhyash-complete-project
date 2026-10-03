@@ -153,7 +153,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
 
   const handleTogglePublishLeaderboard = async () => {
     if (!exam) return;
-    const nextState = exam.is_leaderboard_published === false ? true : false;
+    const nextState = exam.is_leaderboard_published === true ? false : true;
     try {
       setIsUpdatingPublish(true);
       await updateLiveExam(exam.id, { is_leaderboard_published: nextState });
@@ -169,6 +169,53 @@ export default function LiveExamResults({ examId }: { examId: string }) {
       }
     } catch (err) {
       toast.error('মেধা তালিকা স্ট্যাটাস পরিবর্তন করা যায়নি');
+    } finally {
+      setIsUpdatingPublish(false);
+    }
+  };
+
+  const handleTogglePublishAnswers = async () => {
+    if (!exam) return;
+    const nextState = exam.is_answer_published === true ? false : true;
+    try {
+      setIsUpdatingPublish(true);
+      await updateLiveExam(exam.id, { is_answer_published: nextState });
+      setExam((prev) =>
+        prev ? { ...prev, is_answer_published: nextState } : null,
+      );
+      if (nextState) {
+        toast.success(
+          '📖 প্রশ্ন সমাধান ও ব্যাখ্যা সরাসরি উন্মুক্ত করা হয়েছে!',
+        );
+      } else {
+        toast.info('🔒 সমাধান শুধুমাত্র পরীক্ষা শেষে দৃশ্যমান হবে।');
+      }
+    } catch (err) {
+      toast.error('সমাধান স্ট্যাটাস আপডেট করা যায়নি');
+    } finally {
+      setIsUpdatingPublish(false);
+    }
+  };
+
+  const handleExtendExam = async (minutes: number) => {
+    if (!exam) return;
+    try {
+      setIsUpdatingPublish(true);
+      const currentEnd = new Date(exam.end_time).getTime();
+      const newEnd = new Date(currentEnd + minutes * 60000).toISOString();
+      const newDuration = (exam.duration_minutes || 0) + minutes;
+      await updateLiveExam(exam.id, {
+        end_time: newEnd,
+        duration_minutes: newDuration,
+      });
+      setExam((prev) =>
+        prev
+          ? { ...prev, end_time: newEnd, duration_minutes: newDuration }
+          : null,
+      );
+      toast.success(`⏱️ পরীক্ষার সময় +${minutes} মিনিট বাড়ানো হয়েছে!`);
+    } catch {
+      toast.error('সময় বৃদ্ধি করা যায়নি');
     } finally {
       setIsUpdatingPublish(false);
     }
@@ -450,6 +497,141 @@ export default function LiveExamResults({ examId }: { examId: string }) {
             <Download size={15} />
             <span>CSV রিপোর্ট ডাউনলোড</span>
           </button>
+        </div>
+      </div>
+
+      {/* ── Admin Publication & Live Control Center ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 p-4 rounded-2xl bg-neutral-50/80 dark:bg-zinc-900/60 border border-neutral-200 dark:border-zinc-800">
+        {/* Control 1: Leaderboard Publication */}
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-850 border border-neutral-200 dark:border-zinc-750 flex flex-col justify-between gap-3 shadow-2xs">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-neutral-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <Trophy size={14} className="text-amber-500" /> মেধা তালিকা (Leaderboard)
+              </span>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  exam.is_leaderboard_published === true
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                    : exam.is_leaderboard_published === false
+                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                }`}
+              >
+                {exam.is_leaderboard_published === true
+                  ? 'সরাসরি উন্মুক্ত'
+                  : exam.is_leaderboard_published === false
+                  ? 'লুকানো (Hidden)'
+                  : '১৫ মি. পর অটো-প্রকাশ'}
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-1 leading-snug">
+              নিয়ম: পরীক্ষা সমাপ্তির ১৫ মিনিট পর মেধা তালিকা স্বয়ংক্রিয়ভাবে শিক্ষার্থীদের জন্য উন্মুক্ত হয়।
+            </p>
+          </div>
+
+          <button
+            onClick={handleTogglePublishLeaderboard}
+            disabled={isUpdatingPublish}
+            className={`w-full py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              exam.is_leaderboard_published === true
+                ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 border border-rose-200 dark:border-rose-900/50'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+            }`}
+          >
+            {exam.is_leaderboard_published === true ? (
+              <>
+                <Lock size={12} />
+                <span>মেধা তালিকা লুকিয়ে রাখুন</span>
+              </>
+            ) : (
+              <>
+                <Globe size={12} />
+                <span>এখনই সরাসরি প্রকাশ করুন</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Control 2: Answers & Solutions Publication */}
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-850 border border-neutral-200 dark:border-zinc-750 flex flex-col justify-between gap-3 shadow-2xs">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-neutral-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-500" /> উত্তর ও সমাধান (Solutions)
+              </span>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  exam.is_answer_published === true
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                    : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                }`}
+              >
+                {exam.is_answer_published === true
+                  ? 'সরাসরি উন্মুক্ত'
+                  : 'পরীক্ষা শেষেই সরাসরি'}
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-1 leading-snug">
+              নিয়ম: পরীক্ষা সমাপ্তির সাথে সাথে ফলাফল ও সমাধান শিক্ষার্থীরা সরাসরি দেখতে পায়।
+            </p>
+          </div>
+
+          <button
+            onClick={handleTogglePublishAnswers}
+            disabled={isUpdatingPublish}
+            className={`w-full py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              exam.is_answer_published === true
+                ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 border border-rose-200 dark:border-rose-900/50'
+                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+            }`}
+          >
+            {exam.is_answer_published === true ? (
+              <>
+                <Lock size={12} />
+                <span>অগ্রিম সমাধান বন্ধ করুন</span>
+              </>
+            ) : (
+              <>
+                <Eye size={12} />
+                <span>এখনই সমাধান অগ্রিম উন্মুক্ত করুন</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Control 3: Live Exam Time Extension & Practice Status */}
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-850 border border-neutral-200 dark:border-zinc-750 flex flex-col justify-between gap-3 shadow-2xs">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-neutral-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <Clock size={14} className="text-purple-500" /> সময় বৃদ্ধি ও অনুশীলন (Practice)
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                {isLiveNow ? 'লাইভ চলছে' : 'পরীক্ষা সম্পন্ন'}
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-1 leading-snug">
+              পরীক্ষা শেষ হওয়ার সাথে সাথে অনুশীলন মোড সক্রিয় হয় এবং যেকেউ পরীক্ষা দিতে পারে।
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleExtendExam(5)}
+              disabled={isUpdatingPublish}
+              className="flex-1 py-2 px-2 rounded-lg text-xs font-bold bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 transition cursor-pointer text-center"
+            >
+              +৫ মি. বৃদ্ধি
+            </button>
+            <button
+              onClick={() => handleExtendExam(15)}
+              disabled={isUpdatingPublish}
+              className="flex-1 py-2 px-2 rounded-lg text-xs font-bold bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 transition cursor-pointer text-center"
+            >
+              +১৫ মি. বৃদ্ধি
+            </button>
+          </div>
         </div>
       </div>
 
