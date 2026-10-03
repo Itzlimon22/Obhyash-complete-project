@@ -7,6 +7,7 @@ import {
   Zap,
   CheckCircle2,
   FileText,
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getPublishedLiveExams } from "@/services/live-exam-student-service";
@@ -202,7 +203,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
       title={displayCategoryTitle}
       onBack={onBack}
     >
-      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 pt-7 sm:pt-9 pb-28 font-['HindSiliguri']">
+      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 pt-4 sm:pt-5 pb-28 font-['HindSiliguri']">
         {/* Filters & Routine Action Bar matching Flutter live_exam_category_view */}
         <div className="flex items-center justify-between gap-3 mb-4">
           {/* Filter Chips Capsule (All, Ongoing, Upcoming) */}
@@ -385,9 +386,12 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
                       <span>{statusText}</span>
                     </div>
 
-                    <span className="text-[14px] font-semibold text-[#0F172A] dark:text-white">
-                      {timeRemainingText}
-                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[13px] font-semibold text-[#0F172A] dark:text-white">
+                        {timeRemainingText}
+                      </span>
+                      <ChevronRight size={14} className={statusColorClass} />
+                    </div>
                   </div>
                 </div>
               );
