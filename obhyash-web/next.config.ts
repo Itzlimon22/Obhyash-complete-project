@@ -85,6 +85,27 @@ const nextConfig: NextConfig = {
         destination: '/forgot-password?type=recovery',
         permanent: false,
       },
+      // Blog Consolidation & Cannibalization 301 Redirects
+      {
+        source: '/blog/hsc-3-month-study-routine',
+        destination: '/blog/hsc-2026-last-3-month-revision-routine',
+        permanent: true,
+      },
+      {
+        source: '/blog/medical-admission-2026-27',
+        destination: '/blog/medical-admission-circular-2026-guide',
+        permanent: true,
+      },
+      {
+        source: '/blog/buet-admission-preparation-guideline',
+        destination: '/blog/buet-admission-2026-27',
+        permanent: true,
+      },
+      {
+        source: '/blog/gst-cluster-admission-circular-2026',
+        destination: '/blog/gst-admission-2026-27',
+        permanent: true,
+      },
     ];
   },
 
@@ -234,30 +255,6 @@ const nextConfig: NextConfig = {
       {
         source: '/api/(.*)',
         headers: [{ key: 'Cache-Control', value: 'no-store' }],
-      },
-    ];
-  },
-  async redirects() {
-    return [
-      {
-        source: '/blog/hsc-3-month-study-routine',
-        destination: '/blog/hsc-2026-last-3-month-revision-routine',
-        permanent: true,
-      },
-      {
-        source: '/blog/medical-admission-2026-27',
-        destination: '/blog/medical-admission-circular-2026-guide',
-        permanent: true,
-      },
-      {
-        source: '/blog/buet-admission-preparation-guideline',
-        destination: '/blog/buet-admission-2026-27',
-        permanent: true,
-      },
-      {
-        source: '/blog/gst-cluster-admission-circular-2026',
-        destination: '/blog/gst-admission-2026-27',
-        permanent: true,
       },
     ];
   },
