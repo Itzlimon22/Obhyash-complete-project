@@ -24,6 +24,7 @@ export interface LiveExamCategoryViewProps {
 }
 
 const CATEGORY_NAMES: Record<string, string> = {
+  all: "সকল লাইভ পরীক্ষা",
   engineering: "ইঞ্জিনিয়ারিং",
   medical: "মেডিকেল",
   varsity: "ভার্সিটি ক-ইউনিট",
@@ -42,6 +43,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   onBack,
 }) => {
   const { user } = useAuth();
+  const [activeCategory, setActiveCategory] = useState<string>(category);
   const [activeFilter, setActiveFilter] = useState<"All" | "Ongoing" | "Upcoming">("All");
   const [selectedExam, setSelectedExam] = useState<{
     id: string;
@@ -59,12 +61,12 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  const displayCategoryTitle = CATEGORY_NAMES[category.toLowerCase()] || category;
+  const displayCategoryTitle = CATEGORY_NAMES[activeCategory.toLowerCase()] || activeCategory;
 
-  const fetchExams = async () => {
+  const fetchExams = async (catToFetch = activeCategory) => {
     try {
       setIsLoading(true);
-      const data = await getPublishedLiveExams(category, user?.id);
+      const data = await getPublishedLiveExams(catToFetch, user?.id);
       setExams(data);
     } catch (error) {
       console.warn("[LiveExamCategoryView] Fetch error:", error);
@@ -74,8 +76,8 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   };
 
   useEffect(() => {
-    fetchExams();
-  }, [category, user?.id]);
+    fetchExams(activeCategory);
+  }, [activeCategory, user?.id]);
 
   const filteredExams = exams
     .filter((exam) => {
@@ -247,8 +249,56 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
             ))}
           </div>
         ) : filteredExams.length === 0 ? (
-          <div className="py-16 text-center text-sm font-semibold text-neutral-500 dark:text-neutral-400">
-            এই ক্যাটাগরিতে বর্তমানে কোনো লাইভ পরীক্ষা নেই।
+          <div className="py-12 px-4 text-center rounded-2xl bg-white dark:bg-[#13151F] border border-[#E2E8F0] dark:border-[#232738] shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 mx-auto flex items-center justify-center mb-3">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+              {activeFilter !== "All"
+                ? `এই মুহূর্তে কোনো ${activeFilter === "Ongoing" ? "চলমান" : "আসন্ন"} পরীক্ষা নেই`
+                : "এই ক্যাটাগরিতে বর্তমানে কোনো লাইভ পরীক্ষা নির্ধারিত নেই"}
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mb-5 leading-relaxed">
+              {activeFilter !== "All"
+                ? "সকল পরীক্ষা দেখতে 'সবগুলো' ফিল্টারে যান অথবা অন্য ক্যাটাগরির পরীক্ষাগুলো এক্সপ্লোর করুন।"
+                : "আমাদের চলমান ও আসন্ন মেগা লাইভ পরীক্ষাগুলোতে অংশ নিয়ে আপনার মেধা যাচাই করুন।"}
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              {activeFilter !== "All" && (
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter("All")}
+                  className="px-4 py-2 rounded-xl bg-[#004633] text-white text-xs font-bold hover:bg-[#003628] transition-all cursor-pointer shadow-xs"
+                >
+                  সবগুলো পরীক্ষা দেখুন
+                </button>
+              )}
+              {activeCategory !== "medical" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory("medical");
+                    setActiveFilter("All");
+                  }}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
+                >
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <span>মেডিকেল লাইভ পরীক্ষা (চলমান)</span>
+                </button>
+              )}
+              {activeCategory !== "all" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory("all");
+                    setActiveFilter("All");
+                  }}
+                  className="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-semibold transition-all cursor-pointer border border-neutral-300 dark:border-neutral-700"
+                >
+                  সকল লাইভ পরীক্ষা (৯২টি পরীক্ষা)
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-3.5">
