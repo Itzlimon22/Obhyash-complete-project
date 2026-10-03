@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Clock,
-  Download,
+  LayoutGrid,
   Moon,
   Sun,
   AlertTriangle,
@@ -26,7 +26,6 @@ import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 import ExamGridModal from '@/components/student/ui/exam/ExamGridModal';
 import ReportModal from '@/components/student/ui/common/ReportModal';
-import { downloadQuestionPaper } from '@/services/download-service';
 import { cn } from '@/lib/utils';
 
 interface ExamRunnerProps {
@@ -198,15 +197,8 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
     onSubmit(true);
   };
 
-  const handleDownloadPdf = () => {
-    if (examDetails) {
-      toast.info('প্রশ্নপত্র PDF তৈরি হচ্ছে...');
-      downloadQuestionPaper(examDetails, questions);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col select-none max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-hind flex flex-col select-none max-w-full overflow-x-hidden">
       {/* ── 1. Top Sticky Exam Header (Matching Flutter 1:1) ── */}
       <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs select-none">
         <div className="max-w-3xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
@@ -247,16 +239,16 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             <span>{formatTime(timeLeft)}</span>
           </div>
 
-          {/* Right: Download PDF & Theme Toggle Buttons */}
+          {/* Right: Question Palette Grid & Theme Toggle Buttons (Matching Flutter LiveExamSessionView 1:1 - No Download Button) */}
           <div className="flex items-center gap-1.5">
-            {/* Offline PDF Download Button */}
+            {/* Question Palette Grid Button */}
             <button
               type="button"
-              onClick={handleDownloadPdf}
-              title="অফলাইন প্রশ্নপত্র PDF ডাউনলোড করো"
+              onClick={() => setShowGridModal(true)}
+              title="সকল প্রশ্নের তালিকা"
               className="w-8 h-8 rounded-[6px] bg-[#F1F5F9] dark:bg-[#1C1C1E] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:opacity-90 active:scale-95 transition cursor-pointer"
             >
-              <Download size={16} />
+              <LayoutGrid size={16} />
             </button>
 
             {/* Theme Toggle Button */}
@@ -336,7 +328,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                         ? () => onToggleBookmark(question.id)
                         : undefined
                     }
-                    onReport={() => setReportingQuestionId(question.id)}
+                    showReport={false}
                   />
                 </div>
               </React.Fragment>

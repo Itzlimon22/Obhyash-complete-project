@@ -230,8 +230,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               </button>
             )}
 
-            {/* Report Button (Matching Flutter QuestionCard _IconBtn) */}
-            {onReport && (showFeedback || showReport) && (
+            {/* Report Button (Matching Flutter QuestionCard _IconBtn: only when showReport is true) */}
+            {onReport && showReport && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -241,7 +241,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 title="রিপোর্ট করো"
                 className="p-1.5 rounded-[6px] text-[#9CA3AF] dark:text-[#525252] hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer flex items-center justify-center"
               >
-                {onToggleFlag && !showFeedback ? <AlertTriangle size={18} /> : <Flag size={18} />}
+                <Flag size={18} />
               </button>
             )}
           </div>
