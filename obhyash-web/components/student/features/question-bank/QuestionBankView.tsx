@@ -48,7 +48,7 @@ interface QuestionBankViewProps {
 }
 
 // ── HSC Subject List (15 items) ──
-const HSC_SUBJECTS: SubjectCardItem[] = [
+export const HSC_SUBJECTS: SubjectCardItem[] = [
   {
     id: "physics_1",
     name: "পদার্থবিজ্ঞান",
@@ -187,7 +187,7 @@ const HSC_SUBJECTS: SubjectCardItem[] = [
 ];
 
 // ── SSC Subject List ──
-const SSC_SUBJECTS: SubjectCardItem[] = [
+export const SSC_SUBJECTS: SubjectCardItem[] = [
   // Science Core
   {
     id: "ssc_physics",
@@ -376,7 +376,7 @@ const SSC_SUBJECTS: SubjectCardItem[] = [
 ];
 
 // ── Admission Institutes (17 items) ──
-const ADMISSION_INSTITUTES: InstituteCardItem[] = [
+export const ADMISSION_INSTITUTES: InstituteCardItem[] = [
   {
     id: "buet",
     name: "বুয়েট",
@@ -550,7 +550,7 @@ const ADMISSION_INSTITUTES: InstituteCardItem[] = [
 ];
 
 // ── SSC Education Boards & Top Schools (14 items) ──
-const SSC_INSTITUTES: InstituteCardItem[] = [
+export const SSC_INSTITUTES: InstituteCardItem[] = [
   {
     id: "board_dhaka",
     name: "ঢাকা বোর্ড",
@@ -707,6 +707,22 @@ const SSC_INSTITUTES: InstituteCardItem[] = [
     bubbleColor: "bg-white/20",
   },
 ];
+
+export function findQuestionBankSubject(id: string): SubjectCardItem | null {
+  return (
+    HSC_SUBJECTS.find((s) => s.id === id) ||
+    SSC_SUBJECTS.find((s) => s.id === id) ||
+    null
+  );
+}
+
+export function findQuestionBankInstitute(id: string): InstituteCardItem | null {
+  return (
+    ADMISSION_INSTITUTES.find((i) => i.id === id) ||
+    SSC_INSTITUTES.find((i) => i.id === id) ||
+    null
+  );
+}
 
 export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
   user,

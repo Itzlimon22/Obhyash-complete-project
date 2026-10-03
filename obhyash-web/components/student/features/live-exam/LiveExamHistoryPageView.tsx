@@ -344,7 +344,7 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
                               if (onViewSolution) {
                                 onViewSolution(r.liveExamId);
                               } else {
-                                window.location.href = `/live-exam/${r.category}?examId=${r.liveExamId}&solution=true`;
+                                window.location.href = `/live_exam?category=${encodeURIComponent(r.category || 'all')}&examId=${encodeURIComponent(r.liveExamId)}&solution=true`;
                               }
                             }}
                             className="px-2.5 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-black dark:text-white border border-neutral-300 dark:border-neutral-700 rounded-md transition-all cursor-pointer"

@@ -387,6 +387,82 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const [isViewingSolutions, setIsViewingSolutions] = useState(false);
   const [isViewingLeaderboard, setIsViewingLeaderboard] = useState(false);
 
+  // Sync subview from URL on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("solution") === "true" || params.get("subview") === "solutions") {
+      setIsViewingSolutions(true);
+    } else if (params.get("subview") === "leaderboard") {
+      setIsViewingLeaderboard(true);
+    }
+  }, []);
+
+  const handleOpenLeaderboard = () => {
+    setIsViewingLeaderboard(true);
+    setIsViewingSolutions(false);
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      const url = new URL(window.location.href);
+      url.searchParams.set("subview", "leaderboard");
+      window.history.pushState(
+        { tab: "live_exam", liveView: "details", liveSubView: "leaderboard", examId, idx: nextIdx },
+        "",
+        url.toString()
+      );
+    }
+  };
+
+  const handleOpenSolutions = () => {
+    setIsViewingSolutions(true);
+    setIsViewingLeaderboard(false);
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      const url = new URL(window.location.href);
+      url.searchParams.set("subview", "solutions");
+      window.history.pushState(
+        { tab: "live_exam", liveView: "details", liveSubView: "solutions", examId, idx: nextIdx },
+        "",
+        url.toString()
+      );
+    }
+  };
+
+  const handleLeaderboardBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveSubView === "leaderboard") {
+      window.history.back();
+    } else {
+      setIsViewingLeaderboard(false);
+    }
+  };
+
+  const handleSolutionsBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveSubView === "solutions") {
+      window.history.back();
+    } else {
+      setIsViewingSolutions(false);
+    }
+  };
+
+  // Popstate listener for sub-views
+  useEffect(() => {
+    const handlePop = (e: PopStateEvent) => {
+      const sub = e.state?.liveSubView;
+      if (!sub) {
+        setIsViewingLeaderboard(false);
+        setIsViewingSolutions(false);
+      } else if (sub === "leaderboard") {
+        setIsViewingLeaderboard(true);
+        setIsViewingSolutions(false);
+      } else if (sub === "solutions") {
+        setIsViewingSolutions(true);
+        setIsViewingLeaderboard(false);
+      }
+    };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
+
   useEffect(() => {
     if (user?.id) {
       fetchDetails();
@@ -478,14 +554,13 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         {...commonLayoutProps}
         title={`${exam.title} - মেধা তালিকা`}
         centerTitle={true}
-        onBack={() => setIsViewingLeaderboard(false)}
+        onBack={handleLeaderboardBack}
       >
         <LiveExamLeaderboardView
           exam={exam}
-          onBack={() => setIsViewingLeaderboard(false)}
+          onBack={handleLeaderboardBack}
           onViewSolutions={() => {
-            setIsViewingLeaderboard(false);
-            setIsViewingSolutions(true);
+            handleOpenSolutions();
           }}
         />
       </AppLayout>
@@ -495,7 +570,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   // Solution View Screen
   if (isViewingSolutions) {
     if (!isResultPublished) {
-      setIsViewingSolutions(false);
+      handleSolutionsBack();
       toast.info("ফলাফল ও সমাধান এখনও প্রকাশ করা হয়নি।");
       return null;
     }
@@ -506,7 +581,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         categoryTitle={exam.category}
         negativeMarking={exam.negative_marking || 0.25}
         commonLayoutProps={commonLayoutProps}
-        onBack={() => setIsViewingSolutions(false)}
+        onBack={handleSolutionsBack}
       />
     );
   }
@@ -680,7 +755,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                 {isResultPublished && (
                   <button
                     type="button"
-                    onClick={() => setIsViewingSolutions(true)}
+                    onClick={handleOpenSolutions}
                     className="w-full h-[52px] rounded-2xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-[15.5px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
                   >
                     <BookOpen size={18} />
@@ -936,7 +1011,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
             {/* View Full Leaderboard Outlined Button */}
             <button
               type="button"
-              onClick={() => setIsViewingLeaderboard(true)}
+              onClick={handleOpenLeaderboard}
               className="w-full mt-3 h-[48px] rounded-[14px] bg-white dark:bg-[#141417] border border-[#CBD5E1] dark:border-[#27272A] text-[#0F172A] dark:text-[#E2E8F0] hover:bg-[#F8FAFC] dark:hover:bg-[#1C1C20] font-bold text-[14px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-99"
             >
               <Trophy size={18} />

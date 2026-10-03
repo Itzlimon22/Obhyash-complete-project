@@ -79,7 +79,12 @@ import ReferralView from "@/components/student/features/referral/ReferralView";
 // Exam Features
 import { ExamSetupContainer } from "@/components/student/features/exam/setup/ExamSetupContainer";
 import LiveExamView from "@/components/student/features/live-exam/LiveExamView";
-import QuestionBankView, { SubjectCardItem, InstituteCardItem } from "@/components/student/features/question-bank/QuestionBankView";
+import QuestionBankView, {
+  SubjectCardItem,
+  InstituteCardItem,
+  findQuestionBankSubject,
+  findQuestionBankInstitute,
+} from "@/components/student/features/question-bank/QuestionBankView";
 import SubjectCategoryDetailView from "@/components/student/features/question-bank/SubjectCategoryDetailView";
 import AcademicCategoryDetailView from "@/components/student/features/question-bank/AcademicCategoryDetailView";
 import AcademicSectionDetailView from "@/components/student/features/question-bank/AcademicSectionDetailView";
@@ -233,17 +238,22 @@ export default function StudentRoot({
     "dashboard",
     "setup",
     "live_exam",
+    "live-exam",
     "question_bank",
     "question-bank",
     "history",
+    "history_result",
     "practice",
     "leaderboard",
+    "user_profile",
     "analysis",
+    "subject_report",
     "complaint",
     "feature-requests",
     "notifications",
     "about",
     "subscription",
+    "my-subscription",
     "profile",
     "settings",
     "exam",
@@ -257,26 +267,39 @@ export default function StudentRoot({
     "account-info",
     "account-linking",
     "delete-account",
+    "personal",
+    "edit-profile",
     "privacy",
     "terms",
     "faq",
     "help",
+    "reports",
   ];
 
+  const resolvePathToTab = useCallback((rawPath: string): string => {
+    const path = rawPath.replace(/^\//, "").split("?")[0].split("#")[0];
+    if (!path || path === "dashboard") return "dashboard";
+    if (path.startsWith("leaderboard/user/") || path.startsWith("leaderboard/user-profile/")) return "user_profile";
+    if (path.startsWith("history/") && path !== "history") return "history_result";
+    if (path.startsWith("exam/")) return "exam";
+    if (path === "live-exam" || path === "live_exam") return "live_exam";
+    if (path === "question-bank" || path === "question_bank") return "question_bank";
+    if (path === "legends-league" || path === "legends_league") return "legends-league";
+    if (path === "account-info" || path === "info") return "account-info";
+    if (path === "personal" || path === "edit-profile") return "personal";
+    if (path === "my-subscription") return "my-subscription";
+    if (validTabs.includes(path)) return path;
+    return "dashboard";
+  }, []);
+
   const [activeTab, setActiveTab] = useState(() => {
-    if (initialTab && initialTab !== "dashboard") return initialTab;
+    if (initialTab && initialTab !== "dashboard") return resolvePathToTab(initialTab);
     if (typeof window !== "undefined") {
       const pathname = window.location.pathname;
-      // Strip leading slash
-      const path = pathname.replace(/^\//, "");
-
-      // Deep paths: /leaderboard/user/[id] or /leaderboard/user-profile/[id] or /history/[examId]
-      if (path.startsWith("leaderboard/user/") || path.startsWith("leaderboard/user-profile/")) return "user_profile";
-      if (path.startsWith("history/") && path !== "history") return "history_result";
-      if (path.startsWith("exam/")) return "exam";
-
-      // Top-level tab paths
-      if (validTabs.includes(path)) return path;
+      const resolved = resolvePathToTab(pathname);
+      if (resolved !== "dashboard" || pathname === "/" || pathname === "/dashboard") {
+        return resolved;
+      }
       return sessionStorage.getItem("obhyash_active_tab") || "dashboard";
     }
     return initialTab || "dashboard";
@@ -745,13 +768,71 @@ export default function StudentRoot({
   // Session navigation history stack to distinguish in-app clicks from direct landing
   const navHistoryRef = useRef<string[]>([initialTab || "dashboard"]);
 
+  const canGoBackInSession = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    const idx = window.history.state?.idx;
+    if (typeof idx === "number" && idx > 0) return true;
+    return navHistoryRef.current.length > 1;
+  }, []);
+
+  const restoreExamHistoryResult = useCallback((examId: string) => {
+    const res = examHistory.find((e) => e.id === examId);
+    if (res) {
+      setQuestions(res.questions || []);
+      setUserAnswers(res.userAnswers || {});
+      setFlaggedQuestions(new Set(res.flaggedQuestions || []));
+      setExamDetails({
+        subject: res.subject,
+        subjectLabel: res.subjectLabel || res.subject,
+        examType: res.examType || "",
+        chapters: res.chapters || "",
+        topics: "",
+        totalQuestions: res.totalQuestions,
+        durationMinutes: 0,
+        totalMarks: res.totalMarks,
+        negativeMarking: res.negativeMarking,
+      });
+      setTimeTaken(res.timeTaken);
+      setIsReviewingHistory(true);
+      setAppState(AppState.COMPLETED);
+    } else {
+      import("@/services/exam-service").then(async ({ getExamResultById }) => {
+        try {
+          const fetched = await getExamResultById(examId, activeUserId);
+          if (fetched) {
+            setQuestions(fetched.questions || []);
+            setUserAnswers(fetched.userAnswers || {});
+            setFlaggedQuestions(new Set(fetched.flaggedQuestions || []));
+            setExamDetails({
+              subject: fetched.subject,
+              subjectLabel: fetched.subjectLabel || fetched.subject,
+              examType: fetched.examType || "",
+              chapters: fetched.chapters || "",
+              topics: "",
+              totalQuestions: fetched.totalQuestions,
+              durationMinutes: 0,
+              totalMarks: fetched.totalMarks,
+              negativeMarking: fetched.negativeMarking,
+            });
+            setTimeTaken(fetched.timeTaken);
+            setIsReviewingHistory(true);
+            setAppState(AppState.COMPLETED);
+          }
+        } catch (err) {
+          console.error("Failed to load deep exam history:", err);
+        }
+      });
+    }
+  }, [examHistory, activeUserId]);
+
   const handleSelectQuestionBankSubject = useCallback((subj: SubjectCardItem | null) => {
     setSelectedQuestionBankSubject(subj);
     setSelectedQuestionBankCategory(null);
     setSelectedQuestionBankSection(null);
     if (subj && typeof window !== "undefined") {
+      const currentIdx = (window.history.state?.idx as number) ?? 0;
       window.history.pushState(
-        { tab: "question_bank", qbView: "subject", subjectId: subj.id },
+        { tab: "question_bank", qbView: "subject", subjectId: subj.id, idx: currentIdx + 1 },
         "",
         `/question-bank?subject=${encodeURIComponent(subj.id)}`
       );
@@ -761,8 +842,9 @@ export default function StudentRoot({
   const handleSelectQuestionBankCategory = useCallback((catId: string | null) => {
     setSelectedQuestionBankCategory(catId);
     if (catId && selectedQuestionBankSubject && typeof window !== "undefined") {
+      const currentIdx = (window.history.state?.idx as number) ?? 0;
       window.history.pushState(
-        { tab: "question_bank", qbView: "category", subjectId: selectedQuestionBankSubject.id, category: catId },
+        { tab: "question_bank", qbView: "category", subjectId: selectedQuestionBankSubject.id, category: catId, idx: currentIdx + 1 },
         "",
         `/question-bank?subject=${encodeURIComponent(selectedQuestionBankSubject.id)}&category=${encodeURIComponent(catId)}`
       );
@@ -772,235 +854,14 @@ export default function StudentRoot({
   const handleSelectQuestionBankInstitute = useCallback((inst: InstituteCardItem | null) => {
     setSelectedQuestionBankInstitute(inst);
     if (inst && typeof window !== "undefined") {
+      const currentIdx = (window.history.state?.idx as number) ?? 0;
       window.history.pushState(
-        { tab: "question_bank", qbView: "institute", instituteId: inst.id },
+        { tab: "question_bank", qbView: "institute", instituteId: inst.id, idx: currentIdx + 1 },
         "",
         `/question-bank?institute=${encodeURIComponent(inst.id)}`
       );
     }
   }, []);
-
-  const smartBack = useCallback((fallbackTab?: string) => {
-    // 1. Guard: Don't allow accidental back during active exam
-    if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-      setNavWarning({ isOpen: true, targetTab: null, action: "tab" });
-      return;
-    }
-
-    // 2. If on instructions view, cancel instructions cleanly
-    if (appState === AppState.INSTRUCTIONS) {
-      setAppState(AppState.IDLE);
-      setPendingConfig(null);
-      if (typeof window !== "undefined" && window.location.pathname.startsWith("/exam/")) {
-        if (navHistoryRef.current.length > 1) {
-          navHistoryRef.current.pop();
-          window.history.back();
-        } else {
-          setActiveTab("setup");
-          sessionStorage.setItem("obhyash_active_tab", "setup");
-          window.history.replaceState({ tab: "setup" }, "", "/setup");
-        }
-      }
-      return;
-    }
-
-    // 3. If reviewing history or on completed result view
-    if (appState === AppState.COMPLETED) {
-      setAppState(AppState.IDLE);
-      const isHistory = isReviewingHistory;
-      setIsReviewingHistory(false);
-      const target = isHistory ? "history" : "dashboard";
-      if (typeof window !== "undefined" && window.location.pathname.startsWith("/history/")) {
-        if (navHistoryRef.current.length > 1) {
-          navHistoryRef.current.pop();
-          window.history.back();
-        } else {
-          setActiveTab("history");
-          sessionStorage.setItem("obhyash_active_tab", "history");
-          window.history.replaceState({ tab: "history" }, "", "/history");
-        }
-      } else {
-        if (navHistoryRef.current.length > 1) {
-          navHistoryRef.current.pop();
-          window.history.back();
-        } else {
-          setActiveTab(target);
-          sessionStorage.setItem("obhyash_active_tab", target);
-          window.history.replaceState({ tab: target }, "", "/" + target);
-        }
-      }
-      return;
-    }
-
-    // 4. Question Bank deep navigation:
-    if (activeTab === "question_bank" || activeTab === "question-bank") {
-      if (selectedQuestionBankSection) {
-        setSelectedQuestionBankSection(null);
-        if (typeof window !== "undefined" && window.history.state?.qbSubView === "section") {
-          window.history.back();
-        }
-        return;
-      }
-      if (selectedQuestionBankInstitute) {
-        setSelectedQuestionBankInstitute(null);
-        if (typeof window !== "undefined" && window.history.state?.qbView) {
-          window.history.back();
-        }
-        return;
-      }
-      if (selectedQuestionBankCategory) {
-        setSelectedQuestionBankCategory(null);
-        if (typeof window !== "undefined" && window.history.state?.qbView === "category") {
-          window.history.back();
-        }
-        return;
-      }
-      if (selectedQuestionBankSubject) {
-        setSelectedQuestionBankSubject(null);
-        if (typeof window !== "undefined" && window.history.state?.qbView) {
-          window.history.back();
-        }
-        return;
-      }
-    }
-
-    // 5. Subject report deep view
-    if (activeTab === "subject_report") {
-      setSelectedSubjectReport(null);
-      if (navHistoryRef.current.length > 1) {
-        navHistoryRef.current.pop();
-        window.history.back();
-      } else {
-        setActiveTab("dashboard");
-        sessionStorage.setItem("obhyash_active_tab", "dashboard");
-        window.history.replaceState({ tab: "dashboard" }, "", "/dashboard");
-      }
-      return;
-    }
-
-    // 6. User profile deep view
-    if (activeTab === "user_profile") {
-      setSelectedUserProfile(null);
-      if (navHistoryRef.current.length > 1) {
-        navHistoryRef.current.pop();
-        window.history.back();
-      } else {
-        setActiveTab("leaderboard");
-        sessionStorage.setItem("obhyash_active_tab", "leaderboard");
-        window.history.replaceState({ tab: "leaderboard" }, "", "/leaderboard");
-      }
-      return;
-    }
-
-    // 7. General in-app back vs direct landing
-    if (navHistoryRef.current.length > 1) {
-      navHistoryRef.current.pop();
-      window.history.back();
-    } else {
-      // Direct landing: fall back to logical parent
-      const target = fallbackTab || getParentRoute(activeTab);
-      setActiveTab(target);
-      sessionStorage.setItem("obhyash_active_tab", target);
-      if (typeof window !== "undefined") {
-        const canonicalUrl = getStudentRouteUrl(target);
-        window.history.replaceState({ tab: target }, "", canonicalUrl);
-        window.scrollTo({ top: 0, behavior: "instant" });
-      }
-    }
-  }, [
-    appState,
-    isReviewingHistory,
-    activeTab,
-    selectedQuestionBankInstitute,
-    selectedQuestionBankCategory,
-    selectedQuestionBankSubject,
-  ]);
-
-  // Browser back/forward button support
-  useEffect(() => {
-    const onPopState = (e: PopStateEvent) => {
-      // Guard: don't navigate away mid-exam
-      if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-        // Restore the canonical URL without triggering a navigation
-        const canonicalUrl = getStudentRouteUrl(activeTab);
-        window.history.pushState({ tab: activeTab }, '', canonicalUrl);
-        setNavWarning({ isOpen: true, targetTab: null, action: 'tab' });
-        return;
-      }
-      
-      // If we're on the results page (completed state) and the user navigates back, exit the results view
-      if (appState === AppState.COMPLETED) {
-        setAppState(AppState.IDLE);
-        setIsReviewingHistory(false);
-      }
-
-      // If user was viewing instructions and pressed browser back
-      if (appState === AppState.INSTRUCTIONS) {
-        setAppState(AppState.IDLE);
-        setPendingConfig(null);
-      }
-
-      // Handle Question Bank deep sub-views state on browser back/forward
-      if (activeTab === "question_bank" || activeTab === "question-bank") {
-        if (!e.state?.qbView) {
-          setSelectedQuestionBankInstitute(null);
-          setSelectedQuestionBankCategory(null);
-          setSelectedQuestionBankSubject(null);
-        } else if (e.state.qbView === "subject") {
-          setSelectedQuestionBankCategory(null);
-          setSelectedQuestionBankInstitute(null);
-        } else if (e.state.qbView === "institute") {
-          setSelectedQuestionBankCategory(null);
-          setSelectedQuestionBankSubject(null);
-        }
-      }
-
-      // Handle Leaderboard User Profile on browser back
-      if (e.state?.tab !== "user_profile" && activeTab === "user_profile") {
-        setSelectedUserProfile(null);
-      }
-
-      // Handle Subject Report on browser back
-      if (e.state?.tab !== "subject_report" && activeTab === "subject_report") {
-        setSelectedSubjectReport(null);
-      }
-
-      const tab = e.state?.tab || window.location.pathname.replace(/^\//, '') || 'dashboard';
-      const resolved = validTabs.includes(tab) ? tab : 'dashboard';
-      setActiveTab(resolved);
-      sessionStorage.setItem('obhyash_active_tab', resolved);
-
-      // Keep navHistory in sync
-      if (navHistoryRef.current.length > 1) {
-        navHistoryRef.current.pop();
-      }
-
-      // Reset scroll on pop
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      const mainContent = document.querySelector('main') || document.getElementById('main-scroll-container');
-      if (mainContent) {
-        mainContent.scrollTo({ top: 0, behavior: 'instant' });
-      }
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, [appState, activeTab]);
-
-  // On mount: sync current URL path to active tab state
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const currentPath = window.location.pathname.replace(/^\//, '');
-    if (validTabs.includes(currentPath)) {
-      setActiveTab(currentPath);
-      sessionStorage.setItem('obhyash_active_tab', currentPath);
-    } else if (currentPath.startsWith("leaderboard/user/")) {
-      setActiveTab("user_profile");
-    } else if (currentPath.startsWith("history/") && currentPath !== "history") {
-      setActiveTab("history_result");
-    } else if (currentPath.startsWith("exam/")) {
-      setActiveTab("exam");
-    }
-  }, []); // only on mount
 
   const handleTabChange = useCallback((tab: string, replace = false) => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
@@ -1015,7 +876,6 @@ export default function StudentRoot({
 
     if (tab === "question_bank" || tab === "question-bank") {
       if (activeTab === tab) {
-        // Re-tap resets detail view back to main question bank
         setSelectedQuestionBankSubject(null);
         setSelectedQuestionBankCategory(null);
         setSelectedQuestionBankSection(null);
@@ -1042,7 +902,7 @@ export default function StudentRoot({
       navHistoryRef.current.push(tab);
     }
 
-    // Reset page scroll position to top
+    // Reset page scroll position to top instantly
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "instant" });
       const mainContent = document.querySelector("main") || document.getElementById("main-scroll-container");
@@ -1051,13 +911,261 @@ export default function StudentRoot({
       }
 
       const canonicalUrl = getStudentRouteUrl(tab);
+      const currentIdx = (window.history.state?.idx as number) ?? 0;
       if (replace) {
-        window.history.replaceState({ tab }, "", canonicalUrl);
+        window.history.replaceState({ tab, idx: currentIdx }, "", canonicalUrl);
       } else {
-        window.history.pushState({ tab }, "", canonicalUrl);
+        window.history.pushState({ tab, idx: currentIdx + 1 }, "", canonicalUrl);
       }
     }
   }, [appState, activeTab]);
+
+  const smartBack = useCallback((fallbackTab?: string) => {
+    // 1. Guard: Don't allow accidental back during active exam
+    if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
+      setNavWarning({ isOpen: true, targetTab: null, action: "tab" });
+      return;
+    }
+
+    // 2. If on instructions view, cancel instructions cleanly
+    if (appState === AppState.INSTRUCTIONS) {
+      setAppState(AppState.IDLE);
+      setPendingConfig(null);
+      if (typeof window !== "undefined" && window.location.pathname.startsWith("/exam/")) {
+        if (canGoBackInSession()) {
+          window.history.back();
+        } else {
+          handleTabChange("setup", true);
+        }
+      }
+      return;
+    }
+
+    // 3. If reviewing history or on completed result view
+    if (appState === AppState.COMPLETED) {
+      setAppState(AppState.IDLE);
+      const isHistory = isReviewingHistory;
+      setIsReviewingHistory(false);
+      const target = isHistory ? "history" : "dashboard";
+      if (canGoBackInSession()) {
+        window.history.back();
+      } else {
+        handleTabChange(target, true);
+      }
+      return;
+    }
+
+    // 4. Question Bank deep navigation:
+    if (activeTab === "question_bank" || activeTab === "question-bank") {
+      if (selectedQuestionBankSection) {
+        setSelectedQuestionBankSection(null);
+        if (typeof window !== "undefined" && (window.history.state?.qbView === "section" || window.history.state?.qbSubView === "section")) {
+          window.history.back();
+          return;
+        }
+      }
+      if (selectedQuestionBankCategory) {
+        setSelectedQuestionBankCategory(null);
+        if (typeof window !== "undefined" && window.history.state?.qbView === "category") {
+          window.history.back();
+          return;
+        }
+      }
+      if (selectedQuestionBankSubject) {
+        setSelectedQuestionBankSubject(null);
+        if (typeof window !== "undefined" && (window.history.state?.qbView === "subject" || window.history.state?.subjectId)) {
+          window.history.back();
+          return;
+        }
+      }
+      if (selectedQuestionBankInstitute) {
+        setSelectedQuestionBankInstitute(null);
+        if (typeof window !== "undefined" && (window.history.state?.qbView === "institute" || window.history.state?.instituteId)) {
+          window.history.back();
+          return;
+        }
+      }
+    }
+
+    // 5. Subject report deep view
+    if (activeTab === "subject_report") {
+      setSelectedSubjectReport(null);
+      if (canGoBackInSession()) {
+        window.history.back();
+      } else {
+        handleTabChange("analysis", true);
+      }
+      return;
+    }
+
+    // 6. User profile deep view
+    if (activeTab === "user_profile") {
+      setSelectedUserProfile(null);
+      if (canGoBackInSession()) {
+        window.history.back();
+      } else {
+        handleTabChange("leaderboard", true);
+      }
+      return;
+    }
+
+    // 7. General in-app back vs direct landing
+    if (canGoBackInSession()) {
+      window.history.back();
+    } else {
+      // Direct landing: fall back to logical parent
+      const target = fallbackTab || getParentRoute(activeTab);
+      handleTabChange(target, true);
+    }
+  }, [
+    appState,
+    isReviewingHistory,
+    activeTab,
+    selectedQuestionBankInstitute,
+    selectedQuestionBankCategory,
+    selectedQuestionBankSubject,
+    selectedQuestionBankSection,
+    canGoBackInSession,
+    handleTabChange,
+  ]);
+
+  // Browser back/forward button support
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      // Guard: don't navigate away mid-exam
+      if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
+        const canonicalUrl = getStudentRouteUrl(activeTab);
+        const currentIdx = (window.history.state?.idx as number) ?? 0;
+        window.history.pushState({ tab: activeTab, idx: currentIdx + 1 }, '', canonicalUrl);
+        setNavWarning({ isOpen: true, targetTab: null, action: 'tab' });
+        return;
+      }
+      
+      // If on completed result or instructions, exit cleanly
+      if (appState === AppState.COMPLETED) {
+        setAppState(AppState.IDLE);
+        setIsReviewingHistory(false);
+      }
+      if (appState === AppState.INSTRUCTIONS) {
+        setAppState(AppState.IDLE);
+        setPendingConfig(null);
+      }
+
+      // Sync internal history stack
+      if (navHistoryRef.current.length > 1) {
+        navHistoryRef.current.pop();
+      }
+
+      const rawPath = window.location.pathname;
+      const targetTab = e.state?.tab || resolvePathToTab(rawPath);
+      const resolved = validTabs.includes(targetTab) ? targetTab : 'dashboard';
+
+      setActiveTab(resolved);
+      sessionStorage.setItem('obhyash_active_tab', resolved);
+
+      // Handle Question Bank deep sub-views restoration
+      if (resolved === "question_bank" || resolved === "question-bank") {
+        const params = new URLSearchParams(window.location.search);
+        const subjId = e.state?.subjectId || params.get("subject");
+        const instId = e.state?.instituteId || params.get("institute");
+        const cat = e.state?.category || params.get("category");
+        const qbView = e.state?.qbView;
+
+        if (subjId) {
+          const found = findQuestionBankSubject(subjId);
+          if (found) setSelectedQuestionBankSubject(found);
+          if (cat === "academic" || qbView === "category") {
+            setSelectedQuestionBankCategory("academic");
+          } else {
+            setSelectedQuestionBankCategory(null);
+          }
+          setSelectedQuestionBankInstitute(null);
+          setSelectedQuestionBankSection(null);
+        } else if (instId) {
+          const foundInst = findQuestionBankInstitute(instId);
+          if (foundInst) setSelectedQuestionBankInstitute(foundInst);
+          setSelectedQuestionBankSubject(null);
+          setSelectedQuestionBankCategory(null);
+          setSelectedQuestionBankSection(null);
+        } else {
+          setSelectedQuestionBankSubject(null);
+          setSelectedQuestionBankInstitute(null);
+          setSelectedQuestionBankCategory(null);
+          setSelectedQuestionBankSection(null);
+        }
+      }
+
+      // Handle User Profile exit / restoration
+      if (resolved !== "user_profile") {
+        setSelectedUserProfile(null);
+      } else {
+        const match = window.location.pathname.match(/^\/leaderboard\/(?:user|user-profile)\/(.+)$/);
+        if (match && (!selectedUserProfile || selectedUserProfile.id !== match[1])) {
+          import("@/services/database").then(async ({ getUserProfile }) => {
+            const u = await getUserProfile(match[1]);
+            if (u) {
+              setSelectedUserProfile(u);
+              setSelectedUserRank(0);
+            }
+          });
+        }
+      }
+
+      // Handle Subject Report exit
+      if (resolved !== "subject_report") {
+        setSelectedSubjectReport(null);
+      }
+
+      // Handle History Result restoration
+      if (resolved === "history_result") {
+        const m = window.location.pathname.match(/^\/history\/([\w-]+)$/);
+        if (m && m[1]) {
+          restoreExamHistoryResult(m[1]);
+        }
+      }
+
+      // Reset scroll on pop instantly
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      const mainContent = document.querySelector('main') || document.getElementById('main-scroll-container');
+      if (mainContent) {
+        mainContent.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [appState, activeTab, resolvePathToTab, restoreExamHistoryResult, selectedUserProfile]);
+
+  // On mount: sync current URL path & search params to active tab and sub-views state
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Initialize history state with idx: 0 so we can track session depth accurately
+    if (window.history.state?.idx === undefined) {
+      window.history.replaceState({ tab: activeTab, idx: 0 }, '', window.location.href);
+    }
+
+    const currentPath = window.location.pathname;
+    const resolved = resolvePathToTab(currentPath);
+    setActiveTab(resolved);
+    sessionStorage.setItem('obhyash_active_tab', resolved);
+
+    // Initial Question Bank restoration from URL query params
+    if (resolved === "question_bank" || resolved === "question-bank") {
+      const params = new URLSearchParams(window.location.search);
+      const subjId = params.get("subject");
+      const instId = params.get("institute");
+      const cat = params.get("category");
+      if (subjId) {
+        const found = findQuestionBankSubject(subjId);
+        if (found) setSelectedQuestionBankSubject(found);
+        if (cat === "academic") setSelectedQuestionBankCategory("academic");
+      } else if (instId) {
+        const foundInst = findQuestionBankInstitute(instId);
+        if (foundInst) setSelectedQuestionBankInstitute(foundInst);
+      }
+    }
+  }, [resolvePathToTab]);
 
 
   const handleLogoutClick = async () => {
@@ -1162,6 +1270,7 @@ export default function StudentRoot({
   const commonLayoutProps = {
     user: currentUser || undefined,
     onTabChange: handleTabChange,
+    onBack: () => smartBack(),
     onLogout: handleLogoutClick,
     toggleTheme: toggleTheme,
     isDarkMode: theme === "dark",
@@ -1865,27 +1974,63 @@ export default function StudentRoot({
             <SubscriptionView />
           </AppLayout>
         );
-      if (activeTab === "user_profile" && selectedUserProfile)
+      if (activeTab === "user_profile")
         return (
           <AppLayout
             activeTab="user_profile"
             {...commonLayoutProps}
             title={
-              selectedUserProfile.name
+              selectedUserProfile?.name
                 ? `${selectedUserProfile.name}-এর প্রোফাইল`
                 : "শিক্ষার্থীর প্রোফাইল"
             }
             onBack={() => smartBack("leaderboard")}
             hideBottomNav={true}
           >
-            <UserProfileView
-              user={selectedUserProfile}
-              currentUser={currentUser}
-              rank={selectedUserRank}
-              onBack={() => smartBack("leaderboard")}
-            />
+            {selectedUserProfile ? (
+              <UserProfileView
+                user={selectedUserProfile}
+                currentUser={currentUser}
+                rank={selectedUserRank}
+                onBack={() => smartBack("leaderboard")}
+              />
+            ) : (
+              <div className="w-full max-w-4xl mx-auto py-12 px-4 flex flex-col items-center justify-center">
+                <ExamLoadingSkeleton hideHeader={true} />
+              </div>
+            )}
           </AppLayout>
         );
+
+      if (activeTab === "history_result") {
+        return (
+          <AppLayout
+            activeTab="history"
+            {...commonLayoutProps}
+            title="পরীক্ষার ফলাফল"
+            onBack={() => smartBack("history")}
+          >
+            {examDetails && questions.length > 0 ? (
+              <ResultView
+                questions={questions}
+                userAnswers={userAnswers}
+                timeTaken={timeTaken}
+                initialBookmarks={flaggedQuestions}
+                onRestart={() => smartBack("history")}
+                isDarkMode={theme === "dark"}
+                onToggleTheme={toggleTheme}
+                isHistoryMode={true}
+                negativeMarking={examDetails?.negativeMarking}
+                submissionType="digital"
+              />
+            ) : (
+              <div className="w-full max-w-4xl mx-auto py-12 px-4 flex flex-col items-center justify-center">
+                <ExamLoadingSkeleton hideHeader={true} />
+              </div>
+            )}
+          </AppLayout>
+        );
+      }
       if (activeTab === "subject_report") {
         if (selectedSubjectReport) {
           return (

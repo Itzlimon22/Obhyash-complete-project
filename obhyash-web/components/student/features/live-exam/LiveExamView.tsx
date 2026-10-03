@@ -38,6 +38,65 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [liveExamsMap, setLiveExamsMap] = useState<Record<string, boolean>>({});
 
+  // Sync initial sub-view state from URL query parameters
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get("category");
+    const isHist = params.get("view") === "history";
+    const examId = params.get("examId") || params.get("exam");
+    if (examId) {
+      setSelectedExam({
+        id: examId,
+        title: "লাইভ পরীক্ষা",
+        status: "untaken",
+      });
+      if (cat) setSelectedCategory(cat);
+    } else if (cat) {
+      setSelectedCategory(cat);
+    } else if (isHist) {
+      setShowHistory(true);
+    }
+  }, []);
+
+  // Listen to browser popstate within Live Exam view hierarchy
+  useEffect(() => {
+    const handlePop = (e: PopStateEvent) => {
+      if (e.state?.tab && e.state.tab !== "live_exam" && e.state.tab !== "live-exam") {
+        return;
+      }
+      const params = new URLSearchParams(window.location.search);
+      const cat = e.state?.category || params.get("category");
+      const isHist = e.state?.liveView === "history" || params.get("view") === "history";
+      const examId = e.state?.examId || params.get("examId") || params.get("exam");
+
+      if (e.state?.liveView === "details" || examId) {
+        setSelectedExam({
+          id: examId || "",
+          title: e.state?.examTitle || "লাইভ পরীক্ষা",
+          status: e.state?.status || "untaken",
+        });
+        setSelectedCategory(cat || null);
+        setShowHistory(false);
+      } else if (e.state?.liveView === "category" || cat) {
+        setSelectedExam(null);
+        setSelectedCategory(cat);
+        setShowHistory(false);
+      } else if (isHist) {
+        setSelectedExam(null);
+        setSelectedCategory(null);
+        setShowHistory(true);
+      } else {
+        setSelectedExam(null);
+        setSelectedCategory(null);
+        setShowHistory(false);
+      }
+    };
+
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
+
   // Fetch ongoing live exams matching Flutter `_hasLive`
   const fetchLiveStatus = useCallback(async () => {
     try {
@@ -269,6 +328,60 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
     ];
   }
 
+  const handleOpenCategory = (catKey: string) => {
+    setSelectedCategory(catKey);
+    setSelectedExam(null);
+    setShowHistory(false);
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      window.history.pushState(
+        { tab: "live_exam", liveView: "category", category: catKey, idx: nextIdx },
+        "",
+        `/live_exam?category=${encodeURIComponent(catKey)}`
+      );
+    }
+  };
+
+  const handleOpenHistory = () => {
+    setShowHistory(true);
+    setSelectedCategory(null);
+    setSelectedExam(null);
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      window.history.pushState(
+        { tab: "live_exam", liveView: "history", idx: nextIdx },
+        "",
+        "/live_exam?view=history"
+      );
+    }
+  };
+
+  const handleCategoryBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveView === "category") {
+      window.history.back();
+    } else {
+      setSelectedCategory(null);
+      fetchLiveStatus();
+    }
+  };
+
+  const handleHistoryBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveView === "history") {
+      window.history.back();
+    } else {
+      setShowHistory(false);
+    }
+  };
+
+  const handleExamBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveView === "details") {
+      window.history.back();
+    } else {
+      setSelectedExam(null);
+      fetchLiveStatus();
+    }
+  };
+
   const hasAnyLive = categories.some((c) => c.hasLive);
 
   // If user selected a specific exam directly
@@ -279,10 +392,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
         examTitle={selectedExam.title}
         status={selectedExam.status}
         commonLayoutProps={commonLayoutProps}
-        onBack={() => {
-          setSelectedExam(null);
-          fetchLiveStatus();
-        }}
+        onBack={handleExamBack}
       />
     );
   }
@@ -294,10 +404,10 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
         activeTab="live_exam"
         {...commonLayoutProps}
         title="আমার লাইভ পরীক্ষার ফলাফল"
-        onBack={() => setShowHistory(false)}
+        onBack={handleHistoryBack}
       >
         <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 pt-6 pb-28 font-['HindSiliguri']">
-          <LiveExamHistoryPageView onBack={() => setShowHistory(false)} />
+          <LiveExamHistoryPageView onBack={handleHistoryBack} />
         </div>
       </AppLayout>
     );
@@ -309,10 +419,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
       <LiveExamCategoryView
         category={selectedCategory}
         commonLayoutProps={commonLayoutProps}
-        onBack={() => {
-          setSelectedCategory(null);
-          fetchLiveStatus();
-        }}
+        onBack={handleCategoryBack}
       />
     );
   }
@@ -323,7 +430,9 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
       {...commonLayoutProps}
       title="লাইভ মডেল টেস্ট"
       onBack={() => {
-        if (commonLayoutProps?.onTabChange) {
+        if (commonLayoutProps?.onBack) {
+          commonLayoutProps.onBack();
+        } else if (commonLayoutProps?.onTabChange) {
           commonLayoutProps.onTabChange("dashboard");
         }
       }}
@@ -344,7 +453,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
 
           <button
             type="button"
-            onClick={() => setShowHistory(true)}
+            onClick={handleOpenHistory}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#14151B] border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-xs font-normal text-black dark:text-white transition-all shadow-xs cursor-pointer ml-auto"
             title="আমার লাইভ পরীক্ষার ফলাফল ও মেধা তালিকা দেখুন"
           >
@@ -359,7 +468,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
             return (
               <div
                 key={cat.key}
-                onClick={() => setSelectedCategory(cat.key)}
+                onClick={() => handleOpenCategory(cat.key)}
                 className={cn(
                   "group relative rounded-[20px] cursor-pointer select-none transition-transform duration-120 overflow-hidden flex flex-col justify-between",
                   "p-3.5 aspect-[0.85] sm:min-h-[195px]",

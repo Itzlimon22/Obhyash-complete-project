@@ -176,27 +176,56 @@ export default function SubjectCategoryDetailView({
   const [showAcademicView, setShowAcademicView] = useState(false);
 
   useEffect(() => {
-    const handlePop = () => {
-      if (selectedSection) {
+    const handlePop = (e: PopStateEvent) => {
+      if (e.state?.qbSubView !== "section") {
         setSelectedSection(null);
       }
-      if (showAcademicView) {
+      if (e.state?.qbSubView !== "academic") {
         setShowAcademicView(false);
       }
     };
     window.addEventListener("popstate", handlePop);
     return () => window.removeEventListener("popstate", handlePop);
-  }, [selectedSection, showAcademicView]);
+  }, []);
 
   const handleOpenSection = (cat: CategoryItem) => {
     if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
       window.history.pushState(
-        { tab: "question_bank", qbSubView: "section", sectionId: cat.id },
+        { tab: "question_bank", qbView: "subject", qbSubView: "section", subjectId: subject.id, sectionId: cat.id, idx: nextIdx },
         "",
         window.location.pathname + `?subject=${encodeURIComponent(subject.id)}&section=${encodeURIComponent(cat.id)}`
       );
     }
     setSelectedSection(cat);
+  };
+
+  const handleOpenAcademicView = () => {
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      window.history.pushState(
+        { tab: "question_bank", qbView: "subject", qbSubView: "academic", subjectId: subject.id, idx: nextIdx },
+        "",
+        window.location.pathname + `?subject=${encodeURIComponent(subject.id)}&category=academic`
+      );
+    }
+    setShowAcademicView(true);
+  };
+
+  const handleSectionBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.qbSubView === "section") {
+      window.history.back();
+    } else {
+      setSelectedSection(null);
+    }
+  };
+
+  const handleAcademicBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.qbSubView === "academic") {
+      window.history.back();
+    } else {
+      setShowAcademicView(false);
+    }
   };
 
   const paperClean = subject.paper ? subject.paper.split(" ")[0] : "";
@@ -210,12 +239,7 @@ export default function SubjectCategoryDetailView({
           ...selectedSection,
           count: selectedSection.count || 50,
         }}
-        onBack={() => {
-          setSelectedSection(null);
-          if (typeof window !== "undefined" && window.history.state?.qbSubView === "section") {
-            window.history.back();
-          }
-        }}
+        onBack={handleSectionBack}
         showHeader={showHeader}
       />
     );
@@ -225,7 +249,7 @@ export default function SubjectCategoryDetailView({
     return (
       <AcademicCategoryDetailView
         subject={subject}
-        onBack={() => setShowAcademicView(false)}
+        onBack={handleAcademicBack}
         showHeader={showHeader}
       />
     );
@@ -279,7 +303,7 @@ export default function SubjectCategoryDetailView({
                     if (onSelectCategory) {
                       onSelectCategory(cat);
                     } else {
-                      setShowAcademicView(true);
+                      handleOpenAcademicView();
                     }
                   } else {
                     handleOpenSection(cat);

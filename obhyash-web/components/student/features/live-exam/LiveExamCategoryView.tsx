@@ -62,6 +62,60 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     return () => clearInterval(timer);
   }, []);
 
+  const handleSelectExam = (exam: { id: string; title: string; status: "untaken" | "taken" }) => {
+    setSelectedExam(exam);
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      window.history.pushState(
+        { tab: "live_exam", liveView: "details", examId: exam.id, examTitle: exam.title, category: activeCategory, idx: nextIdx },
+        "",
+        `/live_exam?category=${encodeURIComponent(activeCategory)}&examId=${encodeURIComponent(exam.id)}`
+      );
+    }
+  };
+
+  const handleOpenRoutine = () => {
+    setIsRoutineOpen(true);
+    if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
+      window.history.pushState(
+        { tab: "live_exam", liveView: "routine", category: activeCategory, idx: nextIdx },
+        "",
+        `/live_exam?category=${encodeURIComponent(activeCategory)}&view=routine`
+      );
+    }
+  };
+
+  const handleExamBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveView === "details") {
+      window.history.back();
+    } else {
+      setSelectedExam(null);
+      fetchExams();
+    }
+  };
+
+  const handleRoutineBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.liveView === "routine") {
+      window.history.back();
+    } else {
+      setIsRoutineOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handlePop = (e: PopStateEvent) => {
+      if (e.state?.liveView !== "details") {
+        setSelectedExam(null);
+      }
+      if (e.state?.liveView !== "routine") {
+        setIsRoutineOpen(false);
+      }
+    };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
+
   const displayCategoryTitle = CATEGORY_NAMES[activeCategory.toLowerCase()] || activeCategory;
 
   const fetchExams = async (catToFetch = activeCategory) => {
@@ -170,10 +224,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
         examTitle={selectedExam.title}
         status={selectedExam.status}
         commonLayoutProps={commonLayoutProps}
-        onBack={() => {
-          setSelectedExam(null);
-          fetchExams();
-        }}
+        onBack={handleExamBack}
       />
     );
   }
@@ -184,12 +235,12 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
         activeTab="live_exam"
         {...commonLayoutProps}
         title="পরীক্ষার রুটিন ও পূর্ণাঙ্গ সিলেবাস"
-        onBack={() => setIsRoutineOpen(false)}
+        onBack={handleRoutineBack}
       >
         <div className="w-full max-w-5xl mx-auto px-3 sm:px-6 pt-5 sm:pt-7 pb-24 font-['HindSiliguri']">
           <LiveExamRoutinePageView
             categoryTitle={displayCategoryTitle}
-            onBack={() => setIsRoutineOpen(false)}
+            onBack={handleRoutineBack}
           />
         </div>
       </AppLayout>
@@ -231,7 +282,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
           {/* Routine Action Button */}
           <button
             type="button"
-            onClick={() => setIsRoutineOpen(true)}
+            onClick={handleOpenRoutine}
             className="px-3.5 py-1.5 rounded-full bg-[#EFF6FF] dark:bg-[#1E3A8A]/25 border border-[#BFDBFE] dark:border-[#1E3A8A]/50 text-[#2563EB] dark:text-[#60A5FA] text-[13px] font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
           >
             <Calendar size={13} />
@@ -343,7 +394,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
                 <div
                   key={exam.id}
                   onClick={() =>
-                    setSelectedExam({
+                    handleSelectExam({
                       id: exam.id,
                       title: exam.title,
                       status: isTaken ? "taken" : "untaken",

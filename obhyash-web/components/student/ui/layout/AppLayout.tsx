@@ -189,14 +189,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 relative">
               {/* ── Left / Center: Back Button (when not on dashboard) + (Title OR Header Tabs) ── */}
               <div className={`flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2 ${headerTabs ? 'justify-center' : ''}`}>
-                {(onBack || (activeTab !== 'dashboard' && activeTab !== 'setup' && activeTab !== 'question_bank' && activeTab !== 'profile')) && (
+                {(onBack || (activeTab !== 'dashboard' && activeTab !== 'setup' && activeTab !== 'question_bank' && activeTab !== 'question-bank' && activeTab !== 'profile')) && (
                   /* Back button on sub-screens matching Flutter minimal arrow */
                   <button
                     type="button"
                     onClick={() => {
                       if (onBack) {
                         onBack();
-                      } else if (typeof window !== 'undefined' && window.history.length > 1) {
+                      } else if (typeof window !== 'undefined' && ((window.history.state?.idx ?? 0) > 0 || window.history.length > 1)) {
                         window.history.back();
                       } else {
                         onTabChange('dashboard');

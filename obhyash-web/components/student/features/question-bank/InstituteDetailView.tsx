@@ -522,24 +522,33 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
   const [typeFilter, setTypeFilter] = useState<"all" | "mcq" | "written">("all");
 
   useEffect(() => {
-    const handlePop = () => {
-      if (selectedExamSet) {
+    const handlePop = (e: PopStateEvent) => {
+      if (e.state?.qbSubView !== "exam_set") {
         setSelectedExamSet(null);
       }
     };
     window.addEventListener("popstate", handlePop);
     return () => window.removeEventListener("popstate", handlePop);
-  }, [selectedExamSet]);
+  }, []);
 
   const handleOpenExamSet = (set: InstituteExamSet) => {
     if (typeof window !== "undefined") {
+      const nextIdx = ((window.history.state?.idx as number) ?? 0) + 1;
       window.history.pushState(
-        { tab: "question_bank", qbSubView: "exam_set", setId: set.id },
+        { tab: "question_bank", qbView: "institute", qbSubView: "exam_set", instituteId: institute.id, setId: set.id, idx: nextIdx },
         "",
         window.location.pathname + `?institute=${encodeURIComponent(institute.id)}&set=${encodeURIComponent(set.id)}`
       );
     }
     setSelectedExamSet(set);
+  };
+
+  const handleExamSetBack = () => {
+    if (typeof window !== "undefined" && window.history.state?.qbSubView === "exam_set") {
+      window.history.back();
+    } else {
+      setSelectedExamSet(null);
+    }
   };
 
   const allSets = useMemo(() => {
@@ -556,12 +565,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
       <ExamSetDetailView
         institute={institute}
         examSet={selectedExamSet}
-        onBack={() => {
-          setSelectedExamSet(null);
-          if (typeof window !== "undefined" && window.history.state?.qbSubView === "exam_set") {
-            window.history.back();
-          }
-        }}
+        onBack={handleExamSetBack}
         onTakeExam={onStartExam}
         showHeader={showHeader}
       />

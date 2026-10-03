@@ -49,6 +49,7 @@ export function getStudentRouteUrl(tab: string): string {
     case 'exam':
       return STUDENT_ROUTES.setup;
     case 'live_exam':
+    case 'live-exam':
       return STUDENT_ROUTES.liveExam;
     case 'question_bank':
     case 'question-bank':
@@ -140,6 +141,7 @@ export const PARENT_ROUTE_MAP: Record<string, string> = {
   'setup': 'dashboard',
   'exam': 'dashboard',
   'live_exam': 'dashboard',
+  'live-exam': 'dashboard',
   'question_bank': 'dashboard',
   'question-bank': 'dashboard',
   'history': 'dashboard',
