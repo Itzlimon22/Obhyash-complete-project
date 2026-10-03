@@ -156,7 +156,7 @@ graph TD
 
 * 📅 [HSC 2026 পরীক্ষার তারিখ ও সকল বোর্ডের রুটিন PDF ডাউনলোড](/blog/hsc-2026-exam-date-routine-pdf)
 * 📊 [HSC 2026 শর্ট সিলেবাস আপডেট ও বিষয়ভিত্তিক মানবন্টন গাইড](/blog/hsc-2026-short-syllabus-marks-distribution)
-* ⏳ [HSC শেষ ৩ মাসের রিভিশন রুটিন ও পড়ার মাস্টারপ্ল্যান](/blog/hsc-3-month-study-routine)
+* ⏳ [HSC শেষ ৩ মাসের রিভিশন রুটিন ও পড়ার মাস্টারপ্ল্যান](/blog/hsc-2026-last-3-month-revision-routine)
 
 ---
 
