@@ -534,6 +534,132 @@ export const downloadResult = (
 
 export const downloadResultWithExplanations = downloadResult;
 
+// ─── 2.1 Download Live Exam Result & Solutions (Vector PDF) ─────────────────
+
+export const downloadLiveExamResult = (
+  exam: {
+    id: string;
+    title: string;
+    category?: string;
+    duration_minutes?: number;
+    total_marks?: number;
+    total_questions?: number;
+    negative_marking?: number;
+  },
+  questions: Question[],
+  userAnswers: UserAnswers = {},
+  attempt?: {
+    score?: number;
+    correct_count?: number;
+    wrong_count?: number;
+  } | null,
+  userName?: string
+) => {
+  const banglaLetters = ['ক', 'খ', 'গ', 'ঘ'];
+  const hasUserAnswers = userAnswers && Object.keys(userAnswers).length > 0;
+
+  const score = attempt?.score !== undefined 
+    ? attempt.score 
+    : questions.reduce((acc, q) => {
+        const ua = userAnswers[q.id];
+        if (ua === undefined || ua === null || ua === -1) return acc;
+        if (ua === q.correctAnswerIndex) return acc + (q.points || 1);
+        return acc - (exam.negative_marking || 0.25);
+      }, 0);
+
+  const totalPoints = exam.total_marks || questions.reduce((acc, q) => acc + (q.points || 1), 0);
+  const correctCount = attempt?.correct_count !== undefined 
+    ? attempt.correct_count 
+    : questions.filter(q => userAnswers[q.id] === q.correctAnswerIndex).length;
+  const wrongCount = attempt?.wrong_count !== undefined
+    ? attempt.wrong_count
+    : questions.filter(q => {
+        const ua = userAnswers[q.id];
+        return ua !== undefined && ua !== null && ua !== -1 && ua !== q.correctAnswerIndex;
+      }).length;
+
+  const mappedQuestions: QuestionItem[] = questions.map((q, idx) => {
+    const ua = userAnswers ? userAnswers[q.id] : undefined;
+    const isAnswered = ua !== undefined && ua !== null && ua !== -1;
+    const isCorrect = isAnswered && (
+      ua === q.correctAnswerIndex || 
+      (q.correctAnswerIndices && q.correctAnswerIndices.includes(ua))
+    );
+
+    const expLines: string[] = [];
+
+    // Add student choice badge if user answers are provided
+    if (hasUserAnswers) {
+      if (isAnswered) {
+        const userChoiceLetter = banglaLetters[ua] || String(ua);
+        if (isCorrect) {
+          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — সঠিক হয়েছে ✓]`);
+        } else {
+          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — ভুল হয়েছে ✗]`);
+        }
+      } else {
+        expLines.push(`[তোমার উত্তর: দেওয়া হয়নি (অনুত্তর)]`);
+      }
+    }
+
+    if (q.explanation && q.explanation.trim()) {
+      q.explanation
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean)
+        .forEach(l => expLines.push(l));
+    } else if (expLines.length === 0) {
+      expLines.push('এই প্রশ্নের জন্য অতিরিক্ত কোনো ব্যাখ্যা নেই।');
+    }
+
+    return {
+      n: idx + 1,
+      q: q.question || '',
+      img: q.imageUrl,
+      o: {
+        a: q.options[0] || '',
+        b: q.options[1] || '',
+        c: q.options[2] || '',
+        d: q.options[3] || '',
+      },
+      A: banglaLetters[q.correctAnswerIndex] || 'ক',
+      E: expLines,
+    };
+  });
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
+
+  const userPrefix = userName ? `পরীক্ষার্থী: ${userName} · ` : '';
+  const subtitle = hasUserAnswers
+    ? `${userPrefix}প্রাপ্ত নম্বর: ${toBengaliNumber(Number(score).toFixed(2).replace(/\.00$/, ''))} / ${toBengaliNumber(totalPoints)} · সঠিক: ${toBengaliNumber(correctCount)}টি · ভুল: ${toBengaliNumber(wrongCount)}টি · সময়: ${toBengaliNumber(exam.duration_minutes || 30)} মিনিট`
+    : `লাইভ পরীক্ষা · মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি · পূর্ণমান: ${toBengaliNumber(totalPoints)} · সময়: ${toBengaliNumber(exam.duration_minutes || 30)} মিনিট`;
+
+  const settings: GeneratorSettings = {
+    title: `${exam.title} — ফলাফল ও সমাধান পত্র`,
+    subtitle,
+    hasHeader: true,
+    headerLeftText: 'অ্যাপ ইনস্টল করো',
+    headerLeftUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
+    headerRightText: `${exam.title} — সমাধান পত্র`,
+    showHeaderLeftIcon: true,
+    footerLeftPrefix: 'আনলিমিটেড এক্সাম দাও',
+    footerSiteText: 'www.obhyash.com',
+    footerLeftUrl: 'https://www.obhyash.com',
+    footerLeftSuffix: 'এ',
+    footerPagePrefix: 'পৃষ্ঠা',
+    useBanglaDigits: true,
+    pageOffset: 0,
+    density: 'balanced',
+    balanceColumns: true,
+    standaloneToolbar: true,
+    autoPrint: true,
+    baseUrl: origin,
+  };
+
+  const html = generateTemplateHtml(mappedQuestions, settings);
+  printOrOpenHtml(html);
+};
+
 // ─── 3. Download OMR Sheet ───────────────────────────────────────────────────
 
 export const downloadOMRSheet = (

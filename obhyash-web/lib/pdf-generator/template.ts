@@ -1,4 +1,5 @@
 import { QuestionItem, GeneratorSettings } from './types';
+import katex from 'katex';
 
 const BN_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
 export const toBnNumber = (n: number | string): string =>
@@ -33,25 +34,76 @@ function escapeHtml(str: string): string {
 
 const DOL = '\ue000';
 
+function renderKatex(mathStr: string, displayMode: boolean = false): string {
+  try {
+    return katex.renderToString(mathStr.trim(), {
+      displayMode,
+      throwOnError: false,
+      strict: 'ignore',
+      output: 'htmlAndMathml',
+    });
+  } catch {
+    return escapeHtml(mathStr);
+  }
+}
+
+function normalizeMathText(text: string): string {
+  if (!text) return '';
+  let res = text;
+
+  // 1. Normalize bracket delimiters \[ ... \] and \( ... \)
+  res = res.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+  res = res.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+
+  // 2. Fix over-escaped double backslashes in common LaTeX commands
+  res = res.replace(
+    /\\\\(frac|sqrt|text|mathrm|mathbf|vec|hat|bar|times|cdot|pm|to|rightarrow|leftarrow|theta|alpha|beta|gamma|delta|epsilon|omega|pi|phi|tau|lambda|mu|sigma|infty|approx|ne|leq|geq|circ|degree|sum|int|partial|sin|cos|tan|log|ln)\b/g,
+    '\\$1'
+  );
+
+  // 3. Auto-wrap unwrapped standalone math expressions (like \frac{...}{...}, \sqrt{...}, or bare \cos\theta, \theta, \alpha)
+  res = res.replace(/(^|[^\$])(\\(?:frac|sqrt|vec|hat|bar)\{[^}]+\}(?:\{[^}]+\})?)(?!\$)/g, '$1$$$2$$');
+  res = res.replace(/(^|[^\$])(\\(?:theta|alpha|beta|gamma|delta|epsilon|omega|pi|phi|tau|lambda|mu|sigma|infty|approx|pm|times|circ)\b)(?!\$)/g, '$1$$$2$$');
+
+  // 4. Wrap common Bengali math formulas where θ is used with cos/sin/tan
+  res = res.replace(/(^|[^\$])(\b(?:cos|sin|tan)\s*(?:\\?theta|θ|\d+|x|y)\b)(?!\$)/gi, (_m, prefix, formula) => {
+    const cleanFormula = formula.replace(/θ/g, '\\theta').replace(/\s+/g, ' ');
+    const finalCmd = cleanFormula.startsWith('\\') ? cleanFormula : `\\${cleanFormula}`;
+    return `${prefix}$${finalCmd}$`;
+  });
+
+  return res;
+}
+
 function inlineMath(s: string): string {
-  s = s.replace(/\\\$/g, DOL);
-  const parts = s.split(/(\$[^$]+\$)/g);
+  if (!s) return '';
+  const normalized = normalizeMathText(s).replace(/\\\$/g, DOL);
+  const parts = normalized.split(/(\${1,2}[^\$]+\${1,2})/g);
   let out = '';
   for (const p of parts) {
-    if (p.length > 1 && p.startsWith('$') && p.endsWith('$') && p !== '$') {
+    if (p.startsWith('$$') && p.endsWith('$$') && p.length > 4) {
+      out += displayMath(p.slice(2, -2));
+    } else if (p.startsWith('$') && p.endsWith('$') && p.length > 2) {
       const t = p.slice(1, -1);
-      const w = t.length >= 40 ? ' wrapm' : '';
-      out += `<span class="m${w}" data-t="${escapeHtml(t)}"></span>`;
+      const isBig = isBigMath(t);
+      if (isBig) {
+        out += displayMath(t);
+      } else {
+        const w = t.length >= 40 ? ' wrapm' : '';
+        const rendered = renderKatex(t, false);
+        out += `<span class="m${w}">${rendered}</span>`;
+      }
     } else {
       out += escapeHtml(p).replace(new RegExp(DOL, 'g'), '<span class="dl"></span>');
     }
   }
-  out = out.replace(/\((<span class="m[^>]*><\/span>)\)/g, '<span class="nw">($1)</span>');
+  out = out.replace(/\((<span class="m[^>]*>[\s\S]*?<\/span>)\)/g, '<span class="nw">($1)</span>');
   return out;
 }
 
 function displayMath(t: string): string {
-  return `<div class="dm m" data-d="1" data-t="${escapeHtml(t)}"></div>`;
+  const rendered = renderKatex(t, true);
+  return `<div class="dm m">${rendered}</div>`;
 }
 
 function sentences(line: string): string[] {
@@ -77,15 +129,19 @@ function isBigMath(t: string): boolean {
 
 function lineItems(line: string): Array<{ type: 't' | 'd'; html: string }> {
   const items: Array<{ type: 't' | 'd'; html: string }> = [];
-  for (const sent of sentences(line)) {
-    const parts = sent.split(/(\$[^$]+\$)/g);
+  const normalized = normalizeMathText(line);
+  for (const sent of sentences(normalized)) {
+    const parts = sent.split(/(\${1,2}[^\$]+\${1,2})/g);
     let acc = '';
     const flush = () => {
       if (acc.trim()) items.push({ type: 't', html: inlineMath(acc.trim()) });
       acc = '';
     };
     for (const p of parts) {
-      if (p.length > 1 && p.startsWith('$') && p.endsWith('$') && isBigMath(p.slice(1, -1))) {
+      if (p.startsWith('$$') && p.endsWith('$$') && p.length > 4) {
+        flush();
+        items.push({ type: 'd', html: displayMath(p.slice(2, -2)) });
+      } else if (p.startsWith('$') && p.endsWith('$') && p.length > 2 && isBigMath(p.slice(1, -1))) {
         flush();
         items.push({ type: 'd', html: displayMath(p.slice(1, -1)) });
       } else {
@@ -258,7 +314,8 @@ export function generateTemplateHtml(
 <meta charset="utf-8">
 <title>${escapeHtml(settings.title)}</title>
 ${baseUrlTag}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
 <style>
 @font-face {
   font-family: 'Kalpurush';
@@ -541,16 +598,18 @@ const SETTINGS = ${JSON.stringify(settings)};
 const BN = s => String(s).replace(/\\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 
 function renderMath(root) {
-  root.querySelectorAll('.m').forEach(el => {
+  root.querySelectorAll('.m[data-t]').forEach(el => {
     try {
-      katex.render(el.dataset.t, el, {
-        displayMode: !!el.dataset.d,
-        throwOnError: false,
-        strict: 'ignore',
-        output: 'html'
-      });
+      if (window.katex && el.dataset.t) {
+        katex.render(el.dataset.t, el, {
+          displayMode: !!el.dataset.d,
+          throwOnError: false,
+          strict: 'ignore',
+          output: 'html'
+        });
+      }
     } catch(e) {
-      el.textContent = el.dataset.t;
+      if (el.dataset.t) el.textContent = el.dataset.t;
     }
   });
 }

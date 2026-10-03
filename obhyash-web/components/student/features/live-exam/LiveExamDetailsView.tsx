@@ -20,7 +20,11 @@ import {
   History,
   EyeOff,
   ChevronDown,
+  Download,
+  Loader2,
 } from "lucide-react";
+import { getLiveExamSolutions } from "@/services/live-exam-student-service";
+import { downloadLiveExamResult } from "@/services/download-service";
 import { LiveExamSession } from "./LiveExamSession";
 import LiveExamSolutionView from "./LiveExamSolutionView";
 import LiveExamLeaderboardView from "./LiveExamLeaderboardView";
@@ -377,7 +381,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   commonLayoutProps,
   onBack,
 }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [exam, setExam] = useState<LiveExam | null>(null);
   const [attempt, setAttempt] = useState<LiveExamAttempt | null>(null);
   const [practiceHistory, setPracticeHistory] = useState<any[]>([]);
@@ -441,6 +445,33 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
       window.history.back();
     } else {
       setIsViewingSolutions(false);
+    }
+  };
+
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    if (!exam) return;
+    setIsDownloadingPdf(true);
+    try {
+      const solutionData = await getLiveExamSolutions(exam.id, user?.id);
+      if (!solutionData.questions || solutionData.questions.length === 0) {
+        toast.error("পরীক্ষার প্রশ্ন লোড করা যায়নি");
+        return;
+      }
+      downloadLiveExamResult(
+        exam,
+        solutionData.questions,
+        solutionData.userAnswers || attempt?.user_answers || {},
+        attempt,
+        profile?.name || (user?.user_metadata as any)?.name || (user?.user_metadata as any)?.full_name || user?.email?.split("@")[0] || "শিক্ষার্থী"
+      );
+      toast.success("পিডিএফ সমাধান শিট প্রস্তুত হয়েছে!");
+    } catch (err: any) {
+      console.error("Failed to download PDF:", err);
+      toast.error("পিডিএফ তৈরি করতে সমস্যা হয়েছে");
+    } finally {
+      setIsDownloadingPdf(false);
     }
   };
 
@@ -754,14 +785,36 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                 <span>পরীক্ষা এখনও শুরু হয়নি (⏱️ আর {formatRemainingTime(start)} বাকি)</span>
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => setIsTakingExam(true)}
-                className="w-full h-[52px] rounded-2xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
-              >
-                <RotateCcw size={18} />
-                <span>অনুশীলন পরীক্ষা শুরু করুন</span>
-              </button>
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setIsTakingExam(true)}
+                  className="w-full h-[52px] rounded-2xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+                >
+                  <RotateCcw size={18} />
+                  <span>অনুশীলন পরীক্ষা শুরু করুন</span>
+                </button>
+
+                {isResultAndSolutionAvailable && (
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    disabled={isDownloadingPdf}
+                    className="w-full h-[50px] rounded-2xl bg-white dark:bg-[#141417] border border-[#CBD5E1] dark:border-[#27272A] text-[#0F172A] dark:text-[#E2E8F0] hover:bg-[#F8FAFC] dark:hover:bg-[#1C1C20] font-bold text-[15px] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-99 disabled:opacity-60"
+                  >
+                    {isDownloadingPdf ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Download size={18} />
+                    )}
+                    <span>
+                      {isDownloadingPdf
+                        ? "পিডিএফ সমাধান শিট তৈরি হচ্ছে..."
+                        : "প্রশ্ন ও সমাধান ডাউনলোড (PDF)"}
+                    </span>
+                  </button>
+                )}
+              </div>
             )
           ) : (
             isPast || isResultAndSolutionAvailable || exam.id.startsWith("mock-") ? (
@@ -775,6 +828,27 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                   >
                     <BookOpen size={18} />
                     <span>সমাধান ও ব্যাখ্যা দেখুন</span>
+                  </button>
+                )}
+
+                {/* Download PDF Button */}
+                {isResultAndSolutionAvailable && (
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    disabled={isDownloadingPdf}
+                    className="w-full h-[50px] rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-800 hover:from-teal-800 hover:to-emerald-900 text-white font-bold text-[15px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-99 disabled:opacity-60"
+                  >
+                    {isDownloadingPdf ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Download size={18} />
+                    )}
+                    <span>
+                      {isDownloadingPdf
+                        ? "পিডিএফ সমাধান শিট তৈরি হচ্ছে..."
+                        : "ফলাফল ও সমাধান ডাউনলোড (PDF)"}
+                    </span>
                   </button>
                 )}
 
@@ -797,9 +871,27 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         {/* Score Overview Card (When taken) */}
         {isTaken && attempt && (
           <div className="mt-5 rounded-[22px] bg-white dark:bg-[#141417] border border-[#E2E8F0] dark:border-[#27272A] p-5 shadow-xs">
-            <h3 className="text-[15.5px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC]">
-              তোমার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[15.5px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC]">
+                তোমার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)
+              </h3>
+              {isResultAndSolutionAvailable && (
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={isDownloadingPdf}
+                  className="px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[12px] font-bold flex items-center gap-1.5 transition-all hover:bg-emerald-100 dark:hover:bg-emerald-900/50 cursor-pointer disabled:opacity-50"
+                  title="ফলাফল ও সমাধান শিট PDF ডাউনলোড"
+                >
+                  {isDownloadingPdf ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <Download size={13} />
+                  )}
+                  <span>PDF শিট</span>
+                </button>
+              )}
+            </div>
 
             <div className="mt-4 flex items-center justify-around text-center">
               <div>

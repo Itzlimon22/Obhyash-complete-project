@@ -382,10 +382,10 @@ export async function getLiveExamSolutions(
     return { questions: mockQuestions, userAnswers: mockAnswers };
   }
 
-  // Security Check: Verify exam has finished and results are published before returning solutions
+  // Security Check: Verify exam has finished or answers are explicitly published before returning solutions
   const { data: examMeta, error: examMetaErr } = await supabase
     .from("live_exams")
-    .select("id, end_time, is_leaderboard_published")
+    .select("id, end_time, is_answer_published")
     .eq("id", examId)
     .maybeSingle();
 
@@ -394,8 +394,8 @@ export async function getLiveExamSolutions(
   } else if (examMeta) {
     const now = new Date();
     const isPast = examMeta.end_time ? now.getTime() > new Date(examMeta.end_time).getTime() : false;
-    const isPublished = examMeta.is_leaderboard_published !== false;
-    if (!isPast || !isPublished) {
+    const isAnswerAllowed = isPast || examMeta.is_answer_published === true;
+    if (!isAnswerAllowed) {
       throw new Error("EXAM_RESULT_NOT_PUBLISHED");
     }
   }

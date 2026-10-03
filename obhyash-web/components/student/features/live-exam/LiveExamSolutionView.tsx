@@ -22,8 +22,11 @@ import {
   Target,
   HelpCircle,
   Lock,
+  Download,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { downloadLiveExamResult } from "@/services/download-service";
 
 interface LiveExamSolutionViewProps {
   examId: string;
@@ -47,6 +50,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   const [userAnswers, setUserAnswers] = useState<Record<string, number>>({});
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string | number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [filter, setFilter] = useState<"all" | "correct" | "wrong" | "skipped" | "bookmarked">("all");
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
@@ -168,6 +172,40 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
     return true;
   });
 
+  const handleDownloadPdf = () => {
+    if (questions.length === 0) {
+      toast.error("কোনো প্রশ্ন পাওয়া যায়নি");
+      return;
+    }
+    setIsDownloading(true);
+    try {
+      downloadLiveExamResult(
+        {
+          id: examId,
+          title: examTitle,
+          category: categoryTitle,
+          negative_marking: negativeMarking,
+          total_questions: questions.length,
+          total_marks: questions.reduce((acc, q) => acc + (q.points || 1), 0),
+        },
+        questions,
+        userAnswers,
+        {
+          score: finalScore,
+          correct_count: correctCount,
+          wrong_count: wrongCount,
+        },
+        profile?.name || (user?.user_metadata as any)?.name || (user?.user_metadata as any)?.full_name || user?.email?.split('@')[0] || 'শিক্ষার্থী'
+      );
+      toast.success("পিডিএফ সল্যুশন শিট প্রস্তুত হয়েছে!");
+    } catch (err) {
+      console.error("PDF download error:", err);
+      toast.error("পিডিএফ তৈরি করতে সমস্যা হয়েছে");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   if (isLocked) {
     return (
       <AppLayout
@@ -221,11 +259,26 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 rounded-full text-sm font-black flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+            <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 px-3.5 py-1.5 rounded-full text-sm font-black flex items-center gap-2">
               <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>প্রাপ্ত নম্বর: {finalScore}</span>
             </div>
+
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={isDownloading || questions.length === 0}
+              className="px-3.5 py-1.5 rounded-full bg-[#004633] hover:bg-[#003828] text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 disabled:opacity-50"
+              title="পিডিএফ সল্যুশন শিট ডাউনলোড"
+            >
+              {isDownloading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Download size={14} />
+              )}
+              <span>{isDownloading ? "প্রস্তুত হচ্ছে..." : "PDF ডাউনলোড"}</span>
+            </button>
           </div>
         </div>
 
