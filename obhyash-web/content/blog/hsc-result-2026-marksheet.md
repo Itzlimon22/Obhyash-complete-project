@@ -21,7 +21,7 @@ author:
   initials: AW
 readTime: 8
 coverColor: from-blue-600 via-indigo-800 to-slate-950
-publishedAt: '2026-10-03T04:10:00.000Z'
+publishedAt: '2026-10-03T08:30:00.000Z'
 featured: true
 ---
 # এইচএসসি রেজাল্ট ২০২৬: মার্কশিটসহ দেখার সহজ নিয়ম

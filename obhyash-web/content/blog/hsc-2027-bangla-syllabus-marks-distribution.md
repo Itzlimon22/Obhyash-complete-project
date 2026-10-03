@@ -15,7 +15,7 @@ author:
   initials: 'OB'
 readTime: 10
 coverColor: 'from-emerald-600 to-teal-900'
-publishedAt: '2026-09-30T04:00:00.000Z'
+publishedAt: '2026-09-30T08:30:00.000Z'
 featured: false
 ---
 

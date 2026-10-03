@@ -23,7 +23,7 @@ author:
   initials: AW
 readTime: 9
 coverColor: from-amber-600 via-orange-800 to-slate-950
-publishedAt: '2026-10-03T04:15:00.000Z'
+publishedAt: '2026-10-03T04:00:00.000Z'
 featured: true
 ---
 # বুয়েট ভর্তি ২০২৬-২৭: পরীক্ষার তারিখ, যোগ্যতা, পদ্ধতি ও প্রস্তুতি

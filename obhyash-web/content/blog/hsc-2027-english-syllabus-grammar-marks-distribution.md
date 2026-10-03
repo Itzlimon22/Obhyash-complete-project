@@ -17,7 +17,7 @@ author:
   initials: 'OE'
 readTime: 12
 coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
-publishedAt: '2026-09-30T04:00:00.000Z'
+publishedAt: '2026-09-30T13:00:00.000Z'
 featured: true
 ---
 

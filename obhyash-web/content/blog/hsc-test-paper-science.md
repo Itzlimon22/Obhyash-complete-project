@@ -18,7 +18,7 @@ author:
   initials: 'SW'
 readTime: 10
 coverColor: 'from-blue-600 to-indigo-950'
-publishedAt: '2026-09-27T02:56:00.000Z'
+publishedAt: '2026-09-27T03:00:00.000Z'
 featured: true
 ---
 

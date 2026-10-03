@@ -15,7 +15,7 @@ author:
   initials: 'OT'
 readTime: 9
 coverColor: 'from-blue-600 to-indigo-900'
-publishedAt: '2026-09-30T04:00:00.000Z'
+publishedAt: '2026-10-01T04:00:00.000Z'
 featured: false
 ---
 

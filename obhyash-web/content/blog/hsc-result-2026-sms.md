@@ -21,7 +21,7 @@ author:
   initials: AW
 readTime: 5
 coverColor: from-cyan-600 via-blue-800 to-slate-950
-publishedAt: '2026-10-03T04:15:00.000Z'
+publishedAt: '2026-10-03T10:00:00.000Z'
 featured: true
 ---
 # HSC Result 2026 SMS: মোবাইলে রেজাল্ট দেখার নিয়ম

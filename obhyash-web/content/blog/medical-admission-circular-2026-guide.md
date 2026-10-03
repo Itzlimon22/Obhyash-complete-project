@@ -19,7 +19,7 @@ author:
   initials: 'AW'
 readTime: 14
 coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
-publishedAt: '2026-10-03T04:00:00.000Z'
+publishedAt: '2026-10-03T02:00:00.000Z'
 featured: true
 ---
 

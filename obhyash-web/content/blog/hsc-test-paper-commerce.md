@@ -17,7 +17,7 @@ author:
   initials: 'CT'
 readTime: 8
 coverColor: 'from-emerald-600 to-teal-950'
-publishedAt: '2026-09-27T02:57:00.000Z'
+publishedAt: '2026-09-27T05:00:00.000Z'
 featured: false
 ---
 

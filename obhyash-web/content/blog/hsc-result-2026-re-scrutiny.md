@@ -22,7 +22,7 @@ author:
   initials: AW
 readTime: 7
 coverColor: from-blue-600 via-indigo-800 to-slate-950
-publishedAt: '2026-10-03T04:15:00.000Z'
+publishedAt: '2026-10-03T11:30:00.000Z'
 featured: true
 ---
 # এইচএসসি রিজাল্ট ২০২৬ পুনর্নিরীক্ষণ: আবেদনের নিয়ম ও ফি

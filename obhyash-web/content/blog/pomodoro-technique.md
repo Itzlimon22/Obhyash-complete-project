@@ -9,7 +9,7 @@ author:
   initials: 'OT'
 readTime: 4
 coverColor: 'from-rose-500 to-rose-700'
-publishedAt: '2026-02-27T10:00:00.000Z'
+publishedAt: '2026-02-27T08:00:00.000Z'
 featured: true
 ---
 
