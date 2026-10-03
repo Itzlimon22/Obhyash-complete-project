@@ -123,7 +123,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
       {/* ── Main Scrollable Content ── */}
       <main className="flex-1 overflow-y-auto px-1.5 sm:px-4 py-3 sm:py-6 flex justify-center">
-        <div className="w-full max-w-lg flex flex-col gap-3.5 sm:gap-4 pb-24">
+        <div className="w-full max-w-lg flex flex-col gap-3.5 sm:gap-4 pb-32 sm:pb-36">
           {/* ── Card 1: Subject & Scope Accordion ── */}
           <div className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden transition-all">
             <button
@@ -310,7 +310,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </main>
 
       {/* ── Fixed Bottom CTA Bar ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-[70] bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] px-3 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="w-full max-w-lg">
           <button
             type="button"

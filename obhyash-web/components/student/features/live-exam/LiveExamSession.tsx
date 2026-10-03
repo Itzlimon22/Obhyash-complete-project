@@ -74,6 +74,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
         {...commonLayoutProps}
         title="ত্রুটি"
         onBack={onExit}
+        hideBottomNav={true}
       >
         <div className="flex flex-col items-center justify-center py-20 text-red-500 font-['HindSiliguri']">
           <p className="text-xl font-semibold">পরীক্ষা লোড করতে সমস্যা হয়েছে</p>
@@ -96,6 +97,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
         {...commonLayoutProps}
         title="পরীক্ষার নির্দেশিকা"
         onBack={onExit}
+        hideBottomNav={true}
       >
         <ExamInstructionsView
           config={{
@@ -162,6 +164,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
         {...commonLayoutProps}
         title={`${exam.title} - ফলাফল`}
         onBack={onExit}
+        hideBottomNav={true}
       >
         <div className="w-full max-w-xl mx-auto py-6 sm:py-10 px-4 font-['HindSiliguri'] pb-24">
           <div className="w-full bg-white dark:bg-[#18181B] rounded-3xl p-6 sm:p-8 border border-[#E2E8F0] dark:border-[#27272A] shadow-xl text-center space-y-6 animate-in fade-in zoom-in-95 duration-300">
