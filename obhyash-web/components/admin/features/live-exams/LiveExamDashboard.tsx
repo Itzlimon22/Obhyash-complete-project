@@ -28,6 +28,7 @@ import {
   createLiveExam,
   updateLiveExam,
   extendLiveExamDuration,
+  triggerLiveExamLifecycleAutomation,
 } from '@/services/live-exam-admin-service';
 import LiveExamFormModal from './LiveExamFormModal';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -45,6 +46,30 @@ export default function LiveExamDashboard() {
   const [editingExam, setEditingExam] = useState<LiveExam | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [isAutomating, setIsAutomating] = useState(false);
+
+  const handleRunLifecycleAutomation = async () => {
+    try {
+      setIsAutomating(true);
+      const res = await triggerLiveExamLifecycleAutomation();
+      if (res.leaderboardsPublished > 0 || res.notificationsSent > 0) {
+        toast.success(
+          `অটোমেশন সম্পন্ন! ${res.leaderboardsPublished}টি লিডারবোর্ড প্রকাশিত ও ${res.notificationsSent}টি নোটিফিকেশন পাঠানো হয়েছে।`
+        );
+      } else if (res.examsEndedPracticeEnabled > 0 || res.staleAttemptsFinalized > 0) {
+        toast.success(
+          `অটোমেশন সম্পন্ন! ${res.examsEndedPracticeEnabled}টি পরীক্ষার সমাধান উন্মুক্ত ও ${res.staleAttemptsFinalized}টি সাবমিশন সম্পন্ন হয়েছে।`
+        );
+      } else {
+        toast.info('সকল লাইভ পরীক্ষার স্ট্যাটাস, সমাধান ও লিডারবোর্ড সম্পূর্ণ হালনাগাদ রয়েছে।');
+      }
+      fetchExams();
+    } catch (err: any) {
+      toast.error('অটোমেশন ব্যর্থ: ' + (err.message || 'ত্রুটি'));
+    } finally {
+      setIsAutomating(false);
+    }
+  };
 
   useEffect(() => {
     fetchExams();
@@ -147,29 +172,41 @@ export default function LiveExamDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200 dark:border-zinc-800">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-            <span className="text-[11px] font-extrabold text-amber-600 dark:text-amber-400 tracking-wider uppercase">
-              লাইভ প্রতিযোগিতা কমান্ড সেন্টার • Live Exam Controller
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
+              লাইভ পরীক্ষা অটোমেশন সক্রিয় • 15m Leaderboard & Lifecycle Auto
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
             লাইভ পরীক্ষা ব্যবস্থাপনা
           </h1>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-0.5">
-            শিডিউলড লাইভ প্রতিযোগিতা তৈরি, প্রশ্ন নির্ধারণ, সময় বর্ধিতকরণ ও লিডারবোর্ড ট্র্যাকিং
+            শিডিউলড লাইভ প্রতিযোগিতা তৈরি, প্রশ্ন নির্ধারণ, সময় বর্ধিতকরণ ও স্বয়ংক্রিয় লিডারবোর্ড ট্র্যাকিং
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setEditingExam(null);
-            setIsModalOpen(true);
-          }}
-          className="px-5 py-2.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] text-xs font-bold transition-all shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] flex items-center gap-2 cursor-pointer shrink-0"
-        >
-          <Plus size={16} />
-          <span>নতুন লাইভ এক্সাম তৈরি</span>
-        </button>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={handleRunLifecycleAutomation}
+            disabled={isAutomating}
+            title="লাইফসাইকেল অটোমেশন চালান (অটো-এন্ড, সমাধান উন্মুক্ত, ১৫ মিনিট পর লিডারবোর্ড ও নোটিফিকেশন)"
+            className="px-4 py-2.5 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 rounded-[14px] text-xs font-bold transition-all flex items-center gap-2 border border-neutral-300/80 dark:border-zinc-700 cursor-pointer disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={isAutomating ? 'animate-spin text-emerald-500' : 'text-emerald-600 dark:text-emerald-400'} />
+            <span>{isAutomating ? 'সিঙ্ক হচ্ছে...' : 'লাইফসাইকেল সিঙ্ক'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setEditingExam(null);
+              setIsModalOpen(true);
+            }}
+            className="px-5 py-2.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] text-xs font-bold transition-all shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] flex items-center gap-2 cursor-pointer shrink-0"
+          >
+            <Plus size={16} />
+            <span>নতুন লাইভ এক্সাম তৈরি</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Search & Filter Controls ── */}

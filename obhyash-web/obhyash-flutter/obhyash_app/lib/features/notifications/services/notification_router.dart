@@ -36,7 +36,21 @@ class NotificationRouter {
       if (internalRoute == '/exam-setup') {
         internalRoute = '/setup';
       }
+      if (internalRoute.startsWith('/live-exams/') || internalRoute.startsWith('/live_exams/')) {
+        final examId = internalRoute.replaceAll('/live-exams/', '').replaceAll('/live_exams/', '').trim();
+        if (examId.isNotEmpty) {
+          internalRoute = '/live_exam_details/$examId';
+        } else {
+          internalRoute = '/live_exam';
+        }
+      }
       return NotificationRouteResult(route: internalRoute);
+    }
+
+    // Check payload data for exam_id
+    final dataExamId = notif.data?['exam_id']?.toString() ?? notif.data?['live_exam_id']?.toString();
+    if (dataExamId != null && dataExamId.isNotEmpty) {
+      return NotificationRouteResult(route: '/live_exam_details/$dataExamId');
     }
 
     // 2. Intelligent semantic matching based on Type, Title, and Message

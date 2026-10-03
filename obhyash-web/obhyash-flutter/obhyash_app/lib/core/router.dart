@@ -321,6 +321,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/live-exams/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final examId = state.pathParameters['id']!;
+          final exam = state.extra as LiveExam?;
+          return _fadeRoute(
+            LiveExamDetailsView(examId: examId, preloadedExam: exam),
+            state,
+          );
+        },
+      ),
+      GoRoute(
         path: '/live_exam_session/:id',
         parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {

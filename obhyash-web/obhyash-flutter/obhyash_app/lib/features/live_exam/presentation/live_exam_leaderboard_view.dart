@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -28,15 +29,53 @@ class _LiveExamLeaderboardViewState
     extends ConsumerState<LiveExamLeaderboardView> {
   String _searchQuery = '';
   late final TextEditingController _searchController;
+  Timer? _ticker;
+  RealtimeChannel? _realtimeChannel;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+
+    // 1-second ticker for live 15-minute countdown
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+
+    // Supabase Realtime updates
+    try {
+      final supabase = Supabase.instance.client;
+      _realtimeChannel = supabase
+          .channel('public:live_exams_lb:${widget.examId}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'live_exams',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'id',
+              value: widget.examId,
+            ),
+            callback: (_) {
+              if (mounted) {
+                ref.invalidate(liveExamLeaderboardProvider(widget.examId));
+              }
+            },
+          )
+          .subscribe();
+    } catch (_) {}
   }
 
   @override
   void dispose() {
+    _ticker?.cancel();
+    if (_realtimeChannel != null) {
+      try {
+        Supabase.instance.client.removeChannel(_realtimeChannel!);
+      } catch (_) {}
+    }
     _searchController.dispose();
     super.dispose();
   }
@@ -205,37 +244,77 @@ class _LiveExamLeaderboardViewState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Notice if leaderboard is in review / unpublished
-                if (widget.exam?.isLeaderboardPublished == false)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                          color: const Color(0xFFF59E0B)
-                              .withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(LucideIcons.clock,
-                            color: Color(0xFFD97706), size: 20),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'মেধা তালিকা পর্যালোচনাধীন রয়েছে। এডমিন কর্তৃক চূড়ান্ত প্রকাশের পর এখানে সকলের তালিকা দৃশ্যমান হবে।',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark
-                                  ? Colors.amber[200]
-                                  : const Color(0xFF92400E),
-                              fontWeight: FontWeight.w600,
-                            ),
+                // Notice if leaderboard is in review / unpublished (15m countdown)
+                if (widget.exam != null && !widget.exam!.isLeaderboardAvailable)
+                  Builder(
+                    builder: (context) {
+                      final lbPubTime = widget.exam!.endTime.add(const Duration(minutes: 15));
+                      final diff = lbPubTime.difference(DateTime.now());
+                      final totalSecs = diff.inSeconds > 0 ? diff.inSeconds : 0;
+                      final mins = totalSecs ~/ 60;
+                      final secs = totalSecs % 60;
+                      final timeStr = "${BanglaNameHelper.toBanglaNumeral(mins.toString().padLeft(2, '0'))}:${BanglaNameHelper.toBanglaNumeral(secs.toString().padLeft(2, '0'))}";
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
                           ),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          children: [
+                            const Icon(LucideIcons.hourglass,
+                                color: Color(0xFFD97706), size: 22),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'মেধা তালিকা পর্যালোচনাধীন',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: isDark
+                                              ? Colors.amber[200]
+                                              : const Color(0xFF92400E),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        'আর $timeStr মি. বাকি',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFFD97706),
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'লাইভ পরীক্ষা শেষ হওয়ার ১৫ মিনিট পর চূড়ান্ত মেধা তালিকা ও সকল পরীক্ষার্থীর র‍্যাংক স্বয়ংক্রিয়ভাবে প্রকাশিত হবে।',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark
+                                          ? Colors.amber[100]?.withValues(alpha: 0.8)
+                                          : const Color(0xFF92400E),
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
 
                 // Current User Spotlight Card

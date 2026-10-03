@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/live-exams-lifecycle",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/notifications",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

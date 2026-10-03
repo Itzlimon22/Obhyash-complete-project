@@ -1,7 +1,9 @@
+import "dart:async";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:go_router/go_router.dart";
 import "package:lucide_icons/lucide_icons.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
 import "../domain/models.dart";
 import "../providers/live_exam_providers.dart";
 import "../../../core/presentation/widgets/skeleton_loading.dart";
@@ -23,6 +25,55 @@ class LiveExamDetailsView extends ConsumerStatefulWidget {
 }
 
 class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
+  Timer? _ticker;
+  RealtimeChannel? _realtimeChannel;
+
+  @override
+  void initState() {
+    super.initState();
+    // 1-second ticker so remaining time and 15m leaderboard countdown update live
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+
+    // Supabase Realtime listener: auto-refreshes when leaderboard or exam is published
+    try {
+      final supabase = Supabase.instance.client;
+      _realtimeChannel = supabase
+          .channel('public:live_exams:${widget.examId}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'live_exams',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'id',
+              value: widget.examId,
+            ),
+            callback: (_) {
+              if (mounted) {
+                ref.invalidate(liveExamDetailsProvider(widget.examId));
+                ref.invalidate(liveExamLeaderboardProvider(widget.examId));
+              }
+            },
+          )
+          .subscribe();
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    if (_realtimeChannel != null) {
+      try {
+        Supabase.instance.client.removeChannel(_realtimeChannel!);
+      } catch (_) {}
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -468,7 +519,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                             ? "লাইভ এক্সাম সাময়িক বন্ধ রয়েছে"
                             : isOngoing
                                 ? "পরীক্ষা শুরু করুন"
-                                : (isUpcoming ? "পরীক্ষা এখনও শুরু হয়নি (⏱️ আর ${_formatRemainingTime(exam.startTime)} বাকি)" : "অনুশীলন পরীক্ষা শুরু করুন"),
+                                : (isUpcoming ? "পরীক্ষা এখনও শুরু হয়নি (আর ${_formatRemainingTime(exam.startTime)} বাকি)" : "অনুশীলন পরীক্ষা শুরু করুন"),
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.bold,
@@ -481,8 +532,8 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                     ),
                   ),
                 ] else ...[
-                  // When results are published, show Solutions button
-                  if (exam.isResultPublished) ...[
+                  // When results/answers are published or exam ended, show Solutions button
+                  if (exam.isAnswerAvailable) ...[
                     // Solutions Button
                     SizedBox(
                       width: double.infinity,
@@ -769,54 +820,100 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                   ),
                 ],
 
-                // Admin Hidden Leaderboard Banner (When exam ended but admin toggled leaderboard hidden)
-                if (isTaken && (isPast || exam.id.startsWith("mock-")) && !exam.isLeaderboardPublished) ...[
+                // 15-Minute Automated Leaderboard Countdown Card
+                if (isTaken && (isPast || exam.id.startsWith("mock-")) && !exam.isLeaderboardAvailable) ...[
                   const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(LucideIcons.eyeOff, color: isDark ? Colors.white70 : const Color(0xFF4B5563), size: 20),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "মেধা তালিকা প্রকাশ স্থগিত",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF1F2937),
-                                  ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "কর্তৃপক্ষ কর্তৃক এই পরীক্ষার মেধা তালিকা সাময়িকভাবে অপ্রকাশিত রাখা হয়েছে।",
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  height: 1.4,
-                                  color: isDark ? Colors.white70 : const Color(0xFF4B5563),
-                                  ),
-                              ),
-                            ],
+                  Builder(
+                    builder: (context) {
+                      final lbPubTime = exam.endTime.add(const Duration(minutes: 15));
+                      final diff = lbPubTime.difference(DateTime.now());
+                      final totalSecs = diff.inSeconds > 0 ? diff.inSeconds : 0;
+                      final mins = totalSecs ~/ 60;
+                      final secs = totalSecs % 60;
+                      final timeStr = "${BanglaNameHelper.toBanglaNumeral(mins.toString().padLeft(2, '0'))}:${BanglaNameHelper.toBanglaNumeral(secs.toString().padLeft(2, '0'))}";
+
+                      return Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isDark
+                                ? [const Color(0xFF1E1E24), const Color(0xFF141417)]
+                                : [const Color(0xFFFEF3C7), const Color(0xFFFFFBEB)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFFF59E0B).withValues(alpha: 0.3)
+                                : const Color(0xFFFDE68A),
                           ),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(LucideIcons.hourglass, color: Color(0xFFD97706), size: 22),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "মেধা তালিকা প্রকাশের কাউন্টডাউন",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.amber[300] : const Color(0xFF92400E),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF59E0B),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          "$timeStr মি.",
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "লাইভ পরীক্ষা শেষ হওয়ার ১৫ মিনিট পর চূড়ান্ত মেধা তালিকা ও সকল পরীক্ষার্থীর র‍্যাংক স্বয়ংক্রিয়ভাবে প্রকাশিত হবে।",
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      height: 1.4,
+                                      color: isDark ? Colors.white70 : const Color(0xFF78350F),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ],
 
-                // Leaderboard Section (When Past/Ended and Published by Admin)
-                if (isTaken && (isPast || exam.id.startsWith("mock-")) && exam.isLeaderboardPublished) ...[
+                // Leaderboard Section (When Past/Ended and Published or 15m passed)
+                if (isTaken && (isPast || exam.id.startsWith("mock-")) && exam.isLeaderboardAvailable) ...[
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

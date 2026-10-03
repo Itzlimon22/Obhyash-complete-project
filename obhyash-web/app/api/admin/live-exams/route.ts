@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, connection } from 'next/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { findHscSubject } from '@/lib/data/hsc-helpers';
+import { runLiveExamLifecycleAutomation } from '@/lib/live-exam-lifecycle-service';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -544,6 +545,11 @@ export async function POST(request: NextRequest) {
 
       if (delErr) throw delErr;
       return NextResponse.json({ success: true });
+    }
+
+    if (action === 'run_lifecycle_automation') {
+      const result = await runLiveExamLifecycleAutomation(supabaseAdmin);
+      return NextResponse.json({ ...result });
     }
 
     return NextResponse.json(

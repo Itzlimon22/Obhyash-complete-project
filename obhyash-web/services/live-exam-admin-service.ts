@@ -689,3 +689,20 @@ export async function getLiveExamOngoingCount(examId: string): Promise<number> {
   if (error) return 0;
   return count || 0;
 }
+
+export async function triggerLiveExamLifecycleAutomation(): Promise<any> {
+  const res = await fetch("/api/admin/live-exams", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "run_lifecycle_automation",
+    }),
+  });
+
+  const json = await res.json();
+  if (res.ok && json.success) {
+    return json;
+  }
+  throw new Error(json.error || "Failed to trigger live exam lifecycle automation");
+}
+

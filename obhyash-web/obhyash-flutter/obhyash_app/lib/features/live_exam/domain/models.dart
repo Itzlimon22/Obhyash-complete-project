@@ -13,6 +13,7 @@ class LiveExam {
   final String? userAttemptStatus;
   final bool isLeaderboardPublished;
   final bool isAnswerPublished;
+  final bool isPracticeEnabled;
 
   LiveExam({
     required this.id,
@@ -27,8 +28,9 @@ class LiveExam {
     required this.status,
     required this.category,
     this.userAttemptStatus,
-    this.isLeaderboardPublished = true,
+    this.isLeaderboardPublished = false,
     this.isAnswerPublished = false,
+    this.isPracticeEnabled = true,
   });
 
   factory LiveExam.fromJson(Map<String, dynamic> json) {
@@ -73,8 +75,9 @@ class LiveExam {
       status: json['status'] as String? ?? '',
       category: json['category'] as String? ?? '',
       userAttemptStatus: json['userAttemptStatus'] as String?,
-      isLeaderboardPublished: json['is_leaderboard_published'] as bool? ?? true,
+      isLeaderboardPublished: json['is_leaderboard_published'] as bool? ?? false,
       isAnswerPublished: json['is_answer_published'] as bool? ?? false,
+      isPracticeEnabled: json['is_practice_enabled'] as bool? ?? true,
     );
   }
 
@@ -94,6 +97,7 @@ class LiveExam {
       'userAttemptStatus': userAttemptStatus,
       'is_leaderboard_published': isLeaderboardPublished,
       'is_answer_published': isAnswerPublished,
+      'is_practice_enabled': isPracticeEnabled,
     };
   }
 
@@ -116,7 +120,30 @@ class LiveExam {
     if (id.startsWith('mock-')) return true;
     final now = DateTime.now();
     final pubTime = endTime.add(const Duration(minutes: 15));
-    return now.isAfter(pubTime) && isLeaderboardPublished;
+    return now.isAfter(pubTime) || isLeaderboardPublished;
+  }
+
+  /// Automatically available 15 minutes after exam ends or if admin published
+  bool get isLeaderboardAvailable {
+    if (id.startsWith('mock-')) return true;
+    if (isLeaderboardPublished) return true;
+    final now = DateTime.now();
+    final pubTime = endTime.add(const Duration(minutes: 15));
+    return now.isAfter(pubTime);
+  }
+
+  /// Answers & solutions available immediately on exam end or if admin published
+  bool get isAnswerAvailable {
+    if (id.startsWith('mock-')) return true;
+    if (isAnswerPublished) return true;
+    return isPast;
+  }
+
+  /// Practice mode available immediately on exam end
+  bool get isPracticeAvailable {
+    if (id.startsWith('mock-')) return true;
+    if (isPracticeEnabled) return true;
+    return isPast;
   }
 }
 
