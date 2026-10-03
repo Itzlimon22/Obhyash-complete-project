@@ -165,7 +165,7 @@ export function renderCardHtml(q: QuestionItem): string {
   }
   const ex = explHtml(q.E);
   const imgHtml = q.img ? `<div class="q-img" style="text-align:center;margin:6px 0;"><img src="${escapeHtml(q.img)}" style="max-height:130px;max-width:96%;object-fit:contain;border-radius:4px;" /></div>` : '';
-  return `<div class="card"><div class="qb"><span class="bd">${toBnNumber(q.n)}</span>${inlineMath(q.q)}</div>${imgHtml}<div class="opts">${opts}</div>${ex ? `<div class="ex">${ex}</div>` : ''}</div>`;
+  return `<div class="card"><div class="qb"><span class="bd">${toBnNumber(q.n)}</span><span class="qt">${inlineMath(q.q)}</span></div>${imgHtml}<div class="opts">${opts}</div>${ex ? `<div class="ex">${ex}</div>` : ''}</div>`;
 }
 
 const DENSITY_CONFIGS = {
@@ -233,12 +233,31 @@ export function generateTemplateHtml(
   const dc = DENSITY_CONFIGS[density] || DENSITY_CONFIGS.balanced;
   const cardsJson = JSON.stringify(questions.map(renderCardHtml));
 
+  const baseUrlTag = settings.baseUrl
+    ? `<base href="${escapeHtml(settings.baseUrl)}/">`
+    : '';
+
+  const toolbarHtml = settings.standaloneToolbar
+    ? `<div class="no-print" style="position: sticky; top: 0; z-index: 99999; background: #0f4c5c; color: #ffffff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.18); font-family: 'Kalpurush', 'Times New Roman', sans-serif;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span style="font-weight: bold; font-size: 16px; letter-spacing: 0.3px;">অভ্যাস — A4 সল্যুশন শিট</span>
+    <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">ভেক্টর PDF</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 14px;">
+    <span style="font-size: 13px; opacity: 0.85;">কীবোর্ড: Ctrl+P বা ⌘+P</span>
+    <button onclick="window.print()" style="background: #2e9e57; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+      🖨️ প্রিন্ট / Save as PDF
+    </button>
+  </div>
+</div>`
+    : '';
+
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>\${escapeHtml(settings.title)}</title>
-\${settings.baseUrl ? \`<base href="\${escapeHtml(settings.baseUrl)}/">\` : ''}
+<title>${escapeHtml(settings.title)}</title>
+${baseUrlTag}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <style>
 @font-face {
@@ -257,7 +276,7 @@ export function generateTemplateHtml(
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: #fff; }
 body {
-  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'FreeSans', serif;
+  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'SolaimanLipi', 'Kohinoor Bangla', 'FreeSans', serif;
   color: #1c2b33;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
@@ -356,51 +375,63 @@ body {
   margin-bottom: 0;
 }
 .col .card + .card {
-  margin-top: \${dc.cardGap}px;
+  margin-top: ${dc.cardGap}px;
 }
 
 /* Question Box */
 .qb {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   background: #e6f1f1;
   border-left: 5px solid #0f4c5c;
   border-radius: 12px;
-  padding: \${dc.qbPadding};
+  padding: ${dc.qbPadding};
   font-weight: bold;
-  font-size: \${dc.qbFontSize};
-  line-height: \${dc.qbLineHeight};
+  font-size: ${dc.qbFontSize};
+  line-height: ${dc.qbLineHeight};
 }
 .bd {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: ${dc.bdPadding};
   background: #d62839;
   color: #fff;
-  border-radius: 8px;
-  padding: \${dc.bdPadding};
-  margin-right: 7px;
-  font-size: \${dc.bdFontSize};
-  line-height: \${dc.bdLineHeight};
+  border-radius: 999px;
+  font-size: ${dc.bdFontSize};
+  line-height: 1;
   font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.qt {
+  flex: 1;
+  min-width: 0;
 }
 
 /* Options */
 .opts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: \${dc.optsGap};
-  margin: \${dc.optsMargin};
+  gap: ${dc.optsGap};
+  margin: ${dc.optsMargin};
 }
 .op {
   position: relative;
   background: #fff;
   border: 1.5px solid #c9cfd3;
   border-radius: 9px;
-  padding: \${dc.opPadding};
-  font-size: \${dc.opFontSize};
-  line-height: \${dc.opLineHeight};
-  min-height: \${dc.opMinHeight};
+  padding: ${dc.opPadding};
+  font-size: ${dc.opFontSize};
+  line-height: ${dc.opLineHeight};
+  min-height: ${dc.opMinHeight};
   display: block;
 }
 .op b { margin-right: 5px; }
-.op.smo { font-size: calc(\${dc.opFontSize} - 1px); }
+.op.smo { font-size: calc(${dc.opFontSize} - 1px); }
 .op.ok {
   border-color: #2e9e57;
   background: #e8f6ec;
@@ -419,9 +450,9 @@ body {
 .ex {
   background: #fdf0ec;
   border-radius: 12px;
-  padding: \${dc.exPadding};
-  font-size: \${dc.exFontSize};
-  line-height: \${dc.exLineHeight};
+  padding: ${dc.exPadding};
+  font-size: ${dc.exFontSize};
+  line-height: ${dc.exLineHeight};
 }
 .ln { margin: 2px 0; }
 .lab { color: #d62839; font-weight: bold; }
@@ -499,19 +530,7 @@ body {
 </style>
 </head>
 <body>
-\${settings.standaloneToolbar ? \`
-<div class="no-print" style="position: sticky; top: 0; z-index: 99999; background: #0f4c5c; color: #ffffff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.18); font-family: 'Kalpurush', 'Times New Roman', sans-serif;">
-  <div style="display: flex; align-items: center; gap: 12px;">
-    <span style="font-weight: bold; font-size: 16px; letter-spacing: 0.3px;">অভ্যাস — A4 সল্যুশন শিট</span>
-    <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">ভেক্টর PDF</span>
-  </div>
-  <div style="display: flex; align-items: center; gap: 14px;">
-    <span style="font-size: 13px; opacity: 0.85;">কীবোর্ড: Ctrl+P বা ⌘+P</span>
-    <button onclick="window.print()" style="background: #2e9e57; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-      🖨️ প্রিন্ট / Save as PDF
-    </button>
-  </div>
-</div>\` : ''}
+${toolbarHtml}
 <div id="measure"></div>
 <div id="root"></div>
 
