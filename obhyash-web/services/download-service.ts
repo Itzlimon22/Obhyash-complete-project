@@ -67,6 +67,37 @@ const getSubjectCode = (subject?: string, subjectLabel?: string): string | null 
   return null;
 };
 
+// --- Theme Resolver for PDF Generation ---
+export const resolveTheme = (category?: string, title?: string, subject?: string): string => {
+  const text = `${category || ''} ${title || ''} ${subject || ''}`.toLowerCase();
+  if (
+    text.includes('eng') || 
+    text.includes('ইঞ্জিনিয়ারিং') || 
+    text.includes('বুয়েট') || 
+    text.includes('buet') || 
+    text.includes('ckruet') ||
+    text.includes('রুয়েট') ||
+    text.includes('কুয়েট') ||
+    text.includes('চুয়েট')
+  ) {
+    return 'engineering';
+  }
+  if (
+    text.includes('varsi') || 
+    text.includes('ভার্সিটি') || 
+    text.includes('বিশ্ববিদ্যালয়') || 
+    text.includes('dhaka university') || 
+    text.includes('ঢাবি') || 
+    text.includes('du') || 
+    text.includes('guccho') || 
+    text.includes('গুচ্ছ') ||
+    text.includes('কৃষি')
+  ) {
+    return 'varsity_oxford_maroon';
+  }
+  return 'medical';
+};
+
 // --- LaTeX Preprocessor (Chemistry, temperatures, and arrows) ---
 const preprocessMath = (math: string): string => {
   let m = math.trim();
@@ -410,8 +441,10 @@ export const downloadQuestionPaper = (
   }));
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
+  const theme = resolveTheme(details.examType, subjectTitle, details.subject);
 
   const settings: GeneratorSettings = {
+    theme,
     title: `${subjectTitle} — প্রশ্নপত্র`,
     subtitle: `উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · মোট প্রশ্ন: ${toBengaliNumber(totalCount)}টি · পূর্ণমান: ${toBengaliNumber(marks)} · সময়: ${toBengaliNumber(duration)} মিনিট`,
     hasHeader: true,
@@ -501,12 +534,14 @@ export const downloadResult = (
   });
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
+  const theme = resolveTheme(details.examType, subjectTitle, details.subject);
 
   const subtitle = hasUserAnswers
     ? `প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)} · মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি · সময়: ${toBengaliNumber(details.durationMinutes || 25)} মিনিট`
     : `উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি · পূর্ণমান: ${toBengaliNumber(details.totalMarks || questions.length)}`;
 
   const settings: GeneratorSettings = {
+    theme,
     title: `${subjectTitle} — সমাধান ও ব্যাখ্যা`,
     subtitle,
     hasHeader: true,
@@ -628,6 +663,7 @@ export const downloadLiveExamResult = (
   });
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
+  const theme = resolveTheme(exam.category, exam.title);
 
   const userPrefix = userName ? `পরীক্ষার্থী: ${userName} · ` : '';
   const subtitle = hasUserAnswers
@@ -635,6 +671,7 @@ export const downloadLiveExamResult = (
     : `লাইভ পরীক্ষা · মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি · পূর্ণমান: ${toBengaliNumber(totalPoints)} · সময়: ${toBengaliNumber(exam.duration_minutes || 30)} মিনিট`;
 
   const settings: GeneratorSettings = {
+    theme,
     title: `${exam.title} — ফলাফল ও সমাধান পত্র`,
     subtitle,
     hasHeader: true,

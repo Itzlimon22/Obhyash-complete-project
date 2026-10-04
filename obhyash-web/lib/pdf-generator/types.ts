@@ -5,9 +5,15 @@ export interface QuestionItem {
   o: Record<string, string>; // 'a', 'b', 'c', 'd'
   A: string; // 'ক', 'খ', 'গ', 'ঘ' or 'a', 'b', 'c', 'd'
   E: string[]; // explanation lines
+  isContinuation?: boolean;
+  continuationPart?: number;
+  cardType?: 'question' | 'explanation' | 'unified';
 }
 
 export interface GeneratorSettings {
+  // Theme and Palette
+  theme?: string; // e.g. 'medical' | 'engineering' | 'varsity' | custom theme key
+
   // Density and Spacing
   density?: 'balanced' | 'compact' | 'spacious'; // default: 'balanced'
   balanceColumns?: boolean; // default: true
@@ -33,6 +39,9 @@ export interface GeneratorSettings {
   footerPagePrefix: string; // e.g. "পৃষ্ঠা" or "Page"
   useBanglaDigits: boolean; // true = ১, ২; false = 1, 2
   pageOffset: number; // Starting page offset (0 = starts at 1)
+
+  // Advertising & Showcase Back Page
+  includeAdPage?: boolean; // default: true (appends modern 3-phone feature showcase page at the end of PDF)
 
   // Standalone Viewer / Print Support
   standaloneToolbar?: boolean;

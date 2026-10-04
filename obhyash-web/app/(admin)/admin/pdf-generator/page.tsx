@@ -58,6 +58,7 @@ export default function PdfGeneratorPage() {
     footerPagePrefix: 'পৃষ্ঠা',
     useBanglaDigits: true,
     pageOffset: 0,
+    includeAdPage: true,
   });
 
   const [zoomLevel, setZoomLevel] = useState(85);
@@ -467,6 +468,50 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
               <div className="space-y-3.5 pt-1">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    ক্যাটাগরি কালার থিম (Color Theme)
+                  </label>
+                  <select
+                    value={settings.theme || 'random'}
+                    onChange={e =>
+                      setSettings(prev => ({
+                        ...prev,
+                        theme: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                  >
+                    <option value="random">
+                      🎲 র‍্যান্ডম প্যালেট (Random - শত শত থিম থেকে স্বয়ংক্রিয়ভাবে)
+                    </option>
+                    <option value="medical">
+                      🩺 মেডিকেল (Medical Deep Teal & Coral)
+                    </option>
+                    <option value="engineering">
+                      ⚙️ ইঞ্জিনিয়ারিং (Royal Deep Navy & Amber)
+                    </option>
+                    <option value="engineering_slate">
+                      ⚙️ ইঞ্জিনিয়ারিং স্লেট (Cyber Slate & Electric Blue)
+                    </option>
+                    <option value="varsity_oxford_maroon">
+                      🎓 ভার্সিটি অক্সফোর্ড (Oxford Maroon & Antique Gold)
+                    </option>
+                    <option value="varsity">
+                      🎓 ভার্সিটি এমেরাল্ড (Forest Emerald & Golden Amber)
+                    </option>
+                    <option value="midnight_sapphire_gold">
+                      🌌 মিডনাইট স্যাফায়ার গোল্ড
+                    </option>
+                    <option value="espresso_burnished_gold">
+                      ☕ এসপ্রেসো গোল্ড
+                    </option>
+                    <option value="regal_indigo_purple">
+                      🍇 রয়্যাল ভায়োলেট গোল্ড
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     লেআউট ডেনসিটি (Density & Card Fit)
                   </label>
                   <select
@@ -513,6 +558,30 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                       </span>
                       <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
                         কোনো কলামে কম কার্ড থাকলে নিচে বড় গ্যাপ ফেলে না রেখে কার্ডগুলোর মাঝে ফাঁকা জায়গা সমানভাবে ছড়িয়ে দেয়।
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.includeAdPage !== false}
+                      onChange={e =>
+                        setSettings(prev => ({
+                          ...prev,
+                          includeAdPage: e.target.checked,
+                        }))
+                      }
+                      className="rounded text-teal-600 focus:ring-teal-500 w-4 h-4"
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 block">
+                        বিজ্ঞাপন ও অ্যাপ শোকেস পেজ যুক্ত করো (Ad Page)
+                      </span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
+                        PDF-এর শেষে ৩টি ফোন মকআপ সহ অ্যাপ ফিচার ও ডাউনলোড কিউআর কোড পেজ যুক্ত করবে।
                       </span>
                     </div>
                   </label>
