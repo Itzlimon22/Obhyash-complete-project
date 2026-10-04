@@ -45,6 +45,7 @@ import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
 import BlogQuickShareButton from '@/components/blog/BlogQuickShareButton';
 import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
 import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
+import ResultStepFlow from '@/components/blog/ResultStepFlow';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -241,6 +242,9 @@ export default async function BlogPostPage({
       const widget = (props as Record<string, unknown>)['data-widget'];
       if (widget === 'hsc-gpa-calculator') {
         return <HscGpaCalculator />;
+      }
+      if (widget === 'result-step-flow' || widget === 'hsc-result-steps') {
+        return <ResultStepFlow />;
       }
       if (widget === 'related-post') {
         const targetSlug = (props as Record<string, unknown>)['data-slug'] as string;
