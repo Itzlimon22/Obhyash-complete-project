@@ -18,20 +18,25 @@
         text-rendering: geometricPrecision;
       }
     </style>
+    <!-- Soft light gradient for subtle depth -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0F9FF" />
+      <stop offset="100%" stop-color="#EFF6FF" />
+    </linearGradient>
   </defs>
 
-  <!-- 1. Pure Crisp Clean White Canvas -->
-  <rect width="1200" height="630" fill="#FFFFFF" />
+  <!-- 1. Soft Light Premium Canvas -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
 
-  <!-- 2. Minimalist Frame -->
-  <rect x="24" y="24" width="1152" height="582" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
+  <!-- 2. Clean Inside Card Frame -->
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="#FFFFFF" stroke="#E0F2FE" stroke-width="2" />
 
   <!-- 3. Top Row Badges -->
-  <!-- Top Left: Red Category Pill -->
+  <!-- Top Left: Category Pill -->
   <g transform="translate(70, 70)">
-    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FEF2F2" stroke="#FECDD3" stroke-width="1.5" />
-    <circle cx="22" cy="21" r="5" fill="#DC2626" />
-    <text x="36" y="27" class="badge-text" font-size="16" fill="#B91C1C">
+    <rect x="0" y="0" width="185" height="42" rx="21" fill="#E0F2FE" stroke="#BAE6FD" stroke-width="1.5" />
+    <circle cx="22" cy="21" r="5" fill="#0284C7" />
+    <text x="36" y="27" class="badge-text" font-size="16" fill="#0369A1">
       প্রস্তুতি ও সূত্র সমগ্র
     </text>
   </g>
@@ -53,8 +58,8 @@
       এইচএসসি ২০২৭ উচ্চতর গণিত ১ম পত্র
     </text>
 
-    <!-- Line 2: Vibrant Crimson Red -->
-    <text x="0" y="68" class="title" font-size="40" fill="#DC2626" text-anchor="middle">
+    <!-- Line 2: Thematic Accent Color -->
+    <text x="0" y="68" class="title" font-size="40" fill="#2563EB" text-anchor="middle">
       ম্যাট্রিক্স ও ক্যালকুলাস আয়ত্ত করার
     </text>
   </g>
@@ -63,14 +68,14 @@
   <g transform="translate(600, 480)">
     <!-- Pill 1 -->
     <g transform="translate(-320, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
-      <text x="22" y="36" class="meta" font-size="19" fill="#DC2626">📐</text>
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F0F9FF" stroke="#E0F2FE" stroke-width="1.5" />
+      <text x="22" y="36" class="meta" font-size="19" fill="#2563EB">📐</text>
       <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">গুরুত্বপূর্ণ সকল সূত্র</text>
     </g>
 
     <!-- Pill 2 -->
     <g transform="translate(15, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F0F9FF" stroke="#E0F2FE" stroke-width="1.5" />
       <text x="22" y="35" class="meta" font-size="19" fill="#059669">✓</text>
       <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">শর্টকাট টেকনিক ও হ্যাকস</text>
     </g>

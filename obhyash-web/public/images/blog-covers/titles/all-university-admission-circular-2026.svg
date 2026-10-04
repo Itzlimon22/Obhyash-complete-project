@@ -18,21 +18,26 @@
         text-rendering: geometricPrecision;
       }
     </style>
+    <!-- Soft light gradient for subtle depth -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ECFEFF" />
+      <stop offset="100%" stop-color="#F0FDFA" />
+    </linearGradient>
   </defs>
 
-  <!-- 1. Pure Crisp Clean White Canvas -->
-  <rect width="1200" height="630" fill="#FFFFFF" />
+  <!-- 1. Soft Light Premium Canvas -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
 
-  <!-- 2. Minimalist Frame -->
-  <rect x="24" y="24" width="1152" height="582" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
+  <!-- 2. Clean Inside Card Frame -->
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="#FFFFFF" stroke="#CCFBF1" stroke-width="2" />
 
   <!-- 3. Top Row Badges -->
-  <!-- Top Left: Red Category Pill -->
+  <!-- Top Left: Category Pill -->
   <g transform="translate(70, 70)">
-    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FEF2F2" stroke="#FECDD3" stroke-width="1.5" />
-    <circle cx="22" cy="21" r="5" fill="#DC2626" />
-    <text x="36" y="27" class="badge-text" font-size="16" fill="#B91C1C">
-      পরীক্ষার রুটিন
+    <rect x="0" y="0" width="185" height="42" rx="21" fill="#E0F2FE" stroke="#BAE6FD" stroke-width="1.5" />
+    <circle cx="22" cy="21" r="5" fill="#0EA5E9" />
+    <text x="36" y="27" class="badge-text" font-size="16" fill="#0284C7">
+      ভর্তি পরীক্ষা তথ্য
     </text>
   </g>
 
@@ -53,8 +58,8 @@
       সকল বিশ্ববিদ্যালয় ভর্তি সার্কুলার ২০২৬
     </text>
 
-    <!-- Line 2: Vibrant Crimson Red -->
-    <text x="0" y="68" class="title" font-size="44" fill="#DC2626" text-anchor="middle">
+    <!-- Line 2: Thematic Accent Color -->
+    <text x="0" y="68" class="title" font-size="44" fill="#0284C7" text-anchor="middle">
       মেডিকেল ও আবেদন গাইড
     </text>
   </g>
@@ -63,16 +68,16 @@
   <g transform="translate(600, 480)">
     <!-- Pill 1 -->
     <g transform="translate(-320, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
-      <text x="22" y="36" class="meta" font-size="19" fill="#DC2626">📅</text>
-      <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">বোর্ড সময়সূচি ও তারিখ</text>
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F0FDFA" stroke="#CCFBF1" stroke-width="1.5" />
+      <text x="22" y="36" class="meta" font-size="19" fill="#0D9488">🎯</text>
+      <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">যোগ্যতা ও আবেদন নিয়ম</text>
     </g>
 
     <!-- Pill 2 -->
     <g transform="translate(15, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F0FDFA" stroke="#CCFBF1" stroke-width="1.5" />
       <text x="22" y="35" class="meta" font-size="19" fill="#059669">✓</text>
-      <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">অফিসিয়াল PDF রুটিন</text>
+      <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">পরীক্ষা পদ্ধতি ও মানবণ্টন</text>
     </g>
   </g>
 </svg>

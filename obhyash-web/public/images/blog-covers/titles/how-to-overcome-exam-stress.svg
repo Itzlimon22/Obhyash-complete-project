@@ -18,20 +18,25 @@
         text-rendering: geometricPrecision;
       }
     </style>
+    <!-- Soft light gradient for subtle depth -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F8FAFC" />
+    </linearGradient>
   </defs>
 
-  <!-- 1. Pure Crisp Clean White Canvas -->
-  <rect width="1200" height="630" fill="#FFFFFF" />
+  <!-- 1. Soft Light Premium Canvas -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
 
-  <!-- 2. Minimalist Frame -->
-  <rect x="24" y="24" width="1152" height="582" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
+  <!-- 2. Clean Inside Card Frame -->
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
 
   <!-- 3. Top Row Badges -->
-  <!-- Top Left: Red Category Pill -->
+  <!-- Top Left: Category Pill -->
   <g transform="translate(70, 70)">
-    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FEF2F2" stroke="#FECDD3" stroke-width="1.5" />
-    <circle cx="22" cy="21" r="5" fill="#DC2626" />
-    <text x="36" y="27" class="badge-text" font-size="16" fill="#B91C1C">
+    <rect x="0" y="0" width="185" height="42" rx="21" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5" />
+    <circle cx="22" cy="21" r="5" fill="#64748B" />
+    <text x="36" y="27" class="badge-text" font-size="16" fill="#334155">
       স্মার্ট স্টাডি হ্যাকস
     </text>
   </g>
@@ -53,8 +58,8 @@
       পরীক্ষার আগের রাতের ভয় ও দুশ্চিন্তা কাটানোর ৭টি
     </text>
 
-    <!-- Line 2: Vibrant Crimson Red -->
-    <text x="0" y="63" class="title" font-size="39" fill="#DC2626" text-anchor="middle">
+    <!-- Line 2: Thematic Accent Color -->
+    <text x="0" y="63" class="title" font-size="39" fill="#E11D48" text-anchor="middle">
       মনস্তাত্ত্বিক উপায় (How to Overcome
     </text>
   </g>

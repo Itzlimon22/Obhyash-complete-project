@@ -56,7 +56,7 @@ export default function BlogFooter() {
             <div className="flex items-center gap-3 mt-1">
               {/* Facebook Page */}
               <a
-                href="https://www.facebook.com/share/18779ur8WD/"
+                href="https://www.facebook.com/obhyash.official"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Obhyash Facebook Page"
@@ -82,7 +82,7 @@ export default function BlogFooter() {
 
               {/* YouTube Channel */}
               <a
-                href="https://www.youtube.com/@obhyash"
+                href="https://www.youtube.com/@phymathnerds"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Obhyash YouTube Channel"

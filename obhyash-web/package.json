@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "analyze": "ANALYZE=true next build",
-    "generate:banners": "tsx scripts/generate_all_blog_banners.ts"
+    "generate:banners": "npx tsx scripts/generate_all_blog_banners.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.980.0",

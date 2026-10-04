@@ -18,20 +18,25 @@
         text-rendering: geometricPrecision;
       }
     </style>
+    <!-- Soft light gradient for subtle depth -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF1F2" />
+      <stop offset="100%" stop-color="#FEF2F2" />
+    </linearGradient>
   </defs>
 
-  <!-- 1. Pure Crisp Clean White Canvas -->
-  <rect width="1200" height="630" fill="#FFFFFF" />
+  <!-- 1. Soft Light Premium Canvas -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
 
-  <!-- 2. Minimalist Frame -->
-  <rect x="24" y="24" width="1152" height="582" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
+  <!-- 2. Clean Inside Card Frame -->
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="#FFFFFF" stroke="#FFE4E6" stroke-width="2" />
 
   <!-- 3. Top Row Badges -->
-  <!-- Top Left: Red Category Pill -->
+  <!-- Top Left: Category Pill -->
   <g transform="translate(70, 70)">
-    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FEF2F2" stroke="#FECDD3" stroke-width="1.5" />
-    <circle cx="22" cy="21" r="5" fill="#DC2626" />
-    <text x="36" y="27" class="badge-text" font-size="16" fill="#B91C1C">
+    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FFE4E6" stroke="#FECDD3" stroke-width="1.5" />
+    <circle cx="22" cy="21" r="5" fill="#E11D48" />
+    <text x="36" y="27" class="badge-text" font-size="16" fill="#BE123C">
       রেজাল্ট আপডেট
     </text>
   </g>
@@ -53,7 +58,7 @@
       HSC Result 2026 SMS
     </text>
 
-    <!-- Line 2: Vibrant Crimson Red -->
+    <!-- Line 2: Thematic Accent Color -->
     <text x="0" y="76" class="title" font-size="44" fill="#DC2626" text-anchor="middle">
       মোবাইলে রেজাল্ট দেখার নিয়ম
     </text>
@@ -63,14 +68,14 @@
   <g transform="translate(600, 480)">
     <!-- Pill 1 -->
     <g transform="translate(-320, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#FFF1F2" stroke="#FFE4E6" stroke-width="1.5" />
       <text x="22" y="36" class="meta" font-size="19" fill="#DC2626">📅</text>
       <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">সম্ভাব্য তারিখ ও সময়</text>
     </g>
 
     <!-- Pill 2 -->
     <g transform="translate(15, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#FFF1F2" stroke="#FFE4E6" stroke-width="1.5" />
       <text x="22" y="35" class="meta" font-size="19" fill="#059669">✓</text>
       <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">অনলাইন ও SMS মার্কশিট</text>
     </g>

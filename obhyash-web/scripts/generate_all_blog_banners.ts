@@ -144,8 +144,36 @@ function getBadges(title: string, category: string, tags: string[]): {
     yearBadge = 'ঢাবি ভর্তি ২০২৬';
   }
 
-  // Result / Notice
-  if (combined.includes('রেজাল্ট') || combined.includes('result') || combined.includes('বৃত্তি') || combined.includes('scholarship')) {
+  // Admission
+  if (
+    combined.includes('ভর্তি') ||
+    combined.includes('admission') ||
+    combined.includes('বুয়েট') ||
+    combined.includes('বুয়েট') ||
+    combined.includes('মেডিকেল') ||
+    combined.includes('mist') ||
+    combined.includes('gst') ||
+    combined.includes('ckruet')
+  ) {
+    return {
+      catBadge: 'ভর্তি পরীক্ষা তথ্য',
+      yearBadge,
+      chip1Icon: '🎯',
+      chip1Text: 'যোগ্যতা ও আবেদন নিয়ম',
+      chip2Icon: '✓',
+      chip2Text: 'পরীক্ষা পদ্ধতি ও মানবণ্টন',
+    };
+  }
+
+  // Result / Notice / Scholarship
+  if (
+    combined.includes('রেজাল্ট') ||
+    combined.includes('result') ||
+    combined.includes('বৃত্তি') ||
+    combined.includes('scholarship') ||
+    combined.includes('মার্কশিট') ||
+    combined.includes('পুনঃনিরীক্ষণ')
+  ) {
     return {
       catBadge: 'রেজাল্ট আপডেট',
       yearBadge,
@@ -169,7 +197,13 @@ function getBadges(title: string, category: string, tags: string[]): {
   }
 
   // Syllabus / Marks distribution
-  if (combined.includes('সিলেবাস') || combined.includes('syllabus') || combined.includes('মানবণ্টন') || combined.includes('বই') || combined.includes('book')) {
+  if (
+    combined.includes('সিলেবাস') ||
+    combined.includes('syllabus') ||
+    combined.includes('মানবণ্টন') ||
+    combined.includes('বই') ||
+    combined.includes('book')
+  ) {
     return {
       catBadge: 'সিলেবাস ও মানবণ্টন',
       yearBadge,
@@ -180,20 +214,16 @@ function getBadges(title: string, category: string, tags: string[]): {
     };
   }
 
-  // Admission
-  if (combined.includes('ভর্তি') || combined.includes('admission') || combined.includes('বুয়েট') || combined.includes('মেডিকেল') || combined.includes('mist') || combined.includes('gst')) {
-    return {
-      catBadge: 'ভর্তি পরীক্ষা তথ্য',
-      yearBadge,
-      chip1Icon: '🎯',
-      chip1Text: 'যোগ্যতা ও আবেদন নিয়ম',
-      chip2Icon: '✓',
-      chip2Text: 'পরীক্ষা পদ্ধতি ও মানবণ্টন',
-    };
-  }
-
   // Formula / Science / Math
-  if (combined.includes('সূত্র') || combined.includes('formula') || combined.includes('পদার্থ') || combined.includes('রসায়ন') || combined.includes('গণিত') || combined.includes('ict')) {
+  if (
+    combined.includes('সূত্র') ||
+    combined.includes('formula') ||
+    combined.includes('পদার্থ') ||
+    combined.includes('রসায়ন') ||
+    combined.includes('রসায়ন') ||
+    combined.includes('গণিত') ||
+    combined.includes('ict')
+  ) {
     return {
       catBadge: 'প্রস্তুতি ও সূত্র সমগ্র',
       yearBadge,
@@ -229,9 +259,196 @@ function calculateSafeFontSize(text: string, baseSize: number, maxAllowedWidth =
   return Math.max(safeSize, 34); // Keep legible between 34px and 56px
 }
 
-function generateSvgBanner(title: string, category: string, tags: string[]): string {
+interface ColorTheme {
+  name: string;
+  bgGradStart: string;
+  bgGradEnd: string;
+  cardFill: string;
+  cardStroke: string;
+  catPillBg: string;
+  catPillStroke: string;
+  catPillText: string;
+  catPillDot: string;
+  line2Color: string;
+  bottomPillBg: string;
+  bottomPillStroke: string;
+  bottomPill1IconColor: string;
+}
+
+const THEMES: Record<string, ColorTheme> = {
+  cyan: {
+    name: 'cyan',
+    bgGradStart: '#ECFEFF', // ultra light cyan
+    bgGradEnd: '#F0FDFA',
+    cardFill: '#FFFFFF',
+    cardStroke: '#CCFBF1',
+    catPillBg: '#E0F2FE',
+    catPillStroke: '#BAE6FD',
+    catPillText: '#0284C7',
+    catPillDot: '#0EA5E9',
+    line2Color: '#0284C7',
+    bottomPillBg: '#F0FDFA',
+    bottomPillStroke: '#CCFBF1',
+    bottomPill1IconColor: '#0D9488',
+  },
+  green: {
+    name: 'green',
+    bgGradStart: '#F0FDF4', // ultra light emerald mint
+    bgGradEnd: '#F7FEE7',
+    cardFill: '#FFFFFF',
+    cardStroke: '#DCFCE7',
+    catPillBg: '#DCFCE7',
+    catPillStroke: '#BBF7D0',
+    catPillText: '#15803D',
+    catPillDot: '#16A34A',
+    line2Color: '#16A34A',
+    bottomPillBg: '#F0FDF4',
+    bottomPillStroke: '#DCFCE7',
+    bottomPill1IconColor: '#16A34A',
+  },
+  blue: {
+    name: 'blue',
+    bgGradStart: '#F0F9FF', // ultra light sky/blue
+    bgGradEnd: '#EFF6FF',
+    cardFill: '#FFFFFF',
+    cardStroke: '#E0F2FE',
+    catPillBg: '#E0F2FE',
+    catPillStroke: '#BAE6FD',
+    catPillText: '#0369A1',
+    catPillDot: '#0284C7',
+    line2Color: '#2563EB',
+    bottomPillBg: '#F0F9FF',
+    bottomPillStroke: '#E0F2FE',
+    bottomPill1IconColor: '#2563EB',
+  },
+  red: {
+    name: 'red',
+    bgGradStart: '#FFF1F2', // ultra light rose/red
+    bgGradEnd: '#FEF2F2',
+    cardFill: '#FFFFFF',
+    cardStroke: '#FFE4E6',
+    catPillBg: '#FFE4E6',
+    catPillStroke: '#FECDD3',
+    catPillText: '#BE123C',
+    catPillDot: '#E11D48',
+    line2Color: '#DC2626',
+    bottomPillBg: '#FFF1F2',
+    bottomPillStroke: '#FFE4E6',
+    bottomPill1IconColor: '#DC2626',
+  },
+  purewhite: {
+    name: 'purewhite',
+    bgGradStart: '#FFFFFF', // pure minimalist white
+    bgGradEnd: '#F8FAFC',
+    cardFill: '#FFFFFF',
+    cardStroke: '#F1F5F9',
+    catPillBg: '#F1F5F9',
+    catPillStroke: '#E2E8F0',
+    catPillText: '#334155',
+    catPillDot: '#64748B',
+    line2Color: '#E11D48',
+    bottomPillBg: '#F8FAFC',
+    bottomPillStroke: '#E2E8F0',
+    bottomPill1IconColor: '#DC2626',
+  },
+};
+
+function getColorTheme(title: string, category: string, tags: string[], slug: string): ColorTheme {
+  const combined = `${title} ${category} ${tags.join(' ')} ${slug}`.toLowerCase().normalize('NFC');
+
+  // 1. Pure White: Productivity, Mindset, Habits, Study Methods, Stress
+  if (
+    combined.includes('pomodoro') ||
+    combined.includes('challenge') ||
+    combined.includes('habit') ||
+    combined.includes('stress') ||
+    combined.includes('active-recall') ||
+    combined.includes('spaced-repetition') ||
+    combined.includes('full-meaning') ||
+    combined.includes('tips')
+  ) {
+    return THEMES.purewhite;
+  }
+
+  // 2. Cyan: Varsity Admission / Engineering / Medical
+  if (
+    combined.includes('বুয়েট') ||
+    combined.includes('বুয়েট') ||
+    combined.includes('buet') ||
+    combined.includes('মেডিকেল') ||
+    combined.includes('medical') ||
+    combined.includes('mist') ||
+    combined.includes('এমআইএসটি') ||
+    combined.includes('ckruet') ||
+    combined.includes('ঢাবি') ||
+    combined.includes('du ') ||
+    combined.includes('bup') ||
+    combined.includes('gst') ||
+    combined.includes('ভর্তি') ||
+    combined.includes('admission')
+  ) {
+    return THEMES.cyan;
+  }
+
+  // 3. Blue: STEM, Math, Physics, Chemistry, Formulas, ICT
+  if (
+    combined.includes('সূত্র') ||
+    combined.includes('formula') ||
+    combined.includes('পদার্থ') ||
+    combined.includes('physics') ||
+    combined.includes('গণিত') ||
+    combined.includes('math') ||
+    combined.includes('রসায়ন') ||
+    combined.includes('রসায়ন') ||
+    combined.includes('chemistry') ||
+    combined.includes('ict') ||
+    combined.includes('ক্যালকুলাস') ||
+    combined.includes('ভেক্টর') ||
+    combined.includes('periodic-table')
+  ) {
+    return THEMES.blue;
+  }
+
+  // 4. Red: Results, Scholarship, Marksheet, Notice
+  if (
+    combined.includes('রেজাল্ট') ||
+    combined.includes('result') ||
+    combined.includes('বৃত্তি') ||
+    combined.includes('scholarship') ||
+    combined.includes('মার্কশিট') ||
+    combined.includes('marksheet') ||
+    combined.includes('পুনঃনিরীক্ষণ') ||
+    combined.includes('rescrutiny')
+  ) {
+    return THEMES.red;
+  }
+
+  // 5. Green: Books, Syllabus, Routine, Bangla, English
+  if (
+    combined.includes('বই') ||
+    combined.includes('book') ||
+    combined.includes('সিলেবাস') ||
+    combined.includes('syllabus') ||
+    combined.includes('রুটিন') ||
+    combined.includes('routine') ||
+    combined.includes('বাংলা') ||
+    combined.includes('bangla') ||
+    combined.includes('ইংরেজি') ||
+    combined.includes('english')
+  ) {
+    return THEMES.green;
+  }
+
+  // Fallback distributed across all 5 themes
+  const themeList = [THEMES.purewhite, THEMES.cyan, THEMES.green, THEMES.blue, THEMES.red];
+  const charSum = (slug || title).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return themeList[charSum % themeList.length];
+}
+
+function generateSvgBanner(title: string, category: string, tags: string[], slug = ''): string {
   const [rawLine1, rawLine2] = splitTitle(title);
   const badges = getBadges(title, category, tags);
+  const theme = getColorTheme(title, category, tags, slug);
 
   // Dynamic font sizing
   const fontSize1 = calculateSafeFontSize(rawLine1, 52, 920);
@@ -264,20 +481,25 @@ function generateSvgBanner(title: string, category: string, tags: string[]): str
         text-rendering: geometricPrecision;
       }
     </style>
+    <!-- Soft light gradient for subtle depth -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${theme.bgGradStart}" />
+      <stop offset="100%" stop-color="${theme.bgGradEnd}" />
+    </linearGradient>
   </defs>
 
-  <!-- 1. Pure Crisp Clean White Canvas -->
-  <rect width="1200" height="630" fill="#FFFFFF" />
+  <!-- 1. Soft Light Premium Canvas -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
 
-  <!-- 2. Minimalist Frame -->
-  <rect x="24" y="24" width="1152" height="582" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
+  <!-- 2. Clean Inside Card Frame -->
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="${theme.cardFill}" stroke="${theme.cardStroke}" stroke-width="2" />
 
   <!-- 3. Top Row Badges -->
-  <!-- Top Left: Red Category Pill -->
+  <!-- Top Left: Category Pill -->
   <g transform="translate(70, 70)">
-    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FEF2F2" stroke="#FECDD3" stroke-width="1.5" />
-    <circle cx="22" cy="21" r="5" fill="#DC2626" />
-    <text x="36" y="27" class="badge-text" font-size="16" fill="#B91C1C">
+    <rect x="0" y="0" width="185" height="42" rx="21" fill="${theme.catPillBg}" stroke="${theme.catPillStroke}" stroke-width="1.5" />
+    <circle cx="22" cy="21" r="5" fill="${theme.catPillDot}" />
+    <text x="36" y="27" class="badge-text" font-size="16" fill="${theme.catPillText}">
       ${cleanText(badges.catBadge)}
     </text>
   </g>
@@ -299,10 +521,10 @@ function generateSvgBanner(title: string, category: string, tags: string[]): str
       ${cleanText(rawLine1)}
     </text>
 
-    <!-- Line 2: Vibrant Crimson Red -->
+    <!-- Line 2: Thematic Accent Color -->
     ${
       rawLine2
-        ? `<text x="0" y="${y2 - y1}" class="title" font-size="${fontSize2}" fill="#DC2626" text-anchor="middle">
+        ? `<text x="0" y="${y2 - y1}" class="title" font-size="${fontSize2}" fill="${theme.line2Color}" text-anchor="middle">
       ${cleanText(rawLine2)}
     </text>`
         : ''
@@ -313,14 +535,14 @@ function generateSvgBanner(title: string, category: string, tags: string[]): str
   <g transform="translate(600, 480)">
     <!-- Pill 1 -->
     <g transform="translate(-320, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
-      <text x="22" y="36" class="meta" font-size="19" fill="#DC2626">${badges.chip1Icon}</text>
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="${theme.bottomPillBg}" stroke="${theme.bottomPillStroke}" stroke-width="1.5" />
+      <text x="22" y="36" class="meta" font-size="19" fill="${theme.bottomPill1IconColor}">${badges.chip1Icon}</text>
       <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">${cleanText(badges.chip1Text)}</text>
     </g>
 
     <!-- Pill 2 -->
     <g transform="translate(15, 0)">
-      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="${theme.bottomPillBg}" stroke="${theme.bottomPillStroke}" stroke-width="1.5" />
       <text x="22" y="35" class="meta" font-size="19" fill="#059669">${badges.chip2Icon}</text>
       <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">${cleanText(badges.chip2Text)}</text>
     </g>
@@ -344,7 +566,7 @@ async function main() {
     const category = frontmatter.category || '';
     const tags = frontmatter.tags || [];
 
-    const svgContent = generateSvgBanner(title, category, tags);
+    const svgContent = generateSvgBanner(title, category, tags, slug);
     const svgPath = path.join(OUTPUT_DIR, `${slug}.svg`);
     fs.writeFileSync(svgPath, svgContent, 'utf8');
 

@@ -34,17 +34,9 @@ function formatDate(dateStr: string) {
   });
 }
 
-// Katen Signature Wave SVG Underline (in Deep Green)
+// Clean Neutral Gray Indicator Dash
 const KatenWave = () => (
-  <svg width="33" height="6" xmlns="http://www.w3.org/2000/svg" className="mt-1.5 mb-5 block">
-    <path
-      d="M0 2c3.5 0 3.5 2 7 2s3.5-2 7-2 3.5 2 7 2 3.5-2 7-2 3.5 2 5 2"
-      stroke="#059669"
-      strokeWidth="2.2"
-      fill="none"
-      strokeLinecap="round"
-    />
-  </svg>
+  <div className="w-8 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mt-2 mb-4" />
 );
 
 interface BlogListingClientProps {
@@ -562,10 +554,10 @@ export default function BlogListingClient({
 
           {/* Right Sidebar (4 Cols): Explore Topics + Newsletter */}
           <div className="lg:col-span-4 space-y-8">
-            {/* Widget 3: Explore Topics */}
-            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 sm:p-7 shadow-sm">
-              <h3 className="text-base font-black text-[#203656] dark:text-white">
-                Explore Topics
+            {/* Widget 3: Explore Topics (টপিকসমূহ) */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 sm:p-7 shadow-xs font-anek">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                টপিকসমূহ
               </h3>
               <KatenWave />
 
@@ -576,8 +568,8 @@ export default function BlogListingClient({
                     onClick={() => setActiveCategory(cat)}
                     className="w-full flex items-center justify-between py-3 group text-xs sm:text-sm font-medium transition-colors"
                   >
-                    <span className="flex items-center gap-2 text-slate-700 dark:text-slate-300 group-hover:text-[#059669] dark:group-hover:text-[#34d399]">
-                      <ChevronRight className="w-3.5 h-3.5 text-[#059669] group-hover:translate-x-1 transition-transform" />
+                    <span className="flex items-center gap-2 text-slate-700 dark:text-slate-300 group-hover:text-slate-950 dark:group-hover:text-white">
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 transition-transform" />
                       {cat === 'All' ? 'সকল বিষয়' : cat}
                     </span>
                     <span className="text-slate-400 font-mono text-xs">
@@ -588,10 +580,10 @@ export default function BlogListingClient({
               </div>
             </div>
 
-            {/* Widget 4: Newsletter */}
-            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-7 text-center shadow-sm font-anek">
-              <h3 className="text-base font-black text-[#203656] dark:text-white">
-                Newsletter
+            {/* Widget 4: Newsletter (নিউজলেটার) */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-7 text-center shadow-xs font-anek">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                নিউজলেটার
               </h3>
               <KatenWave />
 
@@ -603,14 +595,14 @@ export default function BlogListingClient({
                 <input
                   type="email"
                   required
-                  placeholder="Email address..."
+                  placeholder="ইমেইল ঠিকানা লিখুন..."
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
-                  className="w-full px-4 py-3 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/30 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-[#059669]"
+                  className="w-full px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/30 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
                 />
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-full bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold shadow-sm transition-colors"
+                  className="w-full py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-xs font-bold shadow-xs transition-colors"
                 >
                   সাবস্ক্রাইব করুন
                 </button>
@@ -620,34 +612,39 @@ export default function BlogListingClient({
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 4: LATEST POSTS ROW (Screenshot 4)
-            Left: Latest Posts with Classic Horizontal Cards + Load More
+            SECTION 4: LATEST POSTS ROW
+            Left: Latest Posts Feed
             Right: Obhyash Promo Banner + Tag Clouds
            ══════════════════════════════════════════════════════════════════ */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column (8 Cols): Latest Posts Feed */}
           <div className="lg:col-span-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#203656] dark:text-white">
-                  Latest Posts
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-anek">
+                  সর্বশেষ আর্টিকেলসমূহ
                 </h2>
                 <KatenWave />
               </div>
 
               {/* Category Filter Pills (Quick filter) */}
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar font-anek">
-                {['All', 'এইচএসসি ২০২৭', 'এইচএসসি ২০২৬', 'ভর্তি'].map((c) => (
+                {[
+                  { id: 'All', label: 'সকল বিষয়' },
+                  { id: 'HSC 2027', label: 'এইচএসসি ২০২৭' },
+                  { id: 'HSC 2026', label: 'এইচএসসি ২০২৬' },
+                  { id: 'বিশ্ববিদ্যালয় ভর্তি', label: 'ভর্তি পরীক্ষা' },
+                ].map((item) => (
                   <button
-                    key={c}
-                    onClick={() => setActiveCategory(c === 'ভর্তি' ? 'বিশ্ববিদ্যালয় ভর্তি' : c)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                      (c === 'All' && activeCategory === 'All') || activeCategory === c
-                        ? 'bg-[#059669] text-white shadow-sm'
+                    key={item.id}
+                    onClick={() => setActiveCategory(item.id)}
+                    className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all ${
+                      (item.id === 'All' && activeCategory === 'All') || activeCategory === item.id
+                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                         : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    {c}
+                    {item.label}
                   </button>
                 ))}
               </div>
@@ -659,20 +656,17 @@ export default function BlogListingClient({
                 <div
                   key={post.slug + '-latest'}
                   onClick={() => router.push(`/blog/${post.slug}`)}
-                  className="group flex flex-col sm:flex-row gap-6 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer font-anek shadow-sm"
+                  className="group flex flex-col sm:flex-row gap-6 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer font-anek shadow-xs"
                 >
                   {/* Thumbnail on Left */}
-                  <div className="relative w-full sm:w-64 md:w-72 h-48 sm:h-auto shrink-0 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  <div className="relative w-full sm:w-64 md:w-72 h-44 sm:h-auto shrink-0 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-white/5">
                     <Image
                       src={getPostCover(post)}
                       alt={post.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, 280px"
+                      className="object-contain group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, 288px"
                     />
-                    <span className="absolute top-3 left-3 z-10 px-3 py-1 text-xs font-bold text-white rounded-full bg-gradient-to-r from-[#10b981] to-[#047857] shadow-md">
-                      {post.category}
-                    </span>
                   </div>
 
                   {/* Content on Right */}
@@ -680,7 +674,7 @@ export default function BlogListingClient({
                     <div>
                       {/* Author + Category + Date */}
                       <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 mb-2.5">
-                        <div className="w-5 h-5 rounded-full bg-[#059669] text-white font-bold text-[9px] flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 font-bold text-[9px] flex items-center justify-center">
                           {post.author.initials}
                         </div>
                         <span className="font-bold text-slate-700 dark:text-slate-300">
@@ -689,14 +683,14 @@ export default function BlogListingClient({
                         <span>•</span>
                         <span>{formatDate(post.publishedAt)}</span>
                         {readSlugs.has(post.slug) && (
-                          <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                          <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-slate-500">
                             <CheckCheck className="w-3 h-3" />
                             পড়েছেন
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-lg sm:text-xl font-bold text-[#203656] dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#34d399] transition-colors leading-snug mb-2.5 line-clamp-2">
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors leading-snug mb-2.5 line-clamp-2">
                         {post.title}
                       </h3>
 
@@ -709,7 +703,7 @@ export default function BlogListingClient({
                     <div className="flex items-center justify-between pt-4 mt-3 border-t border-slate-100 dark:border-white/5 text-slate-400">
                       <button
                         onClick={(e) => handleShare(post, e)}
-                        className="hover:text-[#059669] transition-colors flex items-center gap-1 text-xs"
+                        className="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1 text-xs"
                       >
                         <Share2 className="w-4 h-4" />
                         <span>শেয়ার</span>
@@ -717,8 +711,8 @@ export default function BlogListingClient({
 
                       <button
                         onClick={(e) => toggleBookmark(post.slug, e)}
-                        className={`hover:text-[#059669] transition-colors flex items-center gap-1 text-xs ${
-                          bookmarkedSlugs.has(post.slug) ? 'text-[#059669] font-bold' : ''
+                        className={`hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center gap-1 text-xs ${
+                          bookmarkedSlugs.has(post.slug) ? 'text-rose-600 dark:text-rose-400 font-bold' : ''
                         }`}
                       >
                         <Bookmark
@@ -732,12 +726,12 @@ export default function BlogListingClient({
               ))}
             </div>
 
-            {/* Load More 3D Deep Green Button */}
+            {/* Load More Button */}
             {hasMore && (
               <div className="text-center mt-12">
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 6)}
-                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold shadow-sm transition-colors group font-anek"
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-sm font-semibold shadow-xs transition-colors group font-anek"
                 >
                   <span>আরও আর্টিকেল লোড করুন</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -748,30 +742,30 @@ export default function BlogListingClient({
 
           {/* Right Sidebar (4 Cols): Promo Banner + Tag Clouds */}
           <div className="lg:col-span-4 space-y-8">
-            {/* Widget 5: Obhyash Platform Promo Banner */}
-            <div className="rounded-3xl bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#022c22] text-white p-7 shadow-xl relative overflow-hidden font-anek">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-200 block mb-2">
+            {/* Widget 5: Obhyash Platform Promo Banner (Sleek Neutral Slate) */}
+            <div className="rounded-3xl bg-slate-900 dark:bg-[#161616] border border-slate-800 dark:border-white/10 text-white p-7 shadow-xs relative overflow-hidden font-anek">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
                 অভ্যাস এক্সাম সেল
               </span>
-              <h3 className="text-xl font-black leading-snug mb-3">
+              <h3 className="text-xl font-bold leading-snug mb-3">
                 বোর্ড ও ভর্তি পরীক্ষার প্রশ্ন ব্যাংক
               </h3>
-              <p className="text-xs text-emerald-100 leading-relaxed mb-6 opacity-90">
+              <p className="text-xs text-slate-300 dark:text-slate-400 leading-relaxed mb-6">
                 হাজারো নির্ভুল MCQ প্র্যাকটিস করো, সমাধান দেখো এবং নিজের ভুলগুলো স্বয়ংক্রিয় মিস্টেক নোটবুকে সংরক্ষণ করো।
               </p>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-full bg-white text-[#064e3b] text-xs font-bold shadow-md hover:bg-emerald-50 transition-all"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-full bg-white hover:bg-slate-100 dark:bg-white dark:hover:bg-slate-200 text-slate-900 text-xs font-bold shadow-xs transition-all"
               >
                 <span>ফ্রি অনুশীলন শুরু করো</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            {/* Widget 6: Tag Clouds */}
-            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 sm:p-7 shadow-sm font-anek">
-              <h3 className="text-base font-black text-[#203656] dark:text-white">
-                Tag Clouds
+            {/* Widget 6: Tag Clouds (জনপ্রিয় ট্যাগসমূহ) */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 sm:p-7 shadow-xs font-anek">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                জনপ্রিয় ট্যাগসমূহ
               </h3>
               <KatenWave />
 
@@ -780,7 +774,7 @@ export default function BlogListingClient({
                   <button
                     key={tag}
                     onClick={() => router.push(`/blog?tag=${encodeURIComponent(tag)}`)}
-                    className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#059669] hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
+                    className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-600 hover:text-slate-900 dark:hover:text-white transition-colors"
                   >
                     #{tag}
                   </button>

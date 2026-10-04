@@ -40,12 +40,9 @@ import 'katex/dist/katex.min.css';
 
 import ProgressBar from '@/components/blog/ProgressBar';
 import MermaidRenderer from '@/components/blog/MermaidRenderer';
-import SocialShare from '@/components/blog/SocialShare';
-import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
 import BlogQuickShareButton from '@/components/blog/BlogQuickShareButton';
-import NextPostFloater from '@/components/blog/NextPostFloater';
 import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
 import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
 
@@ -187,12 +184,6 @@ export default async function BlogPostPage({
   const allPosts = await getAllPosts();
   const postsBySlug = new Map(allPosts.map((p) => [p.slug, p]));
   const otherPosts = allPosts.filter((p) => p.slug !== post.slug);
-  // Pick matching category or shared tags first, else chronological next
-  const nextPost =
-    otherPosts.find((p) => p.category === post.category && p.slug !== post.slug) ||
-    otherPosts.find((p) => p.tags.some((t) => post.tags.includes(t))) ||
-    otherPosts[0] ||
-    null;
 
   // 4 Related posts (matching category or tags, fallback to other posts)
   const relatedPosts = otherPosts
@@ -782,69 +773,6 @@ export default async function BlogPostPage({
               </div>
             </div>
             {/* end max-w readable */}
-
-            {/* Share + Save Bar */}
-            <div className="flex flex-wrap items-center gap-3 mt-8 px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 shadow-xs">
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-hind">
-                শেয়ার ও সেভ
-              </span>
-              <div className="flex items-center gap-2 ml-auto">
-                <SocialShare url={jsonLd.url} title={post.title} compact />
-                <div className="w-px h-5 bg-slate-200 dark:bg-white/10 mx-1" />
-                <BlogBookmarkButton slug={post.slug} iconOnly />
-              </div>
-            </div>
-
-            {/* Author Bio block */}
-            <div className="mt-6 mb-6 p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 shadow-xs">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#047857] flex items-center justify-center text-white font-bold text-base shadow-sm">
-                  {post.author.initials}
-                </div>
-                <div>
-                  <Link
-                    href={`/blog/author/${post.author.name}`}
-                    className="font-semibold text-[16px] text-slate-900 dark:text-slate-100 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
-                  >
-                    {post.author.name}
-                  </Link>
-                  <p className="text-xs sm:text-sm font-semibold text-[#059669] dark:text-[#34d399] mt-0.5 font-hind">
-                    {post.author.role}
-                  </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-hind">
-                    অভ্যাস টিম স্মার্ট প্রযুক্তি এবং পরীক্ষিত শিক্ষার কৌশলগুলির
-                    মাধ্যমে বাংলাদেশী শিক্ষার্থীদের তাদের একাডেমিক লক্ষ্য অর্জনে
-                    সহায়তা করতে অঙ্গীকারবদ্ধ।
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Obhyash Smart Practice CTA Card */}
-            <div className="mt-8 mb-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20 dark:border-emerald-500/30 dark:bg-emerald-950/20 shadow-sm">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-hind">
-                    🚀 লাইভ প্র্যাকটিস
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white font-hind">
-                    পড়াশোনাকে অভ্যাসে পরিণত করো এখনই!
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 font-hind max-w-xl">
-                    বোর্ড প্রশ্ন, শর্টকাট টেস্ট এবং লাইভ লিডারবোর্ডে হাজারো শিক্ষার্থীর সাথে নিজের প্রস্তুতি যাচাই করতে যুক্ত হও অভ্যাসে।
-                  </p>
-                </div>
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-semibold text-sm font-hind shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] shrink-0"
-                >
-                  বিনামূল্যে শুরু করো →
-                </Link>
-              </div>
-            </div>
-
-            {/* Newsletter Subscription */}
-            <NewsletterSubscribe />
           </article>
         </div>
       </div>
@@ -893,7 +821,6 @@ export default async function BlogPostPage({
         </section>
       )}
 
-      <NextPostFloater currentSlug={post.slug} nextPost={nextPost} />
       <BackToTop />
     </div>
   );
