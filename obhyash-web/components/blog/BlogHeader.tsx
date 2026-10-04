@@ -9,6 +9,10 @@ import {
   Menu,
   ArrowRight,
   Sparkles,
+  LayoutDashboard,
+  Bookmark,
+  Download,
+  BookOpen,
 } from 'lucide-react';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
@@ -16,6 +20,28 @@ import BlogThemeToggle from './BlogThemeToggle';
 import ProgressBar from './ProgressBar';
 import BlogSearchModal from './BlogSearchModal';
 import { BlogPost } from '@/lib/blog-data';
+
+// Authentic Google Play Store Icon
+const GooglePlayIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none">
+    <path
+      d="M3.609 1.814L13.793 12 3.61 22.186A2.37 2.37 0 0 1 3 20.5V3.5c0-.653.228-1.25.609-1.686z"
+      fill="#00E676"
+    />
+    <path
+      d="M17.228 8.565L5.05 1.733A2.348 2.348 0 0 0 3.61 1.814L13.793 12l3.435-3.435z"
+      fill="#FFD600"
+    />
+    <path
+      d="M3.609 22.186c.433.155.932.124 1.44-.162l12.179-6.832L13.793 12 3.61 22.186z"
+      fill="#FF1744"
+    />
+    <path
+      d="M20.893 10.627l-3.665-2.062L13.793 12l3.435 3.435 3.665-2.062a1.58 1.58 0 0 0 0-2.746z"
+      fill="#00B0FF"
+    />
+  </svg>
+);
 
 // Crisp YouTube SVG Icon with transparent knockout play triangle
 const YouTubeIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
@@ -32,14 +58,35 @@ function NavLinks() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const currentTag = searchParams?.get('tag') ?? '';
-  const isHomeActive = pathname === '/blog' && !currentTag;
+  const currentCat = searchParams?.get('category') ?? '';
+  const isHomeActive = pathname === '/blog' && !currentTag && (!currentCat || currentCat === 'All');
 
   const navItems = [
-    { label: 'হোম', href: '/blog', active: isHomeActive },
-    { label: 'এইচএসসি ২০২৭', href: '/blog?tag=HSC 2027', active: currentTag === 'HSC 2027' },
-    { label: 'এইচএসসি ২০২৬', href: '/blog?tag=HSC 2026', active: currentTag === 'HSC 2026' },
-    { label: 'ভর্তি পরীক্ষা', href: '/blog?tag=বিশ্ববিদ্যালয় ভর্তি', active: currentTag === 'বিশ্ববিদ্যালয় ভর্তি' },
-    { label: 'স্টাডি হ্যাকস', href: '/blog?tag=পড়ার কৌশল', active: currentTag === 'পড়ার কৌশল' },
+    {
+      label: 'হোম',
+      href: '/blog',
+      active: isHomeActive,
+    },
+    {
+      label: 'এইচএসসি ২০২৭',
+      href: '/blog?category=HSC 2027',
+      active: currentCat === 'HSC 2027' || currentCat === 'এইচএসসি ২০২৭' || currentTag === 'HSC 2027',
+    },
+    {
+      label: 'এইচএসসি ২০২৬',
+      href: '/blog?category=HSC 2026',
+      active: currentCat === 'HSC 2026' || currentCat === 'এইচএসসি ২০২৬' || currentTag === 'HSC 2026',
+    },
+    {
+      label: 'ভর্তি পরীক্ষা',
+      href: '/blog?category=ভর্তি পরীক্ষা',
+      active: currentCat === 'ভর্তি পরীক্ষা' || currentTag === 'বিশ্ববিদ্যালয় ভর্তি' || currentTag === 'ভর্তি পরীক্ষা',
+    },
+    {
+      label: 'স্টাডি হ্যাকস',
+      href: '/blog?category=স্টাডি হ্যাকস',
+      active: currentCat === 'স্টাডি হ্যাকস' || currentTag === 'পড়ার কৌশল' || currentTag === 'স্টাডি হ্যাকস',
+    },
   ];
 
   return (
@@ -202,13 +249,13 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
       )}
 
       <div
-        className={`fixed top-0 right-0 bottom-0 z-[101] w-80 sm:w-96 bg-white dark:bg-[#161616] border-l border-slate-200 dark:border-white/10 p-6 sm:p-8 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-out font-sans ${
+        className={`fixed top-0 right-0 bottom-0 z-[101] w-80 sm:w-96 bg-white dark:bg-[#161616] border-l border-slate-200 dark:border-white/10 p-6 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-out font-anek overflow-y-auto no-scrollbar ${
           isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div>
+        <div className="space-y-5">
           {/* Drawer Header & Close Button */}
-          <div className="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-white/5">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
             <Link
               href="/blog"
               onClick={() => setIsDrawerOpen(false)}
@@ -218,15 +265,15 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               <Image
                 src="/obhyash_full_logo.svg"
                 alt="অভ্যাস"
-                width={120}
-                height={30}
+                width={110}
+                height={28}
                 className="h-7 w-auto object-contain dark:hidden"
               />
               <Image
                 src="/obhyash_full_logo_dark.svg"
                 alt="অভ্যাস"
-                width={120}
-                height={30}
+                width={110}
+                height={28}
                 className="h-7 w-auto object-contain hidden dark:block"
               />
             </Link>
@@ -239,78 +286,132 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             </button>
           </div>
 
-          {/* Quick Free Exam CTA Banner in Drawer */}
-          <div className="py-4 border-b border-slate-100 dark:border-white/5">
+          {/* Top Quick Actions (Dashboard, Bookmarks, Demo Exam) */}
+          <div className="space-y-2">
+            {/* Obhyash Dashboard Redirect */}
+            <Link
+              href="/dashboard"
+              onClick={() => setIsDrawerOpen(false)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-sm shadow-sm transition-all"
+            >
+              <span className="flex items-center gap-2.5">
+                <LayoutDashboard className="w-4 h-4" />
+                <span>অভ্যাস ড্যাশবোর্ড</span>
+              </span>
+              <ArrowRight className="w-4 h-4 opacity-80" />
+            </Link>
+
+            {/* Bookmarks Option */}
+            <Link
+              href="/blog?filter=bookmarks"
+              onClick={() => setIsDrawerOpen(false)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-sm transition-all"
+            >
+              <span className="flex items-center gap-2.5">
+                <Bookmark className="w-4 h-4 text-rose-500 fill-rose-500/20" />
+                <span>সংরক্ষিত বুকমার্কসমূহ</span>
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+            </Link>
+
+            {/* Free Exam Demo Link */}
             <Link
               href="/demo"
               onClick={() => setIsDrawerOpen(false)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-sm font-anek shadow-sm active:scale-98 transition-all"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-sm transition-all"
             >
-              <Sparkles className="w-4 h-4 text-amber-400 fill-amber-400/40" />
-              <span>ফ্রি এক্সাম দাও (ডেমো টেস্ট)</span>
+              <span className="flex items-center gap-2.5">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>ফ্রি এক্সাম দাও (ডেমো টেস্ট)</span>
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
           </div>
 
-          {/* About Obhyash Brief */}
-          <div className="py-6 border-b border-slate-100 dark:border-white/5">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2 font-anek">
-              অভ্যাস সম্পর্কে
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-anek">
-              বাংলাদেশের শিক্ষার্থীদের জন্য পূর্ণাঙ্গ স্মার্ট এক্সাম, বোর্ড প্রশ্ন ব্যাংক ও স্টাডি গাইড প্ল্যাটফর্ম।
-            </p>
-          </div>
-
           {/* Drawer Navigation Links */}
-          <div className="py-6 space-y-2 font-anek">
-            <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+          <div className="py-2 space-y-1 border-t border-slate-100 dark:border-white/5">
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 pt-2">
               নেভিগেশন
             </h4>
             <Link
               href="/blog"
               onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
-              <span>সকল আর্টিকেল (হোম)</span>
+              <span>সকল আর্টিকেল (Home)</span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
             <Link
-              href="/blog?tag=HSC 2027"
+              href="/blog?category=HSC 2027"
               onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
               <span>এইচএসসি ২০২৭ সিলেবাস ও গাইড</span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
             <Link
-              href="/blog?tag=HSC 2026"
+              href="/blog?category=HSC 2026"
               onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
               <span>এইচএসসি ২০২৬ রিভিশন ও রুটিন</span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
             <Link
-              href="/blog?tag=বিশ্ববিদ্যালয় ভর্তি"
+              href="/blog?category=ভর্তি পরীক্ষা"
               onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
               <span>ভর্তি পরীক্ষা নির্দেশিকা</span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
             <Link
-              href="/"
+              href="/blog?category=স্টাডি হ্যাকস"
               onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 text-sm font-bold text-slate-900 dark:text-white hover:underline pt-2 border-t border-slate-100 dark:border-white/5"
+              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
-              <span>স্টুডেন্ট প্র্যাকটিস ড্যাশবোর্ড</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>স্টাডি হ্যাকস ও রুটিন</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
+            <Link
+              href="/question-bank"
+              onClick={() => setIsDrawerOpen(false)}
+              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                <span>বোর্ড প্রশ্ন ব্যাংক</span>
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+            </Link>
+          </div>
+
+          {/* Google Play Store App Download Card */}
+          <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.obhyash.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/80 dark:bg-white/5 hover:border-slate-400 dark:hover:border-white/20 transition-all text-slate-800 dark:text-white"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-black/30 border border-slate-200/60 dark:border-white/10 flex items-center justify-center shrink-0 shadow-xs">
+                <GooglePlayIcon className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none mb-1">
+                  GET IT ON
+                </span>
+                <span className="text-xs sm:text-sm font-bold leading-tight block truncate">
+                  Google Play Store
+                </span>
+              </div>
+              <Download className="w-4 h-4 text-slate-400 group-hover:translate-y-0.5 transition-transform shrink-0" />
+            </a>
           </div>
         </div>
 
         {/* Drawer Footer Socials (Facebook & YouTube with Official Links) */}
-        <div className="pt-6 border-t border-slate-100 dark:border-white/5">
+        <div className="pt-4 border-t border-slate-100 dark:border-white/5">
           <div className="flex items-center justify-center gap-3">
             <a
               href="https://www.facebook.com/obhyash.official"
@@ -331,8 +432,8 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               <YouTubeIcon className="w-4 h-4" />
             </a>
           </div>
-          <p className="text-center text-[11px] text-slate-400 mt-4">
-            © {new Date().getFullYear()} Obhyash. সর্বস্বত্ব সংরক্ষিত।
+          <p className="text-center text-[11px] text-slate-400 mt-3 font-mono">
+            © {new Date().getFullYear()} Obhyash. All rights reserved.
           </p>
         </div>
       </div>
