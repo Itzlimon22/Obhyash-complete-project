@@ -1,22 +1,25 @@
 ---
 title: 'HSC Full Meaning & GPA Calculation Formula: সহজে জিপিএ ও এ+ গণনার নিয়ম'
-excerpt: 'HSC-এর পূর্ণরূপ কি? এইচএসসি গ্রেডিং সিস্টেম, ৪র্থ বিষয়ের বোনাস পয়েন্ট এবং সহজে জিপিএ (GPA) ও গোল্ডেন A+ হিসাব করার সম্পূর্ণ নিয়ম ও গাইড।'
-category: 'এইচএসসি পরীক্ষা'
+excerpt: >-
+  HSC-এর পূর্ণরূপ কি? এইচএসসি গ্রেডিং সিস্টেম, ৪র্থ বিষয়ের বোনাস পয়েন্ট এবং সহজে
+  জিপিএ (GPA) ও গোল্ডেন A+ হিসাব করার সম্পূর্ণ নিয়ম ও গাইড।
+category: এইচএসসি পরীক্ষা
 tags:
-  - 'HSC Full Meaning'
-  - 'এইচএসসি পূর্ণরূপ'
-  - 'HSC GPA Calculation'
-  - 'Grading System'
-  - 'এইচএসসি গ্রেডিং সিস্টেম'
-  - '৪র্থ বিষয়ের পয়েন্ট'
+  - HSC Full Meaning
+  - এইচএসসি পূর্ণরূপ
+  - HSC GPA Calculation
+  - Grading System
+  - এইচএসসি গ্রেডিং সিস্টেম
+  - ৪র্থ বিষয়ের পয়েন্ট
 author:
-  name: 'অভ্যাস মেন্টর টিম'
-  role: 'এইচএসসি ও এডমিশন স্পেশালিস্ট'
-  initials: 'OT'
+  name: অভ্যাস মেন্টর টিম
+  role: এইচএসসি ও এডমিশন স্পেশালিস্ট
+  initials: OT
 readTime: 7
-coverColor: 'from-blue-600 to-indigo-950'
+coverColor: from-blue-600 to-indigo-950
 publishedAt: '2026-09-29T12:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-full-meaning-and-gpa-calculator.svg
 ---
 
 > **HSC-এর পূর্ণরূপ কি?** HSC-এর ইংরেজি পূর্ণরূপ হলো Higher Secondary Certificate (উচ্চমাধ্যমিক সার্টিফিকেট)। এটি মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ডের অধীনে ১০ম শ্রেণির SSC পরীক্ষার পর একাদশ ও দ্বাদশ শ্রেণির ২ বছরের শিক্ষা সমাপনান্তে অনুষ্ঠিত হওয়া জাতীয় পাবলিক পরীক্ষা।

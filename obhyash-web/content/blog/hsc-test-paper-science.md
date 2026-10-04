@@ -1,25 +1,31 @@
 ---
-slug: 'hsc-test-paper-science'
-title: 'HSC Test Paper Science (বিজ্ঞান বিভাগ): পদার্থ, রসায়ন, গণিত ও জীববিজ্ঞানের সেরা টেস্ট পেপার সমাধান'
-excerpt: 'HSC Test Paper Science নিয়ে সম্পূর্ণ গাইড। পদার্থবিজ্ঞান, রসায়ন, উচ্চতর গণিত ও জীববিজ্ঞান ১ম ও ২য় পত্রের টেস্ট পেপার সমাধান, বোর্ড প্রশ্ন সলভিং টেকনিক, শীর্ষ কলেজ প্রশ্ন বিশ্লেষণ ও সেরা ডিজিটাল প্র্যাকটিস মেথড।'
-category: 'বোর্ড পরীক্ষা প্রস্তুতি'
+slug: hsc-test-paper-science
+title: >-
+  HSC Test Paper Science (বিজ্ঞান বিভাগ): পদার্থ, রসায়ন, গণিত ও জীববিজ্ঞানের
+  সেরা টেস্ট পেপার সমাধান
+excerpt: >-
+  HSC Test Paper Science নিয়ে সম্পূর্ণ গাইড। পদার্থবিজ্ঞান, রসায়ন, উচ্চতর গণিত ও
+  জীববিজ্ঞান ১ম ও ২য় পত্রের টেস্ট পেপার সমাধান, বোর্ড প্রশ্ন সলভিং টেকনিক, শীর্ষ
+  কলেজ প্রশ্ন বিশ্লেষণ ও সেরা ডিজিটাল প্র্যাকটিস মেথড।
+category: বোর্ড পরীক্ষা প্রস্তুতি
 tags:
-  - 'HSC Test Paper Science'
-  - 'বিজ্ঞান টেস্ট পেপার'
-  - 'HSC Science Test Paper'
-  - 'পদার্থবিজ্ঞান টেস্ট পেপার'
-  - 'রসায়ন টেস্ট পেপার'
-  - 'উচ্চতর গণিত টেস্ট পেপার'
-  - 'জীববিজ্ঞান টেস্ট পেপার'
-  - 'HSC Test Paper PDF'
+  - HSC Test Paper Science
+  - বিজ্ঞান টেস্ট পেপার
+  - HSC Science Test Paper
+  - পদার্থবিজ্ঞান টেস্ট পেপার
+  - রসায়ন টেস্ট পেপার
+  - উচ্চতর গণিত টেস্ট পেপার
+  - জীববিজ্ঞান টেস্ট পেপার
+  - HSC Test Paper PDF
 author:
-  name: 'অভ্যাস সায়েন্স উইং'
-  role: 'বিজ্ঞান বিভাগ মেন্টর'
-  initials: 'SW'
+  name: অভ্যাস সায়েন্স উইং
+  role: বিজ্ঞান বিভাগ মেন্টর
+  initials: SW
 readTime: 10
-coverColor: 'from-blue-600 to-indigo-950'
+coverColor: from-blue-600 to-indigo-950
 publishedAt: '2026-09-27T03:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-test-paper-science.svg
 ---
 
 # HSC Test Paper Science (বিজ্ঞান বিভাগ): পদার্থ, রসায়ন, গণিত ও জীববিজ্ঞানের সেরা টেস্ট পেপার সমাধান 🔬

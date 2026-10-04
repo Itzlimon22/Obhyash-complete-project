@@ -1,22 +1,28 @@
 ---
-title: 'HSC 2027 ICT Syllabus & Marks Distribution: ৬টি অধ্যায়ের সৃজনশীল, এমসিকিউ ও প্র্যাকটিক্যাল গাইড'
-excerpt: 'এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য তথ্য ও যোগাযোগ প্রযুক্তি (ICT) পূর্ণাঙ্গ সিলেবাস, সি প্রোগ্রামিং, এইচটিএমএল, সংখ্যা পদ্ধতি ও ১০০ নম্বরের মানবণ্টন।'
-category: 'এইচএসসি কর্নার'
+title: >-
+  HSC 2027 ICT Syllabus & Marks Distribution: ৬টি অধ্যায়ের সৃজনশীল, এমসিকিউ ও
+  প্র্যাকটিক্যাল গাইড
+excerpt: >-
+  এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য তথ্য ও যোগাযোগ প্রযুক্তি
+  (ICT) পূর্ণাঙ্গ সিলেবাস, সি প্রোগ্রামিং, এইচটিএমএল, সংখ্যা পদ্ধতি ও ১০০
+  নম্বরের মানবণ্টন।
+category: এইচএসসি কর্নার
 tags:
-  - 'HSC 2027 ICT Syllabus'
-  - 'HSC 27 ICT'
-  - 'আইসিটি সিলেবাস ২০২৭'
-  - 'এইচএসসি আইসিটি মানবণ্টন'
-  - 'সি প্রোগ্রামিং'
-  - 'এইচটিএমএল কোডিং'
+  - HSC 2027 ICT Syllabus
+  - HSC 27 ICT
+  - আইসিটি সিলেবাস ২০২৭
+  - এইচএসসি আইসিটি মানবণ্টন
+  - সি প্রোগ্রামিং
+  - এইচটিএমএল কোডিং
 author:
-  name: 'অভ্যাস মেন্টর টিম'
-  role: 'আইসিটি ও সিএসই বিশেষজ্ঞ'
-  initials: 'OT'
+  name: অভ্যাস মেন্টর টিম
+  role: আইসিটি ও সিএসই বিশেষজ্ঞ
+  initials: OT
 readTime: 12
-coverColor: 'from-violet-600 to-purple-900'
+coverColor: from-violet-600 to-purple-900
 publishedAt: '2026-10-01T15:00:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/hsc-2027-ict-syllabus-marks-distribution.svg
 ---
 
 # HSC 2027 ICT Syllabus & Marks Distribution: ৬টি অধ্যায়ের সৃজনশীল, এমসিকিউ ও প্র্যাকটিক্যাল গাইড

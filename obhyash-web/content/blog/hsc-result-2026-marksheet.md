@@ -23,6 +23,7 @@ readTime: 8
 coverColor: from-blue-600 via-indigo-800 to-slate-950
 publishedAt: '2026-10-03T08:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-result-2026-marksheet.svg
 ---
 # এইচএসসি রেজাল্ট ২০২৬: মার্কশিটসহ দেখার সহজ নিয়ম
 

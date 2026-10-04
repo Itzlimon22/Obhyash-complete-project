@@ -1,24 +1,30 @@
 ---
-slug: 'hsc-test-paper-commerce'
-title: 'HSC Test Paper Commerce (ব্যবসায় শিক্ষা): হিসাববিজ্ঞান, ফিন্যান্স ও ম্যানেজমেন্ট টেস্ট পেপার গাইড'
-excerpt: 'HSC Test Paper Commerce (ব্যবসায় শিক্ষা বিভাগ) সমাধান ও প্রস্তুতি গাইড। হিসাববিজ্ঞান, ফিন্যান্স, ব্যবসায় সংগঠন ও উৎপাদন ব্যবস্থাপনা বিষয়ের বোর্ড প্রশ্ন বিশ্লেষণ, জাবেদা-খতিয়ান শর্টকাট এবং সেরা মডেল টেস্ট স্ট্র্যাটেজি।'
-category: 'বোর্ড পরীক্ষা প্রস্তুতি'
+slug: hsc-test-paper-commerce
+title: >-
+  HSC Test Paper Commerce (ব্যবসায় শিক্ষা): হিসাববিজ্ঞান, ফিন্যান্স ও
+  ম্যানেজমেন্ট টেস্ট পেপার গাইড
+excerpt: >-
+  HSC Test Paper Commerce (ব্যবসায় শিক্ষা বিভাগ) সমাধান ও প্রস্তুতি গাইড।
+  হিসাববিজ্ঞান, ফিন্যান্স, ব্যবসায় সংগঠন ও উৎপাদন ব্যবস্থাপনা বিষয়ের বোর্ড
+  প্রশ্ন বিশ্লেষণ, জাবেদা-খতিয়ান শর্টকাট এবং সেরা মডেল টেস্ট স্ট্র্যাটেজি।
+category: বোর্ড পরীক্ষা প্রস্তুতি
 tags:
-  - 'HSC Test Paper Commerce'
-  - 'কমার্স টেস্ট পেপার'
-  - 'ব্যবসায় শিক্ষা'
-  - 'হিসাববিজ্ঞান টেস্ট পেপার'
-  - 'ফিন্যান্স টেস্ট পেপার'
-  - 'HSC Commerce'
-  - 'HSC Test Paper PDF'
+  - HSC Test Paper Commerce
+  - কমার্স টেস্ট পেপার
+  - ব্যবসায় শিক্ষা
+  - হিসাববিজ্ঞান টেস্ট পেপার
+  - ফিন্যান্স টেস্ট পেপার
+  - HSC Commerce
+  - HSC Test Paper PDF
 author:
-  name: 'অভ্যাস কমার্স টিম'
-  role: 'ব্যবসায় শিক্ষা মেন্টর'
-  initials: 'CT'
+  name: অভ্যাস কমার্স টিম
+  role: ব্যবসায় শিক্ষা মেন্টর
+  initials: CT
 readTime: 8
-coverColor: 'from-emerald-600 to-teal-950'
+coverColor: from-emerald-600 to-teal-950
 publishedAt: '2026-09-27T05:00:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/hsc-test-paper-commerce.svg
 ---
 
 # HSC Test Paper Commerce (ব্যবসায় শিক্ষা): হিসাববিজ্ঞান, ফিন্যান্স ও ম্যানেজমেন্ট টেস্ট পেপার গাইড 📊

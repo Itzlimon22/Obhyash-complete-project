@@ -44,8 +44,10 @@ import SocialShare from '@/components/blog/SocialShare';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
+import BlogQuickShareButton from '@/components/blog/BlogQuickShareButton';
 import NextPostFloater from '@/components/blog/NextPostFloater';
 import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
+import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -100,6 +102,78 @@ function formatDate(dateStr: string) {
   });
 }
 
+function formatBanglaDate(dateStr: string) {
+  try {
+    return new Date(dateStr).toLocaleDateString('bn-BD', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  } catch {
+    return formatDate(dateStr);
+  }
+}
+
+// Helper to inject in-article "আরও পড়ুন" card
+function injectInArticleRelated(content: string, relatedSlug?: string): string {
+  // If author explicitly used [related:slug], replace with widget div
+  let processed = content.replace(/\[related:([a-zA-Z0-9_-]+)\]/g, (_match, slug) => {
+    return `\n\n<div data-widget="related-post" data-slug="${slug}"></div>\n\n`;
+  });
+
+  if (!relatedSlug) return processed;
+
+  // If already contains a related widget, do not auto-inject
+  if (processed.includes('data-widget="related-post"')) {
+    return processed;
+  }
+
+  // Auto-inject after the 3rd regular paragraph
+  const blocks = processed.split(/\n{2,}/);
+  if (blocks.length < 5) {
+    return processed;
+  }
+
+  let paragraphCount = 0;
+  let insertIndex = -1;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i].trim();
+    // Skip headings, tables, blockquotes, code fences, html tags, lists
+    if (
+      !block ||
+      block.startsWith('#') ||
+      block.startsWith('```') ||
+      block.startsWith('<') ||
+      block.startsWith('|') ||
+      block.startsWith('>') ||
+      block.startsWith('- ') ||
+      block.startsWith('* ') ||
+      /^\d+\.\s/.test(block)
+    ) {
+      continue;
+    }
+
+    paragraphCount++;
+    if (paragraphCount === 3) {
+      insertIndex = i + 1;
+      break;
+    }
+  }
+
+  if (insertIndex === -1 && blocks.length >= 6) {
+    insertIndex = Math.floor(blocks.length / 2);
+  }
+
+  if (insertIndex !== -1 && insertIndex < blocks.length) {
+    const widgetHtml = `<div data-widget="related-post" data-slug="${relatedSlug}"></div>`;
+    blocks.splice(insertIndex, 0, widgetHtml);
+    return blocks.join('\n\n');
+  }
+
+  return processed;
+}
+
 // ─── Page Component ────────────────────────────────────────────────
 export default async function BlogPostPage({
   params,
@@ -111,6 +185,7 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const allPosts = await getAllPosts();
+  const postsBySlug = new Map(allPosts.map((p) => [p.slug, p]));
   const otherPosts = allPosts.filter((p) => p.slug !== post.slug);
   // Pick matching category or shared tags first, else chronological next
   const nextPost =
@@ -118,6 +193,15 @@ export default async function BlogPostPage({
     otherPosts.find((p) => p.tags.some((t) => post.tags.includes(t))) ||
     otherPosts[0] ||
     null;
+
+  // 4 Related posts (matching category or tags, fallback to other posts)
+  const relatedPosts = otherPosts
+    .filter((p) => p.category === post.category || p.tags.some((t) => post.tags.includes(t)))
+    .concat(otherPosts)
+    .filter((p, index, self) => self.findIndex((item) => item.slug === p.slug) === index)
+    .slice(0, 4);
+
+  const processedContent = injectInArticleRelated(post.content, relatedPosts[0]?.slug);
 
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
@@ -163,8 +247,16 @@ export default async function BlogPostPage({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'div'> & { node?: unknown }) => {
-      if ((props as Record<string, unknown>)['data-widget'] === 'hsc-gpa-calculator') {
+      const widget = (props as Record<string, unknown>)['data-widget'];
+      if (widget === 'hsc-gpa-calculator') {
         return <HscGpaCalculator />;
+      }
+      if (widget === 'related-post') {
+        const targetSlug = (props as Record<string, unknown>)['data-slug'] as string;
+        const targetPost = postsBySlug.get(targetSlug) || relatedPosts[0];
+        if (targetPost) {
+          return <InArticleRelatedCard post={targetPost} />;
+        }
       }
       return <div {...props} />;
     },
@@ -172,33 +264,60 @@ export default async function BlogPostPage({
       children,
       ...props
     }: React.ComponentPropsWithoutRef<'blockquote'> & { node?: unknown }) => {
-      // Check if this is a custom callout
-      const ch = children as React.ReactElement<{
-        children?: React.ReactNode;
-      }>[];
-      const text = (ch?.[1]?.props as { children?: string } | undefined)
-        ?.children;
-      let calloutType: string | null = null;
-      let cleanText: React.ReactNode = children;
-
-      if (typeof text === 'string') {
-        const match = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
-        if (match) {
-          calloutType = match[1].toUpperCase();
-          // Remove the tag from the text when rendering
-          const updatedChild = cloneElement(
-            ch[1],
-            {},
-            text.replace(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i, ''),
-          );
-          cleanText = [ch[0], updatedChild, ...ch.slice(2)];
+      // Helper to find the first non-empty text inside nested React elements
+      const findFirstText = (node: React.ReactNode): string => {
+        if (typeof node === 'string') return node;
+        if (typeof node === 'number') return String(node);
+        if (Array.isArray(node)) {
+          for (const item of node) {
+            const text = findFirstText(item);
+            if (text.trim()) return text;
+          }
         }
-      }
+        if (node && typeof node === 'object' && 'props' in node) {
+          const p = (node as React.ReactElement).props as { children?: React.ReactNode };
+          if (p?.children) return findFirstText(p.children);
+        }
+        return '';
+      };
+
+      // Helper to strip [!NOTE] tag from the first text node
+      const stripTag = (node: React.ReactNode): React.ReactNode => {
+        if (typeof node === 'string') {
+          return node.replace(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i, '');
+        }
+        if (Array.isArray(node)) {
+          let stripped = false;
+          return node.map((child) => {
+            if (!stripped) {
+              const text = findFirstText(child);
+              if (/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i.test(text.trim())) {
+                stripped = true;
+                return stripTag(child);
+              }
+            }
+            return child;
+          });
+        }
+        if (node && typeof node === 'object' && 'props' in node) {
+          const el = node as React.ReactElement;
+          const p = el.props as { children?: React.ReactNode };
+          if (p?.children) {
+            return cloneElement(el, {}, stripTag(p.children));
+          }
+        }
+        return node;
+      };
+
+      const firstText = findFirstText(children).trim();
+      const match = firstText.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+      const calloutType = match ? match[1].toUpperCase() : null;
+      const cleanText = calloutType ? stripTag(children) : children;
 
       if (!calloutType) {
         return (
           <blockquote
-            className="border-l-4 border-rose-500 dark:border-rose-400 pl-5 sm:pl-6 py-2 sm:py-3 my-6 sm:my-8 bg-rose-50/50 dark:bg-rose-900/10 rounded-r-xl italic text-slate-700 dark:text-slate-300 text-[16px] sm:text-[17px] leading-relaxed"
+            className="border-l-4 border-slate-300 dark:border-slate-700 pl-5 sm:pl-6 py-2 sm:py-3 my-6 sm:my-8 bg-slate-50 dark:bg-slate-900/60 rounded-r-xl not-italic text-slate-700 dark:text-slate-300 text-[16px] sm:text-[17px] leading-relaxed font-hind [&_p]:before:content-none [&_p]:after:content-none"
             {...props}
           >
             {children}
@@ -215,28 +334,28 @@ export default async function BlogPostPage({
       const config: Record<string, CalloutConfig> = {
         NOTE: {
           color:
-            'bg-blue-50/50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-900 dark:text-blue-200',
-          icon: <Info className="w-5 h-5 text-blue-500" />,
+            'bg-blue-50/60 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-950 dark:text-blue-200',
+          icon: <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
         },
         TIP: {
           color:
-            'bg-emerald-50/50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-900 dark:text-emerald-200',
-          icon: <Lightbulb className="w-5 h-5 text-emerald-500" />,
+            'bg-emerald-50/60 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-950 dark:text-emerald-200',
+          icon: <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
         },
         IMPORTANT: {
           color:
-            'bg-purple-50/50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 text-purple-900 dark:text-purple-200',
-          icon: <CheckCircle2 className="w-5 h-5 text-purple-500" />,
+            'bg-purple-50/60 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 text-purple-950 dark:text-purple-200',
+          icon: <CheckCircle2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />,
         },
         WARNING: {
           color:
-            'bg-amber-50/50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-900 dark:text-amber-200',
-          icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
+            'bg-amber-50/60 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-950 dark:text-amber-200',
+          icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />,
         },
         CAUTION: {
           color:
-            'bg-rose-50/50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-900 dark:text-rose-200',
-          icon: <AlertOctagon className="w-5 h-5 text-rose-500" />,
+            'bg-rose-50/60 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-950 dark:text-rose-200',
+          icon: <AlertOctagon className="w-5 h-5 text-rose-600 dark:text-rose-400" />,
         },
       };
 
@@ -244,10 +363,10 @@ export default async function BlogPostPage({
 
       return (
         <div
-          className={`not-prose flex flex-col sm:flex-row gap-3 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-hind`}
+          className={`not-prose flex flex-col sm:flex-row gap-3.5 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-hind not-italic shadow-sm`}
         >
           <div className="shrink-0 mt-0.5">{icon}</div>
-          <div className="text-[15px] sm:text-[16px] leading-relaxed [&>p]:m-0">
+          <div className="flex-1 min-w-0 text-[15px] sm:text-[16.5px] leading-relaxed space-y-2 [&_p]:my-1.5 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-1 [&_strong]:font-bold [&_p]:before:content-none [&_p]:after:content-none">
             {cleanText}
           </div>
         </div>
@@ -530,7 +649,7 @@ export default async function BlogPostPage({
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] text-slate-900 dark:text-slate-100 transition-colors">
       <ProgressBar />
       {/* JSON-LD */}
       <script
@@ -539,64 +658,58 @@ export default async function BlogPostPage({
       />
       <ViewTracker slug={post.slug} />
 
-      {/* ─── Post Hero ─── */}
-      <section className="bg-[#FAF6F3] dark:bg-[#121212]">
-        <div className="relative max-w-4xl mx-auto mt-16 px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-slate-400 dark:text-slate-500 mb-8 font-medium">
+      {/* ─── Post Hero (Prothom Alo / BigganChinta Editorial Style) ─── */}
+      <section className="bg-white dark:bg-[#0A0A0A]">
+        <div className="max-w-4xl mx-auto pt-6 sm:pt-10 px-4 sm:px-6">
+          {/* 1. Category Tag (Blue Underlined) */}
+          <div className="mb-3">
             <Link
-              href="/blog"
-              className="hover:text-slate-800 dark:hover:text-slate-300 transition-colors flex items-center gap-1 font-hind"
+              href={`/blog?category=${encodeURIComponent(post.category || '')}`}
+              className="text-[#0066cc] dark:text-[#38bdf8] font-bold text-base sm:text-lg underline underline-offset-4 decoration-2 hover:opacity-80 transition-opacity font-hind"
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              ব্লগ
+              {post.category || 'শিক্ষা ও পরীক্ষা'}
             </Link>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-tight mb-6 font-anek">
+          {/* 2. Main Big Editorial Title */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-tight mb-4 font-anek">
             {post.title}
           </h1>
-          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-[1.75] mb-8 font-normal font-hind max-w-3xl tracking-normal">
-            {post.excerpt}
+
+          {/* 3. Small Accent Indicator Line */}
+          <div className="w-8 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mb-3" />
+
+          {/* 4. Author Line */}
+          <p className="text-sm sm:text-[15px] text-slate-600 dark:text-slate-400 font-hind mb-2">
+            <span className="font-bold text-slate-900 dark:text-slate-100">লেখা:</span> {post.author.name}
           </p>
 
-          {/* Author meta row */}
-          <div className="flex flex-wrap items-center gap-3 pb-12">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm font-semibold shrink-0`}
-              >
-                {post.author.initials}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                  {post.author.name}
-                </p>
-                <p className="text-xs text-slate-400">{post.author.role}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 sm:ml-auto text-xs text-slate-400 dark:text-slate-500 flex-wrap font-hind">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                {formatDate(post.publishedAt)}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                {post.readTime} মিনিট
-              </span>
+          {/* 5. Publish Date (Left) & Share + Bookmark Icons (Right) */}
+          <div className="flex items-center justify-between gap-4 py-1 font-hind">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              প্রকাশ: {formatBanglaDate(post.publishedAt)}
+            </p>
+
+            {/* Right: Only Share and Bookmark Buttons */}
+            <div className="flex items-center gap-2">
+              <BlogQuickShareButton title={post.title} url={jsonLd.url} />
+              <BlogBookmarkButton slug={post.slug} iconOnly />
             </div>
           </div>
+
+          {/* 6. Clean Divider Line */}
+          <hr className="border-t border-slate-200 dark:border-white/10 mt-3 mb-6" />
         </div>
       </section>
 
       {/* Cover image */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
-        <div className="relative w-full h-64 sm:h-80 md:h-[420px] rounded-2xl overflow-hidden shadow-md border border-black/5 dark:border-white/5">
+        <div className="relative w-full aspect-[1200/630] rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 dark:border-white/10 bg-white dark:bg-slate-900">
           <Image
             src={getPostCover(post)}
             alt={post.title}
             fill
-            className="object-cover"
+            className="object-contain"
             sizes="(max-width: 1024px) 100vw, 896px"
             priority
           />
@@ -634,7 +747,7 @@ export default async function BlogPostPage({
                   ]}
                   components={MarkdownComponents}
                 >
-                  {post.content}
+                  {processedContent}
                 </ReactMarkdown>
               </div>
               {/* Tags */}
@@ -735,8 +848,53 @@ export default async function BlogPostPage({
           </article>
         </div>
       </div>
+
+      {/* ─── 4-Card 'আরও পড়ুন' Section (Editorial Magazine / Newspaper Style) ─── */}
+      {relatedPosts.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-16 border-t border-slate-200/80 dark:border-white/10">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 font-anek flex items-center gap-2.5">
+              <span className="w-2.5 h-6 rounded-full bg-rose-600 dark:bg-rose-500 inline-block"></span>
+              আরও পড়ুন
+            </h2>
+            <Link
+              href="/blog"
+              className="text-xs sm:text-sm font-semibold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 font-hind"
+            >
+              সব লেখা দেখুন →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedPosts.map((item) => (
+              <Link
+                key={item.slug}
+                href={`/blog/${item.slug}`}
+                className="group flex flex-col"
+              >
+                <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden bg-slate-50 dark:bg-[#121212] border border-slate-200/80 dark:border-white/10 mb-3 group-hover:shadow-md transition-all duration-300">
+                  <Image
+                    src={getPostCover(item)}
+                    alt={item.title}
+                    fill
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                </div>
+                <h3 className="text-[15px] sm:text-[16px] font-bold text-slate-900 dark:text-slate-100 leading-snug group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-2 mb-2 font-hind">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-hind mt-auto">
+                  {formatBanglaDate(item.publishedAt)}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       <NextPostFloater currentSlug={post.slug} nextPost={nextPost} />
       <BackToTop />
-    </>
+    </div>
   );
 }

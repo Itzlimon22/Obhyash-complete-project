@@ -1,22 +1,29 @@
 ---
-title: 'HSC 2027 Admission Plan: কলেজের শুরু থেকেই ফুল সিলেবাস পড়ার গুরুত্ব ও বুয়েট-মেডিকেল রোডম্যাপ'
-excerpt: 'এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য কলেজ জীবনের প্রথম দিন থেকেই বুয়েট, মেডিকেল ও ঢাকা বিশ্ববিদ্যালয় ভর্তি পরীক্ষার দীর্ঘমেয়াদী প্রস্তুতি রোডম্যাপ।'
-category: 'ক্যারিয়ার ও ভর্তি গাইড'
+title: >-
+  HSC 2027 Admission Plan: কলেজের শুরু থেকেই ফুল সিলেবাস পড়ার গুরুত্ব ও
+  বুয়েট-মেডিকেল রোডম্যাপ
+excerpt: >-
+  এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য কলেজ জীবনের প্রথম দিন থেকেই
+  বুয়েট, মেডিকেল ও ঢাকা বিশ্ববিদ্যালয় ভর্তি পরীক্ষার দীর্ঘমেয়াদী প্রস্তুতি
+  রোডম্যাপ।
+category: ক্যারিয়ার ও ভর্তি গাইড
 tags:
-  - 'HSC 2027 Admission Preparation'
-  - 'HSC 27 Admission Plan'
-  - 'বুয়েট মেডিকেল প্রস্তুতি ২০২৭'
-  - 'HSC 2027 Syllabus'
-  - 'এইচএসসি ২০২৭'
-  - 'অ্যাডমিশন রোডম্যাপ'
+  - HSC 2027 Admission Preparation
+  - HSC 27 Admission Plan
+  - বুয়েট মেডিকেল প্রস্তুতি ২০২৭
+  - HSC 2027 Syllabus
+  - এইচএসসি ২০২৭
+  - অ্যাডমিশন রোডম্যাপ
 author:
-  name: 'অভ্যাস মেন্টর টিম'
-  role: 'ভর্তি পরীক্ষা ও ক্যারিয়ার বিশেষজ্ঞ'
-  initials: 'OT'
+  name: অভ্যাস মেন্টর টিম
+  role: ভর্তি পরীক্ষা ও ক্যারিয়ার বিশেষজ্ঞ
+  initials: OT
 readTime: 10
-coverColor: 'from-rose-600 to-red-900'
+coverColor: from-rose-600 to-red-900
 publishedAt: '2026-10-02T04:00:00.000Z'
 featured: false
+coverImage: >-
+  /images/blog-covers/titles/hsc-2027-admission-preparation-full-syllabus-strategy.svg
 ---
 
 # HSC 2027 Admission Plan: কলেজের শুরু থেকেই ফুল সিলেবাস পড়ার গুরুত্ব ও বুয়েট-মেডিকেল রোডম্যাপ 🎯

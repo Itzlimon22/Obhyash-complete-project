@@ -1,22 +1,25 @@
 ---
-slug: 'ssc-result-2026-marksheet-check-online-sms'
+slug: ssc-result-2026-marksheet-check-online-sms
 title: 'এসএসসি রেজাল্ট ২০২৬ দেখার নিয়ম: মার্কশিট ও এসএমএস পদ্ধতি'
-excerpt: 'এসএসসি রেজাল্ট ২০২৬ অনলাইনে ও এসএমএসে কীভাবে দেখবে, মার্কশিট কোথায় পাবে, জিপিএ হিসাব কেমন এবং সাধারণ ভুলগুলো কী, সব জানো এক লেখায়।'
-category: 'বোর্ড পরীক্ষা প্রস্তুতি'
+excerpt: >-
+  এসএসসি রেজাল্ট ২০২৬ অনলাইনে ও এসএমএসে কীভাবে দেখবে, মার্কশিট কোথায় পাবে,
+  জিপিএ হিসাব কেমন এবং সাধারণ ভুলগুলো কী, সব জানো এক লেখায়।
+category: বোর্ড পরীক্ষা প্রস্তুতি
 tags:
-  - 'এসএসসি রেজাল্ট ২০২৬'
-  - 'এসএসসি পরীক্ষার রেজাল্ট কিভাবে দেখব'
-  - 'web based result ssc'
-  - 'ssc board result 2026'
-  - 'এসএসসি ফলাফল ২০২৬'
+  - এসএসসি রেজাল্ট ২০২৬
+  - এসএসসি পরীক্ষার রেজাল্ট কিভাবে দেখব
+  - web based result ssc
+  - ssc board result 2026
+  - এসএসসি ফলাফল ২০২৬
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 14
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-04T08:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/ssc-result-2026-marksheet-check-online-sms.svg
 ---
 
 # এসএসসি রেজাল্ট ২০২৬ দেখার নিয়ম: মার্কশিটসহ অনলাইন ও এসএমএস পদ্ধতি

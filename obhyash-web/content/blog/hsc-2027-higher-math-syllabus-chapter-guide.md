@@ -1,22 +1,27 @@
 ---
-title: 'HSC 2027 Higher Math Syllabus: উচ্চতর গণিত ১ম ও ২য় পত্র অধ্যায় তালিকা ও সম্পূর্ণ গাইড'
-excerpt: 'এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য উচ্চতর গণিত ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস, ক্যালকুলাস-কণিকস আয়ত্ত করার উপায় এবং ১০০ নম্বরের মানবণ্টন।'
-category: 'উচ্চতর গণিত'
+title: >-
+  HSC 2027 Higher Math Syllabus: উচ্চতর গণিত ১ম ও ২য় পত্র অধ্যায় তালিকা ও
+  সম্পূর্ণ গাইড
+excerpt: >-
+  এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য উচ্চতর গণিত ১ম ও ২য় পত্রের
+  পূর্ণাঙ্গ সিলেবাস, ক্যালকুলাস-কণিকস আয়ত্ত করার উপায় এবং ১০০ নম্বরের মানবণ্টন।
+category: উচ্চতর গণিত
 tags:
-  - 'HSC 2027 Higher Math Syllabus'
-  - 'HSC 27 Math'
-  - 'উচ্চতর গণিত সিলেবাস ২০২৭'
-  - 'উচ্চতর গণিত ১ম ও ২য় পত্র'
-  - 'ক্যালকুলাস'
-  - 'HSC 2027 Syllabus'
+  - HSC 2027 Higher Math Syllabus
+  - HSC 27 Math
+  - উচ্চতর গণিত সিলেবাস ২০২৭
+  - উচ্চতর গণিত ১ম ও ২য় পত্র
+  - ক্যালকুলাস
+  - HSC 2027 Syllabus
 author:
-  name: 'অভ্যাস মেন্টর টিম'
-  role: 'গণিত বিশেষজ্ঞ'
-  initials: 'OT'
+  name: অভ্যাস মেন্টর টিম
+  role: গণিত বিশেষজ্ঞ
+  initials: OT
 readTime: 9
-coverColor: 'from-blue-600 to-indigo-900'
+coverColor: from-blue-600 to-indigo-900
 publishedAt: '2026-10-01T04:00:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/hsc-2027-higher-math-syllabus-chapter-guide.svg
 ---
 
 # HSC 2027 Higher Math Syllabus: উচ্চতর গণিত ১ম ও ২য় পত্র অধ্যায় তালিকা ও সম্পূর্ণ গাইড 📐

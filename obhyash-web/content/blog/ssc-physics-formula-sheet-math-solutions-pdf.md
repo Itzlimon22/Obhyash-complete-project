@@ -1,22 +1,25 @@
 ---
-slug: 'ssc-physics-formula-sheet-math-solutions-pdf'
-title: 'এসএসসি পদার্থবিজ্ঞান সকল সূত্রের শিট ও গাণিতিক সমাধান PDF'
-excerpt: 'এসএসসি পদার্থবিজ্ঞানের অধ্যায়ভিত্তিক সব সূত্র, একক, মাত্রা ও ধাপে ধাপে গাণিতিক সমাধান এক জায়গায়। প্রিন্ট করে রাখো আর অঙ্কে ভুল কমাও।'
-category: 'রিসোর্স হাব (PDF/নোটস)'
+slug: ssc-physics-formula-sheet-math-solutions-pdf
+title: এসএসসি পদার্থবিজ্ঞান সকল সূত্রের শিট ও গাণিতিক সমাধান PDF
+excerpt: >-
+  এসএসসি পদার্থবিজ্ঞানের অধ্যায়ভিত্তিক সব সূত্র, একক, মাত্রা ও ধাপে ধাপে
+  গাণিতিক সমাধান এক জায়গায়। প্রিন্ট করে রাখো আর অঙ্কে ভুল কমাও।
+category: রিসোর্স হাব (PDF/নোটস)
 tags:
-  - 'ssc physics formula sheet'
-  - 'এসএসসি পদার্থবিজ্ঞান সূত্র'
-  - 'ssc physics math solve pdf'
-  - 'ssc physics suggestions 2026 2027'
-  - 'ssc physics'
+  - ssc physics formula sheet
+  - এসএসসি পদার্থবিজ্ঞান সূত্র
+  - ssc physics math solve pdf
+  - ssc physics suggestions 2026 2027
+  - ssc physics
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 16
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-04T06:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/ssc-physics-formula-sheet-math-solutions-pdf.svg
 ---
 
 # এসএসসি পদার্থবিজ্ঞান সূত্রের শিট: অধ্যায়ভিত্তিক সব সূত্র, একক ও গাণিতিক সমাধান

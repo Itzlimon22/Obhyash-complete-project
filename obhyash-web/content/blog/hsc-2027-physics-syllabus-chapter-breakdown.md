@@ -1,23 +1,26 @@
 ---
-slug: 'hsc-2027-physics-syllabus-chapter-breakdown'
+slug: hsc-2027-physics-syllabus-chapter-breakdown
 title: 'HSC 2027 Physics Syllabus: ১ম ও ২য় পত্র অধ্যায় তালিকা ও মানবণ্টন'
-excerpt: 'এইচএসসি ২০২৭ পদার্থবিজ্ঞান ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস, অধ্যায়ভিত্তিক CQ-MCQ টপিক, মূল সূত্র, নমুনা অঙ্ক ও বোর্ড পরীক্ষায় এ+ পাওয়ার কৌশল।'
-category: 'পদার্থবিজ্ঞান'
+excerpt: >-
+  এইচএসসি ২০২৭ পদার্থবিজ্ঞান ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস, অধ্যায়ভিত্তিক
+  CQ-MCQ টপিক, মূল সূত্র, নমুনা অঙ্ক ও বোর্ড পরীক্ষায় এ+ পাওয়ার কৌশল।
+category: পদার্থবিজ্ঞান
 tags:
-  - 'HSC 2027 Physics Syllabus'
-  - 'HSC 27 Physics'
-  - 'এইচএসসি পদার্থবিজ্ঞান সিলেবাস ২০২৭'
-  - 'পদার্থবিজ্ঞান ১ম ও ২য় পত্র'
-  - 'HSC 2027 Syllabus'
-  - 'এইচএসসি ২০২৭'
+  - HSC 2027 Physics Syllabus
+  - HSC 27 Physics
+  - এইচএসসি পদার্থবিজ্ঞান সিলেবাস ২০২৭
+  - পদার্থবিজ্ঞান ১ম ও ২য় পত্র
+  - HSC 2027 Syllabus
+  - এইচএসসি ২০২৭
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 14
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-02T08:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-2027-physics-syllabus-chapter-breakdown.svg
 ---
 
 # HSC 2027 Physics Syllabus: পদার্থবিজ্ঞান ১ম ও ২য় পত্র অধ্যায় তালিকা ও পূর্ণাঙ্গ মানবণ্টন

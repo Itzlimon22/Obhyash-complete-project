@@ -1,22 +1,26 @@
 ---
 title: 'HSC 2027 Bangla Syllabus: বাংলা ১ম ও ২য় পত্র পূর্ণাঙ্গ সিলেবাস ও মানবণ্টন'
-excerpt: 'এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য বাংলা ১ম পত্র (গদ্য, পদ্য, লালসালু, সিরাজউদ্দৌলা) ও বাংলা ২য় পত্র (ব্যাকরণ ও নির্মিতি) পূর্ণাঙ্গ সিলেবাস, মানবণ্টন ও এ+ পাওয়ার গাইডলাইন।'
-category: 'বাংলা'
+excerpt: >-
+  এইচএসসি ২০২৭ (HSC 27) ব্যাচের শিক্ষার্থীদের জন্য বাংলা ১ম পত্র (গদ্য, পদ্য,
+  লালসালু, সিরাজউদ্দৌলা) ও বাংলা ২য় পত্র (ব্যাকরণ ও নির্মিতি) পূর্ণাঙ্গ
+  সিলেবাস, মানবণ্টন ও এ+ পাওয়ার গাইডলাইন।
+category: বাংলা
 tags:
-  - 'hsc 2027 bangla 1st paper syllabus'
-  - 'hsc 2027 bangla syllabus'
-  - 'এইচএসসি ২০২৭ বাংলা ১ম পত্র সিলেবাস'
-  - 'বাংলা ২য় পত্র ব্যাকরণ মানবণ্টন'
-  - 'HSC 2027 Syllabus'
-  - 'এইচএসসি ২০২৭'
+  - hsc 2027 bangla 1st paper syllabus
+  - hsc 2027 bangla syllabus
+  - এইচএসসি ২০২৭ বাংলা ১ম পত্র সিলেবাস
+  - বাংলা ২য় পত্র ব্যাকরণ মানবণ্টন
+  - HSC 2027 Syllabus
+  - এইচএসসি ২০২৭
 author:
-  name: 'অভ্যাস বাংলা একাডেমি'
-  role: 'বাংলা সাহিত্য ও ব্যাকরণ গবেষক'
-  initials: 'OB'
+  name: অভ্যাস বাংলা একাডেমি
+  role: বাংলা সাহিত্য ও ব্যাকরণ গবেষক
+  initials: OB
 readTime: 10
-coverColor: 'from-emerald-600 to-teal-900'
+coverColor: from-emerald-600 to-teal-900
 publishedAt: '2026-09-30T08:30:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/hsc-2027-bangla-syllabus-marks-distribution.svg
 ---
 
 # HSC 2027 Bangla Syllabus: বাংলা ১ম ও ২য় পত্র পূর্ণাঙ্গ সিলেবাস ও মানবণ্টন 📚

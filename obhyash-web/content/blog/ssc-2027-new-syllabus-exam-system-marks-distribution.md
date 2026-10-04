@@ -1,21 +1,25 @@
 ---
-slug: 'ssc-2027-new-syllabus-exam-system-marks-distribution'
+slug: ssc-2027-new-syllabus-exam-system-marks-distribution
 title: 'এসএসসি ২০২৭ নতুন সিলেবাস ও পরীক্ষার মানবণ্টন: পূর্ণাঙ্গ গাইড'
-excerpt: 'এসএসসি ২০২৭ পূর্ণাঙ্গ সিলেবাসে হবে। বিষয়ভিত্তিক নম্বর বিভাজন, প্রশ্নের কাঠামো, সাধারণ ভুল ও ৫ মাসের প্রস্তুতি পরিকল্পনা এক লেখায় জেনে নাও।'
-category: 'এসএসসি কর্নার'
+excerpt: >-
+  এসএসসি ২০২৭ পূর্ণাঙ্গ সিলেবাসে হবে। বিষয়ভিত্তিক নম্বর বিভাজন, প্রশ্নের
+  কাঠামো, সাধারণ ভুল ও ৫ মাসের প্রস্তুতি পরিকল্পনা এক লেখায় জেনে নাও।
+category: এসএসসি কর্নার
 tags:
-  - 'এসএসসি ২০২৭ সিলেবাস'
-  - 'এসএসসি ২০২৭ সিলেবাস ও মানবণ্টন'
-  - 'ssc 2027 syllabus'
-  - 'এসএসসি ২০২৭ পরীক্ষা পদ্ধতি'
+  - এসএসসি ২০২৭ সিলেবাস
+  - এসএসসি ২০২৭ সিলেবাস ও মানবণ্টন
+  - ssc 2027 syllabus
+  - এসএসসি ২০২৭ পরীক্ষা পদ্ধতি
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 14
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-04T07:00:00.000Z'
 featured: true
+coverImage: >-
+  /images/blog-covers/titles/ssc-2027-new-syllabus-exam-system-marks-distribution.svg
 ---
 
 # এসএসসি ২০২৭ নতুন সিলেবাস ও পরীক্ষার মানবণ্টন: পূর্ণাঙ্গ গাইড

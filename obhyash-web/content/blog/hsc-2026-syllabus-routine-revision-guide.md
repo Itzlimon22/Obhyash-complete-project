@@ -1,22 +1,28 @@
 ---
-title: 'HSC 2026 Syllabus & Exam Routine: পূর্ণাঙ্গ সিলেবাস, পরীক্ষার রুটিন ও রিভিশন গাইড'
-excerpt: 'এইচএসসি ২০২৬ (HSC 26) শিক্ষার্থীদের জন্য পূর্ণাঙ্গ সিলেবাসের সারসংক্ষেপ, বোর্ড পরীক্ষার রুটিন বিশ্লেষণ, প্রতিটি বিষয়ের সময় বণ্টন এবং শেষ মুহূর্তের এ+ রিভিশন চেকলিস্ট।'
-category: 'এইচএসসি প্রস্তুতি'
+title: >-
+  HSC 2026 Syllabus & Exam Routine: পূর্ণাঙ্গ সিলেবাস, পরীক্ষার রুটিন ও রিভিশন
+  গাইড
+excerpt: >-
+  এইচএসসি ২০২৬ (HSC 26) শিক্ষার্থীদের জন্য পূর্ণাঙ্গ সিলেবাসের সারসংক্ষেপ, বোর্ড
+  পরীক্ষার রুটিন বিশ্লেষণ, প্রতিটি বিষয়ের সময় বণ্টন এবং শেষ মুহূর্তের এ+ রিভিশন
+  চেকলিস্ট।
+category: এইচএসসি প্রস্তুতি
 tags:
-  - 'hsc 2026 syllabus'
-  - 'hsc routine 2026'
-  - 'hsc exam routine 2026'
-  - 'এইচএসসি ২০২৬ সিলেবাস'
-  - 'এইচএসসি পরীক্ষার রুটিন ২০২৬'
-  - 'HSC 2026'
+  - hsc 2026 syllabus
+  - hsc routine 2026
+  - hsc exam routine 2026
+  - এইচএসসি ২০২৬ সিলেবাস
+  - এইচএসসি পরীক্ষার রুটিন ২০২৬
+  - HSC 2026
 author:
-  name: 'অভ্যাস এক্সাম সেল'
-  role: 'বোর্ড পরীক্ষা স্ট্র্যাটেজিস্ট'
-  initials: 'OE'
+  name: অভ্যাস এক্সাম সেল
+  role: বোর্ড পরীক্ষা স্ট্র্যাটেজিস্ট
+  initials: OE
 readTime: 10
-coverColor: 'from-amber-600 to-rose-900'
+coverColor: from-amber-600 to-rose-900
 publishedAt: '2026-09-30T04:00:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/hsc-2026-syllabus-routine-revision-guide.svg
 ---
 
 # HSC 2026 Syllabus & Exam Routine: পূর্ণাঙ্গ সিলেবাস, পরীক্ষার রুটিন ও রিভিশন গাইড 🗓️

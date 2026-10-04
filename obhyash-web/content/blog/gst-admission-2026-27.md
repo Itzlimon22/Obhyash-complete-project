@@ -25,6 +25,7 @@ readTime: 10
 coverColor: from-purple-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-03T07:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/gst-admission-2026-27.svg
 ---
 # গুচ্ছ ভর্তি ২০২৬-২৭: পরীক্ষার তারিখ, যোগ্যতা, সিলেবাস ও প্রস্তুতি
 

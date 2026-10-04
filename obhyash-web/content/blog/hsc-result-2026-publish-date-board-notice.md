@@ -1,19 +1,22 @@
 ---
-slug: 'hsc-result-2026-publish-date-board-notice'
-title: 'এইচএসসি রেজাল্ট ২০২৬ কবে দিবে? বোর্ড প্রকাশের সম্ভাব্য তারিখ'
-excerpt: 'এইচএসসি রেজাল্ট ২০২৬ কবে দিবে? আন্তঃশিক্ষা বোর্ডের জানানো সম্ভাব্য সময় ৭-১৫ নভেম্বর, ফল দেখার নিয়ম, জিপিএ হিসাব ও পুনর্নিরীক্ষণের পূর্ণ গাইড।'
-category: 'নোটিশ ও শিক্ষা আপডেট'
+slug: hsc-result-2026-publish-date-board-notice
+title: এইচএসসি রেজাল্ট ২০২৬ কবে দিবে? বোর্ড প্রকাশের সম্ভাব্য তারিখ
+excerpt: >-
+  এইচএসসি রেজাল্ট ২০২৬ কবে দিবে? আন্তঃশিক্ষা বোর্ডের জানানো সম্ভাব্য সময় ৭-১৫
+  নভেম্বর, ফল দেখার নিয়ম, জিপিএ হিসাব ও পুনর্নিরীক্ষণের পূর্ণ গাইড।
+category: নোটিশ ও শিক্ষা আপডেট
 tags:
-  - 'এইচএসসি রেজাল্ট কবে দিবে'
-  - 'এইচএসসি পরীক্ষার রেজাল্ট কবে ২০২৬'
-  - 'hsc result 2026 date bangladesh'
-  - 'এইচএসসি ফলাফল ২০২৬ প্রকাশের তারিখ'
+  - এইচএসসি রেজাল্ট কবে দিবে
+  - এইচএসসি পরীক্ষার রেজাল্ট কবে ২০২৬
+  - hsc result 2026 date bangladesh
+  - এইচএসসি ফলাফল ২০২৬ প্রকাশের তারিখ
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 13
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
+coverImage: /images/blog-covers/titles/hsc-result-2026-publish-date-board-notice.svg
 publishedAt: '2026-10-04T07:30:00.000Z'
 featured: true
 ---

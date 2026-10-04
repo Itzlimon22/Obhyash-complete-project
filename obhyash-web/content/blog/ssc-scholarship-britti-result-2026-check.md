@@ -1,21 +1,24 @@
 ---
-slug: 'ssc-scholarship-britti-result-2026-check'
+slug: ssc-scholarship-britti-result-2026-check
 title: 'এসএসসি বৃত্তি রেজাল্ট ২০২৬: মেধা ও সাধারণ বৃত্তির তালিকা PDF'
-excerpt: 'এসএসসি ২০২৬-এর মেধা ও সাধারণ বৃত্তির গেজেট কবে আসবে, কারা পাবে, টাকা কত এবং বোর্ডের তালিকা থেকে নিজের নাম কীভাবে খুঁজবে, এক লেখায় সব তথ্য।'
-category: 'নোটিশ ও শিক্ষা আপডেট'
+excerpt: >-
+  এসএসসি ২০২৬-এর মেধা ও সাধারণ বৃত্তির গেজেট কবে আসবে, কারা পাবে, টাকা কত এবং
+  বোর্ডের তালিকা থেকে নিজের নাম কীভাবে খুঁজবে, এক লেখায় সব তথ্য।
+category: নোটিশ ও শিক্ষা আপডেট
 tags:
-  - 'এসএসসি বৃত্তি রেজাল্ট ২০২৬'
-  - 'ssc britti result'
-  - 'ssc scholarship result'
-  - 'ssc britti result 2026 all board pdf'
+  - এসএসসি বৃত্তি রেজাল্ট ২০২৬
+  - ssc britti result
+  - ssc scholarship result
+  - ssc britti result 2026 all board pdf
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 13
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-04T06:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.svg
 ---
 
 # এসএসসি বৃত্তি রেজাল্ট ২০২৬: মেধা ও সাধারণ বৃত্তির তালিকা PDF

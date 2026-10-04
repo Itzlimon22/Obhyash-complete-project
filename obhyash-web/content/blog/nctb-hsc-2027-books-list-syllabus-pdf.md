@@ -1,23 +1,26 @@
 ---
-slug: 'nctb-hsc-2027-books-list-syllabus-pdf'
+slug: nctb-hsc-2027-books-list-syllabus-pdf
 title: 'NCTB HSC 2027 বই তালিকা ও সিলেবাস PDF: সরকারি অনুমোদিত বই গাইড'
-excerpt: 'NCTB অনুমোদিত এইচএসসি ২০২৭ ব্যাচের বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষার বই তালিকা, সিলেবাস PDF ডাউনলোডের নিয়ম এবং সঠিক বই বেছে নেওয়ার কৌশল।'
-category: 'বোর্ড পরীক্ষা ও নোটিশ'
+excerpt: >-
+  NCTB অনুমোদিত এইচএসসি ২০২৭ ব্যাচের বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষার বই
+  তালিকা, সিলেবাস PDF ডাউনলোডের নিয়ম এবং সঠিক বই বেছে নেওয়ার কৌশল।
+category: বোর্ড পরীক্ষা ও নোটিশ
 tags:
-  - 'NCTB HSC 2027 Syllabus'
-  - 'HSC 2027 Books List'
-  - 'NCTB HSC 2027 Syllabus PDF'
-  - 'এইচএসসি ২০২৭ বই তালিকা'
-  - 'এইচএসসি ২০২৭'
-  - 'HSC 27 Syllabus'
+  - NCTB HSC 2027 Syllabus
+  - HSC 2027 Books List
+  - NCTB HSC 2027 Syllabus PDF
+  - এইচএসসি ২০২৭ বই তালিকা
+  - এইচএসসি ২০২৭
+  - HSC 27 Syllabus
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 14
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-02T16:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/nctb-hsc-2027-books-list-syllabus-pdf.svg
 ---
 
 # NCTB HSC 2027 Books List & Syllabus PDF: একাদশ-দ্বাদশ শ্রেণির সরকারি অনুমোদিত বই ও কারিকুলাম নির্দেশিকা

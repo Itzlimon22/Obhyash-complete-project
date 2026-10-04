@@ -25,6 +25,7 @@ readTime: 9
 coverColor: from-amber-600 via-orange-800 to-slate-950
 publishedAt: '2026-10-03T04:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/buet-admission-2026-27.svg
 ---
 # বুয়েট ভর্তি ২০২৬-২৭: পরীক্ষার তারিখ, যোগ্যতা, পদ্ধতি ও প্রস্তুতি
 

@@ -1,26 +1,29 @@
 ---
-slug: 'medical-admission-circular-2026-guide'
+slug: medical-admission-circular-2026-guide
 title: 'মেডিকেল ভর্তি সার্কুলার ২০২৬: যোগ্যতা, আসন, কাট অফ ও প্রস্তুতি গাইড'
-excerpt: 'মেডিকেল ভর্তি পরীক্ষা ২০২৬-এর যোগ্যতা, জিপিএ শর্ত, ৩৭ সরকারি মেডিকেলের ৫,৩৮০ আসন, বিগত বছরের কাট অফ মার্কস ও ডিএমসি ক্র্যাকিং প্রস্তুতির পূর্ণাঙ্গ গাইড।'
-category: 'ক্যারিয়ার ও ভর্তি গাইড'
+excerpt: >-
+  মেডিকেল ভর্তি পরীক্ষা ২০২৬-এর যোগ্যতা, জিপিএ শর্ত, ৩৭ সরকারি মেডিকেলের ৫,৩৮০
+  আসন, বিগত বছরের কাট অফ মার্কস ও ডিএমসি ক্র্যাকিং প্রস্তুতির পূর্ণাঙ্গ গাইড।
+category: ক্যারিয়ার ও ভর্তি গাইড
 tags:
-  - 'মেডিকেল ভর্তি পরীক্ষা ২০২৬'
-  - 'Medical Admission 2026'
-  - 'মেডিকেল সার্কুলার ২০২৬'
-  - 'MBBS Admission Circular 2026'
-  - 'Medical Admission Eligibility'
-  - 'Medical College Seat Capacity'
-  - 'মেডিকেল কাট অফ মার্কস'
-  - 'ডিএমসি প্রস্তুতি'
-  - 'মেডিকেল প্রশ্নব্যাংক সমাধান'
+  - মেডিকেল ভর্তি পরীক্ষা ২০২৬
+  - Medical Admission 2026
+  - মেডিকেল সার্কুলার ২০২৬
+  - MBBS Admission Circular 2026
+  - Medical Admission Eligibility
+  - Medical College Seat Capacity
+  - মেডিকেল কাট অফ মার্কস
+  - ডিএমসি প্রস্তুতি
+  - মেডিকেল প্রশ্নব্যাংক সমাধান
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 14
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-03T02:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/medical-admission-circular-2026-guide.svg
 ---
 
 # মেডিকেল ভর্তি পরীক্ষা সার্কুলার ২০২৬: আবেদনের যোগ্যতা, ৩৭ সরকারি মেডিকেলের আসন, কাট অফ ও ডিএমসি প্রস্তুতি গাইডলাইন

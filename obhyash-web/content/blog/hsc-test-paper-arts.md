@@ -1,24 +1,31 @@
 ---
-slug: 'hsc-test-paper-arts'
-title: 'HSC Test Paper Arts (মানবিক বিভাগ): সকল বিষয় টেস্ট পেপার সমাধান, বোর্ড প্রশ্ন ও মডেল টেস্ট গাইড'
-excerpt: 'HSC Test Paper Arts (মানবিক বিভাগ) নিয়ে ভাবছো? পৌরনীতি, অর্থনীতি, যুক্তিবিদ্যা, সমাজবিজ্ঞান, ইসলামের ইতিহাস সহ মানবিক বিভাগের সকল বিষয়ের টেস্ট পেপার এনালাইসিস, অধ্যায়ভিত্তিক গুরুত্বপূর্ণ টপিক ও সেরা প্রস্তুতির পূর্ণাঙ্গ গাইড।'
-category: 'বোর্ড পরীক্ষা প্রস্তুতি'
+slug: hsc-test-paper-arts
+title: >-
+  HSC Test Paper Arts (মানবিক বিভাগ): সকল বিষয় টেস্ট পেপার সমাধান, বোর্ড প্রশ্ন
+  ও মডেল টেস্ট গাইড
+excerpt: >-
+  HSC Test Paper Arts (মানবিক বিভাগ) নিয়ে ভাবছো? পৌরনীতি, অর্থনীতি,
+  যুক্তিবিদ্যা, সমাজবিজ্ঞান, ইসলামের ইতিহাস সহ মানবিক বিভাগের সকল বিষয়ের টেস্ট
+  পেপার এনালাইসিস, অধ্যায়ভিত্তিক গুরুত্বপূর্ণ টপিক ও সেরা প্রস্তুতির পূর্ণাঙ্গ
+  গাইড।
+category: বোর্ড পরীক্ষা প্রস্তুতি
 tags:
-  - 'HSC Test Paper Arts'
-  - 'মানবিক টেস্ট পেপার'
-  - 'HSC Arts'
-  - 'এইচএসসি মানবিক'
-  - 'HSC Test Paper PDF'
-  - 'Arts Question Bank'
-  - 'মানবিক বিষয় গাইড'
+  - HSC Test Paper Arts
+  - মানবিক টেস্ট পেপার
+  - HSC Arts
+  - এইচএসসি মানবিক
+  - HSC Test Paper PDF
+  - Arts Question Bank
+  - মানবিক বিষয় গাইড
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক টিম'
-  role: 'এইচএসসি মেন্টর'
-  initials: 'OT'
+  name: অভ্যাস অ্যাকাডেমিক টিম
+  role: এইচএসসি মেন্টর
+  initials: OT
 readTime: 9
-coverColor: 'from-amber-600 to-rose-900'
+coverColor: from-amber-600 to-rose-900
 publishedAt: '2026-09-27T07:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-test-paper-arts.svg
 ---
 
 # HSC Test Paper Arts (মানবিক বিভাগ): সকল বিষয় টেস্ট পেপার সমাধান, বোর্ড প্রশ্ন ও মডেল টেস্ট গাইড 📖

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@700;800&amp;family=Hind+Siliguri:wght@600;700&amp;display=swap');
+      .title {
+        font-family: 'Anek Bangla', 'Hind Siliguri', 'Kohinoor Bangla', -apple-system, sans-serif;
+        font-weight: 800;
+        text-rendering: geometricPrecision;
+      }
+      .badge-text {
+        font-family: 'Anek Bangla', 'Hind Siliguri', 'Kohinoor Bangla', -apple-system, sans-serif;
+        font-weight: 700;
+        text-rendering: geometricPrecision;
+      }
+      .meta {
+        font-family: 'Hind Siliguri', 'Kohinoor Bangla', -apple-system, sans-serif;
+        font-weight: 600;
+        text-rendering: geometricPrecision;
+      }
+    </style>
+  </defs>
+
+  <!-- 1. Pure Crisp Clean White Canvas -->
+  <rect width="1200" height="630" fill="#FFFFFF" />
+
+  <!-- 2. Minimalist Frame -->
+  <rect x="24" y="24" width="1152" height="582" rx="28" fill="#FFFFFF" stroke="#F1F5F9" stroke-width="2" />
+
+  <!-- 3. Top Row Badges -->
+  <!-- Top Left: Red Category Pill -->
+  <g transform="translate(70, 70)">
+    <rect x="0" y="0" width="185" height="42" rx="21" fill="#FEF2F2" stroke="#FECDD3" stroke-width="1.5" />
+    <circle cx="22" cy="21" r="5" fill="#DC2626" />
+    <text x="36" y="27" class="badge-text" font-size="16" fill="#B91C1C">
+      সিলেবাস ও মানবণ্টন
+    </text>
+  </g>
+
+  <!-- Top Right: Exam & Session Pill -->
+  <g transform="translate(1130, 70)">
+    <g transform="translate(-195, 0)">
+      <rect x="0" y="0" width="195" height="42" rx="21" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <text x="97.5" y="27" class="badge-text" font-size="15" fill="#475569" text-anchor="middle">
+        এইচএসসি ২০২৭
+      </text>
+    </g>
+  </g>
+
+  <!-- 4. Center Hero Headline (Guaranteed Safe Width) -->
+  <g transform="translate(600, 275)">
+    <!-- Line 1: Dark Slate -->
+    <text x="0" y="0" class="title" font-size="38" fill="#0F172A" text-anchor="middle">
+      NCTB HSC 2027 বই তালিকা ও সিলেবাস PDF
+    </text>
+
+    <!-- Line 2: Vibrant Crimson Red -->
+    <text x="0" y="68" class="title" font-size="44" fill="#DC2626" text-anchor="middle">
+      সরকারি অনুমোদিত বই গাইড
+    </text>
+  </g>
+
+  <!-- 5. Bottom Info Row (Centered Pills) -->
+  <g transform="translate(600, 480)">
+    <!-- Pill 1 -->
+    <g transform="translate(-320, 0)">
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <text x="22" y="36" class="meta" font-size="19" fill="#DC2626">📊</text>
+      <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">পূর্ণাঙ্গ মানবণ্টন ও অধ্যায়</text>
+    </g>
+
+    <!-- Pill 2 -->
+    <g transform="translate(15, 0)">
+      <rect x="0" y="0" width="305" height="56" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+      <text x="22" y="35" class="meta" font-size="19" fill="#059669">✓</text>
+      <text x="56" y="36" class="badge-text" font-size="17" fill="#1E293B">বোর্ড সিলেবাস গাইডলাইন</text>
+    </g>
+  </g>
+</svg>

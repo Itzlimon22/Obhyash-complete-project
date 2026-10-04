@@ -1,23 +1,26 @@
 ---
-slug: 'chemistry-periodic-table-tricks'
-title: 'রসায়ন পর্যায় সারণী মনে রাখার সহজ ছন্দ ও ট্রিকস'
-excerpt: 'পর্যায় সারণীর গ্রুপ ১ থেকে ১৮ ও ডি-ব্লকের মৌলসমূহ মজার বাংলা ছন্দে মনে রাখার সেরা কৌশল। আয়নীকরণ শক্তি, ইলেকট্রন আসক্তি ও তড়িৎ ঋণাত্মকতার শর্টকাট রুলস।'
-category: 'বিষয়ভিত্তিক পড়াশোনা'
+slug: chemistry-periodic-table-tricks
+title: রসায়ন পর্যায় সারণী মনে রাখার সহজ ছন্দ ও ট্রিকস
+excerpt: >-
+  পর্যায় সারণীর গ্রুপ ১ থেকে ১৮ ও ডি-ব্লকের মৌলসমূহ মজার বাংলা ছন্দে মনে রাখার
+  সেরা কৌশল। আয়নীকরণ শক্তি, ইলেকট্রন আসক্তি ও তড়িৎ ঋণাত্মকতার শর্টকাট রুলস।
+category: বিষয়ভিত্তিক পড়াশোনা
 tags:
-  - 'পর্যায় সারণী'
-  - 'রসায়ন ছন্দ'
-  - 'periodic table tricks'
-  - 'এইচএসসি রসায়ন'
-  - 'এসএসসি রসায়ন'
-  - 'মৌল মনে রাখার কৌশল'
+  - পর্যায় সারণী
+  - রসায়ন ছন্দ
+  - periodic table tricks
+  - এইচএসসি রসায়ন
+  - এসএসসি রসায়ন
+  - মৌল মনে রাখার কৌশল
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'রসায়ন বিভাগ'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: রসায়ন বিভাগ
+  initials: AW
 readTime: 18
-coverColor: 'from-violet-600 to-purple-800'
+coverColor: from-violet-600 to-purple-800
 publishedAt: '2026-09-23T11:35:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/chemistry-periodic-table-tricks.svg
 ---
 
 # রসায়ন পর্যায় সারণী মনে রাখার সহজ ছন্দ ও ট্রিকস

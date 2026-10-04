@@ -1,24 +1,30 @@
 ---
-slug: 'mist-admission-circular-2026'
-title: 'এমআইএসটি (MIST) ভর্তি পরীক্ষা সার্কুলার ২০২৬: আসন সংখ্যা, ১৭ পয়েন্ট শর্টলিস্ট ও লিখিত প্রস্তুতি গাইড'
-excerpt: 'মিলিটারি ইনস্টিটিউট অব সায়েন্স অ্যান্ড টেকনোলজি (MIST Admission Circular 2026) সার্কুলার। আবেদনের ন্যূনতম যোগ্যতা, ১৭ পয়েন্ট শর্টলিস্ট ফর্মুলা, ৫৭০টি আসনের তালিকা, ২০০ নম্বরের লিখিত মানবণ্টন ও কাট অফ স্কোর।'
-category: 'ক্যারিয়ার ও ভর্তি গাইড'
+slug: mist-admission-circular-2026
+title: >-
+  এমআইএসটি (MIST) ভর্তি পরীক্ষা সার্কুলার ২০২৬: আসন সংখ্যা, ১৭ পয়েন্ট শর্টলিস্ট
+  ও লিখিত প্রস্তুতি গাইড
+excerpt: >-
+  মিলিটারি ইনস্টিটিউট অব সায়েন্স অ্যান্ড টেকনোলজি (MIST Admission Circular 2026)
+  সার্কুলার। আবেদনের ন্যূনতম যোগ্যতা, ১৭ পয়েন্ট শর্টলিস্ট ফর্মুলা, ৫৭০টি আসনের
+  তালিকা, ২০০ নম্বরের লিখিত মানবণ্টন ও কাট অফ স্কোর।
+category: ক্যারিয়ার ও ভর্তি গাইড
 tags:
-  - 'MIST Admission 2026'
-  - 'এমআইএসটি ভর্তি সার্কুলার ২০২৬'
-  - 'MIST Circular 2026'
-  - 'MIST Eligibility Criteria'
-  - 'MIST Seat Capacity'
-  - 'এমআইএসটি প্রশ্নব্যাংক সমাধান'
-  - 'ইঞ্জিনিয়ারিং ভর্তি ২০২৬'
+  - MIST Admission 2026
+  - এমআইএসটি ভর্তি সার্কুলার ২০২৬
+  - MIST Circular 2026
+  - MIST Eligibility Criteria
+  - MIST Seat Capacity
+  - এমআইএসটি প্রশ্নব্যাংক সমাধান
+  - ইঞ্জিনিয়ারিং ভর্তি ২০২৬
 author:
-  name: 'অভ্যাস ডিফেন্স ও টেক উইং'
-  role: 'MIST অ্যালামনাই ও মেন্টর দল'
-  initials: 'MW'
+  name: অভ্যাস ডিফেন্স ও টেক উইং
+  role: MIST অ্যালামনাই ও মেন্টর দল
+  initials: MW
 readTime: 13
-coverColor: 'from-slate-900 via-stone-900 to-amber-950'
+coverColor: from-slate-900 via-stone-900 to-amber-950
 publishedAt: '2026-09-27T09:48:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/mist-admission-circular-2026.svg
 ---
 
 # এমআইএসটি (MIST) ভর্তি পরীক্ষা সার্কুলার ২০২৬: আসন সংখ্যা, শর্টলিস্ট ফর্মুলা, ২০০ নম্বরের লিখিত মানবণ্টন ও সম্পূর্ণ গাইড 🎖️📐

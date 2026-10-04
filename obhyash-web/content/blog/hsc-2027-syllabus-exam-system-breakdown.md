@@ -1,25 +1,29 @@
 ---
-slug: 'hsc-2027-syllabus-exam-system-breakdown'
+slug: hsc-2027-syllabus-exam-system-breakdown
 title: 'এইচএসসি ২০২৭ সিলেবাস ও পরীক্ষা পদ্ধতি: ফুল নাকি শর্ট সিলেবাস?'
-excerpt: 'এইচএসসি ২০২৭ (HSC 27) ব্যাচের NCTB সিলেবাসের সর্বশেষ অবস্থা, CQ-MCQ-ব্যবহারিকের মানবণ্টন, পাস মার্কস রুলস ও এ+ নিশ্চিত করার পূর্ণাঙ্গ প্রস্তুতি গাইড।'
-category: 'নোটিশ ও শিক্ষা আপডেট'
+excerpt: >-
+  এইচএসসি ২০২৭ (HSC 27) ব্যাচের NCTB সিলেবাসের সর্বশেষ অবস্থা,
+  CQ-MCQ-ব্যবহারিকের মানবণ্টন, পাস মার্কস রুলস ও এ+ নিশ্চিত করার পূর্ণাঙ্গ
+  প্রস্তুতি গাইড।
+category: নোটিশ ও শিক্ষা আপডেট
 tags:
-  - 'এইচএসসি ২০২৭'
-  - 'HSC 2027 Syllabus'
-  - 'HSC 27 Syllabus'
-  - 'NCTB HSC 2027 Syllabus'
-  - 'এইচএসসি সিলেবাস ২০২৭'
-  - 'এইচএসসি মানবণ্টন'
-  - 'বোর্ড পরীক্ষা ২০২৭'
-  - 'HSC 27'
+  - এইচএসসি ২০২৭
+  - HSC 2027 Syllabus
+  - HSC 27 Syllabus
+  - NCTB HSC 2027 Syllabus
+  - এইচএসসি সিলেবাস ২০২৭
+  - এইচএসসি মানবণ্টন
+  - বোর্ড পরীক্ষা ২০২৭
+  - HSC 27
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'সিনিয়র মেন্টর সেল'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: সিনিয়র মেন্টর সেল
+  initials: AW
 readTime: 14
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-02T12:00:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-2027-syllabus-exam-system-breakdown.svg
 ---
 
 # এইচএসসি ২০২৭ সিলেবাস ও পরীক্ষার মানবণ্টন: ফুল নাকি শর্ট সিলেবাস? (HSC 2027 Syllabus Guide)

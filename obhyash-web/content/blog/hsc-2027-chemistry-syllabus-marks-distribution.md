@@ -1,23 +1,27 @@
 ---
-slug: 'hsc-2027-chemistry-syllabus-marks-distribution'
+slug: hsc-2027-chemistry-syllabus-marks-distribution
 title: 'HSC 2027 Chemistry Syllabus: রসায়ন ১ম ও ২য় পত্র সিলেবাস ও মানবণ্টন'
-excerpt: 'এইচএসসি ২০২৭ ব্যাচের জন্য রসায়ন ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস, অধ্যায়ভিত্তিক মানবণ্টন, জৈব রসায়ন সহজে আয়ত্ত করার কৌশল এবং নিশ্চিত এ+ রোডম্যাপ।'
-category: 'বিষয়ভিত্তিক পড়াশোনা'
+excerpt: >-
+  এইচএসসি ২০২৭ ব্যাচের জন্য রসায়ন ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস,
+  অধ্যায়ভিত্তিক মানবণ্টন, জৈব রসায়ন সহজে আয়ত্ত করার কৌশল এবং নিশ্চিত এ+
+  রোডম্যাপ।
+category: বিষয়ভিত্তিক পড়াশোনা
 tags:
-  - 'এইচএসসি ২০২৭'
-  - 'এইচএসসি রসায়ন'
-  - 'রসায়ন ১ম ও ২য় পত্র'
-  - 'hsc 2027 chemistry syllabus'
-  - 'জৈব রসায়ন'
-  - 'গুণগত রসায়ন'
+  - এইচএসসি ২০২৭
+  - এইচএসসি রসায়ন
+  - রসায়ন ১ম ও ২য় পত্র
+  - hsc 2027 chemistry syllabus
+  - জৈব রসায়ন
+  - গুণগত রসায়ন
 author:
-  name: 'অভ্যাস অ্যাকাডেমিক উইং'
-  role: 'রসায়ন বিভাগ'
-  initials: 'AW'
+  name: অভ্যাস অ্যাকাডেমিক উইং
+  role: রসায়ন বিভাগ
+  initials: AW
 readTime: 18
-coverColor: 'from-emerald-600 to-teal-900'
+coverColor: from-emerald-600 to-teal-900
 publishedAt: '2026-10-01T09:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/hsc-2027-chemistry-syllabus-marks-distribution.svg
 ---
 
 # HSC 2027 Chemistry Syllabus: রসায়ন ১ম ও ২য় পত্র সিলেবাস ও মানবণ্টন

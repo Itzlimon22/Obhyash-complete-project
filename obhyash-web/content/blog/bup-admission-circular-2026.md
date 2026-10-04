@@ -1,25 +1,32 @@
 ---
-slug: 'bup-admission-circular-2026'
-title: 'বিইউপি (BUP) ভর্তি সার্কুলার ২০২৬: এফবিএস ও এফএসটি আসন, মানবণ্টন, ভাইভা ও সম্পূর্ণ গাইড'
-excerpt: 'বাংলাদেশ ইউনিভার্সিটি অব প্রফেশনালস (BUP Admission Circular 2026) সার্কুলার। ফ্যাকাল্টি অব বিজনেস স্টাডিজ (FBS), বিজ্ঞান অনুষদ (FST), আইন ও সামাজিক বিজ্ঞান (FSSS/FASS)-এর যোগ্যতা, ১,৩০০ আসনের তালিকা, ১০০ নম্বরের ইংরেজি মানবণ্টন ও ভাইভা প্রস্তুতি।'
-category: 'ক্যারিয়ার ও ভর্তি গাইড'
+slug: bup-admission-circular-2026
+title: >-
+  বিইউপি (BUP) ভর্তি সার্কুলার ২০২৬: এফবিএস ও এফএসটি আসন, মানবণ্টন, ভাইভা ও
+  সম্পূর্ণ গাইড
+excerpt: >-
+  বাংলাদেশ ইউনিভার্সিটি অব প্রফেশনালস (BUP Admission Circular 2026) সার্কুলার।
+  ফ্যাকাল্টি অব বিজনেস স্টাডিজ (FBS), বিজ্ঞান অনুষদ (FST), আইন ও সামাজিক বিজ্ঞান
+  (FSSS/FASS)-এর যোগ্যতা, ১,৩০০ আসনের তালিকা, ১০০ নম্বরের ইংরেজি মানবণ্টন ও
+  ভাইভা প্রস্তুতি।
+category: ক্যারিয়ার ও ভর্তি গাইড
 tags:
-  - 'BUP Admission 2026'
-  - 'বিইউপি ভর্তি সার্কুলার ২০২৬'
-  - 'BUP Circular 2026 PDF'
-  - 'BUP FBS Admission'
-  - 'BUP FST Admission'
-  - 'BUP Viva Preparation'
-  - 'BBA Admission 2026'
-  - 'বিশ্ববিদ্যালয় ভর্তি ২০২৬'
+  - BUP Admission 2026
+  - বিইউপি ভর্তি সার্কুলার ২০২৬
+  - BUP Circular 2026 PDF
+  - BUP FBS Admission
+  - BUP FST Admission
+  - BUP Viva Preparation
+  - BBA Admission 2026
+  - বিশ্ববিদ্যালয় ভর্তি ২০২৬
 author:
-  name: 'অভ্যাস বিইউপি মেন্টর উইং'
-  role: 'BUP অ্যালামনাই ও মেন্টর দল'
-  initials: 'BW'
+  name: অভ্যাস বিইউপি মেন্টর উইং
+  role: BUP অ্যালামনাই ও মেন্টর দল
+  initials: BW
 readTime: 14
-coverColor: 'from-blue-950 via-teal-900 to-slate-900'
+coverColor: from-blue-950 via-teal-900 to-slate-900
 publishedAt: '2026-09-27T09:50:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/bup-admission-circular-2026.svg
 ---
 
 # বিইউপি (BUP) ভর্তি সার্কুলার ২০২৬: এফবিএস ও এফএসটি আসন, মানবণ্টন, ভাইভা ও কমপ্লিট প্রস্তুতি 🏛️💼

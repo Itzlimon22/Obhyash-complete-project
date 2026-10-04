@@ -1,25 +1,29 @@
 ---
-slug: 'hsc-2027-ict-complete-a-plus-guide'
+slug: hsc-2027-ict-complete-a-plus-guide
 title: 'HSC 2027 ICT A+ Guide: ৬টি অধ্যায়ের CQ-MCQ ও ফুল মার্কস ট্রিকস'
-excerpt: 'এইচএসসি ২০২৭ আইসিটিতে সহজে ১০০-তে এ+ তোলার উপায়! সংখ্যা পদ্ধতি, ২-এর পরিপূরক, ডিজিটাল ডিভাইস, HTML ও C প্রোগ্রামিংয়ের CQ-MCQ মানবণ্টন ও ফুল মার্কস স্ট্র্যাটেজি।'
-category: 'আইসিটি'
+excerpt: >-
+  এইচএসসি ২০২৭ আইসিটিতে সহজে ১০০-তে এ+ তোলার উপায়! সংখ্যা পদ্ধতি, ২-এর পরিপূরক,
+  ডিজিটাল ডিভাইস, HTML ও C প্রোগ্রামিংয়ের CQ-MCQ মানবণ্টন ও ফুল মার্কস
+  স্ট্র্যাটেজি।
+category: আইসিটি
 tags:
-  - 'HSC 2027 ICT A+ Guide'
-  - 'ict guide hsc 2027'
-  - 'এইচএসসি ২০২৭'
-  - 'HSC 2027'
-  - 'HSC ICT'
-  - 'এইচএসসি আইসিটি'
-  - 'সংখ্যা পদ্ধতি'
-  - 'সি প্রোগ্রামিং'
+  - HSC 2027 ICT A+ Guide
+  - ict guide hsc 2027
+  - এইচএসসি ২০২৭
+  - HSC 2027
+  - HSC ICT
+  - এইচএসসি আইসিটি
+  - সংখ্যা পদ্ধতি
+  - সি প্রোগ্রামিং
 author:
-  name: 'অভ্যাস মেন্টর টিম'
-  role: 'আইসিটি ট্রেইনার'
-  initials: 'OT'
+  name: অভ্যাস মেন্টর টিম
+  role: আইসিটি ট্রেইনার
+  initials: OT
 readTime: 8
-coverColor: 'from-blue-700 to-indigo-950'
+coverColor: from-blue-700 to-indigo-950
 publishedAt: '2026-09-24T15:00:00.000Z'
 featured: false
+coverImage: /images/blog-covers/titles/hsc-2027-ict-complete-a-plus-guide.svg
 ---
 
 # HSC 2027 ICT A+ Guide: ৬টি অধ্যায়ের CQ-MCQ ও ফুল মার্কস ট্রিকস

@@ -4,6 +4,7 @@
  */
 
 export function getPostCover(post: {
+  slug?: string;
   coverImage?: string;
   category?: string;
   tags?: string[];
@@ -11,6 +12,10 @@ export function getPostCover(post: {
 }): string {
   if (post.coverImage && post.coverImage.trim() !== '') {
     return post.coverImage;
+  }
+
+  if (post.slug) {
+    return `/images/blog-covers/titles/${post.slug}.svg`;
   }
 
   const text = `${post.category || ''} ${post.title || ''} ${(post.tags || []).join(' ')}`.toLowerCase();

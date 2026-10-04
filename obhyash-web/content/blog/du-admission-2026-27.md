@@ -25,6 +25,7 @@ readTime: 8
 coverColor: from-rose-600 via-red-800 to-slate-950
 publishedAt: '2026-10-03T05:30:00.000Z'
 featured: true
+coverImage: /images/blog-covers/titles/du-admission-2026-27.svg
 ---
 # ঢাকা বিশ্ববিদ্যালয় ভর্তি ২০২৬-২৭: ইউনিট ভিত্তিক তারিখ, যোগ্যতা ও প্রস্তুতি
 

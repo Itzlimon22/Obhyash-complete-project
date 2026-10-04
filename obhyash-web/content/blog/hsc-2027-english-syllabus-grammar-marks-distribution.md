@@ -1,24 +1,31 @@
 ---
-slug: 'hsc-2027-english-syllabus-grammar-marks-distribution'
-title: 'HSC 2027 English Syllabus: ইংরেজি ১ম ও ২য় পত্র পূর্ণাঙ্গ সিলেবাস, গ্রামার মানবণ্টন ও A+ গাইডলাইন'
-excerpt: 'এইচএসসি ২০২৭ (HSC 27) ব্যাচের জন্য ইংরেজি ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস, প্রতিটি গ্রামার আইটেমের বিস্তারিত নম্বর বণ্টন, রাইটিং পার্ট ফরম্যাট ও বোর্ডে ৯০+ নম্বর তোলার নিশ্চিত কৌশল।'
-category: 'এইচএসসি কর্নার'
+slug: hsc-2027-english-syllabus-grammar-marks-distribution
+title: >-
+  HSC 2027 English Syllabus: ইংরেজি ১ম ও ২য় পত্র পূর্ণাঙ্গ সিলেবাস, গ্রামার
+  মানবণ্টন ও A+ গাইডলাইন
+excerpt: >-
+  এইচএসসি ২০২৭ (HSC 27) ব্যাচের জন্য ইংরেজি ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস,
+  প্রতিটি গ্রামার আইটেমের বিস্তারিত নম্বর বণ্টন, রাইটিং পার্ট ফরম্যাট ও বোর্ডে
+  ৯০+ নম্বর তোলার নিশ্চিত কৌশল।
+category: এইচএসসি কর্নার
 tags:
-  - 'hsc 2027 english 2nd paper syllabus'
-  - 'hsc 2027 english syllabus'
-  - 'এইচএসসি ইংরেজি ২য় পত্র গ্রামার'
-  - 'hsc english 1st paper marks distribution'
-  - 'HSC 2027 Syllabus'
-  - 'এইচএসসি ২০২৭'
-  - 'HSC 27 English'
+  - hsc 2027 english 2nd paper syllabus
+  - hsc 2027 english syllabus
+  - এইচএসসি ইংরেজি ২য় পত্র গ্রামার
+  - hsc english 1st paper marks distribution
+  - HSC 2027 Syllabus
+  - এইচএসসি ২০২৭
+  - HSC 27 English
 author:
-  name: 'অভ্যাস ইংলিশ একাডেমি'
-  role: 'ইংরেজি ভাষা ও ব্যাকরণ বিশেষজ্ঞ দল'
-  initials: 'OE'
+  name: অভ্যাস ইংলিশ একাডেমি
+  role: ইংরেজি ভাষা ও ব্যাকরণ বিশেষজ্ঞ দল
+  initials: OE
 readTime: 12
-coverColor: 'from-blue-600 via-indigo-900 to-slate-950'
+coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-09-30T13:00:00.000Z'
 featured: true
+coverImage: >-
+  /images/blog-covers/titles/hsc-2027-english-syllabus-grammar-marks-distribution.svg
 ---
 
 # HSC 2027 English Syllabus: ইংরেজি ১ম ও ২য় পত্র পূর্ণাঙ্গ সিলেবাস, গ্রামার মানবণ্টন ও A+ গাইডলাইন 📖
