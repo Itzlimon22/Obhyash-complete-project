@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import BlogSearchModal from '@/components/blog/BlogSearchModal';
 import { getPostCover } from '@/lib/blog-images';
+import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -980,6 +981,13 @@ export default function BlogListingClient({
                 href="https://play.google.com/store/apps/details?id=com.obhyash.app"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  trackBlogConversion({
+                    eventType: 'app_download',
+                    buttonLocation: 'sidebar',
+                    sourceSlug: 'blog_home',
+                  });
+                }}
                 className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold shadow-xs transition-all"
               >
                 <Download className="w-3.5 h-3.5" />

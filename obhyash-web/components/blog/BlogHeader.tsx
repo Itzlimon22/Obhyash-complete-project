@@ -20,6 +20,7 @@ import BlogThemeToggle from './BlogThemeToggle';
 import ProgressBar from './ProgressBar';
 import BlogSearchModal from './BlogSearchModal';
 import { BlogPost } from '@/lib/blog-data';
+import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 // Authentic Google Play Store Icon
 const GooglePlayIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
@@ -206,6 +207,12 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             {/* Free Exam Button (Clean Neutral Slate/White) */}
             <Link
               href="/demo"
+              onClick={() =>
+                trackBlogConversion({
+                  eventType: 'practice_click',
+                  buttonLocation: 'header',
+                })
+              }
               className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 active:scale-95 text-white dark:text-slate-900 text-xs sm:text-sm font-bold font-anek shadow-xs transition-all shrink-0"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400/40" />
@@ -291,7 +298,13 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             {/* Obhyash Dashboard Redirect */}
             <Link
               href="/dashboard"
-              onClick={() => setIsDrawerOpen(false)}
+              onClick={() => {
+                setIsDrawerOpen(false);
+                trackBlogConversion({
+                  eventType: 'signup_click',
+                  buttonLocation: 'drawer',
+                });
+              }}
               className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-sm shadow-sm transition-all"
             >
               <span className="flex items-center gap-2.5">
@@ -317,7 +330,13 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             {/* Free Exam Demo Link */}
             <Link
               href="/demo"
-              onClick={() => setIsDrawerOpen(false)}
+              onClick={() => {
+                setIsDrawerOpen(false);
+                trackBlogConversion({
+                  eventType: 'practice_click',
+                  buttonLocation: 'drawer',
+                });
+              }}
               className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-sm transition-all"
             >
               <span className="flex items-center gap-2.5">
@@ -392,6 +411,12 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               href="https://play.google.com/store/apps/details?id=com.obhyash.app"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackBlogConversion({
+                  eventType: 'app_download',
+                  buttonLocation: 'drawer',
+                });
+              }}
               className="group flex items-center gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/80 dark:bg-white/5 hover:border-slate-400 dark:hover:border-white/20 transition-all text-slate-800 dark:text-white"
             >
               <div className="w-10 h-10 rounded-xl bg-white dark:bg-black/30 border border-slate-200/60 dark:border-white/10 flex items-center justify-center shrink-0 shadow-xs">

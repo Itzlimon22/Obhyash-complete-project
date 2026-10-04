@@ -9,6 +9,7 @@ import {
   Users,
   ArrowRight,
 } from 'lucide-react';
+import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 export default function BlogFooter() {
   const currentYear = new Date().getFullYear();
@@ -183,6 +184,12 @@ export default function BlogFooter() {
               <li>
                 <Link
                   href="/login"
+                  onClick={() =>
+                    trackBlogConversion({
+                      eventType: 'login_click',
+                      buttonLocation: 'footer',
+                    })
+                  }
                   className="hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
                   লগইন করো
@@ -191,6 +198,12 @@ export default function BlogFooter() {
               <li>
                 <Link
                   href="/signup"
+                  onClick={() =>
+                    trackBlogConversion({
+                      eventType: 'signup_click',
+                      buttonLocation: 'footer',
+                    })
+                  }
                   className="hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
                   ফ্রি অ্যাকাউন্ট
