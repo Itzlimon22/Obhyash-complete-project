@@ -1126,12 +1126,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             }
 
             final Set<String> distinctSubjects = questions
-                .map((q) => q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ'))
+                .map((q) => BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel))
                 .toSet();
 
             final Map<String, int> subjectQuestionCounts = {};
             for (final q in questions) {
-              final key = q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ');
+              final key = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
               subjectQuestionCounts[key] = (subjectQuestionCounts[key] ?? 0) + 1;
             }
 
@@ -1145,18 +1145,16 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   final q = questions[index];
                   final cardKey = _itemKeys.putIfAbsent(index, () => GlobalKey());
 
-                  final currentSub = q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ');
+                  final currentSub = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
                   final prevSub = index > 0
-                      ? (questions[index - 1].subject.trim().isNotEmpty
-                          ? questions[index - 1].subject.trim()
-                          : (questions[index - 1].subjectLabel?.trim() ?? 'সাধারণ'))
+                      ? BanglaNameHelper.getMainSubjectName(questions[index - 1].subject, questions[index - 1].subjectLabel)
                       : null;
 
-                  final isFirstInSubject = index == 0 || (prevSub != null && prevSub.toLowerCase() != currentSub.toLowerCase());
+                  final isFirstInSubject = index == 0 || (prevSub != null && prevSub != currentSub);
 
                   Widget? subjectHeader;
                   if (distinctSubjects.length > 1 && isFirstInSubject) {
-                    final banglaSub = BanglaNameHelper.formatSubject(currentSub);
+                    final banglaSub = currentSub;
                     final count = subjectQuestionCounts[currentSub] ?? 0;
                     subjectHeader = Container(
                       margin: EdgeInsets.only(top: index == 0 ? 0 : 18, bottom: 10),

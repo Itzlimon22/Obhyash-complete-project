@@ -171,18 +171,25 @@ async function run() {
 
   // 4. Insert into public.live_exam_questions junction
   console.log('⏳ Inserting 50 questions directly into public.live_exam_questions table...');
-  const junctionPayload = selectedQuestions.map((q, idx) => ({
-    live_exam_id: exam.id,
-    question_id: null,
-    serial: idx + 1,
-    points: 1,
-    question: q.question,
-    options: q.options,
-    correct_answer_index: q.correct_answer_indices[0],
-    explanation: q.explanation,
-    batch: 'engineering',
-    subject: q.subject,
-  }));
+  const q1Diagram = 'https://pub-6560195307b14ca49f6f183b13bfa841.r2.dev/questions/physics_1st/chapter_০৪/phy1_ch4_2_pdf_p11_148_0_pad4.png';
+  const junctionPayload = selectedQuestions.map((q, idx) => {
+    let qText = q.question;
+    if (qText.includes('সমান ভর বিশিষ্ট তিনটি খণ্ড') && !qText.includes(q1Diagram)) {
+      qText = `${qText.trim()}\n\n![চিত্র](${q1Diagram})`;
+    }
+    return {
+      live_exam_id: exam.id,
+      question_id: null,
+      serial: idx + 1,
+      points: 1,
+      question: qText,
+      options: q.options,
+      correct_answer_index: q.correct_answer_indices[0],
+      explanation: q.explanation,
+      batch: 'engineering',
+      subject: 'পদার্থবিজ্ঞান',
+    };
+  });
 
   const { data: insertedJunction, error: juncErr } = await supabase
     .from('live_exam_questions')

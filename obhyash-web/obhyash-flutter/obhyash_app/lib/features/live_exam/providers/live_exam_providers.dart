@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/models.dart';
 import '../../exam/domain/exam_models.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 
 // Provides the active filter (All, Ongoing, Upcoming)
 class LiveExamFilterNotifier extends Notifier<String> {
@@ -330,10 +331,30 @@ final liveExamQuestionsProvider =
   final junctionList = (junctionRes as List).cast<Map<String, dynamic>>();
   if (junctionList.isEmpty) return [];
 
+  List<Question> groupBySubject(List<Question> qList) {
+    if (qList.isEmpty) return qList;
+    final Map<String, List<Question>> groups = {};
+    final List<String> order = [];
+    for (final q in qList) {
+      final rawSub = q.subject.isNotEmpty ? q.subject : (q.subjectLabel ?? 'সাধারণ');
+      final subKey = BanglaNameHelper.getMainSubjectName(rawSub);
+      if (!groups.containsKey(subKey)) {
+        order.add(subKey);
+        groups[subKey] = [];
+      }
+      groups[subKey]!.add(q);
+    }
+    final List<Question> res = [];
+    for (final key in order) {
+      res.addAll(groups[key]!);
+    }
+    return res;
+  }
+
   // Direct secret questions stored directly in live_exam_questions
   final isDirect = junctionList.any((j) => (j['question']?.toString().trim().isNotEmpty ?? false));
   if (isDirect) {
-    return junctionList.map((j) {
+    final directQuestions = junctionList.map((j) {
       final rawOpts = j['options'];
       final List<String> options = (rawOpts is List)
           ? rawOpts.map((e) => e.toString()).toList()
@@ -352,6 +373,8 @@ final liveExamQuestionsProvider =
         points: points,
       );
     }).toList();
+
+    return groupBySubject(directQuestions);
   }
 
   final questionIds = junctionList
@@ -383,7 +406,7 @@ final liveExamQuestionsProvider =
     }
   }
 
-  return questions;
+  return groupBySubject(questions);
 });
 
 // Leaderboard Provider

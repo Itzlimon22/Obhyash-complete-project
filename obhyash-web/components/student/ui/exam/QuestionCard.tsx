@@ -142,10 +142,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
 
         {/* Question Image (if any) */}
-        {question.imageUrl && (
+        {(question.imageUrl || (question as any).image_url) && (
           <div className="my-2.5 max-w-full mx-auto rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#262626] bg-neutral-50 dark:bg-[#111] p-1.5 flex justify-center">
             <img
-              src={question.imageUrl}
+              src={question.imageUrl || (question as any).image_url}
               alt="Question diagram"
               className="max-h-60 max-w-full h-auto object-contain rounded-lg"
             />

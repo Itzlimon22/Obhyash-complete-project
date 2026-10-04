@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:obhyash_app/core/utils/question_formatter.dart';
 
@@ -1022,6 +1023,48 @@ class LatexText extends StatelessWidget {
     return MarkdownBody(
       data: processed,
       extensionSet: md.ExtensionSet.gitHubFlavored,
+      imageBuilder: (uri, title, alt) {
+        final url = uri.toString();
+        if (url.toLowerCase().endsWith('.svg') || url.toLowerCase().contains('.svg')) {
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            padding: const EdgeInsets.all(8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SvgPicture.network(
+                url,
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => const SizedBox(
+                  height: 140,
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF004633)),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          alignment: Alignment.center,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              url,
+              fit: BoxFit.contain,
+              errorBuilder: (ctx, err, stack) => const SizedBox(),
+            ),
+          ),
+        );
+      },
       inlineSyntaxes: [
         _ChemArrowSyntax(),
         _DisplayMathSyntax(),

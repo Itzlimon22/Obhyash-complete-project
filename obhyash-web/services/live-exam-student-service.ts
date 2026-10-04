@@ -1,5 +1,6 @@
 import { supabase } from "./core";
 import { LiveExam, LiveExamAttempt, Question } from "@/lib/types";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 
 // ==========================================
 // FETCHING EXAMS
@@ -141,10 +142,33 @@ export async function startLiveExam(
 
   if (junctionError) throw junctionError;
 
+  // Helper to guarantee questions are grouped subject-wise
+  const groupBySubject = (qList: Question[]): Question[] => {
+    if (!qList || qList.length === 0) return [];
+    const groups = new Map<string, Question[]>();
+    const subjectOrder: string[] = [];
+
+    for (const q of qList) {
+      const rawSub = q.subject || (q as any).subjectLabel || 'সাধারণ';
+      const subKey = BanglaNameHelper.getMainSubjectName(rawSub);
+      if (!groups.has(subKey)) {
+        groups.set(subKey, []);
+        subjectOrder.push(subKey);
+      }
+      groups.get(subKey)!.push(q);
+    }
+
+    const result: Question[] = [];
+    for (const subKey of subjectOrder) {
+      result.push(...groups.get(subKey)!);
+    }
+    return result;
+  };
+
   // Direct secret questions stored inside live_exam_questions
   const isDirect = (junctionData || []).some((j: any) => j.question && j.question.trim().length > 0);
   if (isDirect) {
-    const questions: Question[] = (junctionData || []).map((j: any) => ({
+    const rawQuestions: Question[] = (junctionData || []).map((j: any) => ({
       id: j.id,
       question: j.question,
       options: Array.isArray(j.options) ? j.options : [],
@@ -157,6 +181,7 @@ export async function startLiveExam(
       difficulty: "Medium",
     } as any));
 
+    const questions = groupBySubject(rawQuestions);
     return { attemptId: attemptId!, questions };
   }
 
@@ -178,17 +203,21 @@ export async function startLiveExam(
 
   const questionMap = new Map((qListData || []).map((q: any) => [q.id, q]));
 
-  const questions: Question[] = [];
+  const rawQuestions: Question[] = [];
   for (const j of junctionData || []) {
     if (questionMap.has(j.question_id)) {
       const q = questionMap.get(j.question_id);
-      questions.push({
+      rawQuestions.push({
         ...q,
+        imageUrl: q.imageUrl || q.image_url,
+        explanationImageUrl: q.explanationImageUrl || q.explanation_image_url,
+        subject: j.subject || q.subject || "",
         points: Number(j.points) || q.points || 1,
       });
     }
   }
 
+  const questions = groupBySubject(rawQuestions);
   return { attemptId: attemptId!, questions };
 }
 

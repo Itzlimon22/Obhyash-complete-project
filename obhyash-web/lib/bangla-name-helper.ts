@@ -114,6 +114,43 @@ export class BanglaNameHelper {
   }
 
   /**
+   * Returns the base canonical main subject name (merging 1st & 2nd papers)
+   * e.g. "পদার্থবিজ্ঞান ১ম পত্র" / "পদার্থবিজ্ঞান ২য় পত্র" -> "পদার্থবিজ্ঞান"
+   * "রসায়ন ১ম পত্র" / "রসায়ন ২য় পত্র" -> "রসায়ন"
+   * "উচ্চতর গণিত ১ম পত্র" / "উচ্চতর গণিত ২য় পত্র" -> "উচ্চতর গণিত"
+   * "জীববিজ্ঞান ১ম পত্র" / "জীববিজ্ঞান ২য় পত্র" -> "জীববিজ্ঞান"
+   */
+  static getMainSubjectName(subject?: string, subjectLabel?: string): string {
+    const formatted = this.formatSubject(subject, subjectLabel);
+    if (formatted.includes('পদার্থবিজ্ঞান') || formatted.includes('পদার্থ') || formatted.toLowerCase().includes('physics')) {
+      return 'পদার্থবিজ্ঞান';
+    }
+    if (formatted.includes('রসায়ন') || formatted.toLowerCase().includes('chem')) {
+      return 'রসায়ন';
+    }
+    if (formatted.includes('উচ্চতর গণিত') || formatted.includes('গণিত') || formatted.toLowerCase().includes('math')) {
+      if (formatted.includes('সাধারণ গণিত')) return 'সাধারণ গণিত';
+      return 'উচ্চতর গণিত';
+    }
+    if (formatted.includes('জীববিজ্ঞান') || formatted.includes('উদ্ভিদ') || formatted.includes('প্রাণি') || formatted.toLowerCase().includes('bio')) {
+      return 'জীববিজ্ঞান';
+    }
+    if (formatted.includes('বাংলা') || formatted.toLowerCase().includes('bangla')) {
+      return 'বাংলা';
+    }
+    if (formatted.includes('ইংরেজি') || formatted.toLowerCase().includes('english')) {
+      return 'ইংরেজি';
+    }
+    if (formatted.includes('আইসিটি') || formatted.includes('তথ্য ও যোগাযোগ') || formatted.toLowerCase().includes('ict')) {
+      return 'তথ্য ও যোগাযোগ প্রযুক্তি';
+    }
+    if (formatted.includes('সাধারণ জ্ঞান') || formatted.toLowerCase().includes('gk') || formatted.includes('জ্ঞান')) {
+      return 'সাধারণ জ্ঞান';
+    }
+    return formatted.replace(/\s*(?:১ম|২য়|২য়|১ম পত্র|২য় পত্র|২য় পত্র|১ম খণ্ড|২য় খণ্ড|২য় খণ্ড)\b/g, '').trim();
+  }
+
+  /**
    * Converts chapter strings into clean Bengali text.
    */
   static formatChapter(chapter?: string): string {

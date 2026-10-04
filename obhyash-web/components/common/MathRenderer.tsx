@@ -537,6 +537,15 @@ function BaseMathRenderer({ text, block = false, className = "" }: MathRendererP
               <pre {...props} className="text-xs font-mono max-w-full" />
             </div>
           ),
+          img: ({ node, ...props }: any) => (
+            <span className="block my-2.5 max-w-full text-center">
+              <img
+                {...props}
+                className="max-h-64 max-w-full h-auto inline-block rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-1 shadow-xs"
+                loading="lazy"
+              />
+            </span>
+          ),
         }}
       >
         {formattedText}

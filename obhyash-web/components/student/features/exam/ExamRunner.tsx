@@ -143,24 +143,46 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   const isTimerWarning = timeLeft <= 300 && !isTimerCritical;
 
   // Distinct subjects and counts for subject-wise headers (matching Flutter)
+  // Ensure questions of the same main subject (merging 1st & 2nd paper) are grouped consecutively
+  const orderedQuestions = React.useMemo(() => {
+    if (!questions || questions.length === 0) return [];
+    const groups = new Map<string, Question[]>();
+    const subjectOrder: string[] = [];
+
+    questions.forEach((q) => {
+      const sub = BanglaNameHelper.getMainSubjectName(q.subject || (q as any).subjectLabel || 'সাধারণ');
+      if (!groups.has(sub)) {
+        groups.set(sub, []);
+        subjectOrder.push(sub);
+      }
+      groups.get(sub)!.push(q);
+    });
+
+    const result: Question[] = [];
+    subjectOrder.forEach((sub) => {
+      result.push(...groups.get(sub)!);
+    });
+    return result;
+  }, [questions]);
+
   const distinctSubjects = React.useMemo(() => {
     return Array.from(
       new Set(
-        questions
-          .map((q) => (q.subject || (q as any).subjectLabel || '').trim())
+        orderedQuestions
+          .map((q) => BanglaNameHelper.getMainSubjectName(q.subject || (q as any).subjectLabel || ''))
           .filter(Boolean)
       )
     );
-  }, [questions]);
+  }, [orderedQuestions]);
 
   const subjectQuestionCounts = React.useMemo(() => {
     const counts: Record<string, number> = {};
-    questions.forEach((q) => {
-      const key = (q.subject || (q as any).subjectLabel || '').trim();
+    orderedQuestions.forEach((q) => {
+      const key = BanglaNameHelper.getMainSubjectName(q.subject || (q as any).subjectLabel || '');
       if (key) counts[key] = (counts[key] || 0) + 1;
     });
     return counts;
-  }, [questions]);
+  }, [orderedQuestions]);
 
   const handleOptionSelect = (qId: string | number, optionIndex: number) => {
     if (userAnswers[qId] !== undefined) return; // Locked after one selected
@@ -180,7 +202,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   };
 
   const handleScrollToQuestion = (index: number) => {
-    const q = questions[index];
+    const q = orderedQuestions[index];
     if (q) {
       const elem =
         document.getElementById(`question-${q.id}`) ||
@@ -277,18 +299,18 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       {/* ── 2. Main Question Flow Feed ── */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] min-w-0 max-w-full overflow-x-hidden">
         <div className="flex flex-col gap-3.5 sm:gap-4">
-          {questions.map((question, idx) => {
+          {orderedQuestions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;
             const isFlagged = flaggedQuestions.has(question.id);
             const isBookmarked = bookmarkedIds.has(question.id.toString());
 
-            const currentSub = (question.subject || (question as any).subjectLabel || '').trim();
+            const currentSub = BanglaNameHelper.getMainSubjectName(question.subject || (question as any).subjectLabel || '');
             const prevSub =
               idx > 0
-                ? (questions[idx - 1].subject || (questions[idx - 1] as any).subjectLabel || '').trim()
+                ? BanglaNameHelper.getMainSubjectName(orderedQuestions[idx - 1].subject || (orderedQuestions[idx - 1] as any).subjectLabel || '')
                 : null;
             const isFirstInSubject =
-              idx === 0 || (prevSub && prevSub.toLowerCase() !== currentSub.toLowerCase());
+              idx === 0 || (prevSub !== currentSub);
             const showSubjectHeader =
               distinctSubjects.length > 1 && isFirstInSubject && currentSub;
 
@@ -300,7 +322,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                     <div className="px-3.5 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] flex items-center gap-2 shadow-2xs font-['HindSiliguri']">
                       <BookOpen size={14} className="text-[#004633] dark:text-[#10B981]" />
                       <span className="text-[13px] font-bold text-[#0F172A] dark:text-white">
-                        {BanglaNameHelper.formatSubject(currentSub)}
+                        {currentSub}
                       </span>
                       {subjectQuestionCounts[currentSub] && (
                         <span className="text-[11px] text-[#64748B] dark:text-white/50 font-medium">
@@ -360,7 +382,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
         totalQuestions={totalQuestions}
         userAnswers={userAnswers}
         flaggedQuestions={flaggedQuestions}
-        questionIds={questions.map((q) => q.id)}
+        questionIds={orderedQuestions.map((q) => q.id)}
         onSelectQuestion={handleScrollToQuestion}
       />
 
