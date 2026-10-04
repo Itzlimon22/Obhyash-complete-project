@@ -324,10 +324,12 @@ export default async function BlogPostPage({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'table'> & { node?: unknown }) => (
-      <figure className="not-prose my-6 sm:my-8 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.25)] overflow-hidden">
-        <div className="overflow-x-auto">
+      <figure className="not-prose my-8 sm:my-10 relative rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4)] bg-white dark:bg-slate-900/95 overflow-hidden">
+        {/* Top vibrant brand gradient ribbon */}
+        <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500" />
+        <div className="overflow-x-auto custom-scrollbar">
           <table
-            className="w-full text-left border-collapse m-0 min-w-[480px] text-[13.5px] sm:text-[14.5px]"
+            className="w-full text-left border-collapse m-0 min-w-[520px] font-hind text-[14.5px] sm:text-[15.5px]"
             {...props}
           />
         </div>
@@ -338,7 +340,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'thead'> & { node?: unknown }) => (
       <thead
-        className="bg-gradient-to-r from-indigo-50 to-slate-50 dark:from-indigo-950/40 dark:to-slate-800/60 border-b-2 border-indigo-100 dark:border-indigo-900/50"
+        className="bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80"
         {...props}
       />
     ),
@@ -347,7 +349,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'th'> & { node?: unknown }) => (
       <th
-        className="px-4 py-3 align-middle font-semibold text-indigo-900 dark:text-indigo-200 whitespace-nowrap tracking-wide text-[12px] sm:text-[13px] uppercase first:rounded-tl-2xl last:rounded-tr-2xl"
+        className="px-5 sm:px-6 py-4 align-middle font-bold text-slate-800 dark:text-slate-100 tracking-wider text-[13px] sm:text-[14px] uppercase whitespace-nowrap first:pl-6 last:pr-6"
         {...props}
       />
     ),
@@ -356,7 +358,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'td'> & { node?: unknown }) => (
       <td
-        className="px-4 py-3 align-middle text-slate-700 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/60 first:font-medium first:text-slate-900 dark:first:text-slate-100"
+        className="px-5 sm:px-6 py-3.5 sm:py-4 align-middle text-slate-700 dark:text-slate-300 leading-relaxed border-b border-slate-100 dark:border-slate-800/80 first:font-semibold first:text-slate-900 dark:first:text-white first:pl-6 last:pr-6"
         {...props}
       />
     ),
@@ -365,7 +367,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'tr'> & { node?: unknown }) => (
       <tr
-        className="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/25 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/20 transition-colors duration-150"
+        className="odd:bg-white even:bg-slate-50/50 dark:odd:bg-slate-900 dark:even:bg-slate-800/30 hover:bg-blue-50/60 dark:hover:bg-blue-950/25 transition-colors duration-150 last:border-b-0"
         {...props}
       />
     ),
