@@ -19,6 +19,8 @@ import {
   ExternalLink,
   Zap,
   BookOpen,
+  X,
+  Filter,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LiveExam } from '@/lib/types';
@@ -44,9 +46,105 @@ export default function LiveExamDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExam, setEditingExam] = useState<LiveExam | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const [isAutomating, setIsAutomating] = useState(false);
+
+  // Filters state with URL & sessionStorage persistence
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all' | 'live' | 'upcoming' | 'ended'
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
+
+  // 1. Initial load from URL search params or sessionStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlCat = urlParams.get('category');
+      const urlStatus = urlParams.get('status');
+      const urlQ = urlParams.get('q');
+
+      let savedFilter: any = null;
+      try {
+        const raw = sessionStorage.getItem('obhyash_admin_live_exams_filter');
+        if (raw) savedFilter = JSON.parse(raw);
+      } catch (_) {}
+
+      if (urlCat) {
+        setCategoryFilter(urlCat);
+      } else if (savedFilter?.category) {
+        setCategoryFilter(savedFilter.category);
+      }
+
+      if (urlStatus) {
+        setStatusFilter(urlStatus);
+      } else if (savedFilter?.status) {
+        setStatusFilter(savedFilter.status);
+      }
+
+      if (urlQ) {
+        setSearchQuery(urlQ);
+      } else if (savedFilter?.search) {
+        setSearchQuery(savedFilter.search);
+      }
+    } finally {
+      setHasLoadedFromStorage(true);
+    }
+  }, []);
+
+  // 2. Sync to URL & sessionStorage when filters change (after initial mount)
+  useEffect(() => {
+    if (!hasLoadedFromStorage || typeof window === 'undefined') return;
+
+    try {
+      sessionStorage.setItem(
+        'obhyash_admin_live_exams_filter',
+        JSON.stringify({
+          category: categoryFilter,
+          status: statusFilter,
+          search: searchQuery,
+        })
+      );
+    } catch (_) {}
+
+    const url = new URL(window.location.href);
+    if (categoryFilter && categoryFilter !== 'all') {
+      url.searchParams.set('category', categoryFilter);
+    } else {
+      url.searchParams.delete('category');
+    }
+
+    if (statusFilter && statusFilter !== 'all') {
+      url.searchParams.set('status', statusFilter);
+    } else {
+      url.searchParams.delete('status');
+    }
+
+    if (searchQuery.trim()) {
+      url.searchParams.set('q', searchQuery.trim());
+    } else {
+      url.searchParams.delete('q');
+    }
+
+    const newUrl = url.pathname + (url.search ? url.search : '');
+    window.history.replaceState(null, '', newUrl);
+  }, [categoryFilter, statusFilter, searchQuery, hasLoadedFromStorage]);
+
+  const handleResetFilters = () => {
+    setCategoryFilter('all');
+    setStatusFilter('all');
+    setSearchQuery('');
+    try {
+      sessionStorage.removeItem('obhyash_admin_live_exams_filter');
+    } catch (_) {}
+    const url = new URL(window.location.href);
+    url.searchParams.delete('category');
+    url.searchParams.delete('status');
+    url.searchParams.delete('q');
+    window.history.replaceState(null, '', url.pathname);
+  };
+
+  const isFilterActive =
+    categoryFilter !== 'all' || statusFilter !== 'all' || searchQuery.trim() !== '';
 
   const handleRunLifecycleAutomation = async () => {
     try {
@@ -155,16 +253,104 @@ export default function LiveExamDashboard() {
     }
   };
 
-  const filteredExams = exams.filter((e) => {
-    const matchesSearch =
-      !searchQuery ||
-      e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (e.description &&
-        e.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesCat =
-      categoryFilter === 'all' || e.category === categoryFilter;
-    return matchesSearch && matchesCat;
-  });
+  // Status Tab Counts
+  const counts = React.useMemo(() => {
+    const now = Date.now();
+    let live = 0;
+    let upcoming = 0;
+    let ended = 0;
+
+    exams.forEach((exam) => {
+      if (categoryFilter !== 'all' && exam.category !== categoryFilter) return;
+
+      const start = exam.start_time ? new Date(exam.start_time).getTime() : 0;
+      const end = exam.end_time ? new Date(exam.end_time).getTime() : 0;
+
+      if (start > 0 && end > 0 && now >= start && now <= end) {
+        live++;
+      } else if (start > 0 && now < start) {
+        upcoming++;
+      } else if (end > 0 && now > end) {
+        ended++;
+      }
+    });
+
+    return {
+      all: categoryFilter === 'all' ? exams.length : live + upcoming + ended,
+      live,
+      upcoming,
+      ended,
+    };
+  }, [exams, categoryFilter]);
+
+  // Smart Priority Sorting & Filtering
+  const sortedAndFilteredExams = React.useMemo(() => {
+    const now = Date.now();
+
+    // 1. Filter
+    const filtered = exams.filter((e) => {
+      const matchesSearch =
+        !searchQuery ||
+        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (e.description &&
+          e.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesCat =
+        categoryFilter === 'all' || e.category === categoryFilter;
+
+      const start = e.start_time ? new Date(e.start_time).getTime() : 0;
+      const end = e.end_time ? new Date(e.end_time).getTime() : 0;
+      const isLiveNow = start > 0 && end > 0 && now >= start && now <= end;
+      const isUpcoming = start > 0 && now < start;
+      const isEnded = end > 0 && now > end;
+
+      let matchesStatus = true;
+      if (statusFilter === 'live') matchesStatus = isLiveNow;
+      else if (statusFilter === 'upcoming') matchesStatus = isUpcoming;
+      else if (statusFilter === 'ended') matchesStatus = isEnded;
+
+      return matchesSearch && matchesCat && matchesStatus;
+    });
+
+    // 2. Smart Priority Sorting:
+    // Priority 1: LIVE NOW exams ALWAYS at the very top (ending soonest first)
+    // Priority 2: UPCOMING exams (starting soonest first: start_time ASC)
+    // Priority 3: ENDED exams (most recently ended first: end_time DESC)
+    return filtered.sort((a, b) => {
+      const aStart = a.start_time ? new Date(a.start_time).getTime() : 0;
+      const aEnd = a.end_time ? new Date(a.end_time).getTime() : 0;
+      const aIsLive = aStart > 0 && aEnd > 0 && now >= aStart && now <= aEnd;
+      const aIsUpcoming = aStart > 0 && now < aStart;
+
+      const bStart = b.start_time ? new Date(b.start_time).getTime() : 0;
+      const bEnd = b.end_time ? new Date(b.end_time).getTime() : 0;
+      const bIsLive = bStart > 0 && bEnd > 0 && now >= bStart && now <= bEnd;
+      const bIsUpcoming = bStart > 0 && now < bStart;
+
+      const getTier = (isLive: boolean, isUpcoming: boolean) => {
+        if (isLive) return 1;
+        if (isUpcoming) return 2;
+        return 3;
+      };
+
+      const aTier = getTier(aIsLive, aIsUpcoming);
+      const bTier = getTier(bIsLive, bIsUpcoming);
+
+      if (aTier !== bTier) {
+        return aTier - bTier;
+      }
+
+      if (aIsLive && bIsLive) {
+        return aEnd - bEnd; // Ending soonest first
+      }
+
+      if (aIsUpcoming && bIsUpcoming) {
+        return aStart - bStart; // Starting soonest first
+      }
+
+      return bEnd - aEnd; // Ended most recently first
+    });
+  }, [exams, searchQuery, categoryFilter, statusFilter]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -209,27 +395,96 @@ export default function LiveExamDashboard() {
         </div>
       </div>
 
-      {/* ── Search & Filter Controls ── */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
-          <Search
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
-          />
-          <input
-            type="text"
-            placeholder="পরীক্ষার নাম খুঁজুন..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none text-neutral-900 dark:text-white"
-          />
+      {/* ── Status Tabs & Search/Filter Controls ── */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        {/* Status Tabs */}
+        <div className="flex items-center gap-1 p-1 bg-neutral-100 dark:bg-zinc-900/80 border border-neutral-200/80 dark:border-zinc-800 rounded-2xl overflow-x-auto">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'all'
+                ? 'bg-white dark:bg-zinc-800 text-neutral-900 dark:text-white shadow-sm'
+                : 'text-neutral-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white'
+            }`}
+          >
+            <span>সবগুলো</span>
+            <span className="px-1.5 py-0.2 rounded-md bg-neutral-200 dark:bg-zinc-700/60 text-[10px] font-mono">
+              {counts.all}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('live')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'live'
+                ? 'bg-rose-500 text-white shadow-sm'
+                : 'text-neutral-600 dark:text-zinc-400 hover:text-rose-500'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${statusFilter === 'live' ? 'bg-white' : 'bg-rose-500'} ${counts.live > 0 ? 'animate-pulse' : ''}`} />
+            <span>লাইভ চলছে</span>
+            <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${statusFilter === 'live' ? 'bg-white/20 text-white' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold'}`}>
+              {counts.live}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('upcoming')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'upcoming'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-neutral-600 dark:text-zinc-400 hover:text-blue-500'
+            }`}
+          >
+            <span>আসন্ন</span>
+            <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${statusFilter === 'upcoming' ? 'bg-white/20 text-white' : 'bg-neutral-200 dark:bg-zinc-700/60 text-neutral-700 dark:text-zinc-300'}`}>
+              {counts.upcoming}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('ended')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'ended'
+                ? 'bg-neutral-800 dark:bg-zinc-700 text-white shadow-sm'
+                : 'text-neutral-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white'
+            }`}
+          >
+            <span>সমাপ্ত</span>
+            <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${statusFilter === 'ended' ? 'bg-white/20 text-white' : 'bg-neutral-200 dark:bg-zinc-700/60 text-neutral-700 dark:text-zinc-300'}`}>
+              {counts.ended}
+            </span>
+          </button>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* Search, Category & Refresh */}
+        <div className="flex items-center flex-wrap sm:flex-nowrap gap-2">
+          <div className="relative flex-1 sm:w-64">
+            <Search
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
+            />
+            <input
+              type="text"
+              placeholder="পরীক্ষার নাম খুঁজুন..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-7 py-2 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none text-neutral-900 dark:text-white"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-zinc-200 cursor-pointer"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-2 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs font-semibold outline-none text-neutral-900 dark:text-white cursor-pointer"
+            className="px-3 py-2 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs font-semibold outline-none text-neutral-900 dark:text-white cursor-pointer shrink-0"
           >
             <option value="all">সকল ক্যাটাগরি</option>
             <option value="hsc">HSC Science</option>
@@ -239,9 +494,20 @@ export default function LiveExamDashboard() {
             <option value="ssc">SSC</option>
           </select>
 
+          {isFilterActive && (
+            <button
+              onClick={handleResetFilters}
+              title="সকল ফিল্টার রিসেট করুন"
+              className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shrink-0"
+            >
+              <X size={13} />
+              <span>রিসেট</span>
+            </button>
+          )}
+
           <button
             onClick={fetchExams}
-            className="p-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 rounded-xl text-neutral-600 dark:text-zinc-400 transition"
+            className="p-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 rounded-xl text-neutral-600 dark:text-zinc-400 transition cursor-pointer shrink-0"
             title="Refresh list"
           >
             <RefreshCw size={15} />
@@ -273,15 +539,29 @@ export default function LiveExamDashboard() {
                     লাইভ এক্সাম ডাটা লোড হচ্ছে...
                   </td>
                 </tr>
-              ) : filteredExams.length === 0 ? (
+              ) : sortedAndFilteredExams.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-neutral-500">
-                    কোনো লাইভ পরীক্ষা পাওয়া যায়নি। "নতুন লাইভ এক্সাম তৈরি" বাটনে
-                    ক্লিক করে প্রথম এক্সাম শিডিউল করুন।
+                    <p className="font-semibold text-sm text-neutral-700 dark:text-zinc-300">
+                      কোনো লাইভ পরীক্ষা পাওয়া যায়নি
+                    </p>
+                    <p className="text-xs text-neutral-400 mt-1">
+                      {isFilterActive
+                        ? 'আপনার ফিল্টারের সাথে মিলে এমন কোনো পরীক্ষা নেই।'
+                        : '"নতুন লাইভ এক্সাম তৈরি" বাটনে ক্লিক করে প্রথম এক্সাম শিডিউল করুন।'}
+                    </p>
+                    {isFilterActive && (
+                      <button
+                        onClick={handleResetFilters}
+                        className="mt-3 px-3 py-1.5 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-700 dark:text-zinc-200 rounded-lg text-xs font-bold transition cursor-pointer"
+                      >
+                        সকল ফিল্টার ক্লিয়ার করুন
+                      </button>
+                    )}
                   </td>
                 </tr>
               ) : (
-                filteredExams.map((exam) => {
+                sortedAndFilteredExams.map((exam) => {
                   const now = new Date().getTime();
                   const start = exam.start_time ? new Date(exam.start_time).getTime() : 0;
                   const end = exam.end_time ? new Date(exam.end_time).getTime() : 0;
@@ -292,7 +572,11 @@ export default function LiveExamDashboard() {
                   return (
                     <tr
                       key={exam.id}
-                      className="hover:bg-neutral-50 dark:hover:bg-zinc-850/40 transition-colors"
+                      className={`transition-colors ${
+                        isLiveNow
+                          ? 'bg-rose-500/[0.04] dark:bg-rose-500/[0.07] hover:bg-rose-500/[0.08] dark:hover:bg-rose-500/[0.11]'
+                          : 'hover:bg-neutral-50 dark:hover:bg-zinc-850/40'
+                      }`}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-2">

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Bell,
   Send,
@@ -205,6 +206,22 @@ export default function NotificationManagementPage() {
           />
           রিফ্রেশ
         </button>
+      </div>
+
+      {/* ── Navigation Tabs ── */}
+      <div className="flex items-center gap-2 border-b border-neutral-200/80 dark:border-zinc-800 pb-3">
+        <div className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white shadow-sm flex items-center gap-2">
+          <Send size={15} />
+          <span>নতুন নোটিফিকেশন পাঠান</span>
+        </div>
+
+        <Link
+          href="/admin/notifications/history"
+          className="px-4 py-2 rounded-xl text-xs font-bold text-neutral-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-zinc-800/60 transition flex items-center gap-2"
+        >
+          <History size={15} />
+          <span>সম্পূর্ণ হিস্ট্রি ও ইউজার লগ ({stats.totalSent})</span>
+        </Link>
       </div>
 
       {/* Stats Cards */}
@@ -566,9 +583,12 @@ export default function NotificationManagementPage() {
                 <History size={18} className="text-red-600" />
                 রিসেন্ট ব্রডকাস্ট হিস্ট্রি
               </h3>
-              <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                {history.length} টি রেকর্ড
-              </span>
+              <Link
+                href="/admin/notifications/history"
+                className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
+              >
+                সব দেখুন →
+              </Link>
             </div>
 
             {fetchingData ? (
@@ -644,6 +664,16 @@ export default function NotificationManagementPage() {
                 ))}
               </div>
             )}
+
+            <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 mt-auto">
+              <Link
+                href="/admin/notifications/history"
+                className="w-full py-2.5 px-4 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2"
+              >
+                <History size={15} />
+                <span>সকল শিক্ষার্থী ও ডেলিভারি হিস্ট্রি দেখুন</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

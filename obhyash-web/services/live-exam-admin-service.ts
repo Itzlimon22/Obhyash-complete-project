@@ -29,12 +29,7 @@ export async function getLiveExams(
   try {
     let query = supabase
       .from("live_exams")
-      .select(
-        `
-        *,
-        total_questions:live_exam_questions(count)
-      `
-      )
+      .select("*")
       .order("start_time", { ascending: false });
 
     if (category && category !== "all") {
@@ -49,32 +44,11 @@ export async function getLiveExams(
 
     return (data || []).map((exam) => ({
       ...exam,
-      total_questions: exam.total_questions?.[0]?.count || 0,
+      total_questions: exam.total_questions || 0,
     })) as LiveExam[];
   } catch (err) {
-    console.warn("Direct live_exams join failed, attempting plain select:", err);
-    let fallbackQuery = supabase
-      .from("live_exams")
-      .select("*")
-      .order("start_time", { ascending: false });
-
-    if (category && category !== "all") {
-      fallbackQuery = fallbackQuery.eq("category", category);
-    }
-    if (status && status !== "all") {
-      fallbackQuery = fallbackQuery.eq("status", status);
-    }
-
-    const { data, error } = await fallbackQuery;
-    if (error) {
-      console.error("Error fetching live exams fallback:", error);
-      throw error;
-    }
-
-    return (data || []).map((exam) => ({
-      ...exam,
-      total_questions: 0,
-    })) as LiveExam[];
+    console.warn("Direct live_exams query failed:", err);
+    return [];
   }
 }
 

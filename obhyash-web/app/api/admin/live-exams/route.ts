@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabaseAdmin
       .from('live_exams')
-      .select('*, total_questions:live_exam_questions(count)')
+      .select('*')
       .order('start_time', { ascending: false });
 
     if (category && category !== 'all') {
@@ -171,34 +171,35 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
-    let data: any[] | null = null;
+    const { data: exams, error } = await query;
+    if (error) throw error;
 
-    try {
-      const res = await query;
-      if (res.error) throw res.error;
-      data = res.data;
-    } catch (joinErr) {
-      console.warn('live_exams join query failed, falling back to plain select:', joinErr);
-      let plainQuery = supabaseAdmin
-        .from('live_exams')
-        .select('*')
-        .order('start_time', { ascending: false });
+    const examList = exams || [];
+    const examIds = examList.map((e: any) => e.id).filter(Boolean);
+    const countMap: Record<string, number> = {};
 
-      if (category && category !== 'all') {
-        plainQuery = plainQuery.eq('category', category);
+    if (examIds.length > 0) {
+      try {
+        const { data: qRows, error: qErr } = await supabaseAdmin
+          .from('live_exam_questions')
+          .select('live_exam_id')
+          .in('live_exam_id', examIds);
+
+        if (!qErr && qRows) {
+          for (const row of qRows) {
+            if (row.live_exam_id) {
+              countMap[row.live_exam_id] = (countMap[row.live_exam_id] || 0) + 1;
+            }
+          }
+        }
+      } catch (countErr) {
+        console.warn('Failed to fetch live_exam_questions counts:', countErr);
       }
-      if (status && status !== 'all') {
-        plainQuery = plainQuery.eq('status', status);
-      }
-
-      const plainRes = await plainQuery;
-      if (plainRes.error) throw plainRes.error;
-      data = plainRes.data;
     }
 
-    const mapped = (data || []).map((exam: any) => ({
+    const mapped = examList.map((exam: any) => ({
       ...exam,
-      total_questions: exam.total_questions?.[0]?.count || 0,
+      total_questions: countMap[exam.id] ?? 0,
     }));
 
     return NextResponse.json({ success: true, data: mapped });
