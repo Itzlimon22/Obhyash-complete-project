@@ -124,8 +124,9 @@ const config = {
           'sans-serif',
         ],
         anek: [
+          'var(--font-anek)',
+          "'Anek Bangla'",
           'var(--font-hind)',
-          "'Hind Siliguri'",
           'sans-serif',
         ],
         bengali: [

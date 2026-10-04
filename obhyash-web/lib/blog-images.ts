@@ -40,8 +40,31 @@ export function getPostCover(post: {
     return '/images/blog-covers/ict.svg';
   }
 
-  // Bangla
-  if (text.includes('bangla') || text.includes('বাংলা') || text.includes('সাহিত্য') || text.includes('লালসালু') || text.includes('সিরাজউদ্দৌলা')) {
+  // Result / Notice / Routine / Scholarship / Board Updates
+  if (
+    text.includes('রেজাল্ট') ||
+    text.includes('result') ||
+    text.includes('রুটিন') ||
+    text.includes('routine') ||
+    text.includes('নোটিশ') ||
+    text.includes('notice') ||
+    text.includes('বৃত্তি') ||
+    text.includes('scholarship') ||
+    text.includes('সিলেবাস') ||
+    text.includes('syllabus') ||
+    text.includes('মানবণ্টন')
+  ) {
+    return '/images/blog-covers/routine.svg';
+  }
+
+  // Bangla (use regex word boundary to prevent matching "bangladesh")
+  if (
+    text.includes('বাংলা') ||
+    text.includes('সাহিত্য') ||
+    text.includes('লালসালু') ||
+    text.includes('সিরাজউদ্দৌলা') ||
+    /\bbangla\b/.test(text)
+  ) {
     return '/images/blog-covers/bangla.svg';
   }
 

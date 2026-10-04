@@ -329,7 +329,7 @@ export default async function BlogPostPage({
         <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500" />
         <div className="overflow-x-auto custom-scrollbar">
           <table
-            className="w-full text-left border-collapse m-0 min-w-[520px] font-hind text-[14.5px] sm:text-[15.5px]"
+            className="w-full text-left border-collapse m-0 min-w-[520px] font-hind tabular-nums text-[14.5px] sm:text-[15.5px]"
             {...props}
           />
         </div>
@@ -349,7 +349,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'th'> & { node?: unknown }) => (
       <th
-        className="px-5 sm:px-6 py-4 align-middle font-bold text-slate-800 dark:text-slate-100 tracking-wider text-[13px] sm:text-[14px] uppercase whitespace-nowrap first:pl-6 last:pr-6"
+        className="px-5 sm:px-6 py-4 align-middle font-bold text-slate-800 dark:text-slate-100 font-anek tracking-wider text-[13px] sm:text-[14px] uppercase whitespace-nowrap first:pl-6 last:pr-6"
         {...props}
       />
     ),
@@ -466,7 +466,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h2'> & { node?: unknown }) => (
       <h2
-        className="text-2xl sm:text-3xl md:text-[28px] font-semibold mt-10 sm:mt-12 mb-4 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-2.5 font-hind tracking-normal leading-snug"
+        className="text-2xl sm:text-3xl md:text-[28px] font-bold mt-10 sm:mt-12 mb-4 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-2.5 font-anek tracking-normal leading-snug"
         {...props}
       />
     ),
@@ -475,7 +475,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h3'> & { node?: unknown }) => (
       <h3
-        className="text-xl sm:text-2xl md:text-[22px] font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100 font-hind tracking-normal leading-snug"
+        className="text-xl sm:text-2xl md:text-[22px] font-bold mt-8 mb-3 text-slate-800 dark:text-slate-100 font-anek tracking-normal leading-snug"
         {...props}
       />
     ),
@@ -484,7 +484,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h4'> & { node?: unknown }) => (
       <h4
-        className="text-lg sm:text-xl font-semibold mt-6 mb-2.5 text-slate-800 dark:text-slate-200 font-hind tracking-normal"
+        className="text-lg sm:text-xl font-bold mt-6 mb-2.5 text-slate-800 dark:text-slate-200 font-anek tracking-normal"
         {...props}
       />
     ),
@@ -553,7 +553,7 @@ export default async function BlogPostPage({
             </Link>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 leading-[1.3] tracking-normal mb-6 font-hind">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-tight mb-6 font-anek">
             {post.title}
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-[1.75] mb-8 font-normal font-hind max-w-3xl tracking-normal">
@@ -621,6 +621,7 @@ export default async function BlogPostPage({
               <div
                 className="prose prose-slate dark:prose-invert max-w-none w-full
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-strong:font-semibold font-normal font-hind
+                prose-p:text-[16px] sm:prose-p:text-[17.5px] prose-p:leading-[1.85] prose-p:text-slate-700 dark:prose-p:text-slate-300
               "
               >
                 <ReactMarkdown
