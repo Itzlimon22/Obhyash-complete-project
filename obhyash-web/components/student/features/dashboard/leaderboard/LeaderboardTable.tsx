@@ -59,22 +59,24 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     return () => observer.disconnect();
   }, [handleObserver]);
 
-  const top3 = !hidePodium && users.length >= 3 ? users.slice(0, 3) : [];
-  const remainingUsers = !hidePodium && users.length >= 3 ? users.slice(3) : users;
-
-  const displayTitle =
-    title ??
-    `${LEVELS.find((l) => l.id === selectedLevel)?.label.split(" ")[0] ?? ""} র‍্যাঙ্কিং`;
 
   const getEffectiveXp = (user: UserProfile) => {
     if (timeframe === "all_time") return user.xp || 0;
     return (user as any).monthly_xp ?? user.xp ?? 0;
   };
 
+  const activeUsers = timeframe === "monthly" ? users.filter((u) => getEffectiveXp(u) > 0) : users;
+  const top3 = !hidePodium && activeUsers.length >= 3 ? activeUsers.slice(0, 3) : [];
+  const remainingUsers = !hidePodium && activeUsers.length >= 3 ? users.slice(3) : users;
+
+  const displayTitle =
+    title ??
+    `${LEVELS.find((l) => l.id === selectedLevel)?.label.split(" ")[0] ?? ""} র‍্যাঙ্কিং`;
+
   return (
     <div className="space-y-4 font-sans">
       {/* Top 3 Podium */}
-      {!isLoading && top3.length > 0 && (
+      {!isLoading && top3.length >= 3 && (
         <LeaderboardPodium
           topUsers={top3}
           onUserClick={onUserClick}
@@ -145,8 +147,9 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               ) : (
                 remainingUsers.map((user, idx) => {
                   const isMe = user.isCurrentUser;
-                  const actualRank = !hidePodium && users.length >= 3 ? idx + 4 : idx + 1;
+                  const rawRank = (user as any).rank !== undefined ? (user as any).rank : (!hidePodium && top3.length >= 3 ? idx + 4 : idx + 1);
                   const isPro = (user as any).is_pro !== undefined ? (user as any).is_pro : isUserPro(user);
+                  const userEffectiveXp = getEffectiveXp(user);
 
                   return (
                     <motion.tr
@@ -165,7 +168,9 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                       {/* Rank Index */}
                       <td className="px-3 py-3.5 md:px-6 text-center">
                         <span className="font-mono text-xs sm:text-sm font-black text-neutral-600 dark:text-neutral-400">
-                          #{BanglaNameHelper.toBanglaNumeral(actualRank)}
+                          {rawRank > 0 && (timeframe !== "monthly" || userEffectiveXp > 0)
+                            ? `#${BanglaNameHelper.toBanglaNumeral(rawRank)}`
+                            : "—"}
                         </span>
                       </td>
 

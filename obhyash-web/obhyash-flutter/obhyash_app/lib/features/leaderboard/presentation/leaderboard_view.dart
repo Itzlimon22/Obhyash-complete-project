@@ -111,7 +111,7 @@ class _LBUser {
   final String? batch;
   final String? avatarUrl;
   final String? gender;
-  final int xp, monthlyXp, examsTaken;
+  final int xp, allTimeXp, monthlyXp, examsTaken;
   final bool isCurrentUser;
   final bool isPro;
 
@@ -124,6 +124,7 @@ class _LBUser {
     this.avatarUrl,
     this.gender,
     required this.xp,
+    this.allTimeXp = 0,
     this.monthlyXp = 0,
     required this.examsTaken,
     this.isCurrentUser = false,
@@ -159,6 +160,7 @@ class _LBUser {
       avatarUrl: j['avatar_url'] as String?,
       gender: j['gender'] as String?,
       xp: effectiveXp,
+      allTimeXp: fullXp,
       monthlyXp: mXp,
       examsTaken: (j['exams_taken'] as num?)?.toInt() ?? 0,
       isCurrentUser: j['id'] == me,
@@ -264,20 +266,19 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   Future<void> _fetchCounts() async {
     try {
       final supabase = Supabase.instance.client;
-      final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
       final myProfile = ref.read(userProfileProvider).whenOrNull(data: (u) => u);
       final rawUserBatch = myProfile?.batch?.trim();
 
-      // Count students in each league tier by their active timeframe XP
+      // Count students in each league tier by their lifetime XP
       final futures = _levels.map((lvl) async {
         final (minXp, maxXp) = _getLevelThreshold(lvl.id);
         var query = supabase
             .from('users')
             .select('id')
             .or('role.ilike.student,role.is.null')
-            .gte(sortColumn, minXp);
+            .gte('xp', minXp);
         if (maxXp < 999999999) {
-          query = query.lte(sortColumn, maxXp);
+          query = query.lte('xp', maxXp);
         }
         if (_batchFilter == 'my_batch' && rawUserBatch != null && rawUserBatch.isNotEmpty) {
           query = query.ilike('batch', '%$rawUserBatch%');
@@ -310,17 +311,16 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final me = supabase.auth.currentUser?.id;
       final (minXp, maxXp) = _getLevelThreshold(_selectedLevel);
       final isMonthly = _timeframe == 'monthly';
-      final sortColumn = isMonthly ? 'monthly_xp' : 'xp';
 
-      // 1. Query users who belong to this Tier (Level) in active timeframe (Students Only)
+      // 1. Query users who belong to this Tier (Level) by lifetime XP (Students Only)
       PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
           .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, role, gender')
           .or('role.ilike.student,role.is.null')
-          .gte(sortColumn, minXp);
+          .gte('xp', minXp);
 
       if (maxXp < 999999999) {
-        query = query.lte(sortColumn, maxXp);
+        query = query.lte('xp', maxXp);
       }
 
       // Optional Batch filtering
@@ -351,22 +351,22 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       if (myProfile != null && !isLoadMore) {
         try {
           final myEffectiveXp = isMonthly ? myProfile.monthlyXp : myProfile.xp;
-          final userCalculatedLevel = _calculateLevelFromXp(myEffectiveXp);
+          final userCalculatedLevel = _calculateLevelFromXp(myProfile.xp);
           final (myMinXp, myMaxXp) = _getLevelThreshold(userCalculatedLevel);
           var countQuery = supabase
               .from('users')
               .select('id')
               .or('role.ilike.student,role.is.null')
-              .gte(sortColumn, myMinXp);
+              .gte('xp', myMinXp);
           if (myMaxXp < 999999999) {
-            countQuery = countQuery.lte(sortColumn, myMaxXp);
+            countQuery = countQuery.lte('xp', myMaxXp);
           }
           if (_batchFilter == 'my_batch' && myProfile.batch != null && myProfile.batch!.isNotEmpty) {
             countQuery = countQuery.ilike('batch', '%${myProfile.batch!.trim()}%');
           }
-          countQuery = countQuery.gt(sortColumn, myEffectiveXp);
+          countQuery = countQuery.gt(isMonthly ? 'monthly_xp' : 'xp', myEffectiveXp);
           final countRes = await countQuery.count(CountOption.exact);
-          calculatedRank = countRes.count + 1;
+          calculatedRank = myEffectiveXp > 0 ? (countRes.count + 1) : 0;
         } catch (e) {
           debugPrint('[LeaderboardView] Rank count error: $e');
         }
@@ -382,6 +382,13 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
               .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: _timeframe))
               .toList();
 
+          // Re-sort: effective XP DESC, then lifetime XP DESC
+          fetchedUsers.sort((a, b) {
+            final cmp = b.xp.compareTo(a.xp);
+            if (cmp != 0) return cmp;
+            return b.allTimeXp.compareTo(a.allTimeXp);
+          });
+
           if (fetchedUsers.length < _limit) {
             _hasMore = false;
           }
@@ -394,6 +401,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
             _isLoading = false;
             if (calculatedRank > 0) {
               _myExactRank = calculatedRank;
+            } else {
+              _myExactRank = 0;
             }
           }
           _offset += fetchedUsers.length;
@@ -437,9 +446,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
 
         // Sort by effective monthly XP descending, then lifetime XP
         list.sort((a, b) {
-          final cmp = b.monthlyXp.compareTo(a.monthlyXp);
+          final cmp = b.xp.compareTo(a.xp);
           if (cmp != 0) return cmp;
-          return b.xp.compareTo(a.xp);
+          return b.allTimeXp.compareTo(a.allTimeXp);
         });
 
         setState(() {
@@ -598,7 +607,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     final currentUserAsync = ref.watch(userProfileProvider);
     final myProfile = currentUserAsync.whenOrNull(data: (u) => u);
     final effectiveUserXp = _timeframe == 'monthly' ? (myProfile?.monthlyXp ?? 0) : (myProfile?.xp ?? 0);
-    final myCalculatedLevelId = _calculateLevelFromXp(effectiveUserXp);
+    // Level is strictly determined by lifetime XP
+    final myCalculatedLevelId = _calculateLevelFromXp(myProfile?.xp ?? 0);
     final myLvl = _levelById(myCalculatedLevelId);
     final lvl = _levelById(_selectedLevel);
 
@@ -627,17 +637,29 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       level: u.level,
       batch: u.batch,
       avatarUrl: u.avatarUrl,
-      xp: _timeframe == 'monthly' ? u.monthlyXp : u.xp,
+      gender: u.gender,
+      xp: _timeframe == 'monthly' ? u.monthlyXp : u.allTimeXp,
+      allTimeXp: u.allTimeXp,
       monthlyXp: u.monthlyXp,
       examsTaken: u.examsTaken,
       isCurrentUser: u.isCurrentUser,
       isPro: u.isPro,
     )).toList();
 
+    final myEffectiveXp = _timeframe == 'monthly' ? (myProfile?.monthlyXp ?? 0) : (myProfile?.xp ?? 0);
     final myRankIdx = myProfile != null
         ? displayedUsers.indexWhere((u) => u.id == myProfile.id)
         : -1;
-    final myRank = myRankIdx >= 0 ? myRankIdx + 1 : (_myExactRank > 0 ? _myExactRank : 0);
+    final int myRank;
+    if (myEffectiveXp <= 0) {
+      myRank = 0;
+    } else if (myRankIdx >= 0) {
+      myRank = myRankIdx + 1;
+    } else if (_myExactRank > 0) {
+      myRank = _myExactRank;
+    } else {
+      myRank = 0;
+    }
     final isOnOwnLevel = myLvl.id == lvl.id;
 
     final isSsc = (myProfile?.stream?.toLowerCase().contains('ssc') ?? false) ||
@@ -767,9 +789,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        if (!_isLoading && displayedUsers.length >= 3)
+                                        if (!_isLoading && displayedUsers.where((u) => u.xp > 0).length >= 3)
                                           _PodiumSection(
-                                            users: displayedUsers.take(3).toList(),
+                                            users: displayedUsers.where((u) => u.xp > 0).take(3).toList(),
                                             isDark: isDark,
                                             onTap: (id) => context.push(
                                               '/leaderboard/user-profile/$id',
@@ -2060,7 +2082,7 @@ class _LeaderboardTable extends StatelessWidget {
                           children: [
                             SizedBox(
                               width: 44,
-                              child: _rankBadge(i + 1, isDark),
+                              child: _rankBadge(u.xp > 0 ? (i + 1) : 0, isDark),
                             ),
                             const SizedBox(width: 8),
                             UserAvatar(
@@ -2293,6 +2315,18 @@ class _LeaderboardTable extends StatelessWidget {
   );
 
   Widget _rankBadge(int rank, bool isDark) {
+    if (rank <= 0) {
+      return Center(
+        child: Text(
+          '—',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: isDark ? const Color(0xFF52525B) : const Color(0xFF9CA3AF),
+          ),
+        ),
+      );
+    }
     if (rank == 1) {
       return const Center(child: Text('🥇', style: TextStyle(fontSize: 24)));
     }
@@ -2332,7 +2366,7 @@ class _PodiumSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (users.isEmpty) return const SizedBox();
+    if (users.isEmpty || users.where((u) => u.xp > 0).length < 3) return const SizedBox();
 
     final slots =
         <

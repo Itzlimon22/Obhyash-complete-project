@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { ensureMonthlyLeaderboardReset, calculateEffectiveXp } from '@/lib/leaderboard-utils';
 
 const PAGE_SIZE = 20;
 
@@ -39,6 +40,8 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
+  await ensureMonthlyLeaderboardReset(supabase);
+
   const levelKey = level.toLowerCase();
   const threshold = LEVEL_THRESHOLDS[levelKey] || LEVEL_THRESHOLDS.explorer;
   const isMonthly = timeframe === 'monthly';
@@ -47,7 +50,7 @@ export async function GET(req: NextRequest) {
   // Query users belonging to this level tier based on lifetime XP (Only Students)
   let query = supabase
     .from('users')
-    .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, avatar_color, streak, batch, role')
+    .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, avatar_color, streak, batch, role')
     .or('role.ilike.student,role.is.null')
     .gte('xp', threshold.min);
 
@@ -82,11 +85,8 @@ export async function GET(req: NextRequest) {
     return r === 'student';
   });
 
-  const users = studentRows.map((user: any, index: number) => {
-    const effectiveXp = isMonthly
-      ? (user.monthly_xp ?? 0)
-      : (user.xp ?? 0);
-
+  const users = studentRows.map((user: any) => {
+    const effectiveXp = calculateEffectiveXp(user, timeframe);
     const userLevel = user.level || calculateLevelFromXp(user.xp || 0);
 
     return {
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
       institute: user.institute || 'Unknown Institute',
       xp: effectiveXp,
       allTimeXp: user.xp || 0,
-      monthlyXp: user.monthly_xp || 0,
+      monthlyXp: isMonthly ? effectiveXp : (user.monthly_xp || 0),
       level: userLevel,
       allTimeLevel: userLevel,
       examsTaken: user.exams_taken || 0,
@@ -103,8 +103,25 @@ export async function GET(req: NextRequest) {
       avatarColor: user.avatar_color || undefined,
       streak: user.streak || 0,
       batch: user.batch || undefined,
-      rank: offset + index + 1,
+      rank: 0,
     };
+  });
+
+  // Re-sort in memory by effective XP descending, then lifetime XP
+  users.sort((a, b) => {
+    if (b.xp !== a.xp) return b.xp - a.xp;
+    if (b.allTimeXp !== a.allTimeXp) return b.allTimeXp - a.allTimeXp;
+    return b.examsTaken - a.examsTaken;
+  });
+
+  // Assign ranks: active students (> 0 XP) get ranks; 0 XP students get rank 0 (unranked)
+  let activeRank = offset + 1;
+  users.forEach((u) => {
+    if (isMonthly && u.xp === 0) {
+      u.rank = 0;
+    } else {
+      u.rank = activeRank++;
+    }
   });
 
   return NextResponse.json(

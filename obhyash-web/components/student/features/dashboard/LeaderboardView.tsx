@@ -28,6 +28,7 @@ import { isUserPro } from "@/lib/subscription-utils";
 import UserAvatar from "../../ui/common/UserAvatar";
 import { LeaderboardSkeleton } from "../../ui/common/Skeletons";
 import { getCanonicalCollegeName } from "@/lib/college-mapping";
+import { calculateEffectiveXp } from "@/lib/leaderboard-utils";
 
 // ─── Level Definitions matching Flutter ──────────────────────────────────────
 export interface LevelInfo {
@@ -154,6 +155,7 @@ export interface LeaderboardUser {
   name: string;
   institute?: string;
   xp: number;
+  allTimeXp?: number;
   monthly_xp?: number;
   level?: string;
   exams_taken?: number;
@@ -238,7 +240,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   // ── 2. Fetch Level Student Counts ──────────────────────────────────────────
   const fetchCounts = useCallback(async () => {
     try {
-      const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
       const counts: Record<string, number> = {};
 
       await Promise.all(
@@ -248,11 +249,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               .from("users")
               .select("id", { count: "exact", head: true })
               .or("role.ilike.student,role.is.null");
+            // Level tiers are strictly based on lifetime XP
             if (lvl.minXP > 0) {
-              query = query.gte(sortColumn, lvl.minXP);
+              query = query.gte("xp", lvl.minXP);
             }
             if (lvl.maxXP < 999999999) {
-              query = query.lte(sortColumn, lvl.maxXP);
+              query = query.lte("xp", lvl.maxXP);
             }
             if (batchFilter === "my_batch" && currentUser?.batch) {
               query = query.ilike("batch", `%${currentUser.batch.trim()}%`);
@@ -269,7 +271,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     } catch (err) {
       console.error("Error fetching level counts:", err);
     }
-  }, [supabase, timeframe, batchFilter, currentUser]);
+  }, [supabase, batchFilter, currentUser]);
 
   useEffect(() => {
     fetchCounts();
@@ -296,15 +298,16 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         try {
           let query = supabase
             .from("users")
-            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
+            .select("id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
             .or("role.ilike.student,role.is.null");
 
+          // Level tier bounds are strictly based on lifetime XP
           if (currentLevelInfo.minXP > 0) {
-            query = query.gte(sortColumn, currentLevelInfo.minXP);
+            query = query.gte("xp", currentLevelInfo.minXP);
           }
 
           if (currentLevelInfo.maxXP < 999999999) {
-            query = query.lte(sortColumn, currentLevelInfo.maxXP);
+            query = query.lte("xp", currentLevelInfo.maxXP);
           }
 
           if (batchFilter === "my_batch" && currentUser?.batch) {
@@ -326,39 +329,56 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           if (error) throw error;
 
           if (data && data.length > 0) {
-            mapped = data.map((u: any, idx: number) => {
+            mapped = data.map((u: any) => {
               const isPro = isUserPro(u);
-              const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
+              const effXp = calculateEffectiveXp(u, timeframe);
+              const mXp = calculateEffectiveXp(u, "monthly");
 
               return {
                 id: u.id,
                 name: u.name || "শিক্ষার্থী",
                 institute: u.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই",
                 xp: effXp,
-                monthly_xp: u.monthly_xp || 0,
-                level: calculateLevelFromXp(effXp),
+                allTimeXp: u.xp || 0,
+                monthly_xp: mXp,
+                level: u.level || calculateLevelFromXp(u.xp || 0),
                 exams_taken: u.exams_taken || 0,
                 avatar_url: u.avatar_url || undefined,
                 batch: u.batch || undefined,
-                rank: currentOffset + idx + 1,
+                rank: 0,
                 is_pro: isPro,
               };
+            });
+
+            // Re-sort: effective XP DESC, then lifetime XP DESC, then exams_taken DESC
+            mapped.sort((a, b) => {
+              if (b.xp !== a.xp) return b.xp - a.xp;
+              if ((b.allTimeXp || 0) !== (a.allTimeXp || 0)) return (b.allTimeXp || 0) - (a.allTimeXp || 0);
+              return (b.exams_taken || 0) - (a.exams_taken || 0);
+            });
+
+            // Assign ranks: active students (> 0 XP) get ranks, 0 XP get 0 (unranked)
+            let activeRank = currentOffset + 1;
+            mapped.forEach((u) => {
+              if (timeframe === "monthly" && u.xp === 0) {
+                u.rank = 0;
+              } else {
+                u.rank = activeRank++;
+              }
             });
           }
 
           // Compute accurate current user rank in their tier if initial fetch
           if (currentUser && !isLoadMore) {
             try {
-              const myEffXp = timeframe === "monthly" ? currentUser.monthly_xp || 0 : currentUser.xp || 0;
-              const userCalculatedLevel = calculateLevelFromXp(myEffXp);
-              const myLvlInfo = getLevelById(userCalculatedLevel);
+              const myEffXp = calculateEffectiveXp(currentUser, timeframe);
               let countQuery = supabase
                 .from("users")
                 .select("id", { count: "exact", head: true })
                 .or("role.ilike.student,role.is.null")
-                .gte(sortColumn, myLvlInfo.minXP);
-              if (myLvlInfo.maxXP < 999999999) {
-                countQuery = countQuery.lte(sortColumn, myLvlInfo.maxXP);
+                .gte("xp", currentLevelInfo.minXP);
+              if (currentLevelInfo.maxXP < 999999999) {
+                countQuery = countQuery.lte("xp", currentLevelInfo.maxXP);
               }
               if (batchFilter === "my_batch" && currentUser.batch) {
                 countQuery = countQuery.ilike("batch", `%${currentUser.batch.trim()}%`);
@@ -366,7 +386,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               countQuery = countQuery.gt(sortColumn, myEffXp);
               const { count: rankCount } = await countQuery;
               if (typeof rankCount === "number") {
-                setMyExactRank(rankCount + 1);
+                setMyExactRank(myEffXp > 0 ? rankCount + 1 : 0);
               }
             } catch (rankErr) {
               console.warn("[LeaderboardView] Rank count error:", rankErr);
@@ -436,7 +456,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       try {
         const { data, error } = await supabase
           .from("users")
-          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
+          .select("id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
           .or("role.ilike.student,role.is.null")
           .ilike("institute", currentUser.institute.trim())
           .order("monthly_xp", { ascending: false, nullsFirst: false })
@@ -449,16 +469,17 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           .filter((u: any) => (u.role || "student").toLowerCase() === "student")
           .map((u: any) => {
             const isPro = isUserPro(u);
-            const mXp = u.monthly_xp ?? 0;
-            const effXp = timeframe === "monthly" ? mXp : (u.xp || 0);
+            const effXp = calculateEffectiveXp(u, timeframe);
+            const mXp = calculateEffectiveXp(u, "monthly");
 
             return {
               id: u.id,
               name: u.name || "শিক্ষার্থী",
               institute: u.institute,
               xp: effXp,
+              allTimeXp: u.xp || 0,
               monthly_xp: mXp,
-              level: calculateLevelFromXp(effXp),
+              level: u.level || calculateLevelFromXp(u.xp || 0),
               exams_taken: u.exams_taken || 0,
               avatar_url: u.avatar_url || undefined,
               batch: u.batch || undefined,
@@ -469,27 +490,35 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
         mapped.sort((a, b) => {
           if (b.xp !== a.xp) return b.xp - a.xp;
-          return (b.monthly_xp || 0) - (a.monthly_xp || 0);
+          if ((b.allTimeXp || 0) !== (a.allTimeXp || 0)) return (b.allTimeXp || 0) - (a.allTimeXp || 0);
+          return (b.exams_taken || 0) - (a.exams_taken || 0);
         });
-        mapped.forEach((u, idx) => {
-          u.rank = idx + 1;
+
+        let activeRank = 1;
+        mapped.forEach((u) => {
+          if (timeframe === "monthly" && u.xp === 0) {
+            u.rank = 0;
+          } else {
+            u.rank = activeRank++;
+          }
         });
       } catch (collegeErr) {
         console.warn("[LeaderboardView] Direct college query failed, falling back to API:", collegeErr);
         const res = await fetch(`/api/leaderboard/college?institute=${encodeURIComponent(currentUser.institute)}&limit=100`);
         if (res.ok) {
           const json = await res.json();
-          mapped = (json.users || []).map((u: any, idx: number) => ({
+          mapped = (json.users || []).map((u: any) => ({
             id: u.id,
             name: u.name || "শিক্ষার্থী",
             institute: u.institute || currentUser.institute,
             xp: u.xp || 0,
+            allTimeXp: u.allTimeXp || u.xp || 0,
             monthly_xp: u.monthlyXp || 0,
             level: u.level || calculateLevelFromXp(u.xp || 0),
             exams_taken: u.examsTaken || 0,
             avatar_url: u.avatarUrl || undefined,
             batch: u.batch || undefined,
-            rank: idx + 1,
+            rank: u.rank !== undefined ? u.rank : (u.xp > 0 ? 1 : 0),
             is_pro: Boolean(u.isPro || u.is_pro),
           }));
         }
@@ -636,7 +665,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     return Math.min(100, Math.max(0, Math.round((earned / range) * 100)));
   }, [myEffectiveXp, myLevelInfo, nextLevelInfo]);
 
-  const top3Users = useMemo(() => users.slice(0, 3), [users]);
+  const top3Users = useMemo(() => {
+    // Only active students who have earned points (> 0 XP) qualify for the podium
+    const active = users.filter((u) => u.xp > 0);
+    return active.slice(0, 3);
+  }, [users]);
 
   const isSsc =
     (currentUser?.batch || "").toLowerCase().includes("ssc") ||
@@ -650,6 +683,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   }, [instituteRankings, searchCollegeQuery]);
 
   const renderRankBadge = (rank: number) => {
+    if (!rank || rank <= 0) {
+      return (
+        <div className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-[#27272A] flex items-center justify-center text-xs font-black text-neutral-400 dark:text-neutral-500 tabular-nums shrink-0">
+          —
+        </div>
+      );
+    }
     if (rank === 1) return <span className="text-xl sm:text-2xl select-none leading-none">🥇</span>;
     if (rank === 2) return <span className="text-xl sm:text-2xl select-none leading-none">🥈</span>;
     if (rank === 3) return <span className="text-xl sm:text-2xl select-none leading-none">🥉</span>;

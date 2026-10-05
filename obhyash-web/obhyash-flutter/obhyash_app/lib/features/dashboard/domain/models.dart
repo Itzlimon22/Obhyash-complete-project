@@ -444,13 +444,23 @@ class UserProfile {
 
     final bool isSub = isAdmin || (isProFlag && !isExpired);
 
+    int monthlyXpVal = (json['monthly_xp'] as num?)?.toInt() ?? 0;
+    final rawResetAt = json['monthly_xp_reset_at'] as String?;
+    if (rawResetAt != null) {
+      final resetDate = DateTime.tryParse(rawResetAt);
+      final now = DateTime.now().toUtc();
+      if (resetDate != null && (now.year > resetDate.year || now.month > resetDate.month)) {
+        monthlyXpVal = 0;
+      }
+    }
+
     return UserProfile(
       id: json['id'] as String,
       studentId: json['student_id'] as String?,
       name: json['name'] as String? ?? 'Unknown User',
       email: json['email'] as String?,
       xp: (json['xp'] as num?)?.toInt() ?? 0,
-      monthlyXp: (json['monthly_xp'] as num?)?.toInt() ?? 0,
+      monthlyXp: monthlyXpVal,
       level: json['level'] as String?,
       division: json['division'] as String?,
       stream: json['stream'] as String?,

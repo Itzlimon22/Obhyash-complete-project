@@ -18,17 +18,18 @@ export const LeaderboardPodium: React.FC<LeaderboardPodiumProps> = ({
   onUserClick,
   timeframe = "monthly",
 }) => {
-  if (topUsers.length === 0) return null;
-
-  const first = topUsers[0] || null;
-  const second = topUsers[1] || null;
-  const third = topUsers[2] || null;
-
   const getEffectiveXp = (user: UserProfile | null) => {
     if (!user) return 0;
     if (timeframe === "all_time") return user.xp || 0;
     return (user as any).monthly_xp ?? user.xp ?? 0;
   };
+
+  const activeTopUsers = topUsers.filter((u) => getEffectiveXp(u) > 0);
+  if (activeTopUsers.length === 0) return null;
+
+  const first = activeTopUsers[0] || null;
+  const second = activeTopUsers[1] || null;
+  const third = activeTopUsers[2] || null;
 
   return (
     <div className="w-full max-w-2xl mx-auto my-6 px-2 font-sans">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { getCanonicalCollegeName } from '@/lib/college-mapping';
+import { ensureMonthlyLeaderboardReset, calculateEffectiveXp } from '@/lib/leaderboard-utils';
 
 function calculateRankPoints(rank: number): number {
   if (rank === 1) return 500;
@@ -22,6 +23,7 @@ export async function GET(req: NextRequest) {
   const xpCol = timeframe === 'all_time' ? 'xp' : 'monthly_xp';
 
   const supabase = await createClient();
+  await ensureMonthlyLeaderboardReset(supabase);
 
   const { data, error } = await supabase
     .from('users')
@@ -45,7 +47,7 @@ export async function GET(req: NextRequest) {
     const rawInst = row.institute;
     if (!rawInst || !rawInst.trim()) return;
 
-    const userXp = timeframe === 'all_time' ? (row.xp || 0) : (row.monthly_xp || 0);
+    const userXp = calculateEffectiveXp(row, timeframe);
     if (userXp > 0) {
       activeStudents.push({
         institute: getCanonicalCollegeName(rawInst),
