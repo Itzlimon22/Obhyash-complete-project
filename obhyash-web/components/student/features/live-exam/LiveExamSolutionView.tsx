@@ -5,6 +5,8 @@ import { Question } from "@/lib/types";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getLiveExamSolutions } from "@/services/live-exam-student-service";
 import { toggleBookmark, getUserBookmarks } from "@/services/bookmark-service";
+import QuestionCard from "@/components/student/ui/exam/QuestionCard";
+import ReportModal from "@/components/student/ui/common/ReportModal";
 import LatexText from "@/components/student/ui/common/LatexText";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 import ProUpgradeModal from "@/components/common/ProUpgradeModal";
@@ -54,6 +56,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   const [filter, setFilter] = useState<"all" | "correct" | "wrong" | "skipped" | "bookmarked">("all");
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
+  const [reportingQuestionId, setReportingQuestionId] = useState<string | number | null>(null);
   const [isLocked, setIsLocked] = useState(false);
 
   const isPro = isUserPro(profile);
@@ -359,146 +362,28 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
             <p className="text-neutral-600 dark:text-neutral-400 font-bold">কোনো প্রশ্ন পাওয়া যায়নি</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="flex flex-col">
             {filteredQuestions.map((q) => {
               const questionNumber = questions.findIndex(item => item.id === q.id) + 1;
               const userPick = userAnswers[q.id];
-              const isCorrect = userPick !== undefined && (
-                userPick === q.correctAnswerIndex || 
-                (q.correctAnswerIndices && q.correctAnswerIndices.includes(userPick))
-              );
-              const isBookmarked = bookmarkedIds.has(q.id);
 
               return (
-                <div
+                <QuestionCard
                   key={q.id}
-                  className="bg-white dark:bg-neutral-900 rounded-2xl p-5 sm:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700"
-                >
-                  {/* Question Header & Badges */}
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 font-black text-sm text-neutral-700 dark:text-neutral-300 flex items-center justify-center">
-                        {questionNumber}
-                      </span>
-                      
-                      {q.subject && (
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
-                          {BanglaNameHelper.formatSubject(q.subject, (q as any).subjectLabel)}
-                        </span>
-                      )}
-
-                      {q.chapter && (
-                        <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                          {q.chapter}
-                        </span>
-                      )}
-
-                      {userPick === undefined ? (
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
-                          অনুত্তরিত
-                        </span>
-                      ) : isCorrect ? (
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> সঠিক (+{q.points || 1})
-                        </span>
-                      ) : (
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 flex items-center gap-1">
-                          <XCircle className="w-3.5 h-3.5" /> ভুল (-{negativeMarking})
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Bookmark Action */}
-                    <button
-                      onClick={() => handleToggleBookmark(q.id)}
-                      disabled={bookmarkingId === String(q.id)}
-                      className={`p-2 rounded-xl border transition-all ${
-                        isBookmarked
-                          ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 shadow-sm"
-                          : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                      }`}
-                      title={isBookmarked ? "রিভিশন তালিকা থেকে সরান" : "রিভিশনে যোগ করুন"}
-                    >
-                      {isBookmarked ? (
-                        <BookmarkCheck className="w-5 h-5" />
-                      ) : (
-                        <Bookmark className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Question Text */}
-                  <div className="text-neutral-900 dark:text-neutral-100 font-bold text-base sm:text-lg mb-4 leading-relaxed">
-                    <LatexText text={q.question} />
-                  </div>
-
-                  {/* Optional Question Image */}
-                  {q.imageUrl && (
-                    <div className="mb-4 rounded-xl overflow-hidden max-w-md border border-neutral-200 dark:border-neutral-700">
-                      <img src={q.imageUrl} alt="Question Diagram" className="w-full object-contain max-h-60" />
-                    </div>
-                  )}
-
-                  {/* Options List */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                    {q.options.map((opt, optIndex) => {
-                      const banglaOptions = ["ক", "খ", "গ", "ঘ", "ঙ"];
-                      const banglaLetter = banglaOptions[optIndex] || `${optIndex + 1}`;
-                      const isOptionCorrect = optIndex === q.correctAnswerIndex || (q.correctAnswerIndices && q.correctAnswerIndices.includes(optIndex));
-                      const isUserSelected = userPick === optIndex;
-
-                      let optionBorder = "border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30";
-                      let optionBadge = "bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300";
-
-                      if (isOptionCorrect) {
-                        optionBorder = "border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200";
-                        optionBadge = "bg-emerald-600 text-white";
-                      } else if (isUserSelected && !isOptionCorrect) {
-                        optionBorder = "border-red-500 bg-red-50/80 dark:bg-red-950/40 text-red-950 dark:text-red-200";
-                        optionBadge = "bg-red-600 text-white";
-                      }
-
-                      return (
-                        <div
-                          key={optIndex}
-                          className={`p-3.5 rounded-xl border-2 flex items-start gap-3 transition-all ${optionBorder}`}
-                        >
-                          <span className={`w-6 h-6 rounded-md font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 ${optionBadge}`}>
-                            {banglaLetter}
-                          </span>
-                          <div className="flex-1 font-medium text-sm">
-                            <LatexText text={opt} />
-                          </div>
-                          {isOptionCorrect && (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                          )}
-                          {isUserSelected && !isOptionCorrect && (
-                            <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Detailed Explanation Block */}
-                  {q.explanation && (
-                    <div className="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/40 rounded-xl p-4 text-sm text-neutral-800 dark:text-neutral-200 space-y-2">
-                      <div className="flex items-center gap-2 font-bold text-blue-700 dark:text-blue-400">
-                        <BookOpen className="w-4 h-4" />
-                        <span>সঠিক ব্যাখ্যা:</span>
-                      </div>
-                      <div className="leading-relaxed pl-6">
-                        <LatexText text={q.explanation} />
-                      </div>
-                      {q.explanationImageUrl && (
-                        <div className="pt-2 pl-6">
-                          <img src={q.explanationImageUrl} alt="Explanation Diagram" className="rounded-lg max-h-48 border border-blue-200 dark:border-blue-800" />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                </div>
+                  question={q}
+                  serialNumber={questionNumber}
+                  selectedOptionIndex={userPick}
+                  readOnly={true}
+                  showFeedback={true}
+                  showAnswer={true}
+                  isFlagged={false}
+                  showReport={true}
+                  onReport={() => setReportingQuestionId(q.id)}
+                  isBookmarked={bookmarkedIds.has(q.id)}
+                  onToggleBookmark={() => handleToggleBookmark(q.id)}
+                  hideExplanation={!isPro}
+                  className="mb-3.5"
+                />
               );
             })}
           </div>
@@ -514,6 +399,19 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
         message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও প্র্যাকটিসের জন্য প্রো সাবস্ক্রিপশন নাও।"
         featurePill="বুকমার্ক লিমিট: ২৫/২৫"
       />
+
+      {/* Report Modal */}
+      {reportingQuestionId && (
+        <ReportModal
+          isOpen={true}
+          onClose={() => setReportingQuestionId(null)}
+          onSubmit={(data) => {
+            setReportingQuestionId(null);
+            toast.success("রিপোর্ট গ্রহণ করা হয়েছে। ধন্যবাদ!");
+          }}
+          questionId={reportingQuestionId}
+        />
+      )}
     </AppLayout>
   );
 };

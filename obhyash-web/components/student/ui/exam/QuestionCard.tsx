@@ -33,10 +33,12 @@ export interface QuestionCardProps {
   onToggleBookmark?: () => void;
   onDelete?: () => void;
   hideMetadata?: boolean;
+  hideSourceTag?: boolean;
   alwaysShowSourceTag?: boolean;
   showReport?: boolean;
   initiallyExpanded?: boolean;
   hideExplanation?: boolean;
+  className?: string;
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
@@ -56,10 +58,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   onToggleBookmark,
   onDelete,
   hideMetadata = false,
+  hideSourceTag = false,
   alwaysShowSourceTag = false,
   showReport = false,
   initiallyExpanded = false,
   hideExplanation = false,
+  className,
 }) => {
   const [isExplanationOpen, setIsExplanationOpen] = useState(
     showFeedback && initiallyExpanded,
@@ -108,18 +112,25 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   const isUserSelected = (idx: number) => selectedOptionIndex === idx;
 
+  const shouldShowSourceTag =
+    !hideMetadata &&
+    !hideSourceTag &&
+    Boolean(sourceTags) &&
+    (alwaysShowSourceTag || readOnly || showFeedback || showAnswer);
+
   return (
     <div
       id={`question-${question.id}`}
       className={cn(
-        "relative mb-5 sm:mb-6 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] transition-all duration-200 font-hind w-full max-w-full overflow-hidden min-w-0 box-border",
+        "relative mb-2.5 sm:mb-3 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] transition-all duration-200 font-hind w-full max-w-full overflow-hidden min-w-0 box-border",
         isFlagged
-          ? 'border-[#FB923C] border-2 ring-2 ring-[#FB923C]/20 shadow-md'
+          ? 'border-[#FB923C] border-2 shadow-sm'
           : 'border-[#E5E7EB] dark:border-[#333333] border shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none',
+        className,
       )}
     >
       {/* ── Top Question Section (Flutter: EdgeInsets.fromLTRB(14, 14, 14, 10)) ── */}
-      <div className="p-3.5 pt-3.5 pb-2.5 sm:p-4 sm:pb-3 w-full max-w-full min-w-0 overflow-hidden box-border font-hind">
+      <div className="p-3.5 pt-3.5 pb-2.5 sm:p-3.5 sm:pt-3.5 sm:pb-2.5 w-full max-w-full min-w-0 overflow-hidden box-border font-hind">
         {/* Stimulus / Passage (উদ্দীপক) if present */}
         {question.passage && (
           <div className="mb-2.5 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed max-w-full overflow-hidden break-words [overflow-wrap:anywhere] [word-break:break-word] font-hind">
@@ -130,8 +141,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
         )}
 
-        {/* Serial number + Question text INLINE (Flutter: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}') */}
-        <div className="text-[16.5px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5] font-hind w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word]">
+        {/* Serial number + Question text INLINE (Flutter: '${_toBengaliNumeral(widget.serialNumber)}. ${widget.question.question}' 16.5px FontWeight.normal) */}
+        <div className="text-[16.5px] font-normal text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5] font-hind w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word]">
           <MathRenderer
             text={
               serialNumber !== undefined
@@ -157,7 +168,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           {/* Left: Source Tag & Flagged Badge */}
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">
             {/* Unified Source Tag (Board / University & Year - Short Form e.g. DB '24) */}
-            {!hideMetadata && sourceTags && (alwaysShowSourceTag || readOnly || showFeedback || showAnswer || true) && (
+            {shouldShowSourceTag && (
               <span className="inline-flex items-center px-2 py-[3px] rounded-[6px] bg-[#E0F7FA] dark:bg-[#0E3A4A] border border-[#B2EBF2] dark:border-[#164E63] text-[11px] font-semibold text-[#006064] dark:text-[#A5F3FC] leading-none tracking-tight">
                 {sourceTags}
               </span>
@@ -249,7 +260,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
 
       {/* ── Options List (Flutter: EdgeInsets.fromLTRB(10, 0, 10, 14) with 8px bottom spacing) ── */}
-      <div className="px-2.5 pb-3.5 sm:px-3.5 sm:pb-4 flex flex-col gap-2 w-full max-w-full min-w-0 overflow-hidden box-border">
+      <div className="px-2.5 pb-3.5 sm:px-2.5 sm:pb-3.5 flex flex-col gap-2 w-full max-w-full min-w-0 overflow-hidden box-border">
         {(question.options || []).map((option, idx) => {
           const banglaIndex = BANGLA_INDICES[idx] || `${idx + 1}`;
           const isSelected = isUserSelected(idx);
@@ -319,7 +330,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               disabled={readOnly || showFeedback || isLocked}
               onClick={() => onSelectOption && onSelectOption(idx)}
               className={cn(
-                'w-full max-w-full flex items-center justify-between gap-3 px-3.5 py-2.5 sm:py-3 rounded-[12px] border transition-all text-left group touch-manipulation min-w-0 box-border font-hind',
+                'w-full max-w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-[12px] border transition-all text-left group touch-manipulation min-w-0 box-border font-hind',
                 boxBg,
                 boxBorder,
                 !readOnly && !showFeedback && !isLocked && 'cursor-pointer active:scale-[0.99]',
@@ -335,6 +346,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     bulletBorder,
                     bulletText,
                     isBold ? 'font-bold' : 'font-semibold',
+                    bulletBg === 'bg-transparent' && 'shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-none',
                   )}
                 >
                   <span className="leading-none">{banglaIndex}</span>

@@ -19,6 +19,8 @@ import {
   Award,
 } from "lucide-react";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
+import { getUserBookmarks, toggleBookmark } from "@/services/bookmark-service";
+import { isUserPro } from "@/lib/subscription-utils";
 
 interface LiveExamSessionProps {
   exam: LiveExam;
@@ -39,13 +41,41 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
   onViewSolutions,
   commonLayoutProps,
 }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const engine = useLiveExamEngine();
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [navWarning, setNavWarning] = useState({
     isOpen: false,
     targetTab: null as string | null,
     action: "tab" as "tab" | "logout",
   });
+
+  useEffect(() => {
+    if (user?.id) {
+      getUserBookmarks(user.id).then((bms) => {
+        setBookmarkedIds(new Set(Array.from(bms).map(String)));
+      });
+    }
+  }, [user?.id]);
+
+  const handleToggleBookmark = async (questionId: string | number) => {
+    if (!user?.id) return;
+    const qIdStr = String(questionId);
+    const isBookmarked = bookmarkedIds.has(qIdStr);
+    setBookmarkedIds((prev) => {
+      const next = new Set(prev);
+      if (isBookmarked) {
+        next.delete(qIdStr);
+      } else {
+        next.add(qIdStr);
+      }
+      return next;
+    });
+    try {
+      const isPro = isUserPro(profile);
+      await toggleBookmark(user.id, questionId, isBookmarked, isPro);
+    } catch (_) {}
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -302,8 +332,9 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
       handleLogoutClick={() => {}}
       toggleTheme={toggleTheme}
       isDarkMode={isDarkMode}
-      bookmarkedIds={new Set()}
-      onToggleBookmark={() => {}}
+      isLiveExam={true}
+      bookmarkedIds={bookmarkedIds}
+      onToggleBookmark={handleToggleBookmark}
     />
   );
 };

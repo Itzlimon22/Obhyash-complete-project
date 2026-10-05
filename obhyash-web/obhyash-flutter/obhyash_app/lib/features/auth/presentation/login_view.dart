@@ -20,6 +20,20 @@ class _LoginViewState extends ConsumerState<LoginView>
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isEmailMode = false;
+
+  void _onIdentifierChanged(String value) {
+    final hasLetterOrAt = RegExp(r'[a-zA-Z@]').hasMatch(value);
+    if (hasLetterOrAt && !_isEmailMode) {
+      setState(() {
+        _isEmailMode = true;
+      });
+    } else if (!hasLetterOrAt && value.isNotEmpty && _isEmailMode && RegExp(r'^[0-9+০-৯\s-]+$').hasMatch(value)) {
+      setState(() {
+        _isEmailMode = false;
+      });
+    }
+  }
 
   late AnimationController _animController;
   late Animation<double> _scaleAnimation;
@@ -281,15 +295,135 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      // Field 1: Mobile Number
-                                      Text(
-                                        'মোবাইল নম্বর',
-                                        style: TextStyle(
-                                          fontFamily: 'HindSiliguri',
-                                          fontSize: 13.5,
-                                          fontWeight: FontWeight.w500,
-                                          color: textMuted,
-                                        ),
+                                      // Field 1: Mobile / Email Selector & Input
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            _isEmailMode ? 'ইমেইল এড্রেস' : 'মোবাইল নম্বর',
+                                            style: TextStyle(
+                                              fontFamily: 'HindSiliguri',
+                                              fontSize: 13.5,
+                                              fontWeight: FontWeight.w500,
+                                              color: textMuted,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: isDark ? const Color(0xFF1F2421) : const Color(0xFFEFF5F2),
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: isDark ? const Color(0xFF2B332E) : const Color(0xFFDEE9E3),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    if (_isEmailMode) {
+                                                      HapticFeedback.selectionClick();
+                                                      setState(() => _isEmailMode = false);
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                                    decoration: BoxDecoration(
+                                                      color: !_isEmailMode
+                                                          ? (isDark ? const Color(0xFF28342D) : Colors.white)
+                                                          : Colors.transparent,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      boxShadow: !_isEmailMode
+                                                          ? [
+                                                              BoxShadow(
+                                                                color: Colors.black.withValues(alpha: 0.05),
+                                                                blurRadius: 4,
+                                                                offset: const Offset(0, 1),
+                                                              )
+                                                            ]
+                                                          : null,
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          LucideIcons.phone,
+                                                          size: 11,
+                                                          color: !_isEmailMode
+                                                              ? (isDark ? const Color(0xFF34D399) : const Color(0xFF004633))
+                                                              : textMuted,
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          'মোবাইল',
+                                                          style: TextStyle(
+                                                            fontFamily: 'HindSiliguri',
+                                                            fontSize: 11.5,
+                                                            fontWeight: !_isEmailMode ? FontWeight.bold : FontWeight.w500,
+                                                            color: !_isEmailMode
+                                                                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF004633))
+                                                                : textMuted,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    if (!_isEmailMode) {
+                                                      HapticFeedback.selectionClick();
+                                                      setState(() => _isEmailMode = true);
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                                    decoration: BoxDecoration(
+                                                      color: _isEmailMode
+                                                          ? (isDark ? const Color(0xFF28342D) : Colors.white)
+                                                          : Colors.transparent,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      boxShadow: _isEmailMode
+                                                          ? [
+                                                              BoxShadow(
+                                                                color: Colors.black.withValues(alpha: 0.05),
+                                                                blurRadius: 4,
+                                                                offset: const Offset(0, 1),
+                                                              )
+                                                            ]
+                                                          : null,
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          LucideIcons.mail,
+                                                          size: 11,
+                                                          color: _isEmailMode
+                                                              ? (isDark ? const Color(0xFF34D399) : const Color(0xFF004633))
+                                                              : textMuted,
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          'ইমেইল',
+                                                          style: TextStyle(
+                                                            fontFamily: 'HindSiliguri',
+                                                            fontSize: 11.5,
+                                                            fontWeight: _isEmailMode ? FontWeight.bold : FontWeight.w500,
+                                                            color: _isEmailMode
+                                                                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF004633))
+                                                                : textMuted,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       const SizedBox(height: 7),
                                       Container(
@@ -305,40 +439,72 @@ class _LoginViewState extends ConsumerState<LoginView>
                                         ),
                                         child: Row(
                                           children: [
-                                            Icon(
-                                              LucideIcons.phone,
-                                              size: 20,
-                                              color: textMuted,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              '+88',
-                                              style: TextStyle(
-                                                fontFamily: 'HindSiliguri',
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600,
-                                                color: textPrimary,
-                                              ),
-                                            ),
-                                            Container(
-                                              height: 24,
-                                              width: 1.5,
-                                              margin: const EdgeInsets.symmetric(horizontal: 10),
-                                              color: fieldBorder,
+                                            AnimatedSwitcher(
+                                              duration: const Duration(milliseconds: 180),
+                                              child: _isEmailMode
+                                                  ? Row(
+                                                      key: const ValueKey('email_prefix'),
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          LucideIcons.mail,
+                                                          size: 20,
+                                                          color: textMuted,
+                                                        ),
+                                                        Container(
+                                                          height: 24,
+                                                          width: 1.5,
+                                                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                                                          color: fieldBorder,
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : Row(
+                                                      key: const ValueKey('phone_prefix'),
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          LucideIcons.phone,
+                                                          size: 20,
+                                                          color: textMuted,
+                                                        ),
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          '+88',
+                                                          style: TextStyle(
+                                                            fontFamily: 'HindSiliguri',
+                                                            fontSize: 15,
+                                                            fontWeight: FontWeight.w600,
+                                                            color: textPrimary,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          height: 24,
+                                                          width: 1.5,
+                                                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                                                          color: fieldBorder,
+                                                        ),
+                                                      ],
+                                                    ),
                                             ),
                                             Expanded(
                                               child: TextFormField(
                                                 controller: _emailController,
-                                                keyboardType: TextInputType.phone,
+                                                keyboardType: _isEmailMode
+                                                    ? TextInputType.emailAddress
+                                                    : TextInputType.text,
+                                                onChanged: _onIdentifierChanged,
                                                 style: TextStyle(
                                                   fontFamily: 'HindSiliguri',
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500,
                                                   color: textPrimary,
                                                 ),
-                                                decoration: const InputDecoration(
-                                                  hintText: '01XXXXXXXXX',
-                                                  hintStyle: TextStyle(
+                                                decoration: InputDecoration(
+                                                  hintText: _isEmailMode
+                                                      ? 'example@gmail.com'
+                                                      : '01XXXXXXXXX',
+                                                  hintStyle: const TextStyle(
                                                     fontFamily: 'HindSiliguri',
                                                     color: Color(0xFF9AA9A2),
                                                     fontWeight: FontWeight.w400,

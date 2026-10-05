@@ -318,23 +318,8 @@ class SettingsView extends ConsumerWidget {
       backgroundColor: bg,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(0, 8, 0, 32),
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 32),
           children: [
-            // Page Heading "সেটিংস"
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 4, 18, 14),
-              child: Text(
-                'সেটিংস',
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                  color: isDark ? Colors.white : const Color(0xFF10201A),
-                ),
-              ),
-            ),
-
             // ── Premium Profile Card ──────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -349,18 +334,20 @@ class SettingsView extends ConsumerWidget {
                     width: 1,
                   ),
                   boxShadow: [
-                    const BoxShadow(
-                      color: Color(0x0D06281C), // rgba(6,40,28,.05)
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.25)
+                          : const Color(0x0A000000),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
                     ),
                     BoxShadow(
                       color: isDark
-                          ? Colors.black.withValues(alpha: 0.45)
-                          : const Color(0x59063C2A), // rgba(6,60,42,.35)
-                      blurRadius: 40,
-                      offset: const Offset(0, 18),
-                      spreadRadius: -18,
+                          ? Colors.black.withValues(alpha: 0.35)
+                          : const Color(0x12063C2A), // Soft, subtle organic shadow
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -4,
                     ),
                   ],
                 ),
@@ -693,8 +680,7 @@ class _GoldenAvatarRing extends StatelessWidget {
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           gradient: SweepGradient(
-            startAngle: 200 * math.pi / 180,
-            endAngle: (200 + 360) * math.pi / 180,
+            transform: GradientRotation(200 * math.pi / 180),
             colors: [
               Color(0xFFF6E6AE),
               Color(0xFFC9A24B),

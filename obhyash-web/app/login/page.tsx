@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/client';
 import { Mail, Lock, LogIn, Loader2, ArrowRight, Eye, EyeOff, Sun, Moon, Phone } from 'lucide-react';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { useTheme } from '@/components/providers/ThemeProvider';
+import { cn } from '@/lib/utils';
 
 const AUTH_TIMEOUT_MS = 30000;
 
@@ -30,10 +31,20 @@ async function withTimeout<T>(
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
+  const [authMode, setAuthMode] = useState<'phone' | 'email'>('phone');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleIdentifierChange = (val: string) => {
+    setIdentifier(val);
+    if (val.includes('@') || /[a-zA-Z]/.test(val)) {
+      setAuthMode('email');
+    } else if (/^[0-9+০-৯\s-]+$/.test(val) && val.replace(/\D/g, '').length > 0) {
+      setAuthMode('phone');
+    }
+  };
 
   const { theme, toggleTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -272,29 +283,68 @@ export default function LoginPage() {
           )}
 
           <form className="space-y-4" onSubmit={handleLogin}>
-            {/* Mobile Number Field with +88 badge */}
+            {/* Mobile / Email Field with Selector */}
             <div className="space-y-1.5">
-              <label
-                htmlFor="identifier"
-                className="text-xs sm:text-sm font-semibold text-[#2d3748] dark:text-neutral-300 block"
-              >
-                মোবাইল নম্বর
-              </label>
-              <div className="relative flex items-center h-14 bg-[#f6f9f8] dark:bg-[#18201c] border border-[#e4ebe8] dark:border-[#222e28] rounded-2xl px-3.5 focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 focus-within:bg-white dark:focus-within:bg-[#18201c] transition-all">
-                <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 select-none pr-2.5 border-r border-[#d9e3df] dark:border-[#2a3832]">
-                  <Phone className="w-4 h-4 text-[#066b4f] dark:text-[#34d399]" />
-                  <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200">
-                    +88
-                  </span>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="identifier"
+                  className="text-xs sm:text-sm font-semibold text-[#2d3748] dark:text-neutral-300 block"
+                >
+                  {authMode === 'phone' ? 'মোবাইল নম্বর' : 'ইমেইল এড্রেস'}
+                </label>
+                {/* Switcher Pills */}
+                <div className="inline-flex items-center p-0.5 rounded-xl bg-[#eef3f1] dark:bg-[#1a231f] border border-[#e4ebe8] dark:border-[#222e28] text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode('phone')}
+                    className={cn(
+                      'px-2 py-0.5 rounded-[8px] font-semibold transition-all cursor-pointer flex items-center gap-1',
+                      authMode === 'phone'
+                        ? 'bg-white dark:bg-[#25332c] text-[#066b4f] dark:text-[#34d399] shadow-2xs font-bold'
+                        : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
+                    )}
+                  >
+                    <Phone className="w-2.5 h-2.5" />
+                    <span>মোবাইল</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode('email')}
+                    className={cn(
+                      'px-2 py-0.5 rounded-[8px] font-semibold transition-all cursor-pointer flex items-center gap-1',
+                      authMode === 'email'
+                        ? 'bg-white dark:bg-[#25332c] text-[#066b4f] dark:text-[#34d399] shadow-2xs font-bold'
+                        : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
+                    )}
+                  >
+                    <Mail className="w-2.5 h-2.5" />
+                    <span>ইমেইল</span>
+                  </button>
                 </div>
+              </div>
+
+              <div className="relative flex items-center h-14 bg-[#f6f9f8] dark:bg-[#18201c] border border-[#e4ebe8] dark:border-[#222e28] rounded-2xl px-3.5 focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 focus-within:bg-white dark:focus-within:bg-[#18201c] transition-all">
+                {authMode === 'phone' ? (
+                  <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 select-none pr-2.5 border-r border-[#d9e3df] dark:border-[#2a3832] shrink-0">
+                    <Phone className="w-4 h-4 text-[#066b4f] dark:text-[#34d399]" />
+                    <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200">
+                      +88
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 select-none pr-2.5 border-r border-[#d9e3df] dark:border-[#2a3832] shrink-0">
+                    <Mail className="w-4 h-4 text-[#066b4f] dark:text-[#34d399]" />
+                  </div>
+                )}
                 <input
                   id="identifier"
-                  type="text"
+                  type={authMode === 'email' ? 'email' : 'text'}
+                  inputMode={authMode === 'phone' ? 'numeric' : 'email'}
                   required
                   className="w-full h-full bg-transparent pl-3 pr-2 text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium tracking-wide"
-                  placeholder="01XXXXXXXXX"
+                  placeholder={authMode === 'phone' ? '01XXXXXXXXX' : 'example@gmail.com'}
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  onChange={(e) => handleIdentifierChange(e.target.value)}
                 />
               </div>
             </div>

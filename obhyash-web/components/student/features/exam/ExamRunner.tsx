@@ -48,6 +48,8 @@ interface ExamRunnerProps {
   currentUser?: UserProfile | null;
   bookmarkedIds?: Set<string>;
   onToggleBookmark?: (questionId: string | number) => void;
+  isLiveExam?: boolean;
+  hideSourceTag?: boolean;
   navWarning?: any;
   setNavWarning?: any;
   confirmNavigation?: any;
@@ -72,9 +74,14 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   currentUser,
   bookmarkedIds = new Set(),
   onToggleBookmark,
+  isLiveExam = false,
+  hideSourceTag: propHideSourceTag,
   toggleTheme,
   isDarkMode = false,
 }) => {
+  const isLive = isLiveExam || examDetails?.examType === 'Live Exam';
+  const shouldHideSource = propHideSourceTag !== undefined ? propHideSourceTag : isLive;
+
   const [showGridModal, setShowGridModal] = useState<boolean>(false);
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [showExitModal, setShowExitModal] = useState<boolean>(false);
@@ -298,7 +305,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
 
       {/* ── 2. Main Question Flow Feed ── */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] min-w-0 max-w-full overflow-x-hidden">
-        <div className="flex flex-col gap-3.5 sm:gap-4">
+        <div className="flex flex-col">
           {orderedQuestions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;
             const isFlagged = flaggedQuestions.has(question.id);
@@ -317,7 +324,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             return (
               <React.Fragment key={question.id}>
                 {showSubjectHeader && (
-                  <div className="flex items-center gap-3 my-2 sm:my-3">
+                  <div className="flex items-center gap-3 my-2 sm:my-2.5">
                     <div className="flex-1 h-px bg-[#E2E8F0] dark:bg-[#27272A]" />
                     <div className="px-3.5 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] flex items-center gap-2 shadow-2xs font-['HindSiliguri']">
                       <BookOpen size={14} className="text-[#004633] dark:text-[#10B981]" />
@@ -341,6 +348,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                     isFlagged={isFlagged}
                     isBookmarked={isBookmarked}
                     readOnly={userAnswers[question.id] !== undefined}
+                    hideSourceTag={shouldHideSource}
                     onSelectOption={(optIdx) =>
                       handleOptionSelect(question.id, optIdx)
                     }
