@@ -537,10 +537,12 @@ export default function StudentRoot({
           );
         }
 
-        // Fetch History
-        const dbHistory = await getExamHistory(targetUserId);
-        if (dbHistory && dbHistory.length > 0 && isMounted) {
-          setExamHistory(dbHistory);
+        // Only fetch History if initialHistory was not already populated from server props
+        if (examHistory.length === 0) {
+          const dbHistory = await getExamHistory(targetUserId);
+          if (dbHistory && dbHistory.length > 0 && isMounted) {
+            setExamHistory(dbHistory);
+          }
         }
       } catch (err) {
         console.error("Error in streak/history sync:", err);
@@ -1563,27 +1565,37 @@ export default function StudentRoot({
                   }
                 }
               }}
-              onViewResult={(res) => {
-                setQuestions(res.questions || []);
-                setUserAnswers(res.userAnswers || {});
-                setFlaggedQuestions(new Set(res.flaggedQuestions || [])); // Hydrate bookmarks
+              onViewResult={async (res) => {
+                let activeRes = res;
+                if ((!res.questions || res.questions.length === 0) && res.id) {
+                  try {
+                    const { getExamResultById } = await import("@/services/exam-service");
+                    const full = await getExamResultById(res.id, activeUserId);
+                    if (full) activeRes = full;
+                  } catch (e) {
+                    console.error("Failed to load full exam details:", e);
+                  }
+                }
+                setQuestions(activeRes.questions || []);
+                setUserAnswers(activeRes.userAnswers || {});
+                setFlaggedQuestions(new Set(activeRes.flaggedQuestions || [])); // Hydrate bookmarks
                 setExamDetails({
-                  subject: res.subject,
-                  subjectLabel: res.subjectLabel || res.subject,
-                  examType: res.examType || "",
+                  subject: activeRes.subject,
+                  subjectLabel: activeRes.subjectLabel || activeRes.subject,
+                  examType: activeRes.examType || "",
                   chapters: "",
                   topics: "",
-                  totalQuestions: res.totalQuestions,
+                  totalQuestions: activeRes.totalQuestions,
                   durationMinutes: 0,
-                  totalMarks: res.totalMarks,
-                  negativeMarking: res.negativeMarking,
+                  totalMarks: activeRes.totalMarks,
+                  negativeMarking: activeRes.negativeMarking,
                 });
-                setTimeTaken(res.timeTaken);
+                setTimeTaken(activeRes.timeTaken);
                 setIsReviewingHistory(true);
                 setAppState(AppState.COMPLETED);
                 // Give the result view a shareable URL
-                if (res.id) {
-                  window.history.pushState({ tab: "history_result", examId: res.id }, "", `/history/${res.id}`);
+                if (activeRes.id) {
+                  window.history.pushState({ tab: "history_result", examId: activeRes.id }, "", `/history/${activeRes.id}`);
                 }
               }}
               onRecheckRequest={(id) => alert("Recheck requested for: " + id)}

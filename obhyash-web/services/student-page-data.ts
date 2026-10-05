@@ -23,11 +23,11 @@ export async function getStudentPageData(): Promise<{
     supabase.from('subjects').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
     supabase
       .from('exam_results')
-      .select('*')
+      .select('id, user_id, subject, subject_label, exam_type, date, score, total_marks, total_questions, correct_count, wrong_count, time_taken, negative_marking, chapters, submission_type')
       .eq('user_id', user.id)
       .neq('submission_type', 'started')
       .order('date', { ascending: false })
-      .limit(100),
+      .limit(20),
   ]);
 
   // If user profile is not completed (e.g. exited from Google onboarding without filling),

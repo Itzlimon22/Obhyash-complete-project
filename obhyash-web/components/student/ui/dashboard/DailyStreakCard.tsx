@@ -46,8 +46,8 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
     try {
       let uid = userId;
       if (!uid) {
-        const { data } = await supabase.auth.getUser();
-        uid = data?.user?.id;
+        const { data: { session } } = await supabase.auth.getSession();
+        uid = session?.user?.id;
       }
       if (!uid) return;
 
@@ -122,8 +122,8 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
 
     const setupSubscription = async () => {
       if (!uid) {
-        const { data } = await supabase.auth.getUser();
-        uid = data?.user?.id;
+        const { data: { session } } = await supabase.auth.getSession();
+        uid = session?.user?.id;
       }
       if (!uid) return;
 

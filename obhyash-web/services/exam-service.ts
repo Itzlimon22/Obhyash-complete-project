@@ -840,10 +840,11 @@ export const getExamHistory = async (knownUserId?: string): Promise<ExamResult[]
 
     const { data, error } = await supabase
       .from('exam_results')
-      .select('*')
+      .select('id, user_id, subject, subject_label, exam_type, date, score, total_marks, total_questions, correct_count, wrong_count, time_taken, negative_marking, chapters, submission_type')
       .eq('user_id', user.id)
       .neq('submission_type', 'started') // Exclude incomplete/abandoned sessions
-      .order('date', { ascending: false });
+      .order('date', { ascending: false })
+      .limit(50);
 
     if (error) {
       console.error('getExamHistory error:', error);

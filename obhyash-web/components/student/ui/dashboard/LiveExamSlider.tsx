@@ -19,10 +19,11 @@ interface LiveExamItem {
 }
 
 interface LiveExamSliderProps {
+  userId?: string;
   onExamClick?: (examId: string, category: string) => void;
 }
 
-export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) => {
+export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ userId, onExamClick }) => {
   const [exams, setExams] = useState<LiveExamItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -31,7 +32,11 @@ export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) =
   useEffect(() => {
     const fetchLiveExams = async () => {
       try {
-        const { data: userData } = await supabase.auth.getUser();
+        let currentUserId = userId;
+        if (!currentUserId) {
+          const { data: { session } } = await supabase.auth.getSession();
+          currentUserId = session?.user?.id;
+        }
 
         // Fetch ongoing and upcoming live exams (within past 24 hours to next 7 days)
         const past24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -53,12 +58,12 @@ export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) =
 
         if (data && data.length > 0) {
           let userAttemptsMap: Record<string, string> = {};
-          if (userData?.user) {
+          if (currentUserId) {
             const examIds = data.map((e: any) => e.id);
             const { data: attempts } = await supabase
               .from("live_exam_attempts")
               .select("live_exam_id, status")
-              .eq("user_id", userData.user.id)
+              .eq("user_id", currentUserId)
               .in("live_exam_id", examIds);
 
             if (attempts) {

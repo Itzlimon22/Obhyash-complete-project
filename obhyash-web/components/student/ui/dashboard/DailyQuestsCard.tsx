@@ -162,8 +162,8 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
     try {
       let uid = userId;
       if (!uid) {
-        const { data } = await supabase.auth.getUser();
-        uid = data?.user?.id;
+        const { data: { session } } = await supabase.auth.getSession();
+        uid = session?.user?.id;
       }
       if (!uid) {
         setIsLoading(false);
@@ -324,8 +324,8 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
 
       let uid = userId;
       if (!uid) {
-        const { data } = await supabase.auth.getUser();
-        uid = data?.user?.id;
+        const { data: { session } } = await supabase.auth.getSession();
+        uid = session?.user?.id;
       }
       if (!uid) return;
 

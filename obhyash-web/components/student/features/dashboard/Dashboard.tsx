@@ -261,6 +261,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* 1. Live Exam Announcement / Status Carousel Slider */}
           <motion.div variants={fadeInUp}>
             <LiveExamSlider
+              userId={user?.id}
               onExamClick={() => {
                 if (onLiveExamClick) onLiveExamClick();
               }}
