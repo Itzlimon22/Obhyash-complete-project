@@ -10,6 +10,11 @@ tags:
   - ssc britti result
   - ssc scholarship result
   - ssc britti result 2026 all board pdf
+  - cumilla education board
+  - barisal education board
+  - dinajpur education board
+  - rajshahi education board
+  - ssc result 2026 dhaka board
 author:
   name: অভ্যাস অ্যাকাডেমিক উইং
   role: সিনিয়র মেন্টর সেল
@@ -117,6 +122,26 @@ coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.
 
 মাদ্রাসা বা কারিগরি ধারার শিক্ষার্থীদের জন্য বৃত্তির প্রক্রিয়া সংশ্লিষ্ট অধিদপ্তর ও বোর্ডের মাধ্যমে চলে, তাই তাদের নিজ নিজ বোর্ডের ঘোষণা দেখতে হবে।
 
+### সকল শিক্ষা বোর্ডের অফিশিয়াল ওয়েবসাইট ও বৃত্তির নোটিশ লিংক
+
+শিক্ষার্থীদের সুবিধার্থে দেশের সকল সাধারণ শিক্ষা বোর্ড, মাদ্রাসা ও কারিগরি বোর্ডের অফিশিয়াল ওয়েবসাইটের তালিকা নিচে দেওয়া হলো, যেখানে গেজেট প্রকাশের সাথে সাথেই পিডিএফ পাওয়া যাবে:
+
+| শিক্ষা বোর্ড (Education Board) | অফিশিয়াল ওয়েবসাইট | বৃত্তি নোটিশ ও গেজেট দেখার নিয়ম |
+| :--- | :--- | :--- |
+| **ঢাকা শিক্ষা বোর্ড (Dhaka Board)** | [dhakaeducationboard.gov.bd](https://dhakaeducationboard.gov.bd) | নোটিশ বোর্ডে "SSC Scholarship Gazette" খুঁজবে |
+| **কুমিল্লা শিক্ষা বোর্ড (Cumilla Education Board)** | [comillaboard.gov.bd](https://comillaboard.gov.bd) | "নোটিশ / বৃত্তি ও ফলাফল" সেকশনে ক্লিক করবে |
+| **বরিশাল শিক্ষা বোর্ড (Barisal Education Board)** | [barisalboard.gov.bd](https://barisalboard.gov.bd) | "সর্বশেষ গেজেট ও সার্কুলার" ট্যাবে চোখ রাখবে |
+| **দিনাজপুর শিক্ষা বোর্ড (Dinajpur Education Board)** | [dinajpureducationboard.gov.bd](https://dinajpureducationboard.gov.bd) | "বৃত্তি আদেশ ও পিডিএফ ডাউনলোড" তালিকায় থাকবে |
+| **রাজশাহী শিক্ষা বোর্ড (Rajshahi Education Board)** | [rajshahieducationboard.gov.bd](https://rajshahieducationboard.gov.bd) | SSC কর্নার ও মেধা তালিকা গেজেট পিডিএফ পাওয়া যাবে |
+| **চট্টগ্রাম শিক্ষা বোর্ড (Chittagong Board)** | [bise-ctg.gov.bd](https://bise-ctg.gov.bd) | "বৃত্তি ফলাফল বিজ্ঞপ্তি" অপশনে তালিকা থাকবে |
+| **যশোর শিক্ষা বোর্ড (Jessore Board)** | [jessoreboard.gov.bd](https://jessoreboard.gov.bd) | অনলাইন নোটিশ বোর্ড থেকে মেধা ও সাধারণ বৃত্তি তালিকা |
+| **সিলেট শিক্ষা বোর্ড (Sylhet Board)** | [sylhetboard.gov.bd](https://sylhetboard.gov.bd) | গেজেট ও নোটিশ ট্যাব থেকে জেলাভিত্তিক তালিকা নামাবে |
+| **ময়মনসিংহ শিক্ষা বোর্ড (Mymensingh Board)** | [mymensingheducationboard.gov.bd](https://mymensingheducationboard.gov.bd) | অফিশিয়াল নোটিশ বোর্ডের সর্বশেষ বৃত্তির আদেশ |
+| **বাংলাদেশ মাদ্রাসা ও কারিগরি শিক্ষা বোর্ড** | [bmeb.gov.bd](https://bmeb.gov.bd) / [bteb.gov.bd](https://bteb.gov.bd) | দাখিল ও এসএসসি ভোকেশনাল বৃত্তির আলাদা গেজেট |
+
+> [!TIP]
+> এক বোর্ডের শিক্ষার্থী অন্য বোর্ডের ওয়েবসাইটে নিজের রোল দিয়ে সার্চ করলে রেজাল্ট খুঁজে পাবে না। তাই নিজের প্রবেশপত্রে থাকা নির্দিষ্ট বোর্ডের অফিসিয়াল ওয়েবসাইটে ক্লিক করেই কেবল নোটিশ চেক করো।
+
 ---
 
 ## নির্বাচিত হলে এরপর কী করতে হয়?
@@ -199,7 +224,7 @@ coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.
 
 ## বৃত্তির পর পরবর্তী পরিকল্পনা
 
-বৃত্তি পাও বা না পাও, উচ্চমাধ্যমিকের পড়াশোনার প্রস্তুতি এখন থেকেই শুরু করা ভালো। বিজ্ঞান বিভাগে ভর্তি হলে [এইচএসসি ২০২৭ পদার্থবিজ্ঞান সিলেবাস](/blog/hsc-2027-physics-syllabus-chapter-breakdown) দেখলে কলেজের পড়ার একটি আগাম ধারণা পাবে। ভবিষ্যতে মেডিকেল বা প্রকৌশলে পড়ার ইচ্ছা থাকলে [মেডিকেল ভর্তি পরীক্ষা সার্কুলার ২০২৬](/blog/medical-admission-circular-2026-guide) এবং [বুয়েট ও ইঞ্জিনিয়ারিং ভর্তি প্রস্তুতি](/blog/buet-admission-2026-27) লেখা দুটি আগে থেকে পড়ে রাখা কাজে দেবে। আর নিজের ফলাফলের মার্কশিট কীভাবে পড়তে হয় তা জানতে [এইচএসসি রেজাল্ট মার্কশিট দেখার নিয়ম](/blog/hsc-result-2026-marksheet) গাইডটি দেখতে পারো। তোমার ছোট ভাইবোন বা বন্ধুর এসএসসি ২০২৭ ব্যাচ হলে তাদের জন্য [২০২৭ সালের এসএসসি পরীক্ষা কবে হবে? রুটিন ও প্রস্তুতি রূপরেখা](/blog/ssc-2027-exam-date-routine-preparation-guide) লেখাটি পাঠিয়ে দিতে পারো।
+বৃত্তি পাও বা না পাও, উচ্চমাধ্যমিকের পড়াশোনার প্রস্তুতি এখন থেকেই শুরু করা ভালো। বিজ্ঞান বিভাগে ভর্তি হলে [এইচএসসি ২০২৭ পদার্থবিজ্ঞান সিলেবাস](/blog/hsc-2027-physics-syllabus-chapter-breakdown) দেখলে কলেজের পড়ার একটি আগাম ধারণা পাবে। ভবিষ্যতে মেডিকেল বা প্রকৌশলে পড়ার ইচ্ছা থাকলে [মেডিকেল ভর্তি পরীক্ষা সার্কুলার ২০২৬](/blog/medical-admission-circular-2026-guide) এবং [বুয়েট ও ইঞ্জিনিয়ারিং ভর্তি প্রস্তুতি](/blog/buet-admission-2026-27) লেখা দুটি আগে থেকে পড়ে রাখা কাজে দেবে। আর নিজের ফলাফলের মার্কশিট কীভাবে পড়তে হয় তা জানতে [এইচএসসি রেজাল্ট মার্কশিট দেখার নিয়ম](/blog/hsc-result-2026-marksheet) গাইডটি দেখতে পারো। তোমার পরিচিত কেউ ২০২৬ সালের এসএসসি পরীক্ষার্থী হলে তাদের জন্য [এসএসসি ২০২৬ পরীক্ষার রুটিন, সিলেবাস ও পূর্ণাঙ্গ সময়সূচি](/blog/ssc-2026-exam-date-routine-pdf) গাইডটি পাঠিয়ে দিতে পারো।
 
 ---
 

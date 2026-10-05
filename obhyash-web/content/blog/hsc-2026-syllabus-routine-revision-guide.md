@@ -84,7 +84,9 @@ coverImage: /images/blog-covers/titles/hsc-2026-syllabus-routine-revision-guide.
 - ভুল হওয়া প্রশ্নগুলো নিজে লিখতে হবে না; [স্মার্ট মিস্টেক নোটবুক](/features/mistake-notebook)-এ স্বয়ংক্রিয়ভাবে সংরক্ষিত থাকবে।
 - পরীক্ষার আগে শুধুমাত্র ভুল হওয়া প্রশ্নগুলো রিভিশন দিয়ে নিজের দুর্বলতা দূর করে সর্বোচ্চ মার্কস নিশ্চিত করো।
 
-২০২৭ ব্যাচের সিলেবাস ও অন্যান্য প্রস্তুতিমূলক আর্টিকেলের জন্য পড়তে পারো:
+২০২৬ ও ২০২৭ ব্যাচের অন্যান্য গুরুত্বপূর্ণ আর্টিকেলের জন্য পড়তে পারো:
+- [এইচএসসি ২০২৬ বাংলা ১ম পত্র গুরুত্বপূর্ণ MCQ ও সমাধান: অধ্যায়ভিত্তিক সাজেশন PDF](/blog/hsc-2026-bangla-1st-paper-mcq-solutions)
+- [এইচএসসি রুটিন ২০২৬: সকল বোর্ডের পরীক্ষার সময়সূচী ও PDF ডাউনলোড](/blog/hsc-2026-exam-date-routine-pdf)
 - [HSC 2027 বাংলা ১ম ও ২য় পত্র সিলেবাস](/blog/hsc-2027-bangla-syllabus-marks-distribution)
 - [HSC 2027 ইংরেজি ১ম ও ২য় পত্র সিলেবাস](/blog/hsc-2027-english-syllabus-grammar-marks-distribution)
 - [HSC 2027 পদার্থবিজ্ঞান পূর্ণাঙ্গ সিলেবাস বিশ্লেষণ](/blog/hsc-2027-physics-syllabus-chapter-breakdown)

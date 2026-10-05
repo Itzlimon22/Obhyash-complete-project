@@ -135,6 +135,7 @@ graph TD
 ## 🔗 সম্পর্কিত অন্যান্য গুরুত্বপূর্ণ গাইড
 
 * 📅 [HSC 2026 পরীক্ষার সম্ভাব্য তারিখ ও রুটিন PDF ডাউনলোড নির্দেশিকা](/blog/hsc-2026-exam-date-routine-pdf)
+* 📖 [এইচএসসি ২০২৬ বাংলা ১ম পত্র গুরুত্বপূর্ণ MCQ ও সমাধান: অধ্যায়ভিত্তিক সাজেশন PDF](/blog/hsc-2026-bangla-1st-paper-mcq-solutions)
 * 📑 [HSC 2026 শর্ট সিলেবাস আপডেট ও পূর্ণাঙ্গ বিষয়ভিত্তিক মানবন্টন](/blog/hsc-2026-short-syllabus-marks-distribution)
 * 🏫 [HSC 2026 টেস্ট পরীক্ষার রুটিন ও প্রস্তুতি কৌশল: শীর্ষ কলেজে A+ পাওয়ার গাইড](/blog/hsc-2026-test-exam-routine-preparation)
 * 🎓 [HSC Full Meaning ও জিপিএ গণনার সহজ ফর্মুলা (৪র্থ বিষয়ের বোনাস পয়েন্ট)](/blog/hsc-full-meaning-and-gpa-calculator)
