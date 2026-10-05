@@ -327,54 +327,54 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
   const progressPercent = Math.min(100, Math.round(((totalReferrals % 3) / 3) * 100));
   const needed = 3 - (totalReferrals % 3);
 
-  // Flat premium card style
+  // Flat premium card style supporting both Light and Dark modes
   const cardClass =
-    'bg-[#121214] rounded-2xl p-4 sm:p-5 border border-neutral-800/80 shadow-xs transition-colors';
+    'bg-white dark:bg-[#121214] rounded-2xl p-4 sm:p-5 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs transition-colors';
 
   return (
-    <div className="w-full max-w-xl mx-auto px-3.5 sm:px-4 py-3 sm:py-4 font-['HindSiliguri',sans-serif] pb-24 select-none space-y-3.5">
+    <div className="w-full max-w-xl mx-auto px-3.5 sm:px-4 py-3 sm:py-4 font-['Hind_Siliguri',sans-serif] pb-24 select-none space-y-3.5">
       {/* ── 0. Paused Warning Banner (if disabled by admin) ── */}
       {!isReferralEnabled && (
-        <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-800/50 flex items-center gap-2.5 text-amber-200 text-xs font-semibold">
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 flex items-center gap-2.5 text-amber-800 dark:text-amber-200 text-xs font-semibold">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
           <span>বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে বন্ধ আছে। শীঘ্রই পুনরায় চালু করা হবে।</span>
         </div>
       )}
 
-      {/* ── 1. Unified Referral Hero Hub (Flagship Flat Card) ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#121214] border border-neutral-800/90 p-4.5 sm:p-5.5 shadow-lg">
+      {/* ── 1. Unified Referral Hero Hub (Flagship Card) ── */}
+      <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200/90 dark:border-neutral-800/90 p-4 sm:p-5 pb-5 sm:pb-6 shadow-sm">
         {/* Subtle Ambient Glow */}
-        <div className="absolute -top-16 -right-16 w-44 h-44 bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-44 h-44 bg-rose-500/10 dark:bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Header Row: Badge & Incentive */}
         <div className="flex items-center justify-between gap-2 mb-2 relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-400 text-[11px] font-bold tracking-wide">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/25 text-rose-600 dark:text-rose-400 text-[11px] font-bold tracking-wide">
             <Gift className="w-3.5 h-3.5 text-rose-500" />
             <span>রেফারেল ও রিওয়ার্ড</span>
           </div>
-          <span className="text-[11px] font-bold text-amber-400/90 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+          <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400/90 bg-amber-50 dark:bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-400/20">
             প্রতি রেফারে ৭ দিন প্রো
           </span>
         </div>
 
         {/* Hero Title & Subtitle */}
         <div className="relative z-10 mb-4">
-          <h2 className="text-base sm:text-[17px] font-extrabold text-white leading-snug">
+          <h2 className="text-base sm:text-[17px] font-extrabold text-neutral-900 dark:text-white leading-snug">
             বন্ধুদের আমন্ত্রণ জানাও, দুজনেই পাও প্রো!
           </h2>
-          <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-            তোমার কোড দিয়ে বন্ধু পাবে <strong className="text-neutral-200 font-semibold">১৫ দিন প্রো</strong> এবং তুমি পাবে <strong className="text-neutral-200 font-semibold">৭ দিন প্রো</strong>। প্রতি ৩ রেফারে আনলক হবে বিশেষ স্ক্র্যাচ কার্ড 🎉
+          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 leading-relaxed">
+            তোমার কোড দিয়ে বন্ধু পাবে <strong className="text-neutral-900 dark:text-neutral-200 font-semibold">১৫ দিন প্রো</strong> এবং তুমি পাবে <strong className="text-neutral-900 dark:text-neutral-200 font-semibold">৭ দিন প্রো</strong>। প্রতি ৩ রেফারে আনলক হবে বিশেষ স্ক্র্যাচ কার্ড 🎉
           </p>
         </div>
 
         {/* Integrated Referral Code Display */}
-        <div className="relative z-10 p-3 sm:p-3.5 rounded-xl bg-black/60 border border-neutral-800 flex items-center justify-between gap-3 mb-3">
+        <div className="relative z-10 p-3 sm:p-3.5 rounded-xl bg-neutral-50 dark:bg-black/60 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 mb-3">
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-bold text-neutral-500 block leading-tight">
+            <span className="text-[10px] uppercase font-bold text-neutral-500 dark:text-neutral-400 block leading-tight">
               তোমার রেফারেল কোড
             </span>
-            <span className="text-base sm:text-lg font-mono font-extrabold tracking-widest text-white truncate block">
+            <span className="text-base sm:text-lg font-mono font-extrabold tracking-widest text-neutral-900 dark:text-white truncate block">
               {code || '— — — — — — — —'}
             </span>
           </div>
@@ -384,8 +384,8 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
             onClick={copyCode}
             className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
               isCopied
-                ? 'bg-[#059669] text-white shadow-xs'
-                : 'bg-[#27272A] hover:bg-[#323238] text-neutral-200'
+                ? 'bg-[#006A4E] text-white shadow-xs'
+                : 'bg-neutral-200/80 hover:bg-neutral-200 text-neutral-800 dark:bg-[#27272A] dark:hover:bg-[#323238] dark:text-neutral-200'
             }`}
           >
             {isCopied ? (
@@ -413,18 +413,18 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
         </button>
 
         {/* Seamless Milestones & Progress Strip */}
-        <div className="relative z-10 mt-4 pt-3.5 border-t border-neutral-800/80">
+        <div className="relative z-10 mt-4 pt-3.5 border-t border-neutral-100 dark:border-neutral-800/80">
           <div className="flex items-center justify-between text-xs mb-1.5">
             <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span className="font-bold text-neutral-300">স্ক্র্যাচ কার্ড প্রগ্রেস</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+              <span className="font-bold text-neutral-800 dark:text-neutral-300">স্ক্র্যাচ কার্ড প্রগ্রেস</span>
             </div>
-            <span className="text-[11px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+            <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-400/20">
               {totalReferrals} / {nextMilestone}
             </span>
           </div>
 
-          <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden mb-1.5">
+          <div className="w-full h-2 rounded-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden mb-2">
             <div
               className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
               style={{
@@ -437,7 +437,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
             />
           </div>
 
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11.5px] font-medium text-neutral-600 dark:text-neutral-400 leading-normal pb-0.5">
             {needed === 3 && totalReferrals > 0
               ? '🎉 অভিনন্দন! তুমি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছ!'
               : `আর মাত্র ${needed} টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!`}
@@ -447,16 +447,16 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
 
       {/* ── 2. Claim Friend's Referral Code (Compact & Flat) ── */}
       {!hasUsedReferral && (
-        <div className="rounded-2xl p-4 bg-[#121214] border border-emerald-900/40 shadow-xs">
+        <div className="rounded-2xl p-4 bg-white dark:bg-[#121214] border border-emerald-200 dark:border-emerald-900/40 shadow-xs">
           <div className="flex items-center gap-2.5 mb-2.5">
-            <div className="w-7 h-7 rounded-lg bg-emerald-950/50 border border-emerald-800/40 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/40 flex items-center justify-center text-[#006A4E] dark:text-emerald-400 shrink-0">
               <Gift className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs sm:text-sm font-bold text-white leading-tight">
+              <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white leading-tight">
                 কারো রেফারেল কোড আছে?
               </h3>
-              <p className="text-[11px] text-neutral-400">
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                 ১৫ দিনের সম্পূর্ণ প্রো প্রিমিয়াম ফ্রি উপভোগ করো
               </p>
             </div>
@@ -464,7 +464,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
 
           {/* Lockout Warning */}
           {lockoutSeconds > 0 ? (
-            <div className="p-2.5 mb-2.5 rounded-xl bg-amber-950/40 border border-amber-900/50 flex items-center gap-2 text-amber-300 text-xs font-semibold">
+            <div className="p-2.5 mb-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex items-center gap-2 text-amber-800 dark:text-amber-300 text-xs font-semibold">
               <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span>
                 ৩ বার ভুল কোড দেওয়ায় ইনপুট লক। আর{' '}
@@ -473,7 +473,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
               </span>
             </div>
           ) : (
-            <p className="text-[10px] font-semibold text-neutral-400 mb-2">
+            <p className="text-[10.5px] font-semibold text-neutral-500 dark:text-neutral-400 mb-2">
               ⚠️ সর্বোচ্চ ৩ বার ভুল কোড দেওয়া যাবে (অবশিষ্ট: {remainingAttempts} টি চেষ্টা)
             </p>
           )}
@@ -485,13 +485,13 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
               onChange={(e) => setClaimCodeInput(e.target.value.toUpperCase())}
               disabled={lockoutSeconds > 0 || isClaiming || !isReferralEnabled}
               placeholder={!isReferralEnabled ? 'সাময়িক বন্ধ' : 'CODE1234'}
-              className="flex-1 h-10 px-3.5 rounded-xl border border-neutral-800 bg-black/60 text-xs sm:text-sm font-mono font-bold tracking-widest text-white uppercase focus:outline-none focus:border-emerald-500 transition-colors"
+              className="flex-1 h-10 px-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-black/60 text-xs sm:text-sm font-mono font-bold tracking-widest text-neutral-900 dark:text-white uppercase focus:outline-none focus:border-emerald-500 transition-colors"
             />
             <button
               type="button"
               onClick={handleClaimReferral}
               disabled={lockoutSeconds > 0 || isClaiming || !isReferralEnabled}
-              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shrink-0"
+              className="h-10 px-4 rounded-xl bg-[#006A4E] hover:bg-[#005a42] text-white text-xs font-bold transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shrink-0"
             >
               {isClaiming && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>ক্লেইম করো</span>
@@ -501,27 +501,27 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
       )}
 
       {/* ── 3. How It Works (Clean Flat Stepper Strip) ── */}
-      <div className="rounded-2xl p-4 bg-[#121214] border border-neutral-800/80">
-        <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-3">
+      <div className="rounded-2xl p-4 bg-white dark:bg-[#121214] border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs">
+        <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mb-3">
           কীভাবে কাজ করে?
         </span>
 
         <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800/60 flex flex-col items-center">
+          <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/60 flex flex-col items-center">
             <span className="text-lg mb-1">🔗</span>
-            <span className="text-[11px] font-bold text-neutral-200">কোড কপি</span>
+            <span className="text-[11.5px] font-bold text-neutral-800 dark:text-neutral-200">কোড কপি</span>
             <span className="text-[10px] text-neutral-500 mt-0.5">তোমার কোড নাও</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800/60 flex flex-col items-center">
+          <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/60 flex flex-col items-center">
             <span className="text-lg mb-1">📤</span>
-            <span className="text-[11px] font-bold text-neutral-200">শেয়ার করো</span>
+            <span className="text-[11.5px] font-bold text-neutral-800 dark:text-neutral-200">শেয়ার করো</span>
             <span className="text-[10px] text-neutral-500 mt-0.5">বন্ধুদের পাঠাও</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800/60 flex flex-col items-center">
+          <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/60 flex flex-col items-center">
             <span className="text-lg mb-1">🎉</span>
-            <span className="text-[11px] font-bold text-neutral-200">পুরস্কার লাভ</span>
+            <span className="text-[11.5px] font-bold text-neutral-800 dark:text-neutral-200">পুরস্কার লাভ</span>
             <span className="text-[10px] text-neutral-500 mt-0.5">প্রো ও কার্ড পাও</span>
           </div>
         </div>
@@ -529,8 +529,8 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
 
       {/* ── 4. Scratch Cards Grid (If Any) ── */}
       {scratchCards.length > 0 && (
-        <div className="rounded-2xl p-4 bg-[#121214] border border-neutral-800/80">
-          <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-3">
+        <div className="rounded-2xl p-4 bg-white dark:bg-[#121214] border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs">
+          <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mb-3">
             তোমার স্ক্র্যাচ কার্ডসমূহ
           </span>
 
@@ -546,7 +546,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
                   }}
                   className={`p-3.5 rounded-xl border text-center transition-all ${
                     isScratched
-                      ? 'bg-neutral-900/40 border-neutral-800 cursor-default opacity-60'
+                      ? 'bg-neutral-100 dark:bg-neutral-900/40 border-neutral-200 dark:border-neutral-800 text-neutral-500 cursor-default opacity-60'
                       : 'bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white border-amber-400/50 shadow-md cursor-pointer active:scale-95'
                   }`}
                 >
@@ -568,7 +568,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
       )}
 
       {/* ── 5. Monthly Leaderboard (Grouped Flat Card) ── */}
-      <div className="rounded-2xl bg-[#121214] border border-neutral-800/80 overflow-hidden shadow-xs">
+      <div className="rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200/90 dark:border-neutral-800/80 overflow-hidden shadow-xs">
         <div className="py-3 px-4 bg-gradient-to-r from-[#E11D48] to-[#BE123C] text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-[#FDE047]" />
@@ -576,10 +576,10 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
               এই মাসের সেরা রেফারার
             </h3>
           </div>
-          <span className="text-[10px] text-rose-200 font-semibold">মাসিক পুরস্কার</span>
+          <span className="text-[10px] text-rose-100 font-semibold">মাসিক পুরস্কার</span>
         </div>
 
-        <div className="p-3 divide-y divide-neutral-800/50">
+        <div className="p-3 divide-y divide-neutral-100 dark:divide-neutral-800/50">
           {leaderboard.length === 0 ? (
             <p className="py-4 text-center text-xs text-neutral-500">
               এখনও কেউ লিডারবোর্ডে যুক্ত হয়নি। রেফার করে প্রথম স্থান দখল করো!
@@ -606,16 +606,16 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
                       {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-bold text-white truncate">
+                      <p className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
                         {u.name || 'শিক্ষার্থী'}
                       </p>
-                      <span className="text-[10px] text-rose-400 font-semibold">
+                      <span className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
                         🏆 {prize}
                       </span>
                     </div>
                   </div>
 
-                  <span className="px-2 py-0.5 rounded-full bg-neutral-900 border border-neutral-800 text-[10px] font-bold text-neutral-300 shrink-0">
+                  <span className="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-[10px] font-bold text-neutral-700 dark:text-neutral-300 shrink-0">
                     {u.total_referrals} রেফার
                   </span>
                 </div>
@@ -629,8 +629,8 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
       {history.length > 0 && (
         <div className={cardClass}>
           <div className="flex items-center gap-2 mb-3">
-            <Users className="w-4 h-4 text-neutral-400" />
-            <h3 className="text-xs sm:text-sm font-bold text-white">
+            <Users className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+            <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
               রেফারেল ইতিহাস ({history.length} জন)
             </h3>
           </div>
@@ -648,12 +648,12 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
 
               const statusColor =
                 status === 'Approved'
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
                   : status === 'Rejected'
-                  ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                  ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20'
                   : status === 'Pending Exam'
-                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                  : 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                  ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/20'
+                  : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
 
               const statusLabel =
                 status === 'Approved'
@@ -669,14 +669,14 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
               return (
                 <div
                   key={h.id || i}
-                  className="p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800/70 flex items-center justify-between gap-2.5"
+                  className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/70 flex items-center justify-between gap-2.5"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-rose-500/15 text-rose-400 font-bold text-xs flex items-center justify-center shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center shrink-0">
                       {name[0]?.toUpperCase() || 'U'}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-semibold text-white truncate">
+                      <p className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white truncate">
                         {name}
                       </p>
                       {dateStr && (
@@ -701,7 +701,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
 
       {/* ── 7. Benefits Section (Clean & Flat) ── */}
       <div className={cardClass}>
-        <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-3">
+        <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mb-3">
           রেফারেল প্রোগ্রামের সুবিধা
         </span>
 
@@ -730,16 +730,16 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ user: propUser }) =>
           ].map((item) => (
             <div
               key={item.num}
-              className="p-3 rounded-xl bg-neutral-900/60 border border-neutral-800/70 flex items-start gap-2.5"
+              className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/70 flex items-start gap-2.5"
             >
-              <div className="w-5 h-5 rounded-full bg-rose-950/60 border border-rose-800/40 text-rose-400 font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/40 text-rose-600 dark:text-rose-400 font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">
                 {item.num}
               </div>
               <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">
+                <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
                   {item.title}
                 </h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5 leading-relaxed">
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-0.5 leading-relaxed">
                   {item.desc}
                 </p>
               </div>

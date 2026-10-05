@@ -21,6 +21,19 @@ function getR2Domain() {
   return raw.replace(/^https?:\/\//, '').replace(/\/$/, '');
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 /**
  * POST /api/r2-upload
  *
@@ -41,7 +54,7 @@ export async function POST(request: Request) {
       if (!file) {
         return NextResponse.json(
           { error: 'No file provided' },
-          { status: 400 },
+          { status: 400, headers: corsHeaders },
         );
       }
 
@@ -59,10 +72,19 @@ export async function POST(request: Request) {
         }),
       );
 
-      // Return a proxy URL so images are served through Next.js.
-      // This avoids the need to enable public access on the R2 bucket.
+      const r2Domain = getR2Domain();
+      const directUrl = `https://${r2Domain}/${objectKey}`;
       const proxyUrl = `/api/r2-image?key=${encodeURIComponent(objectKey)}`;
-      return NextResponse.json({ publicUrl: proxyUrl });
+
+      return NextResponse.json(
+        {
+          publicUrl: directUrl,
+          url: directUrl,
+          proxyUrl,
+          key: objectKey,
+        },
+        { headers: corsHeaders },
+      );
     }
 
     // ── Mode 1: return presigned URL (kept for backward-compat) ──
@@ -89,12 +111,18 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({
-      uploadUrl: signedUrl,
-      publicUrl: `https://${r2Domain}/${objectKey}`,
-    });
+    return NextResponse.json(
+      {
+        uploadUrl: signedUrl,
+        publicUrl: `https://${r2Domain}/${objectKey}`,
+      },
+      { headers: corsHeaders },
+    );
   } catch (error) {
     console.error('R2 Upload Error:', error);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Upload failed' },
+      { status: 500, headers: corsHeaders },
+    );
   }
 }

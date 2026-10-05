@@ -176,7 +176,8 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
               Text(
                 'গত ৩০ দিনের অ্যাক্টিভিটি',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 15.5,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
@@ -202,6 +203,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                     Text(
                       '${BanglaNameHelper.toBanglaNumeral(currentStreak)} দিন',
                       style: const TextStyle(
+                        fontFamily: 'HindSiliguri',
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF601D49),

@@ -323,7 +323,6 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     final Color closeIconColor;
     final List<BoxShadow> cardShadows;
     final IconData iconData;
-    final String defaultTitle;
 
     if (isDark) {
       // --- DARK THEME TOAST ---
@@ -342,7 +341,6 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           gradientMid = const Color(0xFF101E30);
           badgeBorder = const Color(0xFF0284C7).withValues(alpha: 0.4);
           iconData = Icons.info_outline_rounded;
-          defaultTitle = 'Information';
           break;
         case PopupType.success:
           accentColor = const Color(0xFF34D399); // Vibrant Emerald 400
@@ -350,7 +348,6 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           gradientMid = const Color(0xFF0B241A);
           badgeBorder = const Color(0xFF059669).withValues(alpha: 0.4);
           iconData = Icons.check_circle_outline_rounded;
-          defaultTitle = 'Success';
           break;
         case PopupType.warning:
           accentColor = const Color(0xFFFBBF24); // Vibrant Amber 400
@@ -358,7 +355,6 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           gradientMid = const Color(0xFF241909);
           badgeBorder = const Color(0xFFD97706).withValues(alpha: 0.4);
           iconData = Icons.warning_amber_rounded;
-          defaultTitle = 'Warning';
           break;
         case PopupType.error:
           accentColor = const Color(0xFFFB7185); // Vibrant Rose 400
@@ -366,7 +362,6 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           gradientMid = const Color(0xFF280F16);
           badgeBorder = const Color(0xFFE11D48).withValues(alpha: 0.4);
           iconData = Icons.error_outline_rounded;
-          defaultTitle = 'Error';
           break;
       }
 
@@ -401,28 +396,24 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           gradientStart = const Color(0xFFE0F2FE); // 100% solid light sky
           gradientMid = const Color(0xFFF0F9FF);   // 100% solid pale sky
           iconData = Icons.info_outline_rounded;
-          defaultTitle = 'Information';
           break;
         case PopupType.success:
           accentColor = const Color(0xFF16A34A); // Green 600
           gradientStart = const Color(0xFFDCFCE7); // 100% solid light mint
           gradientMid = const Color(0xFFF0FDF4);   // 100% solid pale mint
           iconData = Icons.check_circle_outline_rounded;
-          defaultTitle = 'Success';
           break;
         case PopupType.warning:
           accentColor = const Color(0xFFD97706); // Amber 600
           gradientStart = const Color(0xFFFEF3C7); // 100% solid light amber
           gradientMid = const Color(0xFFFFFBEB);   // 100% solid pale amber
           iconData = Icons.warning_amber_rounded;
-          defaultTitle = 'Warning';
           break;
         case PopupType.error:
           accentColor = const Color(0xFFE11D48); // Rose 600
           gradientStart = const Color(0xFFFFE4E6); // 100% solid light rose
           gradientMid = const Color(0xFFFFF1F2);   // 100% solid pale rose
           iconData = Icons.error_outline_rounded;
-          defaultTitle = 'Error';
           break;
       }
 
@@ -442,9 +433,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
       ];
     }
 
-    final resolvedTitle = (widget.title != null && widget.title!.trim().isNotEmpty)
-        ? widget.title!
-        : defaultTitle;
+    final hasTitle = widget.title != null && widget.title!.trim().isNotEmpty;
 
     return Positioned(
       top: math.max(topPadding, 16) + 12,
@@ -542,36 +531,50 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
                                       const SizedBox(width: 14),
                                       // Title & Message Content
                                       Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              resolvedTitle,
-                                              style: TextStyle(
-                                                fontFamily: 'HindSiliguri',
-                                                color: titleColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: -0.2,
-                                                height: 1.2,
+                                        child: hasTitle
+                                            ? Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    widget.title!.trim(),
+                                                    style: TextStyle(
+                                                      fontFamily: 'HindSiliguri',
+                                                      color: titleColor,
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w600,
+                                                      letterSpacing: -0.2,
+                                                      height: 1.2,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    widget.message,
+                                                    style: TextStyle(
+                                                      fontFamily: 'HindSiliguri',
+                                                      color: messageColor,
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.35,
+                                                    ),
+                                                    maxLines: 3,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              )
+                                            : Text(
+                                                widget.message,
+                                                style: TextStyle(
+                                                  fontFamily: 'HindSiliguri',
+                                                  color: titleColor,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  letterSpacing: -0.1,
+                                                  height: 1.35,
+                                                ),
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              widget.message,
-                                              style: TextStyle(
-                                                fontFamily: 'HindSiliguri',
-                                                color: messageColor,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w400,
-                                                height: 1.35,
-                                              ),
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
                                       ),
                                     ],
                                   ),

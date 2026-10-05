@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <!-- Background Gradient for Exercise Solution (Emerald & Teal) -->
+    <linearGradient id="exBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14B8A6" />
+      <stop offset="50%" stop-color="#0D9488" />
+      <stop offset="100%" stop-color="#115E59" />
+    </linearGradient>
+    
+    <linearGradient id="exBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#99F6E4" />
+      <stop offset="100%" stop-color="#0F766E" />
+    </linearGradient>
+
+    <!-- Badge Gradient -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <!-- Pages Gradient -->
+    <linearGradient id="exPages" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F0FDFA" />
+    </linearGradient>
+    
+    <linearGradient id="goldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base 3D Tile -->
+  <rect x="6" y="9" width="88" height="84" rx="26" fill="#042F2E" />
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#exBg)" stroke="url(#exBorder)" stroke-width="3" />
+  
+  <!-- Glossy Curve -->
+  <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.22" />
+
+  <!-- 3D Open Exercise Book -->
+  <!-- Undercover Base Shadow -->
+  <path d="M 18 65 C 32 61 46 65 50 68 C 54 65 68 61 82 65 L 82 70 C 68 66 54 70 50 73 C 46 70 32 66 18 70 Z" fill="#022c22" />
+
+  <!-- Left Pages Stack -->
+  <path d="M 20 63 C 32 59 46 63 50 66 L 50 35 C 46 32 32 28 20 32 Z" fill="#CCFBF1" />
+  <path d="M 21 61 C 33 57 46 61 49 64 L 49 33 C 46 30 33 26 21 30 Z" fill="url(#exPages)" stroke="#99F6E4" stroke-width="0.8" />
+
+  <!-- Right Pages Stack -->
+  <path d="M 80 63 C 68 59 54 63 50 66 L 50 35 C 54 32 68 28 80 32 Z" fill="#CCFBF1" />
+  <path d="M 79 61 C 67 57 54 61 51 64 L 51 33 C 54 30 67 26 79 30 Z" fill="url(#exPages)" stroke="#99F6E4" stroke-width="0.8" />
+
+  <!-- Golden Bookmark Ribbon -->
+  <path d="M 48 33 L 52 33 L 52 69 L 50 67 L 48 69 Z" fill="url(#goldRibbon)" />
+
+  <!-- Math & Science Exercise Annotations on Left Page -->
+  <!-- Summation Symbol ∑ -->
+  <path d="M 27 38 L 33 38 L 30 43 L 33 48 L 27 48" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="36" y1="40" x2="44" y2="40" stroke="#14B8A6" stroke-width="1.8" stroke-linecap="round" />
+  <line x1="36" y1="46" x2="43" y2="46" stroke="#14B8A6" stroke-width="1.8" stroke-linecap="round" />
+  <!-- Root Symbol √x -->
+  <path d="M 27 54 L 29 57 L 33 51 L 41 51" stroke="#0D9488" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="35" y="58" font-size="6" font-family="sans-serif" font-weight="bold" fill="#0D9488">x</text>
+
+  <!-- Right Page Lines -->
+  <line x1="56" y1="38" x2="73" y2="38" stroke="#14B8A6" stroke-width="1.8" stroke-linecap="round" />
+  <line x1="56" y1="44" x2="68" y2="44" stroke="#14B8A6" stroke-width="1.8" stroke-linecap="round" />
+  <line x1="56" y1="50" x2="72" y2="50" stroke="#14B8A6" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- 3D Solved Checkmark Floating Badge Bottom-Right -->
+  <g transform="translate(62, 52)">
+    <circle cx="12" cy="12" r="14" fill="#064E3B" opacity="0.4" />
+    <circle cx="11" cy="11" r="14" fill="url(#badgeGrad)" stroke="#A7F3D0" stroke-width="2.2" />
+    <!-- White Checkmark -->
+    <path d="M 6 11 L 10 15 L 17 7" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Sparkles -->
+  <polygon points="22,23 23.5,19 25,23 29,24.5 25,26 23.5,30 22,26 18,24.5" fill="#FEF08A" />
+  <polygon points="76,23 77.5,20 79,23 82,24.5 79,26 77.5,29 76,26 73,24.5" fill="#A7F3D0" opacity="0.9" />
+</svg>

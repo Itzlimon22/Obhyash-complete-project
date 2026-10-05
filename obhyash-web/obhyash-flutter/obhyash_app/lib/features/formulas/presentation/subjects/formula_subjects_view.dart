@@ -38,18 +38,18 @@ class FormulaSubjectsView extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'ফর্মুলা ব্যাংক',
+          'ফর্মুলা',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 17.5,
+            fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 6, 8, 16),
+          padding: const EdgeInsets.fromLTRB(10, 18, 10, 24),
           child: AppRefreshIndicator(
             onRefresh: () async {
               ref.invalidate(userProfileProvider);

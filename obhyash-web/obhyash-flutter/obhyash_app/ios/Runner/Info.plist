@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>সাপোর্ট টিকিটে সমস্যার স্ক্রিনশট বা ছবি সংযুক্ত করতে ফটো লাইব্রেরি অ্যাক্সেস প্রয়োজন।</string>
 </dict>
 </plist>

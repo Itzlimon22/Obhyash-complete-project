@@ -32,6 +32,10 @@ final appConfigStreamProvider = StreamProvider<AppConfigModel>((ref) {
           return const AppConfigModel();
         }
         return AppConfigModel.fromJson(data.first);
+      })
+      .handleError((e) {
+        // Silently catch realtime socket drops during background sleep
+        return const AppConfigModel();
       });
 });
 

@@ -289,235 +289,385 @@ class _SignupViewState extends ConsumerState<SignupView>
           final authState = ref.watch(authControllerProvider);
           final isLoading = authState.isLoading;
 
-    final bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF18181B);
-    final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
-    final dividerColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
-    const primaryGreen = Color(0xFF006A4E);
+          final sheetBg = isDark ? const Color(0xFF111513) : Colors.white;
+          final textPrimary = isDark ? Colors.white : const Color(0xFF0F1F1A);
+          final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7A74);
+          final dividerColor = isDark ? const Color(0xFF222E28) : const Color(0xFFE4EBE8);
 
-    if (_success) {
-      return _buildSuccessScreen(isDark, textPrimary, bgColor);
-    }
+          if (_success) {
+            return _buildSuccessScreen(isDark, textPrimary, sheetBg);
+          }
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: bgColor,
-      ),
-      child: Scaffold(
-        backgroundColor: bgColor,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Center(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: AnimatedBuilder(
-                      animation: _animController,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: _scaleAnimation.value,
-                          child: Opacity(opacity: _fadeAnimation.value, child: child),
-                        );
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Brand Logo (Transparent BG, Black Text)
-                          Center(
-                            child: Image.asset(
-                              'assets/images/obhyash_full_logo.png',
-                              height: 38,
-                              fit: BoxFit.contain,
-                            ),
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
+              statusBarColor: Colors.transparent,
+              systemNavigationBarColor: sheetBg,
+            ),
+            child: Scaffold(
+              backgroundColor: sheetBg,
+              body: Stack(
+                children: [
+                  // 1. Ambient Background Gradient
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: isDark
+                            ? const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFF0A0F0D), Color(0xFF0D1412)],
+                              )
+                            : const LinearGradient(
+                                begin: Alignment(-0.6, -1.0),
+                                end: Alignment(0.6, 1.0),
+                                colors: [Color(0xFFFBFEFD), Color(0xFFEEF7F3)],
+                                stops: [0.0, 0.7],
+                              ),
+                      ),
+                    ),
+                  ),
+
+                  // 2. Top-Right Gold Glow Orb
+                  Positioned(
+                    top: -110,
+                    right: -120,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 320,
+                        height: 320,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              const Color(0xFFE9C46A)
+                                  .withValues(alpha: isDark ? 0.15 : 0.30),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.65],
                           ),
-                          const SizedBox(height: 18),
-
-                      // Header Title (Matching screenshot bold style)
-                      Text(
-                        'লগইন/রেজিস্টার',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.4,
-                          color: textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                    ),
+                  ),
 
-                      _buildProgressBar(isDark),
-                      const SizedBox(height: 24),
+                  // 3. Left Emerald Glow Orb
+                  Positioned(
+                    top: 90,
+                    left: -130,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 260,
+                        height: 260,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              const Color(0xFF0A8A66)
+                                  .withValues(alpha: isDark ? 0.12 : 0.16),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.70],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
 
-                      // Render Step Content
-                      _step == 1
-                          ? _buildStep1(isDark)
-                          : _step == 2
-                          ? _buildStep2(isDark)
-                          : _buildStep3(isDark),
-
-                      const SizedBox(height: 24),
-
-                      // Action Buttons
-                      Row(
-                        children: [
-                          if (_step > 1) ...[
-                            InkWell(
-                              onTap: _handleBack,
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF141417) : const Color(0xFFF4F4F5),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                  // 4. Foreground Content
+                  SafeArea(
+                    bottom: false,
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 430),
+                        child: AnimatedBuilder(
+                          animation: _animController,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: _scaleAnimation.value,
+                              child: Opacity(
+                                opacity: _fadeAnimation.value,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final bottomPad = MediaQuery.paddingOf(context).bottom;
+                              return SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minHeight: constraints.maxHeight,
                                   ),
-                                ),
-                                child: Icon(
-                                  LucideIcons.chevronLeft,
-                                  size: 20,
-                                  color: textPrimary,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: (isLoading || _isSendingOtp)
-                                  ? null
-                                  : (_step == 3 ? _handleSignup : _handleNext),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryGreen,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: (isLoading || _isSendingOtp)
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : _step == 3
-                                  ? const Text(
-                                      'অ্যাকাউন্ট তৈরি করো',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 0.2,
-                                      ),
-                                    )
-                                  : const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                  child: IntrinsicHeight(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        Text(
-                                          'পরবর্তী ধাপ',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800,
-                                            letterSpacing: 0.2,
+                                        // Top support button (top left)
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: _buildSupportButton(context, isDark),
                                           ),
                                         ),
-                                        SizedBox(width: 6),
-                                        Icon(
-                                          LucideIcons.chevronRight,
-                                          size: 18,
-                                          color: Colors.white,
+
+                                        // Hero: Logo + Slogan
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 38),
+                                          child: Column(
+                                            children: [
+                                              Image.asset(
+                                                'assets/images/obhyash_full_logo.png',
+                                                height: 44,
+                                                fit: BoxFit.contain,
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                'অভ্যাসে শুরু সাফল্যে শেষ',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontFamily: 'HindSiliguri',
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF6B7A74),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        // White Bottom Sheet Card
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: sheetBg,
+                                              borderRadius: const BorderRadius.vertical(
+                                                top: Radius.circular(32),
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(0xFF066B4F)
+                                                      .withValues(alpha: 0.10),
+                                                  blurRadius: 40,
+                                                  offset: const Offset(0, -10),
+                                                ),
+                                              ],
+                                              border: Border(
+                                                top: BorderSide(
+                                                  color: isDark
+                                                      ? const Color(0xFF27272A)
+                                                      : Colors.white,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                            padding: EdgeInsets.fromLTRB(24, 26, 24, 36 + bottomPad),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                                              children: [
+                                                _buildProgressBar(isDark),
+                                                const SizedBox(height: 24),
+
+                                                // Render Step Content
+                                                _step == 1
+                                                    ? _buildStep1(isDark)
+                                                    : _step == 2
+                                                    ? _buildStep2(isDark)
+                                                    : _buildStep3(isDark),
+
+                                                const SizedBox(height: 24),
+
+                                                // Action Buttons
+                                                Row(
+                                                  children: [
+                                                    if (_step > 1) ...[
+                                                      InkWell(
+                                                        onTap: _handleBack,
+                                                        borderRadius: BorderRadius.circular(16),
+                                                        child: Container(
+                                                          width: 54,
+                                                          height: 54,
+                                                          decoration: BoxDecoration(
+                                                            color: isDark ? const Color(0xFF1E1E24) : const Color(0xFFF6F9F8),
+                                                            borderRadius: BorderRadius.circular(16),
+                                                            border: Border.all(
+                                                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4EBE8),
+                                                              width: 1.5,
+                                                            ),
+                                                          ),
+                                                          child: Icon(
+                                                            LucideIcons.chevronLeft,
+                                                            size: 22,
+                                                            color: textPrimary,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 12),
+                                                    ],
+                                                    Expanded(
+                                                      child: Container(
+                                                        height: 54,
+                                                        decoration: BoxDecoration(
+                                                          gradient: const LinearGradient(
+                                                            colors: [Color(0xFF0A8A66), Color(0xFF066B4F)],
+                                                            begin: Alignment.topLeft,
+                                                            end: Alignment.bottomRight,
+                                                          ),
+                                                          borderRadius: BorderRadius.circular(16),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: const Color(0xFF066B4F).withValues(alpha: 0.40),
+                                                              blurRadius: 18,
+                                                              offset: const Offset(0, 8),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Material(
+                                                          color: Colors.transparent,
+                                                          child: InkWell(
+                                                            onTap: (isLoading || _isSendingOtp)
+                                                                ? null
+                                                                : (_step == 3 ? _handleSignup : _handleNext),
+                                                            borderRadius: BorderRadius.circular(16),
+                                                            child: Center(
+                                                              child: (isLoading || _isSendingOtp)
+                                                                  ? const SizedBox(
+                                                                      height: 20,
+                                                                      width: 20,
+                                                                      child: CircularProgressIndicator(
+                                                                        strokeWidth: 2.2,
+                                                                        color: Colors.white,
+                                                                      ),
+                                                                    )
+                                                                  : _step == 3
+                                                                  ? const Text(
+                                                                      'অ্যাকাউন্ট তৈরি করো',
+                                                                      style: TextStyle(
+                                                                        fontFamily: 'HindSiliguri',
+                                                                        fontSize: 16.5,
+                                                                        fontWeight: FontWeight.w700,
+                                                                        color: Colors.white,
+                                                                      ),
+                                                                    )
+                                                                  : const Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      children: [
+                                                                        Text(
+                                                                          'পরবর্তী ধাপ',
+                                                                          style: TextStyle(
+                                                                            fontFamily: 'HindSiliguri',
+                                                                            fontSize: 16.5,
+                                                                            fontWeight: FontWeight.w700,
+                                                                            color: Colors.white,
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(width: 6),
+                                                                        Icon(
+                                                                          LucideIcons.chevronRight,
+                                                                          size: 18,
+                                                                          color: Colors.white,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+
+                                                if (_step == 1) ...[
+                                                  const SizedBox(height: 24),
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Container(
+                                                          height: 1,
+                                                          color: dividerColor,
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                        child: Text(
+                                                          'অথবা চালিয়ে যান',
+                                                          style: TextStyle(
+                                                            fontFamily: 'HindSiliguri',
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.w500,
+                                                            color: textMuted,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Container(
+                                                          height: 1,
+                                                          color: dividerColor,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 18),
+                                                  _buildGoogleButton(isDark, textPrimary, dividerColor),
+                                                ],
+
+                                                const SizedBox(height: 26),
+
+                                                // Existing Account Login Prompt
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      'ইতিমধ্যে অ্যাকাউন্ট আছে? ',
+                                                      style: TextStyle(
+                                                        fontFamily: 'HindSiliguri',
+                                                        fontSize: 14.5,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: textMuted,
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        HapticFeedback.selectionClick();
+                                                        context.push('/login');
+                                                      },
+                                                      behavior: HitTestBehavior.opaque,
+                                                      child: const Padding(
+                                                        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                                                        child: Text(
+                                                          'লগইন করুন',
+                                                          style: TextStyle(
+                                                            fontFamily: 'HindSiliguri',
+                                                            fontSize: 14.5,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: Color(0xFF0A8A66),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      if (_step == 1) ...[
-                        const SizedBox(height: 28),
-                        Row(
-                          children: [
-                            Expanded(child: Divider(color: dividerColor, thickness: 1)),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
-                              child: Text(
-                                'Login / Registration with',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: textMuted,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            Expanded(child: Divider(color: dividerColor, thickness: 1)),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        _buildGoogleButton(isDark, textPrimary, dividerColor),
-                      ],
-
-                      const SizedBox(height: 28),
-
-                      // Existing Account Login Prompt
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'আগেই অ্যাকাউন্ট আছে? ',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: textMuted,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              context.push('/login');
+                              );
                             },
-                            behavior: HitTestBehavior.opaque,
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-                              child: Text(
-                                'লগইন করো',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryGreen,
-                                ),
-                              ),
-                            ),
                           ),
-                        ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          ),
-          // Top Right Support Button pinned directly to the top right corner
-          Positioned(
-            top: 6,
-            right: 20,
-            child: _buildSupportButton(context, isDark),
-          ),
-        ],
-      ),
-    ),
-  ),
-);
+          );
+
 },
 ),
 );
@@ -1245,53 +1395,77 @@ class _SignupViewState extends ConsumerState<SignupView>
   }
 
   Widget _buildGoogleButton(bool isDark, Color textPrimary, Color dividerColor) {
-    return OutlinedButton(
-      onPressed: _handleGoogleLogin,
-      style: OutlinedButton.styleFrom(
-        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
-        elevation: 0,
-        side: BorderSide(color: dividerColor),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+    final fieldBorder = isDark ? const Color(0xFF222E28) : const Color(0xFFE4EBE8);
+    return Container(
+      height: 54,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E24) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: fieldBorder,
+          width: 1.5,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.string(
-            _googleSvgString,
-            width: 20,
-            height: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _handleGoogleLogin,
+          borderRadius: BorderRadius.circular(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.string(
+                _googleSvgString,
+                width: 20,
+                height: 20,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Google দিয়ে চালিয়ে যান',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w600,
+                  color: textPrimary,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Text(
-            'Google',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: textPrimary,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildSupportButton(BuildContext context, bool isDark) {
-    final textMuted = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
         context.push('/login-support');
       },
       behavior: HitTestBehavior.opaque,
-      child: Text(
-        'সাপোর্ট লাগবে?',
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: textMuted,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E24) : Colors.white.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(
+            color: isDark ? const Color(0xFF2E2E36) : const Color(0xFFD5E8E0),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF066B4F).withValues(alpha: 0.05),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+        child: const Text(
+          'সাপোর্ট লাগবে?',
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF066B4F),
+          ),
         ),
       ),
     );

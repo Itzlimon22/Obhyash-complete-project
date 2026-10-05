@@ -101,16 +101,16 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
         title: Text(
           _subject!.subjectName,
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 17.5,
+            fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
       ),
       body: SafeArea(
         child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+          padding: const EdgeInsets.fromLTRB(10, 16, 10, 24),
           itemCount: chapters.length,
           itemBuilder: (context, index) {
             final chapter = chapters[index];

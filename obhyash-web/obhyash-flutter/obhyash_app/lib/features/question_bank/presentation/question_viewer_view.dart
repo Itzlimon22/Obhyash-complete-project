@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/presentation/widgets/app_icon.dart';
-import 'package:obhyash_app/core/providers/theme_provider.dart';
+import '../../../../core/presentation/widgets/theme_toggle_button.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
@@ -191,24 +191,7 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                   ),
 
                   // RIGHT: Theme Toggle Button
-                  InkWell(
-                    onTap: () {
-                      ref.read(themeModeProvider.notifier).toggle();
-                    },
-                    borderRadius: BorderRadius.circular(6),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                        size: 17,
-                        color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
-                      ),
-                    ),
-                  ),
+                  const ThemeToggleButton(size: 17),
                 ],
               ),
             ),

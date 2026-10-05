@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../constants/app_icons.dart';
 import 'app_icon.dart';
 
@@ -115,7 +114,6 @@ class MainBottomNav extends StatelessWidget {
                           (id == 'history' && activeTab == 'history'));
 
                   void handleTap() {
-                    HapticFeedback.lightImpact();
                     if (isAction) {
                       onMenuClick();
                     } else {

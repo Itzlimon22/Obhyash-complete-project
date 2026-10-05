@@ -164,6 +164,30 @@ const kHscFormulaSubjects = [
     svgIcon: 'assets/dashboard-icons/subject_math.svg',
     gradientColors: [0xFF1E1035, 0xFF2D1550],
   ),
+  SubjectMeta(
+    subjectId: 'hsc_biology_1',
+    subjectName: 'জীববিজ্ঞান ১ম পত্র',
+    assetPath: 'assets/formulas/hsc_biology_1/index.json',
+    emoji: '🧬',
+    svgIcon: 'assets/dashboard-icons/subject_biology.svg',
+    gradientColors: [0xFF0D2818, 0xFF134E4A],
+  ),
+  SubjectMeta(
+    subjectId: 'hsc_biology_2',
+    subjectName: 'জীববিজ্ঞান ২য় পত্র',
+    assetPath: 'assets/formulas/hsc_biology_2/index.json',
+    emoji: '🦠',
+    svgIcon: 'assets/dashboard-icons/subject_biology.svg',
+    gradientColors: [0xFF064E3B, 0xFF047857],
+  ),
+  SubjectMeta(
+    subjectId: 'hsc_ict',
+    subjectName: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+    assetPath: 'assets/formulas/hsc_ict/index.json',
+    emoji: '💻',
+    svgIcon: 'assets/dashboard-icons/subject_ict.svg',
+    gradientColors: [0xFF1E1B4B, 0xFF312E81],
+  ),
 ];
 
 const kSscFormulaSubjects = [
@@ -199,6 +223,14 @@ const kSscFormulaSubjects = [
     svgIcon: 'assets/dashboard-icons/subject_math.svg',
     gradientColors: [0xFF1E1035, 0xFF2D1550],
   ),
+  SubjectMeta(
+    subjectId: 'ssc_biology',
+    subjectName: 'জীববিজ্ঞান',
+    assetPath: 'assets/formulas/ssc_biology/index.json',
+    emoji: '🧬',
+    svgIcon: 'assets/dashboard-icons/subject_biology.svg',
+    gradientColors: [0xFF064E3B, 0xFF047857],
+  ),
 ];
 
 List<SubjectMeta> getAllFormulaSubjects() => [
@@ -208,8 +240,65 @@ List<SubjectMeta> getAllFormulaSubjects() => [
 
 List<SubjectMeta> getFormulaSubjectsForLevel(String level) {
   final l = level.toUpperCase();
-  if (l.contains('SSC') || l.contains('Class 10') || l.contains('Class 9')) {
+  if (l.contains('SSC') || l.contains('CLASS 10') || l.contains('CLASS 9') || l.contains('৯ম') || l.contains('১০ম')) {
     return kSscFormulaSubjects;
   }
   return kHscFormulaSubjects;
+}
+
+List<SubjectMeta> getPersonalizedFormulaSubjects({
+  String? level,
+  String? stream,
+  String? division,
+  String? target,
+  String? examTarget,
+  String? optionalSubject,
+}) {
+  final l = (level ?? stream ?? '').toUpperCase();
+  final isSSC = l.contains('SSC') ||
+      l.contains('CLASS 10') ||
+      l.contains('CLASS 9') ||
+      l.contains('৯ম') ||
+      l.contains('১০ম');
+
+  final baseList = isSSC
+      ? List<SubjectMeta>.from(kSscFormulaSubjects)
+      : List<SubjectMeta>.from(kHscFormulaSubjects);
+
+  final combinedTarget = [
+    target,
+    examTarget,
+  ].where((s) => s != null && s.isNotEmpty).join(' ').toLowerCase();
+
+  // If medical target, prioritize Biology and Chemistry
+  if (combinedTarget.contains('med') ||
+      combinedTarget.contains('মেডিকেল') ||
+      combinedTarget.contains('mbbs') ||
+      combinedTarget.contains('mat')) {
+    baseList.sort((a, b) {
+      final aBio = a.subjectId.contains('biology')
+          ? 0
+          : (a.subjectId.contains('chemistry') ? 1 : 2);
+      final bBio = b.subjectId.contains('biology')
+          ? 0
+          : (b.subjectId.contains('chemistry') ? 1 : 2);
+      return aBio.compareTo(bBio);
+    });
+  }
+  // If engineering target, prioritize Physics and Higher Math
+  else if (combinedTarget.contains('eng') ||
+      combinedTarget.contains('buet') ||
+      combinedTarget.contains('ইঞ্জিনিয়ারিং')) {
+    baseList.sort((a, b) {
+      final aEng = a.subjectId.contains('physics')
+          ? 0
+          : (a.subjectId.contains('math') ? 1 : 2);
+      final bEng = b.subjectId.contains('physics')
+          ? 0
+          : (b.subjectId.contains('math') ? 1 : 2);
+      return aEng.compareTo(bEng);
+    });
+  }
+
+  return baseList;
 }

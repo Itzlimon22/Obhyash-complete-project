@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'user_avatar.dart';
 import 'obhyash_tooltip.dart';
+import 'theme_toggle_button.dart';
 
 class MainSidebar extends StatelessWidget {
   final String activeTab;
@@ -84,10 +85,10 @@ class MainSidebar extends StatelessWidget {
         'svg': 'assets/dashboard-icons/analytics.svg',
       },
       {
-        'id': 'formulas',
-        'label': 'ফর্মুলা',
-        'icon': LucideIcons.sigma,
-        'svg': 'assets/dashboard-icons/formulas.svg',
+        'id': 'porashona',
+        'label': 'পড়াশোনা',
+        'icon': LucideIcons.bookOpen,
+        'svg': 'assets/dashboard-icons/porashona.svg',
       },
       {
         'id': 'blog',
@@ -342,25 +343,10 @@ class MainSidebar extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ObhyashTooltip(
-                        message: isDark ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো',
-                        preferredPosition: TooltipPosition.top,
-                        child: IconButton(
-                          onPressed: toggleTheme,
-                          icon: Icon(
-                            isDark ? LucideIcons.sun : LucideIcons.moon,
-                            size: 20,
-                          ),
-                          color: const Color(0xFF737373),
-                          style: IconButton.styleFrom(
-                            backgroundColor: isDark
-                                ? const Color(0xFF1C1C1E)
-                                : Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
+                      ThemeToggleButton(
+                        size: 20,
+                        tooltipPosition: TooltipPosition.top,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       ObhyashTooltip(
                         message: 'লগআউট করো',

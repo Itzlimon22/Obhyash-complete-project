@@ -16,6 +16,8 @@ import {
   FileText,
   ChevronRight,
   MoreVertical,
+  Image as ImageIcon,
+  ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportToCSV } from '@/lib/utils/export-csv';
@@ -28,6 +30,15 @@ interface SupportTicket {
   description: string;
   status: 'Pending' | 'In Progress' | 'Resolved' | 'Dismissed';
   admin_notes?: string;
+  metadata?: {
+    platform?: string;
+    reference_code?: string;
+    has_attachment?: boolean;
+    attachment_url?: string;
+    image_url?: string;
+    attachment_name?: string;
+    [key: string]: any;
+  };
   created_at: string;
   updated_at: string;
 }
@@ -150,6 +161,7 @@ export function LoginSupportTicketsView() {
         'Contact Info',
         'Issue Type',
         'Problem Description',
+        'Attachment URL',
         'Status',
         'Admin Notes',
         'Submitted Time',
@@ -160,6 +172,7 @@ export function LoginSupportTicketsView() {
         t.contact_info,
         t.issue_type,
         t.description,
+        t.metadata?.attachment_url || t.metadata?.image_url || '',
         t.status,
         t.admin_notes || '',
         new Date(t.created_at).toLocaleString('en-GB'),
@@ -325,6 +338,21 @@ export function LoginSupportTicketsView() {
                   <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 font-medium">
                     {t.description}
                   </p>
+
+                  {(t.metadata?.attachment_url || t.metadata?.image_url) && (
+                    <div className="pt-1">
+                      <a
+                        href={t.metadata.attachment_url || t.metadata.image_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-xs font-bold text-[#006A4E] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                      >
+                        <ImageIcon size={14} />
+                        <span>সংযুক্ত ছবি দেখুন</span>
+                        <ExternalLink size={12} className="opacity-70" />
+                      </a>
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-neutral-400">
                     <span className="font-mono text-neutral-600 dark:text-neutral-300">

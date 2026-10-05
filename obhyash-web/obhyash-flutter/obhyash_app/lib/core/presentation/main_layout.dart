@@ -149,6 +149,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return 'question_bank';
     }
     if (location.startsWith('/formulas')) return 'formulas';
+    if (location.startsWith('/porashona')) return 'porashona';
     return 'dashboard';
   }
 
@@ -326,6 +327,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'রেফারেল';
       case 'formulas':
         return 'ফর্মুলা';
+      case 'porashona':
+        return 'পড়াশোনা';
       case 'formula_chapters':
         return 'অধ্যায়';
       case 'formula_detail':
@@ -341,9 +344,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return;
     }
 
-    if (tab == 'formulas') {
+    if (tab == 'porashona' || tab == 'formulas') {
       widget.navigationShell.goBranch(0);
-      context.push('/formulas');
+      context.push(tab == 'porashona' ? '/porashona' : '/formulas');
       return;
     }
 

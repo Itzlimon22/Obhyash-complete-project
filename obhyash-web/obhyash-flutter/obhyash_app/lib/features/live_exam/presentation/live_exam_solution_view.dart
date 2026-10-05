@@ -227,53 +227,64 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
             return true;
           }).toList();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Top Summary Row
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+          return CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            cacheExtent: 600,
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildStatColumn('প্রাপ্ত নম্বর', '$finalScore', const Color(0xFF0B6B42)),
-                      _buildStatColumn('সঠিক', '$correctCount', const Color(0xFF10B981)),
-                      _buildStatColumn('ভুল', '$wrongCount', const Color(0xFFEF4444)),
-                      _buildStatColumn('অনুত্তরিত', '$skippedCount', Colors.grey),
+                      // Top Summary Row
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatColumn('প্রাপ্ত নম্বর', '$finalScore', const Color(0xFF0B6B42)),
+                            _buildStatColumn('সঠিক', '$correctCount', const Color(0xFF10B981)),
+                            _buildStatColumn('ভুল', '$wrongCount', const Color(0xFFEF4444)),
+                            _buildStatColumn('অনুত্তরিত', '$skippedCount', Colors.grey),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Filter Tabs
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            _buildFilterChip('all', 'সবগুলো (${questions.length})', isDark),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('correct', 'সঠিক ($correctCount)', isDark),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('wrong', 'ভুল ($wrongCount)', isDark),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('skipped', 'অনুত্তরিত ($skippedCount)', isDark),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+              ),
 
-                // Filter Tabs
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildFilterChip('all', 'সবগুলো (${questions.length})', isDark),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('correct', 'সঠিক ($correctCount)', isDark),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('wrong', 'ভুল ($wrongCount)', isDark),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('skipped', 'অনুত্তরিত ($skippedCount)', isDark),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Question Review Cards
-                if (filteredQuestions.isEmpty)
-                  Container(
+              // Question Review Cards
+              if (filteredQuestions.isEmpty)
+                SliverToBoxAdapter(
+                  child: Container(
                     padding: const EdgeInsets.all(32),
                     child: Center(
                       child: Text(
@@ -283,34 +294,38 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
                         ),
                       ),
                     ),
-                  )
-                else
-                  ...filteredQuestions.asMap().entries.map((entry) {
-                    final idx = entry.key;
-                    final q = entry.value;
-                    final userPick = userAnswers[q.id];
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
+                  sliver: SliverList.builder(
+                    itemCount: filteredQuestions.length,
+                    itemBuilder: (context, idx) {
+                      final q = filteredQuestions[idx];
+                      final userPick = userAnswers[q.id];
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 14),
-                      child: QuestionCard(
-                        question: q,
-                        serialNumber: idx + 1,
-                        selectedOptionIndex: userPick,
-                        readOnly: true,
-                        showFeedback: true,
-                        showAnswer: true,
-                        isFlagged: false,
-                        onSelectOption: (_) {},
-                        onToggleFlag: () {},
-                        onReport: () => QuestionReportDialog.show(context, q.id),
-                        isBookmarked: _bookmarkedIds.contains(q.id),
-                        onToggleBookmark: () => _toggleBookmark(q.id),
-                      ),
-                    );
-                  }),
-                const SizedBox(height: 30),
-              ],
-            ),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 14),
+                        child: QuestionCard(
+                          question: q,
+                          serialNumber: idx + 1,
+                          selectedOptionIndex: userPick,
+                          readOnly: true,
+                          showFeedback: true,
+                          showAnswer: true,
+                          isFlagged: false,
+                          onSelectOption: (_) {},
+                          onToggleFlag: () {},
+                          onReport: () => QuestionReportDialog.show(context, q.id),
+                          isBookmarked: _bookmarkedIds.contains(q.id),
+                          onToggleBookmark: () => _toggleBookmark(q.id),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
           );
         },
       ),

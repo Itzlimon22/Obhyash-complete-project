@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,7 +14,6 @@ import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
 import 'widgets/account_info_modal.dart';
 import 'widgets/delete_account_modal.dart';
-import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
 
@@ -312,179 +312,68 @@ class SettingsView extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
     final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA);
-    final cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
     final groups = _buildGroups(context, themeMode);
 
     return Scaffold(
       backgroundColor: bg,
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
-        children: [
-          // ── Profile Card ──────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 2, 8, 4),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFE5E5E5),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(0, 8, 0, 32),
+          children: [
+            // Page Heading "সেটিংস"
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 4, 18, 14),
+              child: Text(
+                'সেটিংস',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                  color: isDark ? Colors.white : const Color(0xFF10201A),
                 ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x08000000),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  // Deep green gradient header
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? const [Color(0xFF064E3B), Color(0xFF022C22)]
-                            : const [Color(0xFF064E3B), Color(0xFF047857)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        // Avatar
-                        UserAvatar(
-                          id: user.id,
-                          name: user.name,
-                          avatarUrl: user.avatarUrl,
-                          gender: user.gender,
-                          size: 80,
-                          showBorder: true,
-                          borderColor: Colors.white.withValues(alpha: 0.3),
-                          borderWidth: 3,
-                        ),
-                        const SizedBox(height: 12),
-                        // Name
-                        Text(
-                          user.name,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            ),
-                        ),
-                        if (user.email != null) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            user.email!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  // Info chips + action buttons
-                  Container(
-                    color: cardBg,
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: Column(
-                      children: [
-                        // Info chips (2-column first row + centered batch)
-                        Column(
-                          children: [
-                            if ((user.phone != null && user.phone!.isNotEmpty) ||
-                                (user.institute != null && user.institute!.isNotEmpty))
-                              Row(
-                                children: [
-                                  if (user.phone != null && user.phone!.isNotEmpty)
-                                    Expanded(
-                                      child: _InfoChip(
-                                        emoji: '📞',
-                                        label: user.phone!,
-                                        isDark: isDark,
-                                      ),
-                                    ),
-                                  if (user.phone != null &&
-                                      user.phone!.isNotEmpty &&
-                                      user.institute != null &&
-                                      user.institute!.isNotEmpty)
-                                    const SizedBox(width: 8),
-                                  if (user.institute != null && user.institute!.isNotEmpty)
-                                    Expanded(
-                                      child: _InfoChip(
-                                        emoji: '🏫',
-                                        label: user.institute!,
-                                        isDark: isDark,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            if (user.batch != null && user.batch!.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              _InfoChip(
-                                emoji: '📅',
-                                label: user.batch!.toLowerCase().contains('ব্যাচ')
-                                    ? user.batch!
-                                    : 'ব্যাচ ${user.batch!}',
-                                isDark: isDark,
-                              ),
-                            ],
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        // Action buttons row
-                        Row(
-                          children: [
-                            _ActionBtn(
-                              icon: LucideIcons.user,
-                              label: 'প্রোফাইল',
-                              isDark: isDark,
-                              onTap: () => context.push('/profile/stats'),
-                            ),
-                            _ActionBtn(
-                              icon: LucideIcons.pencil,
-                              label: 'এডিট',
-                              isDark: isDark,
-                              onTap: () => Navigator.of(context, rootNavigator: true).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      PersonalDetailsView(user: user),
-                                ),
-                              ),
-                            ),
-                            _ActionBtn(
-                              icon: LucideIcons.info,
-                              label: 'ইনফো',
-                              isDark: isDark,
-                              onTap: () => AccountInfoModal.show(context, user),
-                            ),
-                            _ActionBtn(
-                              icon: LucideIcons.gift,
-                              label: 'রেফার',
-                              isDark: isDark,
-                              isAccent: true,
-                              onTap: () => context.push('/profile/referral'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ),
-          ),
-          const SizedBox(height: 8),
+
+            // ── Premium Profile Card ──────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF18181B) : Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE6EBE8),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    const BoxShadow(
+                      color: Color(0x0D06281C), // rgba(6,40,28,.05)
+                      blurRadius: 2,
+                      offset: Offset(0, 1),
+                    ),
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.45)
+                          : const Color(0x59063C2A), // rgba(6,60,42,.35)
+                      blurRadius: 40,
+                      offset: const Offset(0, 18),
+                      spreadRadius: -18,
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                    _HeroBanner(user: user),
+                    _CardBody(user: user, isDark: isDark),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           // ── Settings Groups ───────────────────────────────────────────
           ...groups.asMap().entries.map((entry) {
             final gi = entry.key;
@@ -528,8 +417,9 @@ class SettingsView extends ConsumerWidget {
           }),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 // ─── Nav Item Widget ──────────────────────────────────────────────────────────
@@ -648,15 +538,359 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-// ─── Info Chip ────────────────────────────────────────────────────────────────
+// ─── Premium Profile Card Components (from exact HTML design) ─────────────────
 
-class _InfoChip extends StatelessWidget {
-  final String emoji;
+class _HeroBanner extends StatelessWidget {
+  final UserProfile user;
+
+  const _HeroBanner({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // 1. Base Multi-stop Linear Gradient (145deg: #03271c, #065f46 58%, #0a7a57)
+        Positioned.fill(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(-0.8, -0.6),
+                end: Alignment(0.8, 0.6),
+                colors: [
+                  Color(0xFF03271C),
+                  Color(0xFF065F46),
+                  Color(0xFF0A7A57),
+                ],
+                stops: [0.0, 0.58, 1.0],
+              ),
+            ),
+          ),
+        ),
+
+        // 2. Gold Radial Glow (at 90% -20%: rgba(201,162,75,.30))
+        Positioned.fill(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment(0.8, -1.2),
+                radius: 1.1,
+                colors: [
+                  Color(0x4DC9A24B),
+                  Colors.transparent,
+                ],
+                stops: [0.0, 0.55],
+              ),
+            ),
+          ),
+        ),
+
+        // 3. Mint Radial Glow (at 0% 110%: rgba(52,211,153,.22))
+        Positioned.fill(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment(-1.0, 1.1),
+                radius: 0.9,
+                colors: [
+                  Color(0x3834D399),
+                  Colors.transparent,
+                ],
+                stops: [0.0, 0.60],
+              ),
+            ),
+          ),
+        ),
+
+        // 4. Subtle Masked Grid Lines (22px spacing)
+        Positioned.fill(
+          child: ShaderMask(
+            shaderCallback: (bounds) {
+              return RadialGradient(
+                center: const Alignment(0.0, -0.3),
+                radius: 0.8,
+                colors: [
+                  Colors.white.withValues(alpha: 0.16),
+                  Colors.white.withValues(alpha: 0.04),
+                  Colors.transparent,
+                ],
+                stops: const [0.0, 0.55, 1.0],
+              ).createShader(bounds);
+            },
+            blendMode: BlendMode.dstIn,
+            child: CustomPaint(
+              size: Size.infinite,
+              painter: _GridPatternPainter(),
+            ),
+          ),
+        ),
+
+        // 5. Content (Avatar Ring + Name + Email)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(20, 32, 20, 28),
+          child: Column(
+            children: [
+              _GoldenAvatarRing(user: user),
+              Text(
+                user.name.isNotEmpty ? user.name : 'Student',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                (user.email != null && user.email!.isNotEmpty)
+                    ? user.email!
+                    : 'student@obhyash.com',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white.withValues(alpha: 0.74),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GoldenAvatarRing extends StatelessWidget {
+  final UserProfile user;
+
+  const _GoldenAvatarRing({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 126,
+      height: 126,
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.08),
+          width: 7,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
+            spreadRadius: -8,
+          ),
+        ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: SweepGradient(
+            startAngle: 200 * math.pi / 180,
+            endAngle: (200 + 360) * math.pi / 180,
+            colors: [
+              Color(0xFFF6E6AE),
+              Color(0xFFC9A24B),
+              Color(0xFF8A6A1C),
+              Color(0xFFECD78F),
+              Color(0xFFF6E6AE),
+            ],
+          ),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(3),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFF052E22),
+          ),
+          child: ClipOval(
+            child: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty)
+                ? Image.network(
+                    user.avatarUrl!,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildMetallicSphere(),
+                  )
+                : _buildMetallicSphere(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetallicSphere() {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          center: Alignment(-0.04, -0.16),
+          radius: 0.85,
+          colors: [
+            Color(0xFFE4DCCB),
+            Color(0xFF6B6F76),
+            Color(0xFF171A1F),
+          ],
+          stops: [0.0, 0.20, 0.65],
+        ),
+      ),
+    );
+  }
+}
+
+class _GridPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.08)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    const spacing = 22.0;
+
+    for (double x = 0; x <= size.width; x += spacing) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y <= size.height; y += spacing) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CardBody extends StatelessWidget {
+  final UserProfile user;
+  final bool isDark;
+
+  const _CardBody({required this.user, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        gradient: isDark
+            ? null
+            : const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.white, Color(0xFFFBFCFB)],
+              ),
+      ),
+      child: Column(
+        children: [
+          // Pills row 1 (Phone + College)
+          Row(
+            children: [
+              Expanded(
+                child: _PillWidget(
+                  icon: LucideIcons.smartphone,
+                  label: (user.phone != null && user.phone!.isNotEmpty)
+                      ? user.phone!
+                      : '01800000000',
+                  isDark: isDark,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _PillWidget(
+                  icon: LucideIcons.landmark,
+                  label: (user.institute != null && user.institute!.isNotEmpty)
+                      ? user.institute!
+                      : 'ঢাকা কলেজ',
+                  isDark: isDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // Pills row 2 (Centered Batch)
+          Center(
+            child: _PillWidget(
+              icon: LucideIcons.graduationCap,
+              label: (user.batch != null && user.batch!.isNotEmpty)
+                  ? (user.batch!.toLowerCase().contains('ব্যাচ')
+                      ? user.batch!
+                      : 'ব্যাচ ${user.batch!}')
+                  : 'ব্যাচ HSC 2027',
+              isDark: isDark,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // 4 Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: _ActButton(
+                  icon: LucideIcons.user,
+                  label: 'প্রোফাইল',
+                  isDark: isDark,
+                  onTap: () => context.push('/profile/stats'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ActButton(
+                  icon: LucideIcons.edit3,
+                  label: 'এডিট',
+                  isDark: isDark,
+                  onTap: () => Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (_) => PersonalDetailsView(user: user),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ActButton(
+                  icon: LucideIcons.info,
+                  label: 'ইনফো',
+                  isDark: isDark,
+                  onTap: () => AccountInfoModal.show(context, user),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ActButton(
+                  icon: LucideIcons.gift,
+                  label: 'রেফার',
+                  isDark: isDark,
+                  isGold: true,
+                  onTap: () => context.push('/profile/referral'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PillWidget extends StatelessWidget {
+  final IconData icon;
   final String label;
   final bool isDark;
 
-  const _InfoChip({
-    required this.emoji,
+  const _PillWidget({
+    required this.icon,
     required this.label,
     required this.isDark,
   });
@@ -664,29 +898,43 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      height: 46,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(20),
+        color: isDark ? const Color(0xFF222227) : Colors.white,
+        borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+          color: isDark ? const Color(0xFF2E2E33) : const Color(0xFFE6EBE8),
+          width: 1,
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D06281C), // rgba(6,40,28,.05)
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 12)),
-          const SizedBox(width: 5),
+          Icon(
+            icon,
+            size: 18,
+            color: isDark ? const Color(0xFF34D399) : const Color(0xFF065F46),
+          ),
+          const SizedBox(width: 8),
           Flexible(
             child: Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
-                color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151),
+                fontFamily: 'HindSiliguri',
+                fontSize: 14.5,
+                fontWeight: FontWeight.w500,
+                color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF2A3A33),
               ),
             ),
           ),
@@ -696,63 +944,77 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
-// ─── Action Button ────────────────────────────────────────────────────────────
-
-class _ActionBtn extends StatelessWidget {
+class _ActButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isDark;
-  final bool isAccent;
+  final bool isGold;
   final VoidCallback onTap;
 
-  const _ActionBtn({
+  const _ActButton({
     required this.icon,
     required this.label,
     required this.isDark,
+    this.isGold = false,
     required this.onTap,
-    this.isAccent = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = isAccent
-        ? (isDark ? const Color(0x33881337) : const Color(0xFFFFF1F2))
-        : (isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6));
-    final fg = isAccent
-        ? const Color(0xFFEF4444)
-        : (isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151));
+    final bg = isGold
+        ? (isDark ? const Color(0xFF2A2214) : const Color(0xFFFDF6E3))
+        : (isDark ? const Color(0xFF222227) : const Color(0xFFF7F9F8));
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          padding: const EdgeInsets.symmetric(vertical: 9),
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isAccent
-                  ? (isDark ? const Color(0x887f1d1d) : const Color(0xFFFECDD3))
-                  : (isDark
-                        ? const Color(0xFF3F3F46)
-                        : const Color(0xFFE5E7EB)),
+    final borderColor = isGold
+        ? (isDark ? const Color(0xFF6B5324) : const Color(0xFFE6D197))
+        : (isDark ? const Color(0xFF2E2E33) : const Color(0xFFE6EBE8));
+
+    final fgColor = isGold
+        ? (isDark ? const Color(0xFFF6C453) : const Color(0xFF8A6414))
+        : (isDark ? Colors.white : const Color(0xFF10201A));
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 2),
+        decoration: BoxDecoration(
+          color: bg,
+          gradient: isGold && !isDark
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFFDF6E3), Colors.white],
+                )
+              : null,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: borderColor, width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A06281C),
+              blurRadius: 2,
+              offset: Offset(0, 1),
             ),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, size: 16, color: fg),
-              const SizedBox(height: 3),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: fg,
-                ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 22, color: fgColor),
+            const SizedBox(height: 7),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'HindSiliguri',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: fgColor,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

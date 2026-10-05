@@ -43,4 +43,16 @@ class AppIcons {
   static const String navProgressFilled = 'assets/icons/nav_progress_filled.svg';
   static const String navMenu = 'assets/icons/nav_menu.svg';
   static const String navMenuFilled = 'assets/icons/nav_menu_filled.svg';
+
+  // Porashona Hub & Terms Custom Navigation Icons
+  static const String navFormula = 'assets/icons/nav_formula.svg';
+  static const String navFormulaFilled = 'assets/icons/nav_formula_filled.svg';
+  static const String navNotes = 'assets/icons/nav_notes.svg';
+  static const String navNotesFilled = 'assets/icons/nav_notes_filled.svg';
+  static const String navConcepts = 'assets/icons/nav_concepts.svg';
+  static const String navConceptsFilled = 'assets/icons/nav_concepts_filled.svg';
+  static const String navUpgrade = 'assets/icons/nav_upgrade.svg';
+  static const String navUpgradeFilled = 'assets/icons/nav_upgrade_filled.svg';
+  static const String navPorashona = 'assets/icons/nav_porashona.svg';
+  static const String navPorashonaFilled = 'assets/icons/nav_porashona_filled.svg';
 }

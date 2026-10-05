@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -32,8 +34,9 @@ class _LoginSupportViewState extends State<LoginSupportView> {
   bool _isLoading = false;
   String? _submittedTicketId;
   String? _whatsappUrl;
+  String? _uploadedImageUrl;
 
-  XFile? _selectedFile;
+  XFile? _selectedImage;
 
   @override
   void dispose() {
@@ -99,22 +102,57 @@ class _LoginSupportViewState extends State<LoginSupportView> {
     );
   }
 
-  Future<void> _pickMedia() async {
+  Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
       final file = await picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 80,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
       );
       if (file != null) {
-        setState(() => _selectedFile = file);
+        setState(() => _selectedImage = file);
         HapticFeedback.lightImpact();
       }
     } catch (e) {
-      debugPrint('[LoginSupportView] Pick media error: $e');
+      debugPrint('[LoginSupportView] Pick image error: $e');
     }
   }
 
+  Future<String?> _uploadImageToR2(XFile file) async {
+    try {
+      final uri = Uri.parse('https://obhyash.com/api/r2-upload');
+      final request = http.MultipartRequest('POST', uri);
+      request.fields['folder'] = 'support';
+
+      final bytes = await file.readAsBytes();
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: file.name,
+        ),
+      );
+
+      final streamedResponse =
+          await request.send().timeout(const Duration(seconds: 35));
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final publicUrl =
+            (data['publicUrl'] as String?) ?? (data['url'] as String?);
+        return publicUrl;
+      } else {
+        debugPrint(
+            '[LoginSupportView] R2 upload response status ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('[LoginSupportView] R2 upload exception: $e');
+    }
+    return null;
+  }
 
   Future<void> _handleSubmit() async {
     final contact = _phoneController.text.trim();
@@ -156,11 +194,25 @@ class _LoginSupportViewState extends State<LoginSupportView> {
       return;
     }
 
-
     setState(() => _isLoading = true);
     HapticFeedback.lightImpact();
 
     try {
+      String? r2ImageUrl;
+      if (_selectedImage != null) {
+        r2ImageUrl = await _uploadImageToR2(_selectedImage!);
+        if (r2ImageUrl == null) {
+          if (!mounted) return;
+          setState(() => _isLoading = false);
+          AppPopups.show(
+            context,
+            message: 'ছবিটি আপলোড হতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+            isError: true,
+          );
+          return;
+        }
+      }
+
       final refCode =
           DateTime.now().millisecondsSinceEpoch.toRadixString(36).toUpperCase();
 
@@ -173,15 +225,21 @@ class _LoginSupportViewState extends State<LoginSupportView> {
         'metadata': {
           'platform': 'flutter_app',
           'reference_code': refCode,
-          'has_attachment': _selectedFile != null,
-          'attachment_name': _selectedFile?.name,
+          'has_attachment': r2ImageUrl != null,
+          'attachment_url': r2ImageUrl,
+          'image_url': r2ImageUrl,
+          'attachment_name': _selectedImage?.name,
           'submitted_at': DateTime.now().toIso8601String(),
         },
       });
 
-      final encodedText = Uri.encodeComponent(
-        'হ্যালো অভ্যাশ সাপোর্ট টিম,\n\nআমি লগইন/অ্যাপ ব্যবহারে সমস্যায় পড়েছি।\nফোন: $contact\nক্যাটাগরি: $_selectedIssue\nবিবরণ: $desc\n(রেফারেন্স কোড: #$refCode)',
-      );
+      var waMessage =
+          'হ্যালো অভ্যাশ সাপোর্ট টিম,\n\nআমি লগইন/অ্যাপ ব্যবহারে সমস্যায় পড়েছি।\nফোন: $contact\nক্যাটাগরি: $_selectedIssue\nবিবরণ: $desc\n(রেফারেন্স কোড: #$refCode)';
+      if (r2ImageUrl != null) {
+        waMessage += '\nসংযুক্ত ছবি: $r2ImageUrl';
+      }
+
+      final encodedText = Uri.encodeComponent(waMessage);
       final waUrl = 'https://wa.me/8801409583992?text=$encodedText';
 
       if (!mounted) return;
@@ -189,6 +247,7 @@ class _LoginSupportViewState extends State<LoginSupportView> {
         _isLoading = false;
         _submittedTicketId = refCode;
         _whatsappUrl = waUrl;
+        _uploadedImageUrl = r2ImageUrl;
       });
       HapticFeedback.mediumImpact();
     } catch (e) {
@@ -298,7 +357,7 @@ class _LoginSupportViewState extends State<LoginSupportView> {
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: _showCategoryPicker,
+          onTap: _isLoading ? null : _showCategoryPicker,
           behavior: HitTestBehavior.opaque,
           child: Container(
             width: double.infinity,
@@ -348,6 +407,7 @@ class _LoginSupportViewState extends State<LoginSupportView> {
           ),
           child: TextField(
             controller: _phoneController,
+            enabled: !_isLoading,
             keyboardType: TextInputType.phone,
             style: TextStyle(
               fontSize: 15,
@@ -387,6 +447,7 @@ class _LoginSupportViewState extends State<LoginSupportView> {
           ),
           child: TextField(
             controller: _descController,
+            enabled: !_isLoading,
             maxLines: 6,
             minLines: 4,
             style: TextStyle(
@@ -415,18 +476,26 @@ class _LoginSupportViewState extends State<LoginSupportView> {
 
         const SizedBox(height: 22),
 
-        // 4. ছবি / ভিডিও আপলোড করো
+        // 4. ছবি আপলোড করো (Strictly Image, No Video)
         Text(
-          'ছবি / ভিডিও আপলোড করো',
+          'ছবি আপলোড করো',
           style: TextStyle(
             fontSize: 14.5,
             fontWeight: FontWeight.w700,
             color: textPrimary,
           ),
         ),
+        const SizedBox(height: 4),
+        Text(
+          'সমস্যার স্ক্রিনশট বা ছবি থাকলে যুক্ত করো (ঐচ্ছিক)',
+          style: TextStyle(
+            fontSize: 12.5,
+            color: textMuted,
+          ),
+        ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: _pickMedia,
+          onTap: _isLoading ? null : _pickImage,
           behavior: HitTestBehavior.opaque,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -443,26 +512,29 @@ class _LoginSupportViewState extends State<LoginSupportView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  LucideIcons.fileUp,
+                  LucideIcons.image,
                   size: 18,
                   color: isDark ? const Color(0xFF34D399) : const Color(0xFF006A4E),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  _selectedFile == null
-                      ? 'পিকচার / ভিডিও আপলোড করো'
-                      : 'ফাইল সিলেক্টেড (${_selectedFile!.name})',
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color:
-                        isDark ? const Color(0xFF34D399) : const Color(0xFF006A4E),
+                Flexible(
+                  child: Text(
+                    _selectedImage == null
+                        ? 'ছবি যুক্ত করো'
+                        : 'ছবি সিলেক্টেড (${_selectedImage!.name})',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isDark ? const Color(0xFF34D399) : const Color(0xFF006A4E),
+                    ),
                   ),
                 ),
-                if (_selectedFile != null) ...[
+                if (_selectedImage != null && !_isLoading) ...[
                   const SizedBox(width: 8),
                   GestureDetector(
-                    onTap: () => setState(() => _selectedFile = null),
+                    onTap: () => setState(() => _selectedImage = null),
                     child: Icon(
                       LucideIcons.x,
                       size: 16,
@@ -479,7 +551,7 @@ class _LoginSupportViewState extends State<LoginSupportView> {
 
         const SizedBox(height: 28),
 
-        // 6. Submit Button
+        // 5. Submit Button
         SizedBox(
           width: double.infinity,
           height: 52,
@@ -495,13 +567,29 @@ class _LoginSupportViewState extends State<LoginSupportView> {
               ),
             ),
             child: _isLoading
-                ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: textPrimary,
-                    ),
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        _selectedImage != null
+                            ? 'ছবি আপলোড ও জমা হচ্ছে...'
+                            : 'জমা হচ্ছে...',
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: textPrimary,
+                        ),
+                      ),
+                    ],
                   )
                 : Text(
                     'সাপোর্ট রিকোয়েস্ট পাঠাও',
@@ -604,6 +692,31 @@ class _LoginSupportViewState extends State<LoginSupportView> {
                   ),
                 ],
               ),
+              if (_uploadedImageUrl != null) ...[
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('সংযুক্ত ছবি',
+                        style: TextStyle(fontSize: 13, color: textMuted)),
+                    Row(
+                      children: const [
+                        Icon(LucideIcons.image,
+                            size: 14, color: Color(0xFF006A4E)),
+                        SizedBox(width: 4),
+                        Text(
+                          'R2 ক্লাউডে সংরক্ষিত',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF006A4E),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

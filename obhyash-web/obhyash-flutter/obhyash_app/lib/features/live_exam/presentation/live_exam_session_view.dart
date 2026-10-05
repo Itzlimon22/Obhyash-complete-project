@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
-import '../../../core/providers/theme_provider.dart';
+import '../../../core/presentation/widgets/theme_toggle_button.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
@@ -45,6 +45,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
   DateTime _sessionStartTime = DateTime.now().toUtc();
   Timer? _timer;
   int _secondsRemaining = 0;
+  late final ValueNotifier<int> _secondsRemainingNotifier;
   bool _isSubmitting = false;
 
   // Anti-Cheat: Tab switch / focus loss tracking
@@ -60,6 +61,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     _sessionStartTime = DateTime.now().toUtc();
     final durationMins = widget.exam?.durationMinutes ?? 45;
     _secondsRemaining = durationMins * 60;
+    _secondsRemainingNotifier = ValueNotifier<int>(_secondsRemaining);
     _startTimer();
     _fetchBookmarks();
     _registerAttemptStart();
@@ -89,6 +91,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
         final parsed = DateTime.tryParse(existing['start_time'].toString());
         if (parsed != null) {
           _sessionStartTime = parsed.toUtc();
+          final durationMins = widget.exam?.durationMinutes ?? 45;
+          final elapsed = DateTime.now().toUtc().difference(_sessionStartTime).inSeconds;
+          final remaining = (_secondsRemaining - elapsed).clamp(0, durationMins * 60);
+          _secondsRemaining = remaining;
+          _secondsRemainingNotifier.value = remaining;
         }
       }
     } catch (_) {}
@@ -96,10 +103,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaining > 0) {
-        setState(() {
-          _secondsRemaining--;
-        });
+      if (_secondsRemainingNotifier.value > 0) {
+        _secondsRemainingNotifier.value--;
       } else {
         _timer?.cancel();
         _autoSubmit();
@@ -178,6 +183,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     AntiPiracyService.disableProtection();
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+    _secondsRemainingNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -662,15 +668,17 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOutCubic,
       ).then((_) {
-        final retryKey = _itemKeys[index];
-        if (retryKey?.currentContext != null) {
-          Scrollable.ensureVisible(
-            retryKey!.currentContext!,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-            alignment: 0.02,
-          );
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final retryKey = _itemKeys[index];
+          if (retryKey?.currentContext != null) {
+            Scrollable.ensureVisible(
+              retryKey!.currentContext!,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              alignment: 0.02,
+            );
+          }
+        });
       });
     }
   }
@@ -998,58 +1006,65 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                       orElse: () => const SizedBox(),
                     ),
 
-                    // MIDDLE: Timer box
+                    // MIDDLE: Timer box (Isolated with ValueListenableBuilder to prevent parent rebuilds during scroll)
                     ObhyashTooltip(
                       message: 'অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।',
                       preferredPosition: TooltipPosition.bottom,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _secondsRemaining < 60
-                              ? const Color(0xFFDC2626) // Critical
-                              : _secondsRemaining < 300
-                                  ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB)) // Warning
-                                  : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)), // Normal
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: _secondsRemaining < 60
-                                ? const Color(0xFFDC2626)
-                                : _secondsRemaining < 300
-                                    ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
-                                    : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
-                          ),
-                          boxShadow: _secondsRemaining < 60
-                              ? [BoxShadow(color: const Color(0xFFDC2626).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
-                              : [],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.timer_outlined,
-                              size: 14,
-                              color: _secondsRemaining < 60
-                                  ? Colors.white
-                                  : _secondsRemaining < 300
-                                      ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
-                                      : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569)),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _formatTime(_secondsRemaining),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: 'monospace',
-                                color: _secondsRemaining < 60
-                                    ? Colors.white
-                                    : _secondsRemaining < 300
-                                        ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
-                                        : (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF27272A)),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: _secondsRemainingNotifier,
+                        builder: (context, secondsRemaining, _) {
+                          final isCritical = secondsRemaining < 60;
+                          final isWarning = secondsRemaining < 300;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isCritical
+                                  ? const Color(0xFFDC2626) // Critical
+                                  : isWarning
+                                      ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB)) // Warning
+                                      : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)), // Normal
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: isCritical
+                                    ? const Color(0xFFDC2626)
+                                    : isWarning
+                                        ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
+                                        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
                               ),
+                              boxShadow: isCritical
+                                  ? [BoxShadow(color: const Color(0xFFDC2626).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
+                                  : [],
                             ),
-                          ],
-                        ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.timer_outlined,
+                                  size: 14,
+                                  color: isCritical
+                                      ? Colors.white
+                                      : isWarning
+                                          ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
+                                          : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569)),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _formatTime(secondsRemaining),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    fontFamily: 'monospace',
+                                    color: isCritical
+                                        ? Colors.white
+                                        : isWarning
+                                            ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
+                                            : (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF27272A)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
 
@@ -1081,28 +1096,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                           orElse: () => const SizedBox(),
                         ),
                         const SizedBox(width: 6),
-                        ObhyashTooltip(
-                          message: isDark ? 'লাইট মোড' : 'ডার্ক মোড',
-                          preferredPosition: TooltipPosition.bottom,
-                          child: InkWell(
-                            onTap: () {
-                              ref.read(themeModeProvider.notifier).toggle();
-                            },
-                            borderRadius: BorderRadius.circular(6),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Icon(
-                                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                                size: 16,
-                                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
-                              ),
-                            ),
-                          ),
-                        ),
+                        const ThemeToggleButton(),
                       ],
                     ),
                   ],
@@ -1135,126 +1129,125 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               subjectQuestionCounts[key] = (subjectQuestionCounts[key] ?? 0) + 1;
             }
 
-            return SingleChildScrollView(
+            return ListView.builder(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               padding: const EdgeInsets.fromLTRB(10, 14, 10, 120),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: List.generate(questions.length, (index) {
-                  final q = questions[index];
-                  final cardKey = _itemKeys.putIfAbsent(index, () => GlobalKey());
+              itemCount: questions.length,
+              cacheExtent: 600,
+              itemBuilder: (context, index) {
+                final q = questions[index];
+                final cardKey = _itemKeys.putIfAbsent(index, () => GlobalKey());
 
-                  final currentSub = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
-                  final prevSub = index > 0
-                      ? BanglaNameHelper.getMainSubjectName(questions[index - 1].subject, questions[index - 1].subjectLabel)
-                      : null;
+                final currentSub = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
+                final prevSub = index > 0
+                    ? BanglaNameHelper.getMainSubjectName(questions[index - 1].subject, questions[index - 1].subjectLabel)
+                    : null;
 
-                  final isFirstInSubject = index == 0 || (prevSub != null && prevSub != currentSub);
+                final isFirstInSubject = index == 0 || (prevSub != null && prevSub != currentSub);
 
-                  Widget? subjectHeader;
-                  if (distinctSubjects.length > 1 && isFirstInSubject) {
-                    final banglaSub = currentSub;
-                    final count = subjectQuestionCounts[currentSub] ?? 0;
-                    subjectHeader = Container(
-                      margin: EdgeInsets.only(top: index == 0 ? 0 : 18, bottom: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                              thickness: 1.2,
+                Widget? subjectHeader;
+                if (distinctSubjects.length > 1 && isFirstInSubject) {
+                  final banglaSub = currentSub;
+                  final count = subjectQuestionCounts[currentSub] ?? 0;
+                  subjectHeader = Container(
+                    margin: EdgeInsets.only(top: index == 0 ? 0 : 18, bottom: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            thickness: 1.2,
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
                             ),
                           ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(LucideIcons.bookOpen, size: 14, color: Color(0xFF004633)),
+                              const SizedBox(width: 6),
+                              Text(
+                                banglaSub,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(LucideIcons.bookOpen, size: 14, color: Color(0xFF004633)),
+                              if (count > 0) ...[
                                 const SizedBox(width: 6),
                                 Text(
-                                  banglaSub,
+                                  '(${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন)',
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
                                     fontFamily: 'HindSiliguri',
-                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                    color: isDark ? Colors.white54 : const Color(0xFF64748B),
                                   ),
                                 ),
-                                if (count > 0) ...[
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '(${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন)',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontFamily: 'HindSiliguri',
-                                      color: isDark ? Colors.white54 : const Color(0xFF64748B),
-                                    ),
-                                  ),
-                                ],
                               ],
-                            ),
+                            ],
                           ),
-                          Expanded(
-                            child: Divider(
-                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                              thickness: 1.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final isAnswered = _userAnswers.containsKey(q.id);
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ?subjectHeader,
-                      Container(
-                        key: cardKey,
-                        child: QuestionCard(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          question: q,
-                          serialNumber: index + 1,
-                          selectedOptionIndex: _userAnswers[q.id],
-                          isFlagged: _flaggedIds.contains(q.id),
-                          isBookmarked: _bookmarkedIds.contains(q.id),
-                          readOnly: isAnswered, // Locked after selection
-                          hideSourceTag: true,
-                          onSelectOption: (optIndex) {
-                            if (_userAnswers.containsKey(q.id)) return; // Locked: no change allowed
-                            setState(() {
-                              _userAnswers[q.id] = optIndex;
-                            });
-                          },
-                          onToggleFlag: () {
-                            setState(() {
-                              if (_flaggedIds.contains(q.id)) {
-                                _flaggedIds.remove(q.id);
-                              } else {
-                                _flaggedIds.add(q.id);
-                              }
-                            });
-                          },
-                          onToggleBookmark: () => _toggleBookmark(q.id),
-                          onReport: () => QuestionReportDialog.show(context, q.id),
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: Divider(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            thickness: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
-                }),
-              ),
+                }
+
+                final isAnswered = _userAnswers.containsKey(q.id);
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ?subjectHeader,
+                    Container(
+                      key: cardKey,
+                      child: QuestionCard(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        question: q,
+                        serialNumber: index + 1,
+                        selectedOptionIndex: _userAnswers[q.id],
+                        isFlagged: _flaggedIds.contains(q.id),
+                        isBookmarked: _bookmarkedIds.contains(q.id),
+                        readOnly: isAnswered, // Locked after selection
+                        hideSourceTag: true,
+                        onSelectOption: (optIndex) {
+                          if (_userAnswers.containsKey(q.id)) return; // Locked: no change allowed
+                          setState(() {
+                            _userAnswers[q.id] = optIndex;
+                          });
+                        },
+                        onToggleFlag: () {
+                          setState(() {
+                            if (_flaggedIds.contains(q.id)) {
+                              _flaggedIds.remove(q.id);
+                            } else {
+                              _flaggedIds.add(q.id);
+                            }
+                          });
+                        },
+                        onToggleBookmark: () => _toggleBookmark(q.id),
+                        onReport: () => QuestionReportDialog.show(context, q.id),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
         ),

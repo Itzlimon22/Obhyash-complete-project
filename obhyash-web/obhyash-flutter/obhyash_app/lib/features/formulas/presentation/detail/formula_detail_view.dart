@@ -193,12 +193,12 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
         title: Text(
           _chapter?.chapterName ?? 'সূত্র তালিকা',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 17.5,
+            fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(

@@ -47,6 +47,9 @@ import '../features/profile/presentation/bookmarks_view.dart';
 import '../features/formulas/presentation/subjects/formula_subjects_view.dart';
 import '../features/formulas/presentation/chapters/formula_chapters_view.dart';
 import '../features/formulas/presentation/detail/formula_detail_view.dart';
+import '../features/porashona/presentation/porashona_view.dart';
+import '../features/porashona/presentation/notes_pdf_viewer_page.dart';
+import '../features/porashona/presentation/notes_category_detail_page.dart';
 import '../features/question_bank/presentation/question_bank_view.dart';
 import '../features/question_bank/presentation/subject_question_bank_detail_view.dart';
 import '../features/question_bank/presentation/academic_category_detail_view.dart';
@@ -144,6 +147,48 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/';
       }
       return null;
+    },
+    errorBuilder: (context, state) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF0F172A),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.amber, size: 48),
+                const SizedBox(height: 16),
+                const Text(
+                  'পৃষ্ঠাটি খুঁজে পাওয়া যায়নি',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  state.error?.toString() ?? 'একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: () => context.go('/'),
+                  icon: const Icon(Icons.home_rounded, size: 18),
+                  label: const Text('হোমে ফিরে যান'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B82F6),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     },
     routes: [
       GoRoute(
@@ -389,6 +434,37 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const BlogView(), state),
+      ),
+      GoRoute(
+        path: '/porashona',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const PorashonaView(), state),
+      ),
+      GoRoute(
+        path: '/notes-category',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final categoryTitle = extra?['categoryTitle'] as String? ?? 'নোটস';
+          return _fadeRoute(
+            NotesCategoryDetailPage(categoryTitle: categoryTitle),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/pdf-viewer',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final title = extra?['title'] as String? ?? 'নোটস';
+          final pdfUrl = extra?['pdfUrl'] as String? ?? '';
+          return _fadeRoute(
+            NotesPdfViewerPage(title: title, pdfUrl: pdfUrl),
+            state,
+          );
+        },
       ),
       GoRoute(
         path: '/formulas',

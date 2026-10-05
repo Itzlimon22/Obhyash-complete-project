@@ -111,12 +111,12 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                       onTap: () => context.go('/setup'),
                     ),
                     DashboardActionCard(
-                      title: 'ফর্মুলা',
-                      icon: Icons.functions_rounded,
-                      svgAsset: 'assets/dashboard-icons/formulas.svg',
+                      title: 'পড়াশোনা',
+                      icon: Icons.menu_book_rounded,
+                      svgAsset: 'assets/dashboard-icons/porashona.svg',
                       primaryColor: const Color(0xFF601D49),
                       lightColor: const Color(0xFFFDF2F8),
-                      onTap: () => context.push('/formulas'),
+                      onTap: () => context.push('/porashona'),
                     ),
                     DashboardActionCard(
                       title: 'ইতিহাস',
