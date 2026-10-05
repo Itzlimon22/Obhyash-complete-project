@@ -1,2 +1,62 @@
-# Ignore mobile app flutter project in Vercel builds to save upload time and prevent build context limits
+# Ignore mobile app flutter project
 obhyash-flutter/
+
+# Local database migrations & SQL scripts
+sql/
+*.sql
+
+# Local scratch directories & backups
+backups/
+scratch/
+.agents/
+
+# Internal documentation & root blueprint files (specifically anchored to root so content/blog is untouched)
+docs/
+/CLAUDE_SEO_BLOG_PROMPT.md
+/LEGENDS_LEAGUE_BLUEPRINT.md
+/TRACKING.md
+/blog-seo-guide.txt
+/json-generator-prompt.txt
+
+# Standalone CLI scripts & Python helper utilities
+scripts/
+*.py
+
+# Root one-off maintenance, patch, and test scripts
+check-icons.js
+check-type.js
+check_icons.js
+debug_exam.js
+fix-modals.js
+fix-paths.js
+fix-paths2.js
+fix-premium.mjs
+fix-test.js
+migrate-blog.js
+parse_edits.js
+replace-colors.js
+replace-other-colors.js
+run_test.js
+scratch-cols.js
+scratch-insert.ts
+scratch-schema.js
+scratch.ts
+test-dashboard-2.js
+test-dashboard.js
+test-db.js
+test-login-check.js
+test-query.js
+test-redeem.js
+test-render.js
+test-rls.ts
+test-sb.js
+test-sb2.js
+test-sub.js
+test.js
+test_search.js
+
+# Logs and temporary build dumps
+*.log
+tsc_output.txt
+temp_input.txt
+.DS_Store
