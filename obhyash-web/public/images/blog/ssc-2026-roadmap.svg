@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="100%" height="100%" style="background:#ffffff; border-radius:16px; font-family:system-ui, -apple-system, 'Hind Siliguri', sans-serif;">
+  <defs>
+    <filter id="card-shadow-road" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="380" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="800" height="5" fill="#0284c7" rx="2" />
+
+  <!-- Badge & Title -->
+  <rect x="330" y="24" width="140" height="24" rx="12" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+  <text x="400" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#0284c7" letter-spacing="1">STUDY ROADMAP</text>
+
+  <text x="400" y="74" text-anchor="middle" font-size="20" font-weight="800" fill="#0f172a">এসএসসি ২০২৬: ৯০ দিনের রিভিশন রোডম্যাপ</text>
+  <text x="400" y="96" text-anchor="middle" font-size="13" fill="#64748b">৩টি ধাপে সম্পূর্ণ সিলেবাস শেষ করে সর্বোচ্চ প্রস্তুতির গাইড</text>
+
+  <!-- Horizontal Timeline Connecting Line -->
+  <line x1="160" y1="135" x2="640" y2="135" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Phase 1 Card -->
+  <g transform="translate(40, 120)">
+    <!-- Phase Circle Indicator -->
+    <circle cx="110" cy="15" r="16" fill="#0284c7" />
+    <text x="110" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">১</text>
+
+    <rect y="45" width="220" height="185" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" filter="url(#card-shadow-road)"/>
+    <text x="110" y="75" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">ফেজ ১ (১-৩০ দিন)</text>
+    <text x="110" y="95" text-anchor="middle" font-size="12" font-weight="600" fill="#0284c7">ব্যাকলগ ক্লিয়ার</text>
+    <line x1="25" y1="108" x2="195" y2="108" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="25" y="132" font-size="12" fill="#334155">• শর্ট সিলেবাসের দুর্বল অধ্যায়</text>
+    <text x="25" y="156" font-size="12" fill="#334155">• গণিত ও বিজ্ঞানের সূত্র নোট</text>
+    <text x="25" y="180" font-size="12" fill="#334155">• মূল বই রিডিং ও কনসেপ্ট ক্লিয়ার</text>
+
+    <rect x="25" y="196" width="170" height="22" rx="6" fill="#e0f2fe"/>
+    <text x="110" y="211" text-anchor="middle" font-size="11" font-weight="700" fill="#0369a1">টার্গেট: বেসিক ১০০% ক্লিয়ার</text>
+  </g>
+
+  <!-- Phase 2 Card -->
+  <g transform="translate(290, 120)">
+    <!-- Phase Circle Indicator -->
+    <circle cx="110" cy="15" r="16" fill="#2563eb" />
+    <text x="110" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">২</text>
+
+    <rect y="45" width="220" height="185" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" filter="url(#card-shadow-road)"/>
+    <text x="110" y="75" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">ফেজ ২ (৩১-৬০ দিন)</text>
+    <text x="110" y="95" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">টেস্ট পেপার সলভ</text>
+    <line x1="25" y1="108" x2="195" y2="108" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="25" y="132" font-size="12" fill="#334155">• বিগত ৫ বছরের বোর্ড প্রশ্ন</text>
+    <text x="25" y="156" font-size="12" fill="#334155">• শীর্ষ ২০টি স্কুলের টেস্ট পেপার</text>
+    <text x="25" y="180" font-size="12" fill="#334155">• ভুল হওয়া প্রশ্ন ডায়েরিতে নোট</text>
+
+    <rect x="25" y="196" width="170" height="22" rx="6" fill="#dbeafe"/>
+    <text x="110" y="211" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">টার্গেট: কমন প্যাটার্ন আয়ত্ত</text>
+  </g>
+
+  <!-- Phase 3 Card -->
+  <g transform="translate(540, 120)">
+    <!-- Phase Circle Indicator -->
+    <circle cx="110" cy="15" r="16" fill="#16a34a" />
+    <text x="110" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">৩</text>
+
+    <rect y="45" width="220" height="185" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" filter="url(#card-shadow-road)"/>
+    <text x="110" y="75" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">ফেজ ৩ (৬১-৯০ দিন)</text>
+    <text x="110" y="95" text-anchor="middle" font-size="12" font-weight="600" fill="#16a34a">মক টেস্ট ও রিভিশন</text>
+    <line x1="25" y1="108" x2="195" y2="108" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="25" y="132" font-size="12" fill="#334155">• ওএমআর শিটে টাইমার টেস্ট</text>
+    <text x="25" y="156" font-size="12" fill="#334155">• সময় মেপে সৃজনশীল লেখা</text>
+    <text x="25" y="180" font-size="12" fill="#334155">• দুর্বল টপিকগুলোর চূড়ান্ত রিভিশন</text>
+
+    <rect x="25" y="196" width="170" height="22" rx="6" fill="#dcfce7"/>
+    <text x="110" y="211" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">টার্গেট: স্পিড ও নির্ভুলতা</text>
+  </g>
+</svg>

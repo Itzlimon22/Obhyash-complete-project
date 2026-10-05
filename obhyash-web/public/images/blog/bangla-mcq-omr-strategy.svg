@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" width="100%" height="100%" style="background:#ffffff; border-radius:16px; font-family:system-ui, -apple-system, 'Hind Siliguri', sans-serif;">
+  <defs>
+    <filter id="card-shadow-mcq" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="390" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="800" height="5" fill="#f59e0b" rx="2" />
+
+  <!-- Badge & Title -->
+  <rect x="335" y="24" width="130" height="24" rx="12" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+  <text x="400" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706" letter-spacing="1">OMR TIME HACK</text>
+
+  <text x="400" y="74" text-anchor="middle" font-size="20" font-weight="800" fill="#0f172a">বাংলা ১ম পত্র: ২৫ মিনিটে ৩০ MCQ ও OMR কৌশল</text>
+  <text x="400" y="96" text-anchor="middle" font-size="13" fill="#64748b">৩-ফেজ টাইম ম্যানেজমেন্ট ও বহুপদী প্রশ্ন সমাধানের নিয়ম</text>
+
+  <!-- Left: 3-Phase Timeline Cards (Width 430) -->
+  <g transform="translate(40, 120)">
+    <rect width="440" height="235" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" filter="url(#card-shadow-mcq)"/>
+    <text x="24" y="32" font-size="14" font-weight="800" fill="#0f172a">⏱️ ২৫ মিনিটের ৩-ফেজ টাইম ব্লকিং</text>
+
+    <!-- Phase 1 -->
+    <g transform="translate(20, 50)">
+      <rect width="400" height="48" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>
+      <circle cx="28" cy="24" r="14" fill="#10b981"/>
+      <text x="28" y="29" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">১</text>
+      <text x="54" y="22" font-size="13" font-weight="700" fill="#065f46">ফেজ ১ (প্রথম ১২ মিনিট): সহজ প্রশ্ন</text>
+      <text x="54" y="38" font-size="11.5" fill="#047857">নিশ্চিত জানা ১৮-২০টি প্রশ্ন দ্রুত পড়ে ওএমআরে দাগাও</text>
+    </g>
+
+    <!-- Phase 2 -->
+    <g transform="translate(20, 108)">
+      <rect width="400" height="48" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+      <circle cx="28" cy="24" r="14" fill="#3b82f6"/>
+      <text x="28" y="29" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">২</text>
+      <text x="54" y="22" font-size="13" font-weight="700" fill="#1e40af">ফেজ ২ (পরবর্তী ৮ মিনিট): মাঝারি প্রশ্ন</text>
+      <text x="54" y="38" font-size="11.5" fill="#1d4ed8">উদ্দীপক পড়ে ৬-৭টি প্রয়োগ ও অনুধাবনমূলক প্রশ্ন সমাধান</text>
+    </g>
+
+    <!-- Phase 3 -->
+    <g transform="translate(20, 166)">
+      <rect width="400" height="48" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1"/>
+      <circle cx="28" cy="24" r="14" fill="#f97316"/>
+      <text x="28" y="29" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">৩</text>
+      <text x="54" y="22" font-size="13" font-weight="700" fill="#9a3412">ফেজ ৩ (শেষ ৫ মিনিট): কঠিন ও রিভিশন</text>
+      <text x="54" y="38" font-size="11.5" fill="#c2410c">বাকি জটিল বহুপদী শেষ করা ও ওএমআর ক্রম রিচেক</text>
+    </g>
+  </g>
+
+  <!-- Right: Elimination Technique Card (Width 260) -->
+  <g transform="translate(500, 120)">
+    <rect width="260" height="235" rx="12" fill="#fffbeb" stroke="#fde68a" stroke-width="1" filter="url(#card-shadow-mcq)"/>
+    <text x="20" y="32" font-size="13.5" font-weight="800" fill="#92400e">🎯 বহুপদী এলিমিনেশন ট্রিক</text>
+
+    <!-- Step 1 -->
+    <rect x="18" y="52" width="224" height="46" rx="8" fill="#ffffff" stroke="#fef3c7" stroke-width="1"/>
+    <text x="30" y="70" font-size="11.5" font-weight="700" fill="#b45309">১. ভুল উক্তি চিহ্নিত করো</text>
+    <text x="30" y="86" font-size="11" fill="#78350f">(i, ii, iii)-এর মধ্যে কোনটি ভুল খোঁজো</text>
+
+    <!-- Step 2 -->
+    <rect x="18" y="108" width="224" height="46" rx="8" fill="#ffffff" stroke="#fef3c7" stroke-width="1"/>
+    <text x="30" y="126" font-size="11.5" font-weight="700" fill="#b45309">২. ভুল অপশন কেটে দাও</text>
+    <text x="30" y="142" font-size="11" fill="#78350f">উক্ত নম্বর থাকা সব অপশন বাতিল</text>
+
+    <!-- Step 3 -->
+    <rect x="18" y="164" width="224" height="46" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>
+    <text x="30" y="182" font-size="11.5" font-weight="700" fill="#065f46">৩. সঠিক উত্তর নিশ্চিত</text>
+    <text x="30" y="198" font-size="11" fill="#047857">বাকি থাকা অপশনটিই নিশ্চিত উত্তর!</text>
+  </g>
+</svg>

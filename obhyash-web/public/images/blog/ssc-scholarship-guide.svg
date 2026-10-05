@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" width="100%" height="100%" style="background:#ffffff; border-radius:16px; font-family:system-ui, -apple-system, 'Hind Siliguri', sans-serif;">
+  <defs>
+    <filter id="card-shadow-sch" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="390" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Top Accent Bar -->
+  <rect x="0" y="0" width="800" height="5" fill="#10b981" rx="2" />
+
+  <!-- Badge & Title -->
+  <rect x="330" y="24" width="140" height="24" rx="12" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>
+  <text x="400" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#059669" letter-spacing="1">SSC SCHOLARSHIP</text>
+
+  <text x="400" y="74" text-anchor="middle" font-size="20" font-weight="800" fill="#0f172a">এসএসসি মেধা ও সাধারণ বৃত্তি ২০২৬ গাইড</text>
+  <text x="400" y="96" text-anchor="middle" font-size="13" fill="#64748b">ভাতা, কোটা ও অফিশিয়াল গেজেটে নাম খোঁজার সহজ নিয়ম</text>
+
+  <!-- Left Side: 2 Cards (Talentpool vs General) -->
+  <g transform="translate(40, 118)">
+    <!-- Talentpool -->
+    <g transform="translate(0, 0)">
+      <rect width="345" height="112" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" filter="url(#card-shadow-sch)"/>
+      <rect x="14" y="14" width="90" height="22" rx="6" fill="#dcfce7"/>
+      <text x="59" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">★ মেধাবৃত্তি</text>
+
+      <text x="14" y="58" font-size="13" font-weight="700" fill="#0f172a">মাসিক: ৬০০ টাকা | এককালীন: ৯০০ টাকা</text>
+      <text x="14" y="80" font-size="12" fill="#334155">কোটা: সারা দেশে প্রায় ৩,০০০ জন (বোর্ড মেধা অনুযায়ী)</text>
+      <text x="14" y="98" font-size="11.5" fill="#16a34a">যোগ্যতা: জিপিএ ৫.০০ প্রাপ্ত সেরা নিয়মিত শিক্ষার্থী</text>
+    </g>
+
+    <!-- General -->
+    <g transform="translate(0, 126)">
+      <rect width="345" height="112" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" filter="url(#card-shadow-sch)"/>
+      <rect x="14" y="14" width="90" height="22" rx="6" fill="#dbeafe"/>
+      <text x="59" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">● সাধারণ বৃত্তি</text>
+
+      <text x="14" y="58" font-size="13" font-weight="700" fill="#0f172a">মাসিক: ৩৫০ টাকা | এককালীন: ৪৫০ টাকা</text>
+      <text x="14" y="80" font-size="12" fill="#334155">কোটা: সারা দেশে প্রায় ২২,৫০০ জন (উপজেলা কোটা)</text>
+      <text x="14" y="98" font-size="11.5" fill="#2563eb">যোগ্যতা: প্রতিটি উপজেলা/থানার কোটাভিত্তিক শীর্ষ শিক্ষার্থী</text>
+    </g>
+  </g>
+
+  <!-- Right Side: 4 Steps To Check Gazette -->
+  <g transform="translate(415, 118)">
+    <rect width="345" height="238" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" filter="url(#card-shadow-sch)"/>
+    <text x="20" y="32" font-size="13.5" font-weight="800" fill="#0f172a">📋 গেজেট চেক করার ৪টি ধাপ</text>
+
+    <!-- Step 1 -->
+    <g transform="translate(18, 50)">
+      <circle cx="14" cy="14" r="12" fill="#e2e8f0"/>
+      <text x="14" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">১</text>
+      <text x="36" y="14" font-size="12.5" font-weight="700" fill="#0f172a">বোর্ডের ওয়েবসাইটে যাও</text>
+      <text x="36" y="28" font-size="11" fill="#64748b">নিজ নিজ শিক্ষা বোর্ডের অফিশিয়াল সাইট ওপেন করো</text>
+    </g>
+
+    <!-- Step 2 -->
+    <g transform="translate(18, 96)">
+      <circle cx="14" cy="14" r="12" fill="#e2e8f0"/>
+      <text x="14" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">২</text>
+      <text x="36" y="14" font-size="12.5" font-weight="700" fill="#0f172a">বৃত্তির গেজেট PDF ডাউনলোড</text>
+      <text x="36" y="28" font-size="11" fill="#64748b">Notice বা Scholarship ট্যাব থেকে PDF নামাও</text>
+    </g>
+
+    <!-- Step 3 -->
+    <g transform="translate(18, 142)">
+      <circle cx="14" cy="14" r="12" fill="#e2e8f0"/>
+      <text x="14" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">৩</text>
+      <text x="36" y="14" font-size="12.5" font-weight="700" fill="#0f172a">রোল নম্বর দিয়ে সার্চ করো</text>
+      <text x="36" y="28" font-size="11" fill="#64748b">PDF-এ নিজের এসএসসি রোল নম্বর লিখে সার্চ দাও</text>
+    </g>
+
+    <!-- Step 4 -->
+    <g transform="translate(18, 188)">
+      <circle cx="14" cy="14" r="12" fill="#dcfce7"/>
+      <text x="14" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">৪</text>
+      <text x="36" y="14" font-size="12.5" font-weight="700" fill="#15803d">কলেজে যোগাযোগ করো</text>
+      <text x="36" y="28" font-size="11" fill="#16a34a">নাম থাকলে প্রতিষ্ঠান মারফত পরবর্তী সুবিধা পাবে</text>
+    </g>
+  </g>
+</svg>
