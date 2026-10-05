@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 /**
  * Obhyash Live Exam Promo / Feature Showcase Advertising Page (A4 Size: 210mm x 297mm)
  * Pure Vector HTML/CSS with White/Light Theme.
@@ -11,20 +8,39 @@ import * as path from 'path';
  */
 
 export function getAdPageFragment(): { css: string; html: string } {
-  const cwd = process.cwd();
+  let src_1 = '/images/app-screenshots/screen_1.png';
+  let src_4 = '/images/app-screenshots/screen_4.png';
+  let src_2 = '/images/app-screenshots/screen_2.png';
+  let src_full_logo = '/obhyash_full_logo.svg';
 
-  // Load base64 of the 3 real app screenshots and official logos
-  const img1Path = path.join(cwd, 'public/images/app-screenshots/screen_1.png');
-  const img4Path = path.join(cwd, 'public/images/app-screenshots/screen_4.png');
-  const img2Path = path.join(cwd, 'public/images/app-screenshots/screen_2.png');
-  const fullLogoPath = path.join(cwd, 'public/obhyash_full_logo.svg');
-  const appIconPath = path.join(cwd, 'public/app_logo_1024.png');
+  // In Node.js server/CLI environments, embed base64 directly for offline PDF rendering
+  if (typeof window === 'undefined') {
+    try {
+      const nodeFs = eval('require')('fs');
+      const nodePath = eval('require')('path');
+      const cwd = process.cwd();
 
-  const b64_1 = fs.existsSync(img1Path) ? fs.readFileSync(img1Path).toString('base64') : '';
-  const b64_4 = fs.existsSync(img4Path) ? fs.readFileSync(img4Path).toString('base64') : '';
-  const b64_2 = fs.existsSync(img2Path) ? fs.readFileSync(img2Path).toString('base64') : '';
-  const b64_full_logo = fs.existsSync(fullLogoPath) ? fs.readFileSync(fullLogoPath).toString('base64') : '';
-  const b64_app_icon = fs.existsSync(appIconPath) ? fs.readFileSync(appIconPath).toString('base64') : '';
+      const img1Path = nodePath.join(cwd, 'public/images/app-screenshots/screen_1.png');
+      const img4Path = nodePath.join(cwd, 'public/images/app-screenshots/screen_4.png');
+      const img2Path = nodePath.join(cwd, 'public/images/app-screenshots/screen_2.png');
+      const fullLogoPath = nodePath.join(cwd, 'public/obhyash_full_logo.svg');
+
+      if (nodeFs.existsSync(img1Path)) {
+        src_1 = `data:image/png;base64,${nodeFs.readFileSync(img1Path).toString('base64')}`;
+      }
+      if (nodeFs.existsSync(img4Path)) {
+        src_4 = `data:image/png;base64,${nodeFs.readFileSync(img4Path).toString('base64')}`;
+      }
+      if (nodeFs.existsSync(img2Path)) {
+        src_2 = `data:image/png;base64,${nodeFs.readFileSync(img2Path).toString('base64')}`;
+      }
+      if (nodeFs.existsSync(fullLogoPath)) {
+        src_full_logo = `data:image/svg+xml;base64,${nodeFs.readFileSync(fullLogoPath).toString('base64')}`;
+      }
+    } catch {
+      // Fallback to relative public paths if filesystem is inaccessible
+    }
+  }
 
   const css = `
     /* =========================================
@@ -433,7 +449,7 @@ export function getAdPageFragment(): { css: string; html: string } {
     <div class="top-nav-bar">
       <!-- Top-Left: Real Obhyash Full Logo -->
       <div class="top-left-brand">
-        <img src="data:image/svg+xml;base64,${b64_full_logo}" class="top-brand-logo" alt="অভ্যাস" />
+        <img src="${src_full_logo}" class="top-brand-logo" alt="অভ্যাস" />
       </div>
 
       <!-- Top-Right: Google Play Store Pill -->
@@ -577,21 +593,21 @@ export function getAdPageFragment(): { css: string; html: string } {
         <!-- PHONE 1: REAL LIVE EXAM MAIN PAGE (LEFT) -->
         <div class="phone-mockup phone-left">
           <div class="screen-img-box">
-            <img class="screen-img" src="data:image/png;base64,${b64_4}" alt="Live Exam Screen" />
+            <img class="screen-img" src="${src_4}" alt="Live Exam Screen" />
           </div>
         </div>
 
         <!-- PHONE 2: REAL MOCK EXAM PAGE (HERO CENTER) -->
         <div class="phone-mockup phone-hero">
           <div class="screen-img-box">
-            <img class="screen-img" src="data:image/png;base64,${b64_1}" alt="Mock Exam Screen" />
+            <img class="screen-img" src="${src_1}" alt="Mock Exam Screen" />
           </div>
         </div>
 
         <!-- PHONE 3: REAL QUESTION BANK PAGE (RIGHT) -->
         <div class="phone-mockup phone-right">
           <div class="screen-img-box">
-            <img class="screen-img" src="data:image/png;base64,${b64_2}" alt="Question Bank Screen" />
+            <img class="screen-img" src="${src_2}" alt="Question Bank Screen" />
           </div>
         </div>
 
