@@ -25,15 +25,15 @@ export default async function BlogManagementPage() {
   // if (profile?.role !== 'admin') redirect('/dashboard');
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-black p-4 sm:p-6 lg:p-10 font-anek">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#f4f5f8] dark:bg-[#0d0d0f] -m-4 sm:-m-6 lg:-m-8 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
+      <div className="max-w-[1440px] mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               ব্লগ ও নিউজলেটার সাবস্ক্রাইবার
             </h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">
               ব্লগের সমস্ত নিউজলেটার সাবস্ক্রাইবারদের তালিকা পরিচালনা ও CSV এক্সপোর্ট করুন।
             </p>
           </div>

@@ -21,6 +21,7 @@ import {
   Flame,
   MousePointerClick,
   CheckCircle2,
+  ArrowUpRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/admin/questions/pagination';
@@ -103,7 +104,7 @@ export default function BlogManagementClient() {
     };
   };
 
-  // Aesthetic Metric Cards with Auto-Refresh every 30s
+  // Metric Cards with Auto-Refresh every 30s
   const {
     data: metrics,
     isLoading: metricsLoading,
@@ -181,10 +182,10 @@ export default function BlogManagementClient() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       {/* ── Table Not Migrated Warning Banner (if applicable) ── */}
       {metrics && metrics.tableExists === false && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 flex items-start gap-3.5">
+        <div className="p-4 sm:p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 flex items-start gap-3.5 shadow-card">
           <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h4 className="text-sm font-bold text-amber-900 dark:text-amber-200">
@@ -201,74 +202,110 @@ export default function BlogManagementClient() {
         </div>
       )}
 
-      {/* ── 1. Conversion & Traffic KPI Grid ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: App Downloads */}
-        <MetricCard
-          title="অ্যাপ ডাউনলোড ক্লিক"
-          subtitle="Play Store ডাউনলোড বাটন"
-          value={metrics?.totalAppDownloads ?? 0}
-          badge={
-            metrics?.todayAppDownloads !== undefined && metrics.todayAppDownloads > 0
-              ? `+${metrics.todayAppDownloads} আজ`
-              : undefined
-          }
-          icon={Smartphone}
-          loading={metricsLoading}
-          color="emerald"
-        />
+      {/* ── 1. NIOND SOFT-PASTEL BENTO KPI GRID ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Metric 1: App Downloads (Soft Mint Lime) */}
+        <div className="bg-[#c2f2d0] dark:bg-[#1a3828] text-slate-900 dark:text-emerald-100 rounded-3xl p-6 shadow-card hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between min-h-[160px]">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/10 dark:bg-white/10 backdrop-blur-sm">
+              <Smartphone className="w-3.5 h-3.5 opacity-80" />
+              <span>অ্যাপ ডাউনলোড</span>
+            </div>
+            {metrics?.todayAppDownloads !== undefined && metrics.todayAppDownloads > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full text-emerald-900 bg-emerald-500/20 dark:text-emerald-200">
+                +{metrics.todayAppDownloads} আজ
+              </span>
+            )}
+          </div>
+          <div className="my-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 dark:text-white font-sans select-all">
+              {metricsLoading ? '...' : (metrics?.totalAppDownloads ?? 0).toLocaleString('bn-BD')}
+            </h3>
+          </div>
+          <p className="text-xs font-medium text-slate-700/80 dark:text-emerald-200/70 truncate">
+            Play Store ডাউনলোড বাটন
+          </p>
+        </div>
 
-        {/* Metric 2: Signups / Dashboard */}
-        <MetricCard
-          title="রেজিস্ট্রেশন ও ড্যাশবোর্ড ক্লিক"
-          subtitle="ফ্রি এক্সাম ও একাউন্ট তৈরি"
-          value={metrics?.totalSignups ?? 0}
-          badge={
-            metrics?.todaySignups !== undefined && metrics.todaySignups > 0
-              ? `+${metrics.todaySignups} আজ`
-              : undefined
-          }
-          icon={UserCheck}
-          loading={metricsLoading}
-          color="blue"
-        />
+        {/* Metric 2: Signups / Dashboard (Soft Periwinkle Blue) */}
+        <div className="bg-[#d0e2ff] dark:bg-[#1e2f4a] text-slate-900 dark:text-blue-100 rounded-3xl p-6 shadow-card hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between min-h-[160px]">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/10 dark:bg-white/10 backdrop-blur-sm">
+              <UserCheck className="w-3.5 h-3.5 opacity-80" />
+              <span>রেজিস্ট্রেশন ক্লিক</span>
+            </div>
+            {metrics?.todaySignups !== undefined && metrics.todaySignups > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full text-blue-900 bg-blue-500/20 dark:text-blue-200">
+                +{metrics.todaySignups} আজ
+              </span>
+            )}
+          </div>
+          <div className="my-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 dark:text-white font-sans select-all">
+              {metricsLoading ? '...' : (metrics?.totalSignups ?? 0).toLocaleString('bn-BD')}
+            </h3>
+          </div>
+          <p className="text-xs font-medium text-slate-700/80 dark:text-blue-200/70 truncate">
+            ফ্রি এক্সাম ও একাউন্ট তৈরি
+          </p>
+        </div>
 
-        {/* Metric 3: Newsletter Subscribers */}
-        <MetricCard
-          title="নিউজলেটার সাবস্ক্রাইবার"
-          subtitle="সক্রিয় ইমেইল রিডার"
-          value={metrics?.subscribers ?? 0}
-          icon={Mail}
-          loading={metricsLoading}
-          color="rose"
-        />
+        {/* Metric 3: Newsletter Subscribers (Soft Pastel Lavender) */}
+        <div className="bg-[#e0d6ff] dark:bg-[#2b214a] text-slate-900 dark:text-purple-100 rounded-3xl p-6 shadow-card hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between min-h-[160px]">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/10 dark:bg-white/10 backdrop-blur-sm">
+              <Mail className="w-3.5 h-3.5 opacity-80" />
+              <span>নিউজলেটার</span>
+            </div>
+            <span className="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full text-purple-900 bg-purple-500/20 dark:text-purple-200">
+              Active List
+            </span>
+          </div>
+          <div className="my-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 dark:text-white font-sans select-all">
+              {metricsLoading ? '...' : (metrics?.subscribers ?? 0).toLocaleString('bn-BD')}
+            </h3>
+          </div>
+          <p className="text-xs font-medium text-slate-700/80 dark:text-purple-200/70 truncate">
+            সক্রিয় ইমেইল সাবস্ক্রাইবার
+          </p>
+        </div>
 
-        {/* Metric 4: Total Conversion Actions */}
-        <MetricCard
-          title="মোট কনভার্শন অ্যাকশন"
-          subtitle="ব্লগ থেকে প্ল্যাটফর্মে রিডাইরেক্ট"
-          value={metrics?.totalConversions ?? 0}
-          icon={MousePointerClick}
-          loading={metricsLoading}
-          color="indigo"
-        />
+        {/* Metric 4: Total Conversions (High-Contrast Forest Teal Banner) */}
+        <div className="bg-[#0a666b] dark:bg-[#074f53] text-white rounded-3xl p-6 shadow-card hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/15 backdrop-blur-sm text-teal-100">
+              <MousePointerClick className="w-3.5 h-3.5 text-[#c6f634]" />
+              <span>মোট কনভার্শন</span>
+            </div>
+            <span className="w-2 h-2 rounded-full bg-[#c6f634] animate-pulse" />
+          </div>
+          <div className="my-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-sans select-all">
+              {metricsLoading ? '...' : (metrics?.totalConversions ?? 0).toLocaleString('bn-BD')}
+            </h3>
+          </div>
+          <p className="text-xs font-medium text-teal-100/80 truncate">
+            ব্লগ থেকে প্ল্যাটফর্মে রিডাইরেক্ট
+          </p>
+        </div>
       </div>
 
-      {/* ── 2. Real-time Conversion Attribution Section ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* ── 2. REAL-TIME CONVERSION ATTRIBUTION SECTION ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Left (7 Cols): Top Converting Blog Posts */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#121212] rounded-3xl border border-slate-200 dark:border-[#2b2b2b] p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white dark:bg-[#151515] rounded-3xl border border-slate-100/80 dark:border-zinc-800/80 p-6 shadow-card flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <Flame className="w-4 h-4" />
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-zinc-800/80 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                  <Flame className="w-5 h-5 fill-amber-500/20" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    টপ কনভার্টিং ব্লগ আর্টিকেল (Top Converting Posts)
+                  <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                    টপ কনভার্টিং আর্টিকেল
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-400 dark:text-zinc-400 mt-0.5">
                     যেসব পোস্ট পড়ে শিক্ষার্থীরা সবচেয়ে বেশি অ্যাপ ও প্ল্যাটফর্মে গেছে
                   </p>
                 </div>
@@ -281,17 +318,17 @@ export default function BlogManagementClient() {
                 {metrics.topConvertingPosts.map((post, idx) => (
                   <div
                     key={post.slug}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 px-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 transition-all group"
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-200 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-7 h-7 rounded-xl bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200 flex items-center justify-center font-mono font-black text-xs shrink-0 shadow-xs border border-slate-200/60 dark:border-zinc-700/60">
                         {idx + 1}
                       </span>
                       <div className="truncate min-w-0">
                         <Link
                           href={`/blog/${post.slug}`}
                           target="_blank"
-                          className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white hover:text-rose-600 dark:hover:text-rose-400 transition-colors truncate block"
+                          className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate block"
                           title={post.slug}
                         >
                           {post.slug}
@@ -300,10 +337,10 @@ export default function BlogManagementClient() {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto font-mono text-xs">
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/40">
+                      <span className="px-2.5 py-1 rounded-full bg-[#c2f2d0] dark:bg-[#1a3828] text-slate-950 dark:text-emerald-200 font-bold text-[11px] shadow-xs">
                         📱 {post.appDownloads} অ্যাপ
                       </span>
-                      <span className="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/40">
+                      <span className="px-2.5 py-1 rounded-full bg-[#d0e2ff] dark:bg-[#1e2f4a] text-slate-950 dark:text-blue-200 font-bold text-[11px] shadow-xs">
                         🎓 {post.signups} সাইনআপ
                       </span>
                     </div>
@@ -311,9 +348,9 @@ export default function BlogManagementClient() {
                 ))}
               </div>
             ) : (
-              <div className="py-12 text-center">
-                <MousePointerClick className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+              <div className="py-14 text-center">
+                <MousePointerClick className="w-8 h-8 text-slate-300 dark:text-zinc-600 mx-auto mb-2" />
+                <p className="text-xs text-slate-400 dark:text-zinc-400">
                   এখনও কোনো কনভার্শন রেকর্ড হয়নি। ব্লগে ক্লিক হওয়া মাত্র এখানে তালিকা দৃশ্যমান হবে।
                 </p>
               </div>
@@ -322,18 +359,18 @@ export default function BlogManagementClient() {
         </div>
 
         {/* Right (5 Cols): Live Activity Stream */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#121212] rounded-3xl border border-slate-200 dark:border-[#2b2b2b] p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white dark:bg-[#151515] rounded-3xl border border-slate-100/80 dark:border-zinc-800/80 p-6 shadow-card flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5 mb-4">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                  রিয়েলটাইম কনভার্শন ফিড (Live Stream)
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-zinc-800/80 mb-5">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#c6f634] ring-4 ring-emerald-500/20 animate-pulse" />
+                <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                  রিয়েলটাইম কনভার্শন ফিড
                 </h3>
               </div>
               <button
                 onClick={() => mutateMetrics()}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
                 title="রিফ্রেশ করুন"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -342,31 +379,31 @@ export default function BlogManagementClient() {
 
             {/* Stream List */}
             {metrics?.recentConversions && metrics.recentConversions.length > 0 ? (
-              <div className="space-y-2.5 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+              <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
                 {metrics.recentConversions.map((conv) => {
                   const isApp = conv.event_type === 'app_download';
                   const ts = formatTimestamp24h(conv.created_at);
                   return (
                     <div
                       key={conv.id}
-                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 flex items-center justify-between gap-2 text-xs"
+                      className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs hover:border-slate-200 transition-all"
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0">
                         <span
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                             isApp
-                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                              : 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300'
                           }`}
                         >
                           {isApp ? (
-                            <Smartphone className="w-3.5 h-3.5" />
+                            <Smartphone className="w-4 h-4" />
                           ) : (
-                            <UserCheck className="w-3.5 h-3.5" />
+                            <UserCheck className="w-4 h-4" />
                           )}
                         </span>
                         <div className="truncate">
-                          <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                          <p className="font-bold text-slate-900 dark:text-zinc-100 truncate">
                             {isApp ? 'Play Store ক্লিক' : 'রেজিস্ট্রেশন ক্লিক'}
                           </p>
                           <p className="text-[10px] text-slate-400 truncate">
@@ -376,7 +413,7 @@ export default function BlogManagementClient() {
                       </div>
 
                       <div className="flex flex-col items-end text-right font-mono shrink-0">
-                        <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        <span className="text-[10px] font-bold text-slate-700 dark:text-zinc-300">
                           {ts.date}
                         </span>
                         <span className="text-[10px] text-slate-400">
@@ -388,7 +425,7 @@ export default function BlogManagementClient() {
                 })}
               </div>
             ) : (
-              <div className="py-12 text-center text-xs text-slate-400">
+              <div className="py-14 text-center text-xs text-slate-400">
                 নতুন কোনো ক্লিক অ্যাক্টিভিটি নেই
               </div>
             )}
@@ -396,37 +433,44 @@ export default function BlogManagementClient() {
         </div>
       </div>
 
-      {/* ── 3. Newsletter Subscribers Table ── */}
-      <div className="bg-white dark:bg-[#121212] rounded-3xl border border-slate-200 dark:border-[#2b2b2b] shadow-sm overflow-hidden">
+      {/* ── 3. NEWSLETTER SUBSCRIBERS TABLE (NIOND BENTO CARD) ── */}
+      <div className="bg-white dark:bg-[#151515] rounded-3xl border border-slate-100/80 dark:border-zinc-800/80 shadow-card overflow-hidden">
         {/* Toolbar region */}
-        <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-[#2b2b2b] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5 text-rose-500" />
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-              নিউজলেটার সাবস্ক্রাইবার তালিকা ({totalCount})
-            </h2>
+        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-zinc-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#e0d6ff] dark:bg-[#2b214a] text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+              <Mail className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                নিউজলেটার সাবস্ক্রাইবার তালিকা
+              </h2>
+              <p className="text-xs text-slate-400 dark:text-zinc-400 mt-0.5">
+                মোট {totalCount.toLocaleString('bn-BD')} জন সক্রিয় গ্রাহক
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Box */}
             <div className="relative flex-1 sm:w-72">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="ইমেইল দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-black border border-slate-200 dark:border-[#2b2b2b] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#c6f634]/50 transition-all"
               />
             </div>
 
-            {/* Export CSV button */}
+            {/* Export CSV button - Niond Neo-Lime Pill */}
             <button
               onClick={exportData}
               disabled={listData.length === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#c6f634] hover:bg-[#b8ea27] text-slate-950 text-xs font-bold rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>CSV ডাউনলোড</span>
             </button>
           </div>
@@ -434,8 +478,8 @@ export default function BlogManagementClient() {
 
         {/* Table representation */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400 font-sans">
-            <thead className="bg-slate-50 dark:bg-black/40 text-xs uppercase font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-[#2b2b2b]">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-zinc-400 font-sans border-collapse">
+            <thead className="bg-slate-50/70 dark:bg-zinc-900/40 text-[11px] uppercase font-bold text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800">
               <tr>
                 <th className="px-6 py-4">#</th>
                 <th className="px-6 py-4">ইমেইল এড্রেস</th>
@@ -444,17 +488,17 @@ export default function BlogManagementClient() {
                 <th className="px-6 py-4 text-right">একশন</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-[#242424]">
+            <tbody className="divide-y divide-slate-100/80 dark:divide-zinc-800/60 text-xs">
               {dataLoading ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-rose-500 mx-auto mb-2" />
-                    <span className="text-xs">লোড হচ্ছে...</span>
+                  <td colSpan={5} className="py-14 text-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#0a666b] mx-auto mb-2" />
+                    <span className="text-xs font-medium text-slate-400">লোড হচ্ছে...</span>
                   </td>
                 </tr>
               ) : listData.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-400">
+                  <td colSpan={5} className="py-14 text-center text-slate-400 font-medium">
                     কোনো সাবস্ক্রাইবার পাওয়া যায়নি।
                   </td>
                 </tr>
@@ -466,27 +510,27 @@ export default function BlogManagementClient() {
                   return (
                     <tr
                       key={sub.id}
-                      className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors"
+                      className="hover:bg-slate-50/80 dark:hover:bg-zinc-900/50 transition-colors group"
                     >
-                      <td className="px-6 py-4 font-mono text-xs">
+                      <td className="px-6 py-4 font-mono text-xs text-slate-400">
                         {(page - 1) * pageSize + idx + 1}
                       </td>
-                      <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
+                      <td className="px-6 py-4 font-bold text-slate-900 dark:text-zinc-100">
                         {sub.email}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/40">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#c2f2d0] dark:bg-[#1a3828] text-emerald-950 dark:text-emerald-200">
                           {sub.status || 'Active'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-mono text-xs">
-                        {ts.date} {ts.time}
+                      <td className="px-6 py-4 font-mono text-xs text-slate-500 dark:text-zinc-400">
+                        {ts.date} <span className="opacity-70">{ts.time}</span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => handleDeleteSubscriber(sub.id, sub.email)}
                           disabled={isDeleting}
-                          className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
+                          className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors disabled:opacity-50"
                           title="মুছে ফেলুন"
                         >
                           {isDeleting ? (
@@ -506,7 +550,7 @@ export default function BlogManagementClient() {
 
         {/* Pagination Section */}
         {totalPages > 1 && (
-          <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-[#2b2b2b] flex items-center justify-between">
+          <div className="p-5 sm:p-6 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between">
             <Pagination
               currentPage={page}
               totalPages={totalPages}
@@ -517,71 +561,6 @@ export default function BlogManagementClient() {
             />
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-// ----------------------------------------------------
-// Auxiliary Components
-// ----------------------------------------------------
-
-interface MetricCardProps {
-  title: string;
-  subtitle?: string;
-  value: number;
-  badge?: string;
-  icon: any;
-  loading?: boolean;
-  color?: 'blue' | 'rose' | 'emerald' | 'indigo' | 'amber';
-}
-
-function MetricCard({
-  title,
-  subtitle,
-  value,
-  badge,
-  icon: Icon,
-  loading = false,
-  color = 'blue',
-}: MetricCardProps) {
-  const colorMap = {
-    blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
-    emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  };
-
-  return (
-    <div className="bg-white dark:bg-[#121212] p-5 rounded-3xl border border-slate-200 dark:border-[#2b2b2b] shadow-sm flex items-center justify-between">
-      <div className="space-y-1">
-        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-          {title}
-        </p>
-        <div className="flex items-center gap-2">
-          {loading ? (
-            <div className="h-7 w-16 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
-          ) : (
-            <p className="text-2xl font-black text-slate-900 dark:text-white">
-              {value.toLocaleString('bn-BD')}
-            </p>
-          )}
-
-          {badge && (
-            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              {badge}
-            </span>
-          )}
-        </div>
-        {subtitle && (
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-sans">
-            {subtitle}
-          </p>
-        )}
-      </div>
-      <div className={`p-3 rounded-2xl ${colorMap[color]} shrink-0 ml-2`}>
-        <Icon className="w-5 h-5" />
       </div>
     </div>
   );

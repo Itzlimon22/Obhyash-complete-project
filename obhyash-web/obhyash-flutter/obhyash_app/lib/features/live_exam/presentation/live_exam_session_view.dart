@@ -24,14 +24,11 @@ class LiveExamSessionView extends ConsumerStatefulWidget {
   final String examId;
   final LiveExam? exam;
 
-  const LiveExamSessionView({
-    super.key,
-    required this.examId,
-    this.exam,
-  });
+  const LiveExamSessionView({super.key, required this.examId, this.exam});
 
   @override
-  ConsumerState<LiveExamSessionView> createState() => _LiveExamSessionViewState();
+  ConsumerState<LiveExamSessionView> createState() =>
+      _LiveExamSessionViewState();
 }
 
 class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
@@ -87,13 +84,20 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
           'status': 'ongoing',
           'start_time': _sessionStartTime.toIso8601String(),
         }, onConflict: 'live_exam_id,user_id');
-      } else if (existing['status'] != 'submitted' && existing['start_time'] != null) {
+      } else if (existing['status'] != 'submitted' &&
+          existing['start_time'] != null) {
         final parsed = DateTime.tryParse(existing['start_time'].toString());
         if (parsed != null) {
           _sessionStartTime = parsed.toUtc();
           final durationMins = widget.exam?.durationMinutes ?? 45;
-          final elapsed = DateTime.now().toUtc().difference(_sessionStartTime).inSeconds;
-          final remaining = (_secondsRemaining - elapsed).clamp(0, durationMins * 60);
+          final elapsed = DateTime.now()
+              .toUtc()
+              .difference(_sessionStartTime)
+              .inSeconds;
+          final remaining = (_secondsRemaining - elapsed).clamp(
+            0,
+            durationMins * 60,
+          );
           _secondsRemaining = remaining;
           _secondsRemainingNotifier.value = remaining;
         }
@@ -134,7 +138,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     final supabase = Supabase.instance.client;
     final user = supabase.auth.currentUser;
     if (user == null) {
-      AppPopups.show(context, message: 'বুকমার্ক করতে লগইন করুন', isError: true);
+      AppPopups.show(
+        context,
+        message: 'বুকমার্ক করতে লগইন করুন',
+        isError: true,
+      );
       return;
     }
 
@@ -146,7 +154,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
         if (!mounted) return;
         AppPopups.warning(
           context,
-          message: 'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
+          message:
+              'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
         );
         return;
       }
@@ -204,7 +213,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     final isOfficialLive = !widget.examId.startsWith('mock-');
     if (!isOfficialLive || _isSubmitting) return;
 
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       _wasBackgrounded = true;
     } else if (state == AppLifecycleState.resumed && _wasBackgrounded) {
       _wasBackgrounded = false;
@@ -236,7 +246,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           backgroundColor: isDark ? const Color(0xFF1E1E24) : Colors.white,
           title: Row(
             children: [
@@ -246,7 +258,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   color: Colors.amber.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.alertTriangle, color: Colors.amber, size: 24),
+                child: const Icon(
+                  LucideIcons.alertTriangle,
+                  color: Colors.amber,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               const Expanded(
@@ -267,15 +283,24 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               ),
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.amber.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.amber.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.shieldAlert, size: 18, color: Colors.amber),
+                    const Icon(
+                      LucideIcons.shieldAlert,
+                      size: 18,
+                      color: Colors.amber,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -298,7 +323,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF10B981),
                 foregroundColor: Colors.white,
-                
               ),
               child: const Text('আমি বুঝেছি, পরীক্ষা চালিয়ে যান'),
             ),
@@ -316,7 +340,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           backgroundColor: isDark ? const Color(0xFF1E1E24) : Colors.white,
           title: Row(
             children: [
@@ -326,13 +352,21 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   color: Colors.red.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.shieldAlert, color: Colors.red, size: 24),
+                child: const Icon(
+                  LucideIcons.shieldAlert,
+                  color: Colors.red,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
                   'নকল রোধ: পরীক্ষা সাবমিট!',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
                 ),
               ),
             ],
@@ -350,7 +384,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                
               ),
               child: const Text('ঠিক আছে'),
             ),
@@ -393,7 +426,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       _isSubmitting = true;
     });
 
-    final questions = ref.read(liveExamQuestionsProvider(widget.examId)).value ?? [];
+    final questions =
+        ref.read(liveExamQuestionsProvider(widget.examId)).value ?? [];
     final negativeRate = widget.exam?.negativeMarking.toDouble() ?? 0.25;
 
     num rawScore = 0;
@@ -428,7 +462,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
 
         if (user != null) {
           final now = DateTime.now();
-          final isPast = widget.exam != null && widget.exam!.endTime.isBefore(now);
+          final isPast =
+              widget.exam != null && widget.exam!.endTime.isBefore(now);
 
           final existing = await supabase
               .from('live_exam_attempts')
@@ -438,10 +473,14 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               .maybeSingle();
 
           final bool isFirstOfficialAttempt =
-              (existing == null || existing['status'] != 'submitted') && !isPast;
+              (existing == null || existing['status'] != 'submitted') &&
+              !isPast;
 
           final submitTime = DateTime.now().toUtc();
-          timeTakenMs = submitTime.difference(_sessionStartTime).inMilliseconds.clamp(0, 86400000);
+          timeTakenMs = submitTime
+              .difference(_sessionStartTime)
+              .inMilliseconds
+              .clamp(0, 86400000);
           timeTakenSeconds = (timeTakenMs / 1000).round().clamp(0, 86400);
 
           if (isFirstOfficialAttempt) {
@@ -472,7 +511,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   .upsert(payload, onConflict: 'live_exam_id,user_id');
             }
             final streakData = await StreakService.syncStreak(user.id);
-            ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+            ref
+                .read(userProfileProvider.notifier)
+                .updateStreak(streakData.streakCount);
 
             // Also record in exam_results so it appears in history, subject reports, and analysis
             try {
@@ -485,7 +526,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                 'date': nowIso,
                 'created_at': nowIso,
                 'score': finalScore.toDouble(),
-                'total_marks': widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
+                'total_marks':
+                    widget.exam?.totalMarks.toDouble() ??
+                    (questions.length * 1.0),
                 'correct_count': correctCount,
                 'wrong_count': wrongCount,
                 'time_taken': timeTakenSeconds,
@@ -495,7 +538,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                 'status': 'evaluated',
               });
             } catch (liveInsertErr) {
-              debugPrint('[LiveExamSessionView] exam_results live attempt insert error: $liveInsertErr');
+              debugPrint(
+                '[LiveExamSessionView] exam_results live attempt insert error: $liveInsertErr',
+              );
             }
           } else {
             // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
@@ -513,7 +558,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                 'submit_time': submitTime.toIso8601String(),
               });
               final streakData = await StreakService.syncStreak(user.id);
-              ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+              ref
+                  .read(userProfileProvider.notifier)
+                  .updateStreak(streakData.streakCount);
 
               // Calculate and award Live Exam XP (Live Exam Participation: +30 XP + accuracy)
               final liveXpBreakdown = ExamXpCalculator.calculateExamXp(
@@ -527,10 +574,13 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               );
               if (liveXpBreakdown.totalXpEarned > 0) {
                 try {
-                  await supabase.rpc('increment_user_xp', params: {
-                    'uid': user.id,
-                    'amount': liveXpBreakdown.totalXpEarned,
-                  });
+                  await supabase.rpc(
+                    'increment_user_xp',
+                    params: {
+                      'uid': user.id,
+                      'amount': liveXpBreakdown.totalXpEarned,
+                    },
+                  );
                 } catch (_) {}
               }
             } catch (_) {}
@@ -551,7 +601,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               'date': nowIso,
               'created_at': nowIso,
               'score': finalScore.toDouble(),
-              'total_marks': widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
+              'total_marks':
+                  widget.exam?.totalMarks.toDouble() ??
+                  (questions.length * 1.0),
               'correct_count': correctCount,
               'wrong_count': wrongCount,
               'time_taken': timeTakenSeconds,
@@ -561,7 +613,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               'status': 'evaluated',
             });
             final streakData = await StreakService.syncStreak(user.id);
-            ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+            ref
+                .read(userProfileProvider.notifier)
+                .updateStreak(streakData.streakCount);
 
             final practiceXp = ExamXpCalculator.calculateExamXp(
               totalQuestions: questions.length,
@@ -574,10 +628,10 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             );
             if (practiceXp.totalXpEarned > 0) {
               try {
-                await supabase.rpc('increment_user_xp', params: {
-                  'uid': user.id,
-                  'amount': practiceXp.totalXpEarned,
-                });
+                await supabase.rpc(
+                  'increment_user_xp',
+                  params: {'uid': user.id, 'amount': practiceXp.totalXpEarned},
+                );
               } catch (_) {}
             }
           } catch (err) {
@@ -602,7 +656,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             examType: 'live_exam_practice',
             date: DateTime.now().toIso8601String(),
             score: finalScore,
-            totalMarks: widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
+            totalMarks:
+                widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
             totalQuestions: questions.length,
             correctCount: correctCount,
             wrongCount: wrongCount,
@@ -662,24 +717,29 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
         alignment: 0.02,
       );
     } else if (_scrollController.hasClients) {
-      final approxOffset = (index * 260.0).clamp(0.0, _scrollController.position.maxScrollExtent);
-      _scrollController.animateTo(
-        approxOffset,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOutCubic,
-      ).then((_) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final retryKey = _itemKeys[index];
-          if (retryKey?.currentContext != null) {
-            Scrollable.ensureVisible(
-              retryKey!.currentContext!,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              alignment: 0.02,
-            );
-          }
-        });
-      });
+      final approxOffset = (index * 260.0).clamp(
+        0.0,
+        _scrollController.position.maxScrollExtent,
+      );
+      _scrollController
+          .animateTo(
+            approxOffset,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeInOutCubic,
+          )
+          .then((_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final retryKey = _itemKeys[index];
+              if (retryKey?.currentContext != null) {
+                Scrollable.ensureVisible(
+                  retryKey!.currentContext!,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  alignment: 0.02,
+                );
+              }
+            });
+          });
     }
   }
 
@@ -707,7 +767,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         width: 36,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                          color: isDark
+                              ? const Color(0xFF3F3F46)
+                              : const Color(0xFFE2E8F0),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -722,7 +784,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'HindSiliguri',
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                         IconButton(
@@ -736,18 +800,37 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                     // Legend Row
                     Row(
                       children: [
-                        _LegendDot(color: const Color(0xFF059669), label: 'উত্তর দেওয়া (${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)})', isDark: isDark),
+                        _LegendDot(
+                          color: const Color(0xFF059669),
+                          label:
+                              'উত্তর দেওয়া (${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)})',
+                          isDark: isDark,
+                        ),
                         const SizedBox(width: 12),
-                        _LegendDot(color: const Color(0xFFD97706), label: 'ফ্ল্যাগ (${BanglaNameHelper.toBanglaNumeral(_flaggedIds.length)})', isDark: isDark),
+                        _LegendDot(
+                          color: const Color(0xFFD97706),
+                          label:
+                              'ফ্ল্যাগ (${BanglaNameHelper.toBanglaNumeral(_flaggedIds.length)})',
+                          isDark: isDark,
+                        ),
                         const SizedBox(width: 12),
-                        _LegendDot(color: isDark ? const Color(0xFF52525B) : const Color(0xFF94A3B8), label: 'বাকি (${BanglaNameHelper.toBanglaNumeral(questions.length - _userAnswers.length)})', isDark: isDark),
+                        _LegendDot(
+                          color: isDark
+                              ? const Color(0xFF52525B)
+                              : const Color(0xFF94A3B8),
+                          label:
+                              'বাকি (${BanglaNameHelper.toBanglaNumeral(questions.length - _userAnswers.length)})',
+                          isDark: isDark,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
 
                     // Grid
                     ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.45),
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.45,
+                      ),
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
                         child: Wrap(
@@ -758,28 +841,45 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                             final isAnswered = _userAnswers.containsKey(qId);
                             final isFlagged = _flaggedIds.contains(qId);
 
-                            Color bg = isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9);
-                            Color textColor = isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155);
+                            Color bg = isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFF1F5F9);
+                            Color textColor = isDark
+                                ? const Color(0xFFD4D4D8)
+                                : const Color(0xFF334155);
                             Border? border;
 
                             if (isFlagged) {
-                              bg = const Color(0xFFD97706).withValues(alpha: 0.2);
+                              bg = const Color(
+                                0xFFD97706,
+                              ).withValues(alpha: 0.2);
                               textColor = const Color(0xFFF59E0B);
-                              border = Border.all(color: const Color(0xFFD97706), width: 1.5);
+                              border = Border.all(
+                                color: const Color(0xFFD97706),
+                                width: 1.5,
+                              );
                             } else if (isAnswered) {
-                              bg = const Color(0xFF059669).withValues(alpha: isDark ? 0.25 : 0.15);
+                              bg = const Color(
+                                0xFF059669,
+                              ).withValues(alpha: isDark ? 0.25 : 0.15);
                               textColor = const Color(0xFF059669);
-                              border = Border.all(color: const Color(0xFF059669), width: 1.5);
+                              border = Border.all(
+                                color: const Color(0xFF059669),
+                                width: 1.5,
+                              );
                             }
 
                             return GestureDetector(
                               onTap: () {
                                 Navigator.pop(ctx);
-                                Future.delayed(const Duration(milliseconds: 160), () {
-                                  if (mounted) {
-                                    _scrollToQuestion(i);
-                                  }
-                                });
+                                Future.delayed(
+                                  const Duration(milliseconds: 160),
+                                  () {
+                                    if (mounted) {
+                                      _scrollToQuestion(i);
+                                    }
+                                  },
+                                );
                               },
                               child: Container(
                                 width: 44,
@@ -837,7 +937,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   color: const Color(0xFF004633).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.checkCheck, color: Color(0xFF004633), size: 26),
+                child: const Icon(
+                  LucideIcons.checkCheck,
+                  color: Color(0xFF004633),
+                  size: 26,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -852,16 +956,37 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF8FAFC),
+                  color: isDark
+                      ? const Color(0xFF1C1C1E)
+                      : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE2E8F0),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _DialogStat(label: 'মোট', value: '$total', color: const Color(0xFF3B82F6), isDark: isDark),
-                    _DialogStat(label: 'উত্তর', value: '$answered', color: const Color(0xFF10B981), isDark: isDark),
-                    _DialogStat(label: 'বাকি', value: '$remaining', color: const Color(0xFFEF4444), isDark: isDark),
+                    _DialogStat(
+                      label: 'মোট',
+                      value: '$total',
+                      color: const Color(0xFF3B82F6),
+                      isDark: isDark,
+                    ),
+                    _DialogStat(
+                      label: 'উত্তর',
+                      value: '$answered',
+                      color: const Color(0xFF10B981),
+                      isDark: isDark,
+                    ),
+                    _DialogStat(
+                      label: 'বাকি',
+                      value: '$remaining',
+                      color: const Color(0xFFEF4444),
+                      isDark: isDark,
+                    ),
                   ],
                 ),
               ),
@@ -873,14 +998,22 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                       onPressed: () => Navigator.pop(ctx),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        side: BorderSide(color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFD1D5DB)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF3F3F46)
+                              : const Color(0xFFD1D5DB),
+                        ),
                       ),
                       child: Text(
                         'আরেকটু দেখব',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
+                          color: isDark
+                              ? const Color(0xFFA1A1AA)
+                              : const Color(0xFF475569),
                         ),
                       ),
                     ),
@@ -893,18 +1026,24 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         _submitExam();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF12544F), // Solid #12544F
+                        backgroundColor: const Color(
+                          0xFF12544F,
+                        ), // Solid #12544F
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        
                       ),
                       child: _isSubmitting
-                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
                           : const Text(
                               'হ্যাঁ, জমা দাও',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: TextStyle(fontWeight: FontWeight.w600),
                             ),
                     ),
                   ),
@@ -924,7 +1063,10 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text(
+          'পরীক্ষা বাতিল করবে?',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         content: const Text(
           'এখন বের হয়ে গেলে তোমার উত্তরপত্র জমা হবে না।',
           style: TextStyle(),
@@ -972,7 +1114,10 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             surfaceTintColor: Colors.transparent,
             flexibleSpace: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 8.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -980,15 +1125,21 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                     // LEFT: Answered / Total Pill (Clickable Question Palette)
                     questionsAsync.maybeWhen(
                       data: (questions) => ObhyashTooltip(
-                        message: 'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা (প্যালেট দেখতে ক্লিক করুন)',
+                        message:
+                            'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা (প্যালেট দেখতে ক্লিক করুন)',
                         preferredPosition: TooltipPosition.bottom,
                         child: InkWell(
                           onTap: () => _showQuestionPalette(questions),
                           borderRadius: BorderRadius.circular(6),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                              color: isDark
+                                  ? const Color(0xFF1C1C1E)
+                                  : const Color(0xFFF1F5F9),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -997,7 +1148,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'HindSiliguri',
-                                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                                color: isDark
+                                    ? const Color(0xFFD4D4D4)
+                                    : const Color(0xFF475569),
                               ),
                             ),
                           ),
@@ -1008,7 +1161,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
 
                     // MIDDLE: Timer box (Isolated with ValueListenableBuilder to prevent parent rebuilds during scroll)
                     ObhyashTooltip(
-                      message: 'অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।',
+                      message:
+                          'অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।',
                       preferredPosition: TooltipPosition.bottom,
                       child: ValueListenableBuilder<int>(
                         valueListenable: _secondsRemainingNotifier,
@@ -1016,23 +1170,42 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                           final isCritical = secondsRemaining < 60;
                           final isWarning = secondsRemaining < 300;
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: isCritical
                                   ? const Color(0xFFDC2626) // Critical
                                   : isWarning
-                                      ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB)) // Warning
-                                      : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)), // Normal
+                                  ? (isDark
+                                        ? const Color(0xFF451A03)
+                                        : const Color(0xFFFFFBEB)) // Warning
+                                  : (isDark
+                                        ? const Color(0xFF1C1C1E)
+                                        : const Color(0xFFF1F5F9)), // Normal
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: isCritical
                                     ? const Color(0xFFDC2626)
                                     : isWarning
-                                        ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
-                                        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                                    ? (isDark
+                                          ? const Color(0xFFB45309)
+                                          : const Color(0xFFFDE68A))
+                                    : (isDark
+                                          ? const Color(0xFF27272A)
+                                          : const Color(0xFFE2E8F0)),
                               ),
                               boxShadow: isCritical
-                                  ? [BoxShadow(color: const Color(0xFFDC2626).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFDC2626,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ]
                                   : [],
                             ),
                             child: Row(
@@ -1044,8 +1217,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                   color: isCritical
                                       ? Colors.white
                                       : isWarning
-                                          ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
-                                          : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569)),
+                                      ? (isDark
+                                            ? const Color(0xFFFCD34D)
+                                            : const Color(0xFFB45309))
+                                      : (isDark
+                                            ? const Color(0xFFD4D4D4)
+                                            : const Color(0xFF475569)),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
@@ -1057,8 +1234,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                     color: isCritical
                                         ? Colors.white
                                         : isWarning
-                                            ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
-                                            : (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF27272A)),
+                                        ? (isDark
+                                              ? const Color(0xFFFCD34D)
+                                              : const Color(0xFFB45309))
+                                        : (isDark
+                                              ? const Color(0xFFF5F5F5)
+                                              : const Color(0xFF27272A)),
                                   ),
                                 ),
                               ],
@@ -1082,13 +1263,17 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                                  color: isDark
+                                      ? const Color(0xFF1C1C1E)
+                                      : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Icon(
                                   LucideIcons.layoutGrid,
                                   size: 16,
-                                  color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                                  color: isDark
+                                      ? const Color(0xFFD4D4D4)
+                                      : const Color(0xFF475569),
                                 ),
                               ),
                             ),
@@ -1109,9 +1294,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
           loading: () => const Center(
             child: CircularProgressIndicator(color: Color(0xFF004633)),
           ),
-          error: (e, _) => Center(
-            child: Text('Error: $e', style: const TextStyle()),
-          ),
+          error: (e, _) =>
+              Center(child: Text('Error: $e', style: const TextStyle())),
           data: (questions) {
             if (questions.isEmpty) {
               return const Center(
@@ -1120,18 +1304,29 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             }
 
             final Set<String> distinctSubjects = questions
-                .map((q) => BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel))
+                .map(
+                  (q) => BanglaNameHelper.getMainSubjectName(
+                    q.subject,
+                    q.subjectLabel,
+                  ),
+                )
                 .toSet();
 
             final Map<String, int> subjectQuestionCounts = {};
             for (final q in questions) {
-              final key = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
-              subjectQuestionCounts[key] = (subjectQuestionCounts[key] ?? 0) + 1;
+              final key = BanglaNameHelper.getMainSubjectName(
+                q.subject,
+                q.subjectLabel,
+              );
+              subjectQuestionCounts[key] =
+                  (subjectQuestionCounts[key] ?? 0) + 1;
             }
 
             return ListView.builder(
               controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
               padding: const EdgeInsets.fromLTRB(10, 14, 10, 120),
               itemCount: questions.length,
               cacheExtent: 600,
@@ -1139,41 +1334,64 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                 final q = questions[index];
                 final cardKey = _itemKeys.putIfAbsent(index, () => GlobalKey());
 
-                final currentSub = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
+                final currentSub = BanglaNameHelper.getMainSubjectName(
+                  q.subject,
+                  q.subjectLabel,
+                );
                 final prevSub = index > 0
-                    ? BanglaNameHelper.getMainSubjectName(questions[index - 1].subject, questions[index - 1].subjectLabel)
+                    ? BanglaNameHelper.getMainSubjectName(
+                        questions[index - 1].subject,
+                        questions[index - 1].subjectLabel,
+                      )
                     : null;
 
-                final isFirstInSubject = index == 0 || (prevSub != null && prevSub != currentSub);
+                final isFirstInSubject =
+                    index == 0 || (prevSub != null && prevSub != currentSub);
 
                 Widget? subjectHeader;
                 if (distinctSubjects.length > 1 && isFirstInSubject) {
                   final banglaSub = currentSub;
                   final count = subjectQuestionCounts[currentSub] ?? 0;
                   subjectHeader = Container(
-                    margin: EdgeInsets.only(top: index == 0 ? 0 : 18, bottom: 10),
+                    margin: EdgeInsets.only(
+                      top: index == 0 ? 0 : 18,
+                      bottom: 10,
+                    ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Divider(
-                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
                             thickness: 1.2,
                           ),
                         ),
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+                            color: isDark
+                                ? const Color(0xFF18181B)
+                                : const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                              color: isDark
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFCBD5E1),
                             ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(LucideIcons.bookOpen, size: 14, color: Color(0xFF004633)),
+                              const Icon(
+                                LucideIcons.bookOpen,
+                                size: 14,
+                                color: Color(0xFF004633),
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 banglaSub,
@@ -1181,7 +1399,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'HindSiliguri',
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                               if (count > 0) ...[
@@ -1191,7 +1411,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontFamily: 'HindSiliguri',
-                                    color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                                    color: isDark
+                                        ? Colors.white54
+                                        : const Color(0xFF64748B),
                                   ),
                                 ),
                               ],
@@ -1200,7 +1422,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         ),
                         Expanded(
                           child: Divider(
-                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
                             thickness: 1.2,
                           ),
                         ),
@@ -1227,7 +1451,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         readOnly: isAnswered, // Locked after selection
                         hideSourceTag: true,
                         onSelectOption: (optIndex) {
-                          if (_userAnswers.containsKey(q.id)) return; // Locked: no change allowed
+                          if (_userAnswers.containsKey(q.id))
+                            return; // Locked: no change allowed
                           setState(() {
                             _userAnswers[q.id] = optIndex;
                           });
@@ -1242,7 +1467,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                           });
                         },
                         onToggleBookmark: () => _toggleBookmark(q.id),
-                        onReport: () => QuestionReportDialog.show(context, q.id),
+                        onReport: () =>
+                            QuestionReportDialog.show(context, q.id),
                       ),
                     ),
                   ],
@@ -1284,23 +1510,30 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                       if (_userAnswers.length == questions.length) {
                         _submitExam();
                       } else {
-                        _showSubmitConfirmation(questions.length, _userAnswers.length);
+                        _showSubmitConfirmation(
+                          questions.length,
+                          _userAnswers.length,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
+                      backgroundColor: const Color(
+                        0xFF12544F,
+                      ), // Solid Viridian Forest
                       foregroundColor: Colors.white,
                       minimumSize: const Size(0, 38),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 24),
-                      
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 7,
+                        horizontal: 24,
+                      ),
                     ),
                     child: const Text(
                       'জমা দাও',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14.5,
-                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1319,14 +1552,22 @@ class _LegendDot extends StatelessWidget {
   final String label;
   final bool isDark;
 
-  const _LegendDot({required this.color, required this.label, required this.isDark});
+  const _LegendDot({
+    required this.color,
+    required this.label,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 5),
         Text(
           label,
