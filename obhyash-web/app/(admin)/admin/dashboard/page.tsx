@@ -21,7 +21,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
-  NiondHeader,
   KpiCard,
   ParticipationChart,
   StatusBanner,
@@ -30,7 +29,6 @@ import {
   TeamList,
 } from '@/components/admin/dashboard';
 import { SystemControlsCard, AppConfig } from '@/components/admin/dashboard/system-controls-card';
-import { UserSpotlightSearchBar } from '@/components/admin/dashboard/user-spotlight-modal';
 import { LearningTrendsChart } from '@/components/admin/dashboard/learning-trends-chart';
 import { ActionAlertsHub } from '@/components/admin/dashboard/action-alerts-hub';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
@@ -138,39 +136,29 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f4f5f8] dark:bg-[#0d0d0f] -m-4 sm:-m-6 lg:-m-8 p-4 sm:p-6 lg:p-8 transition-colors duration-200">
-      <div className="max-w-[1440px] mx-auto space-y-7">
+    <div className="space-y-6 pb-12 transition-colors duration-200">
+      <div className="max-w-[1440px] mx-auto space-y-6">
         
-        {/* ── 1. NIOND TOP HEADER & SEARCH COMMAND BAR ── */}
-        <NiondHeader
-          title="Dashboard"
-          adminName={adminDisplayName}
-          adminRole={adminRoleDisplay}
-          adminAvatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=face"
-        />
-
-        {/* Action Controls & Fast Search Strip */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/80 dark:bg-[#151515]/80 backdrop-blur-md p-3.5 px-5 rounded-3xl border border-slate-100/90 dark:border-zinc-800 shadow-card">
-          <div className="flex items-center gap-3">
+        {/* ── Top Utility Status & Fast Refresh ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#c6f634] ring-4 ring-emerald-500/20 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-zinc-200">
-              সুপার অ্যাডমিন কমান্ড সেন্টার • Obhyash Hub
+            <span className="text-xs font-bold text-slate-700 dark:text-zinc-300">
+              প্ল্যাটফর্ম লাইভ মনিটর • রিয়েল-টাইম ডাটাবেজ সিঙ্ক
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <UserSpotlightSearchBar />
-
+          <div className="flex items-center gap-2.5 self-end sm:self-auto">
             <button
               onClick={() => fetchOverview(true)}
               disabled={isRefreshing}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 text-xs font-bold transition-all active:scale-95 shadow-sm border border-slate-200/60 dark:border-zinc-700/60"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-white dark:bg-[#151515] border border-slate-100 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 text-xs font-bold shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 transition-all active:scale-95 cursor-pointer"
               title="Force refresh database cache"
             >
               <RefreshCw
                 className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-500' : ''}`}
               />
-              <span>রিফ্রেশ</span>
+              <span>ডাটা রিফ্রেশ</span>
             </button>
           </div>
         </div>
@@ -192,7 +180,7 @@ export default function AdminDashboardPage() {
               title="Total Students"
               badgeText="মোট শিক্ষার্থী"
               value={isLoading ? '...' : (metrics.totalUsers >= 1000 ? `${(metrics.totalUsers / 1000).toFixed(2)}K` : metrics.totalUsers.toLocaleString())}
-              subtext={`${metrics.proUsers.toLocaleString()} জন প্রো/পেইড মেম্বার`}
+              subtext={`${metrics.proUsers.toLocaleString()} জন প্রো মেম্বার`}
               icon={Users}
               trend={{ value: '+6.04%', isPositive: true }}
             />
@@ -218,7 +206,7 @@ export default function AdminDashboardPage() {
               title="Question Bank"
               badgeText="প্রশ্ন ব্যাংক ভাণ্ডার"
               value={isLoading ? '...' : metrics.totalQuestions.toLocaleString()}
-              subtext={`${metrics.pendingQuestions} টি অনুমোদনের অপেক্ষায়`}
+              subtext={metrics.pendingQuestions > 0 ? `${metrics.pendingQuestions} টি অনুমোদনের অপেক্ষায়` : 'সকল প্রশ্ন অনুমোদিত'}
               icon={FileQuestion}
               trend={{ value: '৭৪.৮% সলভ রেট', isPositive: true }}
             />

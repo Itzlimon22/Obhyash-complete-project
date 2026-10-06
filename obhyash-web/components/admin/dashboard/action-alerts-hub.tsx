@@ -96,53 +96,69 @@ export function ActionAlertsHub({
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div
+        className={`grid grid-cols-1 ${
+          alerts.length === 1
+            ? 'grid-cols-1'
+            : alerts.length === 2
+              ? 'sm:grid-cols-2'
+              : alerts.length === 3
+                ? 'sm:grid-cols-3'
+                : 'sm:grid-cols-2 lg:grid-cols-4'
+        } gap-4`}
+      >
         {alerts.map((alert, idx) => {
           const Icon = alert.icon;
           return (
             <Link
               key={idx}
               href={alert.href}
-              className="p-4 rounded-xl border bg-white dark:bg-[#121215] border-neutral-200 dark:border-zinc-800/80 hover:border-amber-500/50 hover:shadow-md transition-all flex flex-col justify-between group"
+              className="p-5 rounded-3xl border bg-white dark:bg-[#151515] border-slate-100/90 dark:border-zinc-800/80 shadow-card hover:border-[#c6f634] hover:-translate-y-0.5 transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <div
-                    className={`p-2 rounded-lg ${
+                    className={`p-2.5 rounded-2xl ${
                       alert.color === 'rose'
-                        ? 'bg-rose-500/10 text-rose-500'
+                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                         : alert.color === 'amber'
-                          ? 'bg-amber-500/10 text-amber-500'
+                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                           : alert.color === 'emerald'
-                            ? 'bg-emerald-500/10 text-emerald-500'
-                            : 'bg-blue-500/10 text-blue-500'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                     }`}
                   >
-                    <Icon size={16} />
+                    <Icon size={18} />
                   </div>
                   <span
-                    className={`text-xs font-mono font-black px-2 py-0.5 rounded-full ${
+                    className={`text-[11px] font-bold px-3 py-1 rounded-full ${
                       alert.color === 'rose'
-                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                        ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40'
                         : alert.color === 'amber'
-                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                          ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/40'
+                          : alert.color === 'emerald'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/40'
+                            : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/40'
                     }`}
                   >
                     {alert.count} Pending
                   </span>
                 </div>
-                <h4 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors">
                   {alert.title}
                 </h4>
-                <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-1 leading-relaxed line-clamp-2">
+                <p className="text-[11px] text-slate-400 dark:text-zinc-400 mt-1 leading-relaxed">
                   {alert.desc}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-neutral-100 dark:border-zinc-800/50 flex items-center justify-between text-[11px] font-bold text-neutral-400 group-hover:text-emerald-600 transition-colors">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors pt-3 mt-3 border-t border-slate-100 dark:border-zinc-800/60">
                 <span>সমাধান করুন</span>
-                <ArrowRight size={12} />
+                <ArrowRight
+                  size={12}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
               </div>
             </Link>
           );

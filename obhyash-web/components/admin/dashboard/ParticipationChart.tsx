@@ -74,7 +74,7 @@ export const ParticipationChart: React.FC<ParticipationChartProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Regular Sell
+              নিয়মিত পরীক্ষা ট্রাফিক
             </h3>
             <p className="text-xs text-slate-400 dark:text-zinc-400 mt-0.5">
               সাপ্তাহিক MCQ অনুশীলন ও লাইভ পার্টিসিপেশন

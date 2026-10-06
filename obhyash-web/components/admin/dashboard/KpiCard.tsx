@@ -102,8 +102,8 @@ export const KpiCard: React.FC<KpiCardProps> = ({
             className={cn(
               'inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full',
               trend.isPositive !== false
-                ? 'text-emerald-800 bg-emerald-500/15 dark:text-emerald-300'
-                : 'text-rose-800 bg-rose-500/15 dark:text-rose-300',
+                ? 'text-emerald-900 bg-emerald-500/20 dark:text-emerald-300'
+                : 'text-slate-800 bg-black/10 dark:text-slate-200 dark:bg-white/15',
             )}
           >
             {trend.isPositive !== false ? (
