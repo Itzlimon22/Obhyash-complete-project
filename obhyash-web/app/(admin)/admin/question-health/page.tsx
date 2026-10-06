@@ -344,20 +344,15 @@ export default function QuestionHealthPage() {
 
   return (
     <div className="space-y-6 pb-12 transition-colors">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-zinc-800/80">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-2xl bg-rose-500/10 dark:bg-rose-500/15 border border-rose-500/20 text-rose-600 dark:text-rose-400 shrink-0">
-            <HeartPulse className="w-6 h-6 animate-pulse" />
+      {/* Actions Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-zinc-800/80">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-rose-500/10 dark:bg-rose-500/15 border border-rose-500/20 text-rose-600 dark:text-rose-400 shrink-0">
+            <HeartPulse className="w-4 h-4 animate-pulse" />
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">
-              প্রশ্ন কোয়ালিটি ও হেলথ কন্ট্রোল
-            </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-0.5">
-              ভুল উত্তর, শিক্ষার্থী রিপোর্ট এবং পারফরম্যান্স সংক্রান্ত অসঙ্গতি পর্যবেক্ষণ ও সমাধান
-            </p>
-          </div>
+          <span className="text-xs font-bold text-rose-600 dark:text-rose-400">
+            প্রশ্ন কোয়ালিটি ও হেলথ অডিট
+          </span>
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0">

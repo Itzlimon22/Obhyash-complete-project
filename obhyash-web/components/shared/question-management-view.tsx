@@ -149,11 +149,8 @@ export default function QuestionManagementView({
       {/* List View */}
       {viewMode === 'list' && (
         <>
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-6">
-            <h1 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white tracking-tight shrink-0">
-              {title}
-            </h1>
+          {/* Actions Bar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-4">
             <div className="grid grid-cols-3 md:flex md:flex-wrap gap-2 md:gap-3 shrink-0">
               <button
                 onClick={handleCreate}

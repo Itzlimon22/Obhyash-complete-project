@@ -34,23 +34,17 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in zoom-in-95 duration-500">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 px-1">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-            সেটিংস
-          </h1>
-          <div className="h-1 w-12 bg-red-600 rounded-full mt-2"></div>
-        </div>
+      {/* Save Action */}
+      <div className="flex items-center justify-end gap-4 px-1 pb-2">
         <button
           onClick={handleSave}
           disabled={loading}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl shadow-xl shadow-red-500/30 transition-all font-black text-xs uppercase tracking-widest disabled:opacity-70 active:scale-95"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl shadow-lg shadow-red-500/20 transition-all font-black text-xs uppercase tracking-widest disabled:opacity-70 active:scale-95 cursor-pointer"
         >
           {loading ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <Save size={18} strokeWidth={3} />
+            <Save size={16} strokeWidth={2.5} />
           )}
           সেভ করো
         </button>

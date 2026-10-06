@@ -368,13 +368,11 @@ export default function NewQuestionPage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+              className="p-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-zinc-300 transition"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
+              <span>পেছনে যান</span>
             </button>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-              {isEditMode ? 'Edit Question' : 'New Question'}
-            </h1>
           </div>
           <div className="flex items-center gap-3">
             <button

@@ -217,22 +217,13 @@ function NotificationHistoryContent() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
-      {/* ── Top Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
-            <span className="text-[11px] font-extrabold text-red-600 dark:text-red-400 tracking-wider uppercase">
-              নোটিফিকেশন অডিট ও ডেলিভারি লগ
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <HistoryIcon className="text-red-600 shrink-0" size={28} />
-            নোটিফিকেশন হিস্ট্রি
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
-            কোন শিক্ষার্থীকে কখন কোন নোটিফিকেশন পাঠানো হয়েছে এবং তারা পড়েছে কি না তা বিস্তারিত দেখুন
-          </p>
+      {/* ── Top Action ── */}
+      <div className="flex items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+          <span className="text-xs font-bold text-red-600 dark:text-red-400">
+            নোটিফিকেশন অডিট ও ডেলিভারি লগ
+          </span>
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0">

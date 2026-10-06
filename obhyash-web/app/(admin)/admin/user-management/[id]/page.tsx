@@ -376,25 +376,19 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/user-management"
-            className="p-2 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-sm"
+            className="p-2 px-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-sm flex items-center gap-2 text-xs font-bold"
             title="Back to Users List"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} />
+            <span>ইউজার তালিকা</span>
           </Link>
-          <div>
-            <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-              <Link href="/admin/dashboard" className="hover:underline">Admin</Link>
-              <span>/</span>
-              <Link href="/admin/user-management" className="hover:underline">User Management</Link>
-              <span>/</span>
-              <span className="text-neutral-900 dark:text-neutral-200 font-semibold">{userData.name}</span>
-            </div>
-            <h1 className="text-xl md:text-2xl font-black text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5 mt-0.5">
-              <span>{userData.name}</span>
-              <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700">
-                {userData.student_id}
-              </span>
-            </h1>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-neutral-900 dark:text-white text-base">
+              {userData.name}
+            </span>
+            <span className="px-2 py-0.5 rounded-lg text-xs font-mono font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700">
+              {userData.student_id}
+            </span>
           </div>
         </div>
 

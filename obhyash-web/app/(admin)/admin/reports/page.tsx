@@ -154,21 +154,13 @@ export default function AdminReportsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
-      {/* ── Top Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-zinc-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
-            <span className="text-[11px] font-extrabold text-rose-600 dark:text-rose-400 tracking-wider uppercase">
-              কোয়ালিটি অডিট ও রিপোর্ট কমান্ড সেন্টার • Quality Assurance
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-            প্রশ্ন রিপোর্ট ও সমাধান ব্যবস্থাপনা
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-0.5">
-            শিক্ষার্থীদের পাঠানো প্রশ্নের ভুলত্রুটি রিভিউ, ১-ক্লিক ইনলাইন সমাধান ও প্রো রিওয়ার্ড প্রদান
-          </p>
+      {/* ── Top Actions Bar ── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-zinc-800">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+          <span className="text-xs font-bold text-rose-600 dark:text-rose-400">
+            কোয়ালিটি অডিট ও রিপোর্ট কমান্ড সেন্টার
+          </span>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">

@@ -267,22 +267,13 @@ export default function AdminCouponsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans">
-      {/* ── Top Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-              <Tag size={20} />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
-                কুপন ও অ্যাম্বাসেডর ম্যানেজমেন্ট
-              </h1>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif]">
-                ক্যাম্পাস অ্যাম্বাসেডরদের কুপন কোড তৈরি, লাইভ ট্র্যাকিং ও রেভিনিউ শেয়ার নিয়ন্ত্রণ
-              </p>
-            </div>
-          </div>
+      {/* ── Top Actions Bar ── */}
+      <div className="flex items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+            কুপন ও অ্যাম্বাসেডর হাব
+          </span>
         </div>
 
         <div className="flex items-center gap-3">

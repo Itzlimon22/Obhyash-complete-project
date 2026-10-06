@@ -149,29 +149,8 @@ export default function AdminComplaintsPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
       <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="space-y-0.5">
-            <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
-              {activeTab === 'complaints' ? (
-                <>
-                  <AlertTriangle className="text-red-600" size={24} />
-                  Complaints & Feedback
-                </>
-              ) : (
-                <>
-                  <Headphones className="text-emerald-600" size={24} />
-                  Login & Registration Support
-                </>
-              )}
-            </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
-              {activeTab === 'complaints'
-                ? 'Manage technical issues and feedback from registered students'
-                : 'Direct support requests from students facing login, OTP or registration issues'}
-            </p>
-          </div>
-
+        {/* Actions Bar */}
+        <div className="flex flex-col md:flex-row justify-end items-end md:items-center gap-4">
           {activeTab === 'complaints' && (
             <div className="flex items-center gap-2 self-end md:self-auto">
               <div className="flex items-center gap-2.5 mr-1">

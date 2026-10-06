@@ -281,18 +281,13 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
             <div className="w-11 h-11 rounded-xl bg-teal-50 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shadow-sm">
               <FileText className="w-6 h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  মডেল টেস্ট PDF জেনারেটর
-                </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
-                  Zero-Gap Dynamic Engine
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                হেডার, ফুটার, ডেনসিটি ও স্মার্ট স্পেসিং কাস্টমাইজ করে কোনো অতিরিক্ত ফাঁকা জায়গা ছাড়াই নিখুঁত PDF তৈরি করুন।
-              </p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
+                মডেল টেস্ট ইঞ্জিন
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                Zero-Gap Dynamic Engine
+              </span>
             </div>
           </div>
         </div>

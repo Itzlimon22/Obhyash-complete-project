@@ -147,16 +147,13 @@ export default function AdminFeatureRequestsPage() {
 
   return (
     <div className="space-y-6">
-      {/* ── Top Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5">
-            <Lightbulb className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-            ব্যবহারকারীদের ফিচার প্রস্তাবনা
-          </h1>
-          <p className="text-xs md:text-sm text-neutral-500 mt-1">
-            শিক্ষার্থীদের পাঠানো নতুন ফিচার আইডিয়া রিভিউ, রোডম্যাপে যুক্ত ও স্ট্যাটাস আপডেট করো
-          </p>
+      {/* ── Top Actions Bar ── */}
+      <div className="flex items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            ফিচার রোডম্যাপ ও প্রস্তাবনা
+          </span>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <Button

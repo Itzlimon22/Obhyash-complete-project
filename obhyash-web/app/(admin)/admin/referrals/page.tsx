@@ -334,22 +334,13 @@ export default function AdminReferralsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-7 animate-in fade-in duration-300">
-      {/* ── Top Header ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-neutral-200 dark:border-zinc-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
-              গ্রোথ ও রেফারেল কন্ট্রোল সেন্টার
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <Gift className="text-emerald-500" size={28} />
-            <span>রেফারেল ও রিওয়ার্ড ম্যানেজমেন্ট</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-0.5">
-            ইউজারদের রেফারেল কোড, কে কখন কতবার কোড ব্যবহার করেছে এবং রিওয়ার্ড অনুমোদন বা বাতিল পরিচালনা করুন
-          </p>
+      {/* ── Top Actions Bar ── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-zinc-800">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            গ্রোথ ও রেফারেল কন্ট্রোল সেন্টার
+          </span>
         </div>
 
         {/* Top Actions */}

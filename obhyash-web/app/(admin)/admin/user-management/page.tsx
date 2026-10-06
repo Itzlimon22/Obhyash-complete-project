@@ -256,18 +256,8 @@ export default function UserManagementPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8">
       <div className="max-w-[1600px] mx-auto space-y-4 md:space-y-8">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
-          <div>
-            <h1 className="text-2xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
-              User Management
-            </h1>
-            <p className="text-xs lg:text-base text-neutral-600 dark:text-neutral-400 mt-1">
-              Manage student accounts, roles, and permissions
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+        {/* Page Actions */}
+        <div className="flex items-center justify-end gap-2 md:gap-3">
             <div className="hidden md:flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
               <button
                 onClick={() => setViewStyle('card')}
@@ -300,7 +290,6 @@ export default function UserManagementPage() {
               <Download size={16} />
               <span>Export</span>
             </button>
-          </div>
         </div>
 
         {/* Stats */}

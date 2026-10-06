@@ -139,21 +139,13 @@ export default function AnalyticsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
-      {/* ── Top Header Bar ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200 dark:border-zinc-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 tracking-wider uppercase">
-              লার্নিং ইন্টেলিজেন্স ও গ্রোথ অ্যানালিটিক্স
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-            প্ল্যাটফর্ম পারফরম্যান্স অ্যানালিটিক্স
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-0.5">
-            শিক্ষার্থীদের পরীক্ষার নির্ভুলতা, অধ্যয়নের সময় এবং বিষয়ভিত্তিক পারফরম্যান্স মেট্রিক্স
-          </p>
+      {/* ── Top Actions Bar ── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-zinc-800">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
+          <span className="text-xs font-bold text-neutral-600 dark:text-zinc-400">
+            লার্নিং ইন্টেলিজেন্স ও গ্রোথ অ্যানালিটিক্স
+          </span>
         </div>
 
         {/* Timeframe selector & Actions */}

@@ -144,25 +144,20 @@ export default function ControlPanelPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-16 px-4 sm:px-6">
-      {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            <SlidersHorizontal size={24} />
+      {/* ── Top Status Strip ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-4 sm:px-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <SlidersHorizontal size={20} />
           </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
-                কন্ট্রোল প্যানেল (Master Controls)
-              </h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                রিয়েলটাইম সচল
-              </span>
-            </div>
-            <p className="text-xs text-neutral-500 dark:text-zinc-400 mt-0.5">
-              প্ল্যাটফর্মের সকল জরুরি সুইচ, অ্যান্টি-চিট, নিরাপত্তা ও লাইভ কনফিগারেশন
-            </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200">
+              মাস্টার কনফিগারেশন ও সুইচ
+            </span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              রিয়েলটাইম সচল
+            </span>
           </div>
         </div>
 

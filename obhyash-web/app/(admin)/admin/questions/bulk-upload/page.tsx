@@ -482,22 +482,15 @@ export default function BulkUploadPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        {/* Back Navigation */}
+        <div className="flex items-center gap-4 mb-4">
           <button
             onClick={() => router.back()}
-            className="p-2 rounded-lg bg-white dark:bg-slate-800 shadow hover:bg-slate-50 dark:hover:bg-slate-700"
+            className="p-2 px-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200/60 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-zinc-300 transition"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
+            <span>পেছনে যান</span>
           </button>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Bulk Upload Questions
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              Upload CSV, JSON, or XLSX files
-            </p>
-          </div>
         </div>
 
         {/* Templates */}

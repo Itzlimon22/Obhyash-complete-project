@@ -184,27 +184,24 @@ export default function NotificationManagementPage() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <Bell className="text-red-600 shrink-0" size={28} />
-            নোটিফিকেশন সেন্টার
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
-            সকল শিক্ষার্থীকে রিয়েল-টাইম বার্তা ও সিস্টেম নোটিশ পাঠান
-          </p>
+      {/* Top Action */}
+      <div className="flex items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-xs font-bold text-red-600 dark:text-red-400">
+            রিয়েল-টাইম নোটিফিকেশন সেন্টার
+          </span>
         </div>
         <button
           onClick={loadData}
           disabled={fetchingData}
-          className="p-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all self-start sm:self-auto flex items-center gap-2 text-xs font-bold"
+          className="p-2 px-3 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all flex items-center gap-2 text-xs font-bold"
         >
           <RefreshCw
-            size={16}
+            size={14}
             className={`text-neutral-500 ${fetchingData ? 'animate-spin' : ''}`}
           />
-          রিফ্রেশ
+          <span>রিফ্রেশ</span>
         </button>
       </div>
 

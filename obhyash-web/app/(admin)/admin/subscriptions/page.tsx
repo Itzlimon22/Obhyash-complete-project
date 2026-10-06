@@ -748,18 +748,8 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-[1600px] mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-            সাবস্ক্রিপশন ও পেমেন্ট
-          </h1>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-            পেমেন্ট ভেরিফিকেশন, অ্যাক্টিভ প্রিমিয়াম ইউজার ও মেয়াদ নিয়ন্ত্রণ করুন
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+      {/* Actions Bar */}
+      <div className="flex items-center justify-end gap-2 sm:gap-3">
           {/* View Toggle */}
           <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl flex items-center gap-1 border border-neutral-200 dark:border-neutral-700">
             <button
@@ -815,7 +805,6 @@ export default function SubscriptionsPage() {
             <span className="hidden sm:inline">এক্সপোর্ট CSV</span>
           </button>
         </div>
-      </div>
 
       {/* Global Server Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">

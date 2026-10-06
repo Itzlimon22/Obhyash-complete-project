@@ -40,9 +40,41 @@ const ROUTE_TITLES: Record<string, { title: string; subtitle?: string }> = {
   '/admin/feature-requests': { title: 'Feature Requests', subtitle: 'ফিচার প্রস্তাবনা ও রোডম্যাপ' },
   '/admin/notifications': { title: 'Broadcasts', subtitle: 'সিস্টেম নোটিফিকেশন ব্রডকাস্ট' },
   '/admin/blog-management': { title: 'Blog Conversions', subtitle: 'ব্লগ কনভার্শন ও ট্রাফিক অ্যানালিটিক্স' },
+  '/admin/control-panel': { title: 'Control Panel', subtitle: 'সিস্টেম ও প্ল্যাটফর্ম মাস্টার কন্ট্রোল' },
   '/admin/settings': { title: 'System Settings', subtitle: 'সিস্টেম ও সিকিউরিটি সেটিংস' },
   '/admin/profile': { title: 'Admin Profile', subtitle: 'অ্যাডমিন প্রোফাইল' },
 };
+
+function getRouteBreadcrumb(pathname: string): { title: string; parent?: { title: string; href: string } } {
+  if (ROUTE_TITLES[pathname]) {
+    return { title: ROUTE_TITLES[pathname].title };
+  }
+  if (pathname.startsWith('/admin/user-management/')) {
+    return {
+      title: 'User Details',
+      parent: { title: 'User Management', href: '/admin/user-management' },
+    };
+  }
+  if (pathname === '/admin/questions/new') {
+    return {
+      title: 'New Question',
+      parent: { title: 'Question Bank', href: '/admin/question-management' },
+    };
+  }
+  if (pathname === '/admin/questions/bulk-upload') {
+    return {
+      title: 'Bulk Upload',
+      parent: { title: 'Question Bank', href: '/admin/question-management' },
+    };
+  }
+  if (pathname === '/admin/notifications/history') {
+    return {
+      title: 'History',
+      parent: { title: 'Broadcasts', href: '/admin/notifications' },
+    };
+  }
+  return { title: 'Overview' };
+}
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({
   toggleSidebar,
@@ -69,10 +101,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     }
   };
 
-  const routeInfo = ROUTE_TITLES[pathname] || {
-    title: 'Obhyash Admin',
-    subtitle: 'অ্যাডমিন কন্ট্রোল সেন্টার',
-  };
+  const breadcrumb = getRouteBreadcrumb(pathname);
+  const pageTitle = breadcrumb.parent
+    ? `${breadcrumb.parent.title} / ${breadcrumb.title}`
+    : breadcrumb.title;
 
   const currentDate = new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
@@ -81,8 +113,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   }).format(new Date());
 
   return (
-    <header className="sticky top-0 z-30 w-full h-20 bg-white/85 dark:bg-[#151515]/85 backdrop-blur-md border-b border-slate-100/90 dark:border-zinc-800/90 flex items-center justify-between px-4 sm:px-8 transition-colors">
-      {/* LEFT: Sidebar Toggle & Page Title with Date */}
+    <header className="sticky top-0 z-30 w-full h-18 sm:h-20 bg-white/85 dark:bg-[#151515]/85 backdrop-blur-md border-b border-slate-100/90 dark:border-zinc-800/90 flex items-center justify-between px-4 sm:px-8 transition-colors">
+      {/* LEFT: Sidebar Toggle & Page Title */}
       <div className="flex items-center gap-3.5 min-w-0">
         <button
           type="button"
@@ -96,7 +128,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-white tracking-tight leading-tight truncate">
-              {routeInfo.title}
+              {pageTitle}
             </h1>
             <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#c6f634] text-slate-950 text-[10px] font-black uppercase tracking-wider shrink-0 shadow-xs">
               • Live
