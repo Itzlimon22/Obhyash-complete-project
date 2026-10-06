@@ -51,12 +51,42 @@ const config = {
           800: '#18181B',
           700: '#27272A',
         },
-        // --- 🟢 NEW: Custom Light Backgrounds ---
         paper: {
           50: '#fafafa',
           100: '#ffffff',
           200: '#e5e5e5',
           900: '#171717',
+        },
+        // --- 🟢 Niond Soft Pastel & Neo-Lime Tokens ---
+        canvas: {
+          DEFAULT: '#f4f5f8',
+          dark: '#0d0d0f',
+        },
+        surface: {
+          DEFAULT: '#ffffff',
+          dark: '#151515',
+        },
+        lime: {
+          DEFAULT: '#c6f634',
+          hover: '#b8ea27',
+          ink: '#0f172a',
+        },
+        niondLime: {
+          DEFAULT: '#c6f634',
+          hover: '#b8ea27',
+          ink: '#0f172a',
+        },
+        pastel: {
+          lavender: '#e0d6ff',
+          periwinkle: '#d0e2ff',
+          mint: '#c2f2d0',
+          'lavender-dark': '#2d224d',
+          'periwinkle-dark': '#223552',
+          'mint-dark': '#1e3d2b',
+        },
+        teal: {
+          deep: '#0a666b',
+          'deep-dark': '#07484b',
         },
         neutral: {
           750: '#212124',
@@ -156,6 +186,8 @@ const config = {
         glass: '0 4px 30px rgba(0, 0, 0, 0.1)',
         glow: '0 0 15px rgba(4, 120, 87, 0.15)',
         subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        card: '0 10px 35px rgba(0, 0, 0, 0.03)',
+        'card-hover': '0 14px 40px rgba(0, 0, 0, 0.06)',
       },
       keyframes: {
         'accordion-down': {

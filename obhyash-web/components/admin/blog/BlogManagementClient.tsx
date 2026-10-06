@@ -345,6 +345,7 @@ export default function BlogManagementClient() {
               <div className="space-y-2.5 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
                 {metrics.recentConversions.map((conv) => {
                   const isApp = conv.event_type === 'app_download';
+                  const ts = formatTimestamp24h(conv.created_at);
                   return (
                     <div
                       key={conv.id}
@@ -374,9 +375,14 @@ export default function BlogManagementClient() {
                         </div>
                       </div>
 
-                      <span className="text-[10px] text-slate-400 font-mono shrink-0">
-                        {formatTimestamp24h(conv.created_at).time}
-                      </span>
+                      <div className="flex flex-col items-end text-right font-mono shrink-0">
+                        <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                          {ts.date}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {ts.time}
+                        </span>
+                      </div>
                     </div>
                   );
                 })}

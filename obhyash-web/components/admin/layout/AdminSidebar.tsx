@@ -321,33 +321,24 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     href={item.href}
                     onClick={() => isMobile && setIsOpen(false)}
                     className={`
-                      group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
+                      group relative flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold transition-all duration-200
                       ${
                         isActive
-                          ? isDark
-                            ? 'bg-[#12544F]/30 text-emerald-400 border border-emerald-500/30 shadow-sm'
-                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm'
+                          ? 'bg-[#c6f634] text-slate-950 shadow-sm rounded-2xl'
                           : isDark
-                            ? 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 border border-transparent'
-                            : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 border border-transparent'
+                            ? 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 rounded-xl'
+                            : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-xl'
                       }
                       ${!isOpen && !isMobile ? 'justify-center px-0' : ''}
                     `}
                     title={!isOpen && !isMobile ? item.label : undefined}
                   >
-                    {/* Active Accent Indicator */}
-                    {isActive && (
-                      <div className="absolute left-0 top-2 bottom-2 w-1 bg-emerald-500 rounded-r-full" />
-                    )}
-
                     <Icon
                       size={18}
                       strokeWidth={isActive ? 2.5 : 2}
                       className={`shrink-0 transition-transform duration-200 group-hover:scale-105 ${
                         isActive
-                          ? isDark
-                            ? 'text-emerald-400'
-                            : 'text-emerald-600'
+                          ? 'text-slate-950'
                           : isDark
                             ? 'text-zinc-400 group-hover:text-zinc-200'
                             : 'text-neutral-500 group-hover:text-neutral-900'
