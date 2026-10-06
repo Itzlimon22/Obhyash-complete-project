@@ -16,17 +16,12 @@ import {
   TrendingUp,
   RefreshCw,
   AlertTriangle,
-  ExternalLink,
   ChevronRight,
   Sparkles,
 } from 'lucide-react';
 import {
   KpiCard,
-  ParticipationChart,
   StatusBanner,
-  ScheduleCard,
-  QuestionSetTable,
-  TeamList,
 } from '@/components/admin/dashboard';
 import { SystemControlsCard, AppConfig } from '@/components/admin/dashboard/system-controls-card';
 import { LearningTrendsChart } from '@/components/admin/dashboard/learning-trends-chart';
@@ -88,21 +83,18 @@ export default function AdminDashboardPage() {
   }, [fetchOverview]);
 
   const metrics = data?.metrics || {
-    totalUsers: 242650,
-    proUsers: 17347,
-    totalQuestions: 8540,
-    pendingQuestions: 12,
-    totalExams: 185000,
-    todayExams: 17347,
-    yesterdayExams: 16200,
-    examGrowthPercent: 6.04,
-    activeLiveExams: 2,
-    pendingReports: 4,
-    pendingComplaints: 1,
+    totalUsers: 0,
+    proUsers: 0,
+    totalQuestions: 0,
+    pendingQuestions: 0,
+    totalExams: 0,
+    todayExams: 0,
+    yesterdayExams: 0,
+    examGrowthPercent: 0,
+    activeLiveExams: 0,
+    pendingReports: 0,
+    pendingComplaints: 0,
   };
-
-  const adminDisplayName = profile?.name || user?.email?.split('@')[0] || 'Nora Watson';
-  const adminRoleDisplay = profile?.role === 'super_admin' ? 'Super Administrator' : 'Sales / Operations Manager';
 
   const quickShortcuts = [
     {
@@ -163,7 +155,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* ── 2. ACTION ALERTS HUB (Preserved 100%) ── */}
+        {/* ── 1. ACTION ALERTS HUB (Real Action Center) ── */}
         <ActionAlertsHub
           pendingQuestions={metrics.pendingQuestions}
           pendingReports={metrics.pendingReports}
@@ -171,9 +163,9 @@ export default function AdminDashboardPage() {
           activeLiveExams={metrics.activeLiveExams}
         />
 
-        {/* ── 3. TOP BENTO ROW: 3 SOFT PASTEL KPI CARDS + HIGH-CONTRAST FEATURE BANNER ── */}
+        {/* ── 2. NIOND SOFT PASTEL BENTO KPI GRID (Real Platform Metrics) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1: Soft Lavender Pastel (Total Students / Earning) */}
+          {/* Card 1: Soft Lavender Pastel (Total Students) */}
           <Link href="/admin/user-management">
             <KpiCard
               variant="lavender"
@@ -186,7 +178,7 @@ export default function AdminDashboardPage() {
             />
           </Link>
 
-          {/* Card 2: Soft Periwinkle Pastel (Daily Submissions / Active Earning) */}
+          {/* Card 2: Soft Periwinkle Pastel (Daily Submissions) */}
           <Link href="/admin/analytics">
             <KpiCard
               variant="periwinkle"
@@ -199,7 +191,7 @@ export default function AdminDashboardPage() {
             />
           </Link>
 
-          {/* Card 3: Soft Mint Pastel (Question Bank / Conversion) */}
+          {/* Card 3: Soft Mint Pastel (Question Bank) */}
           <Link href="/admin/question-management">
             <KpiCard
               variant="mint"
@@ -212,7 +204,7 @@ export default function AdminDashboardPage() {
             />
           </Link>
 
-          {/* Card 4: High-Contrast Forest Teal Banner (Live Exam System Engine) */}
+          {/* Card 4: High-Contrast Forest Teal Banner (Live Exam Engine) */}
           <StatusBanner
             title="লাইভ এক্সাম ইঞ্জিন"
             metric={metrics.activeLiveExams > 0 ? `${metrics.activeLiveExams} টি লাইভ চলছে` : 'স্ট্যান্ডবাই মোড'}
@@ -222,27 +214,7 @@ export default function AdminDashboardPage() {
           />
         </div>
 
-        {/* ── 4. MIDDLE BENTO ROW: PARTICIPATION DUAL-BAR CHART & DAILY LIVE SCHEDULE ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          {/* Left 8 Cols: Dual-Tone Lavender & Neo-Lime Bar Chart */}
-          <div className="lg:col-span-8 flex flex-col">
-            <ParticipationChart className="h-full" />
-          </div>
-
-          {/* Right 4 Cols: Daily Live Schedule & Conductor Meeting Card */}
-          <div className="lg:col-span-4 flex flex-col justify-between">
-            <ScheduleCard
-              title="Daily Live Schedule"
-              timeInfo="12+ Person • 8:30 PM"
-              conductorsText="আজকের লাইভ সেশন মেন্টরিং প্যানেল রেডি"
-              buttonText="লাইভ এক্সাম সেশনে প্রবেশ"
-              onJoin={() => window.location.href = '/admin/live-exams'}
-              className="h-full"
-            />
-          </div>
-        </div>
-
-        {/* ── 5. 24-HOUR REAL-TIME LEARNING ACTIVITY GRAPH (Preserved 100%) ── */}
+        {/* ── 3. 24-HOUR REAL-TIME LEARNING ACTIVITY GRAPH (Real Analytics) ── */}
         {data?.analytics && (
           <div className="bg-white dark:bg-[#151515] rounded-3xl p-6 shadow-card border border-slate-100/80 dark:border-zinc-800/80">
             <LearningTrendsChart
@@ -254,24 +226,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ── 6. BOTTOM BENTO ROW: TOP PERFORMING SETS & ACTIVE TEAM MEMBERS ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          {/* Left 8 Cols: Top Store / Top Performing Sets Table */}
-          <div className="lg:col-span-8">
-            <QuestionSetTable title="Top Store" />
-          </div>
-
-          {/* Right 4 Cols: Team Members Widget */}
-          <div className="lg:col-span-4 flex flex-col">
-            <TeamList
-              title="Team Member"
-              className="h-full"
-              onAddMember={() => window.location.href = '/admin/user-management'}
-            />
-          </div>
-        </div>
-
-        {/* ── 7. QUICK MANAGEMENT SHORTCUTS (Preserved 100%) ── */}
+        {/* ── 4. QUICK MANAGEMENT SHORTCUTS (Real Actions) ── */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
@@ -312,7 +267,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* ── 8. MASTER PLATFORM CONTROLLER & BROADCAST CARD (Preserved 100%) ── */}
+        {/* ── 5. MASTER PLATFORM CONTROLLER & BROADCAST CARD (Real Controls) ── */}
         {data?.systemControls && (
           <div className="bg-white dark:bg-[#151515] rounded-3xl shadow-card border border-slate-100/80 dark:border-zinc-800/80 p-6">
             <SystemControlsCard
@@ -322,7 +277,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ── 9. DIRECTORY & CLOUD INFRASTRUCTURE (Preserved 100%) ── */}
+        {/* ── 6. DIRECTORY & CLOUD INFRASTRUCTURE (Real Status) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left 2 Cols: Module Directory */}
           <div className="lg:col-span-2 bg-white dark:bg-[#151515] border border-slate-100/80 dark:border-zinc-800/80 rounded-3xl p-6 space-y-4 shadow-card">

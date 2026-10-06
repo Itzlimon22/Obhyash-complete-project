@@ -39,7 +39,7 @@ const ROUTE_TITLES: Record<string, { title: string; subtitle?: string }> = {
   '/admin/complaints': { title: 'Support & Tickets', subtitle: 'অভিযোগ ও মতামত কেন্দ্র' },
   '/admin/feature-requests': { title: 'Feature Requests', subtitle: 'ফিচার প্রস্তাবনা ও রোডম্যাপ' },
   '/admin/notifications': { title: 'Broadcasts', subtitle: 'সিস্টেম নোটিফিকেশন ব্রডকাস্ট' },
-  '/admin/blog-management': { title: 'Blog & Newsletter', subtitle: 'ব্লগ ও নিউজলেটার সাবস্ক্রাইবার' },
+  '/admin/blog-management': { title: 'Blog Conversions', subtitle: 'ব্লগ কনভার্শন ও ট্রাফিক অ্যানালিটিক্স' },
   '/admin/settings': { title: 'System Settings', subtitle: 'সিস্টেম ও সিকিউরিটি সেটিংস' },
   '/admin/profile': { title: 'Admin Profile', subtitle: 'অ্যাডমিন প্রোফাইল' },
 };

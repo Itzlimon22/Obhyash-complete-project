@@ -31,10 +31,10 @@ export default async function BlogManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              ব্লগ ও নিউজলেটার সাবস্ক্রাইবার
+              ব্লগ কনভার্শন ও ট্রাফিক
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">
-              ব্লগের সমস্ত নিউজলেটার সাবস্ক্রাইবারদের তালিকা পরিচালনা ও CSV এক্সপোর্ট করুন।
+              ব্লগ পোস্ট থেকে অ্যাপ ডাউনলোড, সাইনআপ ও নিউজলেটার সাবস্ক্রাইবারদের রিয়েল-টাইম ট্র্যাকিং।
             </p>
           </div>
         </div>

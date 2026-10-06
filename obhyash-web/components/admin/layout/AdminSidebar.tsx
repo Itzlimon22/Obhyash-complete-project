@@ -18,17 +18,15 @@ import {
   BookOpen,
   Settings,
   LogOut,
-  ChevronRight,
   ChevronsLeft,
   X,
   Lightbulb,
-  UploadCloud,
   Gift,
-  Sun,
-  Moon,
   SlidersHorizontal,
   Tag,
   FileText,
+  ExternalLink,
+  Newspaper,
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
@@ -58,7 +56,7 @@ const ADMIN_NAVIGATION: NavSection[] = [
     items: [
       {
         id: 'dashboard',
-        label: 'কমান্ড সেন্টার',
+        label: 'ড্যাশবোর্ড',
         icon: LayoutDashboard,
         href: '/admin/dashboard',
       },
@@ -70,69 +68,79 @@ const ADMIN_NAVIGATION: NavSection[] = [
       },
       {
         id: 'analytics',
-        label: 'অ্যানালিটিক্স ও রিপোর্ট',
+        label: 'অ্যানালিটিক্স',
         icon: BarChart3,
         href: '/admin/analytics',
       },
     ],
   },
   {
-    title: 'ম্যানেজমেন্ট',
+    title: 'প্রশ্ন ও পরীক্ষা',
     items: [
       {
         id: 'questions',
-        label: 'প্রশ্ন ব্যাংক ও বাল্ক',
+        label: 'প্রশ্ন ব্যাংক',
         icon: FileQuestion,
         href: '/admin/question-management',
       },
       {
         id: 'question-health',
-        label: 'প্রশ্ন হেলথ ও কোয়ালিটি',
+        label: 'প্রশ্ন হেলথ',
         icon: HeartPulse,
         href: '/admin/question-health',
       },
       {
         id: 'live-exams',
-        label: 'লাইভ পরীক্ষা কন্ট্রোলার',
+        label: 'লাইভ এক্সাম',
         icon: Radio,
         href: '/admin/live-exams',
       },
       {
         id: 'pdf-generator',
-        label: 'মডেল টেস্ট PDF তৈরি',
+        label: 'PDF জেনারেটর',
         icon: FileText,
         href: '/admin/pdf-generator',
       },
       {
+        id: 'reports',
+        label: 'এরর রিপোর্ট',
+        icon: Flag,
+        href: '/admin/reports',
+      },
+    ],
+  },
+  {
+    title: 'ইউজার ও পেমেন্ট',
+    items: [
+      {
         id: 'users',
-        label: 'ইউজার ও রোল',
+        label: 'ইউজার্স',
         icon: Users,
         href: '/admin/user-management',
       },
       {
         id: 'subscriptions',
-        label: 'সাবস্ক্রিপশন ও পেমেন্ট',
+        label: 'সাবস্ক্রিপশন',
         icon: CreditCard,
         href: '/admin/subscriptions',
       },
       {
-        id: 'referrals',
-        label: 'রেফারেল ও রিওয়ার্ড',
-        icon: Gift,
-        href: '/admin/referrals',
-      },
-      {
         id: 'coupons',
-        label: 'কুপন ও অ্যাম্বাসেডর',
+        label: 'কুপন',
         icon: Tag,
         href: '/admin/coupons',
       },
       {
-        id: 'reports',
-        label: 'প্রশ্ন এরর রিপোর্ট',
-        icon: Flag,
-        href: '/admin/reports',
+        id: 'referrals',
+        label: 'রেফারেল',
+        icon: Gift,
+        href: '/admin/referrals',
       },
+    ],
+  },
+  {
+    title: 'সাপোর্ট ও আউটরিচ',
+    items: [
       {
         id: 'complaints',
         label: 'অভিযোগ কেন্দ্র',
@@ -140,22 +148,22 @@ const ADMIN_NAVIGATION: NavSection[] = [
         href: '/admin/complaints',
       },
       {
-        id: 'feature-requests',
-        label: 'ফিচার প্রস্তাবনা',
-        icon: Lightbulb,
-        href: '/admin/feature-requests',
+        id: 'blog-management',
+        label: 'ব্লগ কনভার্শন',
+        icon: Newspaper,
+        href: '/admin/blog-management',
       },
       {
         id: 'notifications',
-        label: 'নোটিফিকেশন ব্রডকাস্ট',
+        label: 'নোটিফিকেশন',
         icon: Bell,
         href: '/admin/notifications',
       },
       {
-        id: 'blog-management',
-        label: 'নিউজলেটার সাবস্ক্রাইবার',
-        icon: Mail,
-        href: '/admin/blog-management',
+        id: 'feature-requests',
+        label: 'ফিচার রিকোয়েস্ট',
+        icon: Lightbulb,
+        href: '/admin/feature-requests',
       },
     ],
   },
@@ -170,7 +178,7 @@ const BOTTOM_ITEMS: NavItem[] = [
   },
   {
     id: 'live-site',
-    label: 'লাইভ প্ল্যাটফর্ম',
+    label: 'স্টুডেন্ট প্ল্যাটফর্ম',
     icon: BookOpen,
     href: '/dashboard',
   },
@@ -182,7 +190,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isMobile,
 }) => {
   const pathname = usePathname();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const { signOut } = useAdminAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -217,8 +225,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           fixed top-0 bottom-0 left-0 z-50 flex flex-col
           ${
             isDark
-              ? 'bg-[#0E0E11] text-zinc-200 border-r border-zinc-800/80'
-              : 'bg-white text-neutral-800 border-r border-neutral-200 shadow-sm'
+              ? 'bg-[#121215] text-zinc-200 border-r border-zinc-800/90'
+              : 'bg-white text-slate-800 border-r border-slate-100/90 shadow-card'
           }
           transition-all duration-300 ease-in-out
           ${
@@ -232,31 +240,35 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           }
         `}
       >
-        {/* Top Branding */}
+        {/* Top Branding Bar */}
         <div
-          className={`h-16 flex items-center justify-between px-4 shrink-0 transition-colors ${
+          className={`h-20 flex items-center justify-between px-5 shrink-0 transition-colors ${
             isDark
-              ? 'border-b border-zinc-800/80 bg-[#0E0E11]'
-              : 'border-b border-neutral-200 bg-white'
+              ? 'border-b border-zinc-800/80 bg-[#121215]'
+              : 'border-b border-slate-100 bg-white'
           }`}
         >
           <Link href="/admin/dashboard" className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#12544F] to-[#092328] border border-emerald-500/30 flex items-center justify-center shadow-md shrink-0">
-              <span className="text-white font-black text-sm tracking-tighter font-mono">O</span>
+            {/* Modern Obhyash Brand Capsule */}
+            <div className="w-10 h-10 rounded-2xl bg-slate-950 dark:bg-white flex items-center justify-center text-white dark:text-slate-950 shadow-sm shrink-0">
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-4.5 bg-[#c6f634] rounded-full transform -skew-x-12" />
+                <span className="w-1.5 h-4.5 bg-white dark:bg-slate-950 rounded-full transform -skew-x-12" />
+              </div>
             </div>
 
             {showLabel && (
               <div className="flex flex-col min-w-0">
                 <span
-                  className={`font-extrabold text-sm tracking-tight truncate ${
-                    isDark ? 'text-white' : 'text-neutral-900'
+                  className={`font-black text-base tracking-tight truncate ${
+                    isDark ? 'text-white' : 'text-slate-950'
                   }`}
                 >
-                  অভ্যাস অ্যাডমিন
+                  Obhyash
                 </span>
-                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Command Hub
+                <span className="text-[10px] text-[#0a666b] dark:text-[#c6f634] font-black uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c6f634] animate-pulse" />
+                  Admin HQ
                 </span>
               </div>
             )}
@@ -265,23 +277,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           {isMobile ? (
             <button
               onClick={() => setIsOpen(false)}
-              className={`p-1.5 rounded-lg transition-colors ${
-                isDark
-                  ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
-                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
             >
               <X size={20} />
             </button>
           ) : (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`p-1.5 rounded-lg transition-colors ${
-                isDark
-                  ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/80'
-                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-              title={isOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+              title={isOpen ? 'সাইডবার গুটিয়ে রাখুন' : 'সাইডবার প্রসারিত করুন'}
             >
               <ChevronsLeft
                 size={18}
@@ -292,17 +296,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </div>
 
         {/* Navigation Links Scrollable Area */}
-        <div
-          className={`flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin ${
-            isDark ? 'scrollbar-thumb-zinc-800' : 'scrollbar-thumb-neutral-200'
-          }`}
-        >
+        <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-5 scrollbar-thin">
           {ADMIN_NAVIGATION.map((section, idx) => (
             <div key={idx} className="space-y-1">
               {showLabel && section.title && (
                 <div
-                  className={`px-3 text-[10px] font-extrabold uppercase tracking-wider mb-2 ${
-                    isDark ? 'text-zinc-500' : 'text-neutral-400'
+                  className={`px-3.5 text-[10px] font-black uppercase tracking-wider mb-2 ${
+                    isDark ? 'text-zinc-500' : 'text-slate-400'
                   }`}
                 >
                   {section.title}
@@ -321,27 +321,27 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     href={item.href}
                     onClick={() => isMobile && setIsOpen(false)}
                     className={`
-                      group relative flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold transition-all duration-200
+                      group relative flex items-center gap-3.5 px-3.5 py-2.5 text-xs font-bold transition-all duration-200
                       ${
                         isActive
                           ? 'bg-[#c6f634] text-slate-950 shadow-sm rounded-2xl'
                           : isDark
-                            ? 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 rounded-xl'
-                            : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-xl'
+                            ? 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 rounded-2xl'
+                            : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50 rounded-2xl'
                       }
                       ${!isOpen && !isMobile ? 'justify-center px-0' : ''}
                     `}
                     title={!isOpen && !isMobile ? item.label : undefined}
                   >
                     <Icon
-                      size={18}
+                      size={17}
                       strokeWidth={isActive ? 2.5 : 2}
                       className={`shrink-0 transition-transform duration-200 group-hover:scale-105 ${
                         isActive
                           ? 'text-slate-950'
                           : isDark
                             ? 'text-zinc-400 group-hover:text-zinc-200'
-                            : 'text-neutral-500 group-hover:text-neutral-900'
+                            : 'text-slate-500 group-hover:text-slate-950'
                       }`}
                     />
 
@@ -350,13 +350,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     )}
 
                     {showLabel && item.count !== undefined && item.count > 0 && (
-                      <span
-                        className={`ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-                          isDark
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        }`}
-                      >
+                      <span className="ml-auto px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20">
                         {item.count}
                       </span>
                     )}
@@ -367,12 +361,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           ))}
         </div>
 
-        {/* Bottom Section (Settings, Live Platform, Theme Toggle & Logout) */}
+        {/* Bottom Section (Settings, Live Platform & Logout) */}
         <div
-          className={`p-3 space-y-1.5 shrink-0 transition-colors ${
+          className={`p-3.5 space-y-1.5 shrink-0 transition-colors ${
             isDark
-              ? 'border-t border-zinc-800/80 bg-[#0A0A0C]'
-              : 'border-t border-neutral-200 bg-neutral-50/90'
+              ? 'border-t border-zinc-800/80 bg-[#0e0e11]'
+              : 'border-t border-slate-100 bg-slate-50/80'
           }`}
         >
           {BOTTOM_ITEMS.map((item) => {
@@ -384,15 +378,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 href={item.href}
                 onClick={() => isMobile && setIsOpen(false)}
                 className={`
-                  group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all
+                  group flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-bold transition-all
                   ${
                     isActive
                       ? isDark
                         ? 'bg-zinc-800 text-white'
-                        : 'bg-neutral-200 text-neutral-900'
+                        : 'bg-slate-200 text-slate-900'
                       : isDark
                         ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
-                        : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }
                   ${!isOpen && !isMobile ? 'justify-center px-0' : ''}
                 `}
@@ -404,53 +398,28 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             );
           })}
 
-          {/* Theme Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all
-              ${
-                isDark
-                  ? 'text-zinc-300 hover:text-white hover:bg-zinc-800/60 border border-zinc-800'
-                  : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-200/70 border border-neutral-200'
-              }
-              ${!isOpen && !isMobile ? 'justify-center px-0' : ''}
-            `}
-            title={isDark ? 'লাইট মোড অন করুন' : 'ডার্ক মোড অন করুন'}
-          >
-            {isDark ? (
-              <Sun size={16} className="text-amber-400 shrink-0" />
-            ) : (
-              <Moon size={16} className="text-indigo-600 shrink-0" />
-            )}
-            {showLabel && (
-              <span className="truncate">
-                {isDark ? 'লাইট মোড (Light)' : 'ডার্ক মোড (Dark)'}
-              </span>
-            )}
-          </button>
-
           <button
             type="button"
             onClick={handleLogout}
             disabled={isLoggingOut}
             className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer disabled:opacity-50
+              w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-bold transition-all border border-transparent cursor-pointer disabled:opacity-50
               ${
                 isDark
-                  ? 'text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 hover:border-rose-500/20'
-                  : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-200'
+                  ? 'text-rose-400 hover:text-rose-300 hover:bg-rose-500/10'
+                  : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50'
               }
               ${!isOpen && !isMobile ? 'justify-center px-0' : ''}
             `}
             title={!isOpen && !isMobile ? 'লগ আউট' : undefined}
           >
             <LogOut size={16} strokeWidth={2} className={`shrink-0 ${isLoggingOut ? 'animate-spin' : ''}`} />
-            {showLabel && <span>{isLoggingOut ? 'লগ আউট হচ্ছে...' : 'লগ আউট'}</span>}
+            {showLabel && <span>{isLoggingOut ? 'লগআউট হচ্ছে...' : 'লগ আউট'}</span>}
           </button>
         </div>
       </aside>
     </>
   );
 };
+
+export default AdminSidebar;
