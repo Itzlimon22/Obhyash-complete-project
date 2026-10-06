@@ -16,6 +16,15 @@ function getSupabaseAdmin() {
   });
 }
 
+// In-Memory Global User Stats Cache (60-second TTL) to eliminate heavy full-table scans
+let cachedGlobalUserStats: {
+  total: number;
+  active: number;
+  students: number;
+  premium: number;
+  expiresAt: number;
+} | null = null;
+
 // ── Admin Authorization Helper ──
 async function verifyAdminCaller(request: NextRequest, supabaseAdmin: any): Promise<boolean> {
   // 1. Try Cookie Session
@@ -222,62 +231,71 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Compute global stats
+    // Compute global stats using in-memory cache or lightweight head queries (NO full table scans)
     let totalCount = count || mappedUsers.length;
     let activeCount = 0;
     let studentsCount = 0;
     let premiumCount = 0;
 
-    try {
-      const [totalRes, activeRes, studentsRes, allSubsRes] = await Promise.all([
-        supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
-        supabaseAdmin.from('users').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
-        supabaseAdmin.from('users').select('*', { count: 'exact', head: true }).eq('role', 'Student'),
-        supabaseAdmin.from('users').select('subscription, is_subscribed, subscription_status, subscription_expires_at'),
-      ]);
+    const nowTime = Date.now();
+    if (cachedGlobalUserStats && nowTime < cachedGlobalUserStats.expiresAt) {
+      totalCount = cachedGlobalUserStats.total;
+      activeCount = cachedGlobalUserStats.active;
+      studentsCount = cachedGlobalUserStats.students;
+      premiumCount = cachedGlobalUserStats.premium;
+    } else {
+      try {
+        const [totalRes, activeRes, studentsRes, proRes] = await Promise.all([
+          supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
+          supabaseAdmin.from('users').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
+          supabaseAdmin.from('users').select('*', { count: 'exact', head: true }).eq('role', 'Student'),
+          supabaseAdmin
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .or('is_subscribed.eq.true,subscription_status.eq.Active,subscription_status.eq.active'),
+        ]);
 
-      totalCount = totalRes.count ?? totalCount;
-      activeCount = activeRes.count ?? 0;
-      studentsCount = studentsRes.count ?? 0;
+        totalCount = totalRes.count ?? totalCount;
+        activeCount = activeRes.count ?? 0;
+        studentsCount = studentsRes.count ?? 0;
+        premiumCount = proRes.count ?? 0;
 
-      if (allSubsRes.data) {
-        const checkNow = new Date();
-        premiumCount = allSubsRes.data.filter((u: any) => {
-          const rawExp = u.subscription_expires_at || u.subscription?.expiry || u.subscription?.expires_at;
-          const exp = rawExp ? new Date(rawExp) : null;
-          if (!exp || isNaN(exp.getTime()) || exp <= checkNow) return false;
-
-          const rawStatus = (u.subscription?.status || u.subscription_status || '').toString().toLowerCase();
-          const isSub = u.is_subscribed === true || rawStatus === 'active';
-          if (!isSub) return false;
-
-          const plan = (u.subscription?.plan || u.plan || '').toString().toLowerCase().trim();
-          if (!plan || plan === 'free' || plan === 'inactive') return false;
-
-          return true;
-        }).length;
+        cachedGlobalUserStats = {
+          total: totalCount,
+          active: activeCount,
+          students: studentsCount,
+          premium: premiumCount,
+          expiresAt: nowTime + 60_000, // 60-second TTL
+        };
+      } catch (statsErr) {
+        console.warn('Failed to calculate exact global user stats:', statsErr);
       }
-    } catch (statsErr) {
-      console.warn('Failed to calculate exact global user stats:', statsErr);
     }
 
     const totalUsers = count ?? totalCount;
     const totalPages = Math.ceil(totalUsers / pageSize) || 1;
 
-    return NextResponse.json({
-      success: true,
-      users: filteredList,
-      totalUsers,
-      totalPages,
-      page,
-      pageSize,
-      stats: {
-        total: totalCount,
-        active: activeCount,
-        students: studentsCount,
-        premium: premiumCount,
+    return NextResponse.json(
+      {
+        success: true,
+        users: filteredList,
+        totalUsers,
+        totalPages,
+        page,
+        pageSize,
+        stats: {
+          total: totalCount,
+          active: activeCount,
+          students: studentsCount,
+          premium: premiumCount,
+        },
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=15, stale-while-revalidate=30',
+        },
+      },
+    );
   } catch (err: any) {
     console.error('Failed to get admin users:', err);
     return NextResponse.json(

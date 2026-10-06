@@ -4,9 +4,29 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+let cachedStats: any = null;
+let statsExpiresAt = 0;
+
 export async function GET() {
   try {
     await connection();
+
+    const now = Date.now();
+    if (cachedStats && now < statsExpiresAt) {
+      return NextResponse.json(
+        {
+          success: true,
+          data: cachedStats,
+          cached: true,
+        },
+        {
+          headers: {
+            'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+          },
+        },
+      );
+    }
+
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
     const todayStart = new Date();
@@ -37,17 +57,30 @@ export async function GET() {
         .in('status', ['Pending', 'pending']),
     ]);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        totalUsers: usersRes.count || 0,
-        totalQuestions: questionsRes.count || 0,
-        totalExams: examsRes.count || 0,
-        todayExams: todayExamsRes.count || 0,
-        activeLiveExams: liveExamsRes.count || 0,
-        pendingReports: reportsRes.count || 0,
+    const statsData = {
+      totalUsers: usersRes.count || 0,
+      totalQuestions: questionsRes.count || 0,
+      totalExams: examsRes.count || 0,
+      todayExams: todayExamsRes.count || 0,
+      activeLiveExams: liveExamsRes.count || 0,
+      pendingReports: reportsRes.count || 0,
+    };
+
+    cachedStats = statsData;
+    statsExpiresAt = Date.now() + 60_000;
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: statsData,
+        cached: false,
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+        },
+      },
+    );
   } catch (err: any) {
     console.error('Error in /api/admin/stats:', err);
     return NextResponse.json(

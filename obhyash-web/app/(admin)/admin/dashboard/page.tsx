@@ -52,11 +52,27 @@ interface DashboardData {
   lastUpdated?: string;
 }
 
+const DASHBOARD_CACHE_KEY = 'obhyash_admin_dashboard_cache_v1';
+
 export default function AdminDashboardPage() {
   const { profile, user } = useAdminAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Instant 0ms SWR Hydration from sessionStorage
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(DASHBOARD_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.metrics) {
+          setData(parsed);
+          setIsLoading(false);
+        }
+      }
+    } catch (_) {}
+  }, []);
 
   const fetchOverview = useCallback(async (forceRefresh = false) => {
     if (forceRefresh) setIsRefreshing(true);
@@ -68,6 +84,9 @@ export default function AdminDashboardPage() {
         const json = await res.json();
         if (json.success && json.data) {
           setData(json.data);
+          try {
+            sessionStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(json.data));
+          } catch (_) {}
         }
       }
     } catch (err) {

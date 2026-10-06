@@ -194,19 +194,26 @@ export async function GET(request: NextRequest) {
     const totalCount = pageRes.count || 0;
     const mappedQuestions = (pageRes.data || []).map(mapQuestionToCamelCase);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        questions: mappedQuestions,
-        totalCount,
-        approvedCount,
-        pendingCount,
-        rejectedCount,
-        totalPages: Math.ceil(totalCount / pageSize),
-        currentPage: page,
-        pageSize,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          questions: mappedQuestions,
+          totalCount,
+          approvedCount,
+          pendingCount,
+          rejectedCount,
+          totalPages: Math.ceil(totalCount / pageSize),
+          currentPage: page,
+          pageSize,
+        },
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=15, stale-while-revalidate=30',
+        },
+      },
+    );
   } catch (err: any) {
     console.error('Error in /api/admin/questions GET:', err);
     return NextResponse.json(

@@ -11,7 +11,18 @@ import { useAuth } from '@/components/auth/AuthProvider';
  */
 const USERS_CACHE_KEY = 'obhyash_admin_users_cache';
 
-function getInitialCachedUsers(): { users: User[]; totalUsers: number } | null {
+interface CachedUsersPayload {
+  users: User[];
+  totalUsers: number;
+  stats?: {
+    total: number;
+    active: number;
+    students: number;
+    premium: number;
+  };
+}
+
+function getInitialCachedUsers(): CachedUsersPayload | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = sessionStorage.getItem(USERS_CACHE_KEY);
@@ -40,12 +51,15 @@ export function useUserManagement() {
   const [totalUsers, setTotalUsers] = useState(() => initialCache?.totalUsers || 0);
 
   // Global aggregate stats across ALL users in database
-  const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    students: 0,
-    premium: 0,
-  });
+  const [stats, setStats] = useState(
+    () =>
+      initialCache?.stats || {
+        total: 0,
+        active: 0,
+        students: 0,
+        premium: 0,
+      },
+  );
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,7 +132,11 @@ export function useUserManagement() {
         try {
           sessionStorage.setItem(
             USERS_CACHE_KEY,
-            JSON.stringify({ users: fetchedUsers, totalUsers: json.totalUsers || fetchedUsers.length }),
+            JSON.stringify({
+              users: fetchedUsers,
+              totalUsers: json.totalUsers || fetchedUsers.length,
+              stats: json.stats,
+            }),
           );
         } catch {}
       }

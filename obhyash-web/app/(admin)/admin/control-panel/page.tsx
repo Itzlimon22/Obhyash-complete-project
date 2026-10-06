@@ -113,6 +113,8 @@ const ModernSwitch: React.FC<ModernSwitchProps> = ({
   );
 };
 
+const SYSTEM_CONTROLS_CACHE_KEY = 'obhyash_admin_system_controls_cache_v1';
+
 export default function ControlPanelPage() {
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [initialConfig, setInitialConfig] = useState<AppConfig | null>(null);
@@ -123,8 +125,22 @@ export default function ControlPanelPage() {
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [activeSection, setActiveSection] = useState<string>('all');
 
+  // Instant SWR Hydration
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(SYSTEM_CONTROLS_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed) {
+          setConfig(parsed);
+          setInitialConfig(parsed);
+          setIsLoading(false);
+        }
+      }
+    } catch (_) {}
+  }, []);
+
   const fetchConfig = useCallback(async () => {
-    setIsLoading(true);
     setErrorMessage(null);
     try {
       const res = await fetch('/api/admin/system-controls');
@@ -132,6 +148,9 @@ export default function ControlPanelPage() {
       if (data.success && data.data) {
         setConfig(data.data);
         setInitialConfig(data.data);
+        try {
+          sessionStorage.setItem(SYSTEM_CONTROLS_CACHE_KEY, JSON.stringify(data.data));
+        } catch (_) {}
         if (data.data.updated_at) {
           setLastUpdated(new Date(data.data.updated_at).toLocaleTimeString('bn-BD'));
         }
@@ -190,6 +209,9 @@ export default function ControlPanelPage() {
       if (data.success) {
         setSaveSuccess(true);
         setInitialConfig(payload);
+        try {
+          sessionStorage.setItem(SYSTEM_CONTROLS_CACHE_KEY, JSON.stringify(payload));
+        } catch (_) {}
         setLastUpdated(new Date().toLocaleTimeString('bn-BD'));
         toast.success('সকল সিস্টেম কন্ট্রোল সেটিংস ডাটাবেজে সংরক্ষিত ও কার্যকর হয়েছে');
         setTimeout(() => setSaveSuccess(false), 3500);

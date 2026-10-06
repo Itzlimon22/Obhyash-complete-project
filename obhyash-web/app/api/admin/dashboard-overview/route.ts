@@ -16,12 +16,19 @@ export async function GET(request: Request) {
 
     const now = Date.now();
     if (!forceRefresh && cachedData && now < cacheExpiresAt) {
-      return NextResponse.json({
-        success: true,
-        data: cachedData,
-        cached: true,
-        expiresInSec: Math.round((cacheExpiresAt - now) / 1000),
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          data: cachedData,
+          cached: true,
+          expiresInSec: Math.round((cacheExpiresAt - now) / 1000),
+        },
+        {
+          headers: {
+            'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+          },
+        },
+      );
     }
 
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
@@ -184,15 +191,22 @@ export async function GET(request: Request) {
       lastUpdated: new Date().toISOString(),
     };
 
-    // Save to in-memory cache for 45s
+    // Save to in-memory cache for 60s
     cachedData = payload;
-    cacheExpiresAt = Date.now() + 45000;
+    cacheExpiresAt = Date.now() + 60000;
 
-    return NextResponse.json({
-      success: true,
-      data: payload,
-      cached: false,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: payload,
+        cached: false,
+      },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+        },
+      },
+    );
   } catch (err: any) {
     console.error('Error in /api/admin/dashboard-overview:', err);
     return NextResponse.json(
