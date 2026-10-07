@@ -1814,7 +1814,8 @@ export default function StudentRoot({
             {...commonLayoutProps}
             title="অ্যাকাউন্ট ইনফো"
             onBack={() => smartBack("settings")}
-            hideBottomNav={true}
+            hideBottomNav={false}
+            centerTitle={true}
           >
             <AccountInfoView
               user={currentUser}

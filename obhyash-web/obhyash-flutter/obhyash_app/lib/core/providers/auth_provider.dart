@@ -38,6 +38,8 @@ class AuthNotifier extends Notifier<User?> {
         case AuthChangeEvent.signedIn:
         case AuthChangeEvent.initialSession:
         case AuthChangeEvent.tokenRefreshed:
+        case AuthChangeEvent.userUpdated:
+        case AuthChangeEvent.passwordRecovery:
           if (session != null) {
             await _handleSessionEstablished(session, event: event);
           }

@@ -826,7 +826,19 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
   Future<void> _handleViewQuestions() async {
     HapticFeedback.lightImpact();
     final qs = await _getQuestions();
-    if (!mounted || qs.isEmpty) return;
+    if (!mounted) return;
+    if (qs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'এই পরীক্ষার প্রশ্নপত্র বর্তমানে ডাটাবেজে উপলব্ধ নেই। শীঘ্রই যুক্ত করা হবে।',
+          ),
+          duration: Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
     context.push(
       '/question-bank/questions-view',
       extra: {
@@ -862,7 +874,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
               .eq('chapters', 'সকল অধ্যায়')
               .gte('created_at', startOfDay);
 
-          if (res.length >= 1) {
+          if (res.isNotEmpty) {
             if (!mounted) return;
             MockExamLimitScreen.show(context);
             return;
@@ -874,7 +886,19 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     }
 
     final qs = await _getQuestions();
-    if (!mounted || qs.isEmpty) return;
+    if (!mounted) return;
+    if (qs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'এই পরীক্ষার প্রশ্নপত্র বর্তমানে ডাটাবেজে উপলব্ধ নেই। শীঘ্রই যুক্ত করা হবে।',
+          ),
+          duration: Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
     final instName = (widget.institute['name'] ?? 'ইনস্টিটিউট').toString();
     final isWritten = widget.examSet.type == 'written' ||

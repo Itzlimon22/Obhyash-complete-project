@@ -74,6 +74,7 @@ class _NotesCategoryDetailPageState
     final allSubjects = getPersonalizedFormulaSubjects(
       level: userProfile?.level,
       stream: userProfile?.stream,
+      batch: userProfile?.batch,
       division: userProfile?.division,
       target: userProfile?.target,
       examTarget: userProfile?.examTarget,
@@ -163,6 +164,7 @@ class _NotesCategoryDetailPageState
     final allSubjects = getPersonalizedFormulaSubjects(
       level: userProfile?.level,
       stream: userProfile?.stream,
+      batch: userProfile?.batch,
       division: userProfile?.division,
       target: userProfile?.target,
       examTarget: userProfile?.examTarget,
@@ -814,7 +816,7 @@ class _OfflineSaveButtonState extends State<_OfflineSaveButton> {
             ),
           ),
           content: Text(
-            'এই নোটটি আপনার অ্যাপে অফলাইনে সংরক্ষিত আছে। আপনি কি এটি মুছে ফেলতে চান?',
+            'এই নোটটি তোমার অ্যাপে অফলাইনে সংরক্ষিত আছে। তুমি কি এটি মুছে ফেলতে চাও?',
             style: TextStyle(
               fontSize: 13.5,
               color: widget.isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B),

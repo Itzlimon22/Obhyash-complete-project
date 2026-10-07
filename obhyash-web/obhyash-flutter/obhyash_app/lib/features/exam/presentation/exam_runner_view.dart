@@ -235,7 +235,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'পরীক্ষা চলাকালীন অবস্থায় বের হওয়া যাবে না। বের হতে চাইলে পরীক্ষাটি জমা দাও। তুমি কি পরীক্ষা জমা দিয়ে বের হতে চাও?',
+                  'পরীক্ষা চলাকালীন বের হওয়া যাবে না। পরীক্ষাটি এখনই জমা দিতে চাও?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -849,6 +849,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   serialNumber: index + 1,
                   selectedOptionIndex: state.userAnswers[q.id],
                   isFlagged: state.flaggedQuestions.contains(q.id),
+                  readOnly: (state.answerSelectionCounts[q.id] ?? 0) >= 2,
                   onSelectOption: (optIndex) {
                     ref
                         .read(examEngineProvider.notifier)

@@ -274,33 +274,39 @@ class UserProfile {
       return false;
     }
 
-    // 4. Plan check: Explicitly free or inactive plans are not pro
+    // 4. Plan check: Explicitly free or inactive plans are NEVER pro
     final p = (plan ?? '').toString().toLowerCase().trim();
-    final bool isExplicitlyFree = p == 'free' ||
+    final bool isExplicitlyFree = p.isEmpty ||
+        p == 'free' ||
         p == 'inactive' ||
         p == 'rookie' ||
         p == 'basic' ||
         p == 'explorer';
 
+    if (isExplicitlyFree) {
+      // If plan is explicitly free, ONLY pro if user has an active future expiry
+      // and is explicitly marked subscribed
+      if (isSubscribed && expDate != null && expDate.isAfter(now)) {
+        return true;
+      }
+      return false;
+    }
+
     final bool isPlanPro = p.contains('pro') ||
         p.contains('premium') ||
         p.contains('ranker') ||
         p.contains('booster') ||
-        p.contains('master') ||
-        (level ?? '').toString().toLowerCase().trim() == 'pro';
+        p.contains('master');
 
-    final bool hasActiveSubscription = isSubscribed == true || s == 'active';
-
-    // If marked subscribed or has active status or pro plan
-    if (hasActiveSubscription || isPlanPro) {
-      if (isExplicitlyFree && (expDate == null || expDate.isBefore(now)) && isSubscribed != true) {
-        return false;
-      }
+    if (isSubscribed && (expDate == null || expDate.isAfter(now))) {
       return true;
     }
 
-    // If valid future expiration date and not explicitly free
-    if (expDate != null && expDate.isAfter(now) && !isExplicitlyFree) {
+    if (isPlanPro && (expDate == null || expDate.isAfter(now))) {
+      return true;
+    }
+
+    if (s == 'active' && expDate != null && expDate.isAfter(now)) {
       return true;
     }
 
@@ -412,6 +418,7 @@ class UserProfile {
       } catch (_) {}
     }
 
+    final rawSubStatus = (json['subscription_status'] ?? '').toString().trim();
     final rawStatus = (subJson?['status'] ?? json['subscription_status'])?.toString().trim();
     final rawExp = subJson?['expiry']?.toString() ??
         subJson?['expires_at']?.toString() ??
@@ -419,7 +426,9 @@ class UserProfile {
         json['expires_at']?.toString() ??
         json['subscription_end_date']?.toString();
     final expDate = rawExp != null && rawExp.trim().isNotEmpty ? DateTime.tryParse(rawExp.trim()) : null;
-    final bool isExpired = expDate != null && expDate.isBefore(DateTime.now());
+    final now = DateTime.now();
+    final bool isExpired = expDate != null && expDate.isBefore(now);
+    final bool hasValidFutureExpiry = expDate != null && expDate.isAfter(now);
 
     final rawPlan = (subJson?['plan'] ??
         subJson?['plan_name'] ??
@@ -429,6 +438,20 @@ class UserProfile {
         .toString()
         .trim();
 
+    final rawPlanLower = rawPlan.toLowerCase().trim();
+    final bool isExplicitlyFree = rawPlanLower.isEmpty ||
+        rawPlanLower == 'free' ||
+        rawPlanLower == 'inactive' ||
+        rawPlanLower == 'rookie' ||
+        rawPlanLower == 'basic' ||
+        rawPlanLower == 'explorer';
+
+    final bool isPlanPro = rawPlanLower.contains('pro') ||
+        rawPlanLower.contains('premium') ||
+        rawPlanLower.contains('ranker') ||
+        rawPlanLower.contains('booster') ||
+        rawPlanLower.contains('master');
+
     final roleStr = (json['role'] ?? '').toString().toLowerCase().trim();
     final bool isAdmin = roleStr == 'admin' ||
         roleStr == 'super admin' ||
@@ -436,13 +459,24 @@ class UserProfile {
         roleStr == 'moderator' ||
         roleStr == 'teacher';
 
-    final bool isProFlag = json['is_pro'] == true ||
-        (subJson?['is_pro'] == true) ||
-        json['is_subscribed'] == true ||
-        rawStatus?.toLowerCase() == 'active' ||
-        (rawPlan.toLowerCase().contains('pro') && (expDate == null || expDate.isAfter(DateTime.now())));
+    final bool isMarkedSubscribed = json['is_subscribed'] == true ||
+        rawSubStatus.toLowerCase() == 'active' ||
+        json['is_pro'] == true ||
+        (subJson?['is_pro'] == true);
 
-    final bool isSub = isAdmin || (isProFlag && !isExpired);
+    bool isSub = false;
+    if (isAdmin) {
+      isSub = true;
+    } else if (isExpired) {
+      isSub = false;
+    } else if (isExplicitlyFree) {
+      // An explicitly Free plan is NEVER Pro unless they have a verified active future subscription
+      isSub = isMarkedSubscribed && hasValidFutureExpiry;
+    } else if (isPlanPro) {
+      isSub = !isExpired;
+    } else if (isMarkedSubscribed && hasValidFutureExpiry) {
+      isSub = true;
+    }
 
     int monthlyXpVal = (json['monthly_xp'] as num?)?.toInt() ?? 0;
     final rawResetAt = json['monthly_xp_reset_at'] as String?;

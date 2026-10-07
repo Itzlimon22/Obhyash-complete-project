@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/presentation/widgets/app_button_3d.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_popups.dart';
 import '../providers/auth_controller.dart';
 import 'forgot_password_sheet.dart';
@@ -564,7 +566,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                                                   color: textPrimary,
                                                 ),
                                                 decoration: const InputDecoration(
-                                                  hintText: 'আপনার পাসওয়ার্ড',
+                                                  hintText: 'তোমার পাসওয়ার্ড',
                                                   hintStyle: TextStyle(
                                                     fontFamily: 'HindSiliguri',
                                                     color: Color(0xFF9AA9A2),
@@ -623,7 +625,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                                               horizontal: 2,
                                             ),
                                             child: Text(
-                                              'পাসওয়ার্ড ভুলে গেছেন?',
+                                              'পাসওয়ার্ড ভুলে গেছো?',
                                               style: TextStyle(
                                                 fontFamily: 'HindSiliguri',
                                                 fontSize: 13.5,
@@ -637,58 +639,18 @@ class _LoginViewState extends ConsumerState<LoginView>
 
                                       const SizedBox(height: 20),
 
-                                      // Primary Button ("এগিয়ে যাও")
-                                      Container(
-                                        height: 56,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(16),
-                                          gradient: const LinearGradient(
-                                            begin: Alignment(-0.8, -0.6),
-                                            end: Alignment(0.8, 0.6),
-                                            colors: [
-                                              Color(0xFF0A8A66),
-                                              Color(0xFF066B4F),
-                                              Color(0xFF055640),
-                                            ],
-                                            stops: [0.0, 0.6, 1.0],
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(0xFF066B4F)
-                                                  .withValues(alpha: 0.55),
-                                              blurRadius: 24,
-                                              offset: const Offset(0, 12),
-                                              spreadRadius: -8,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            onTap: isLoading ? null : _handleLogin,
-                                            borderRadius: BorderRadius.circular(16),
-                                            child: Center(
-                                              child: isLoading
-                                                  ? const SizedBox(
-                                                      height: 22,
-                                                      width: 22,
-                                                      child: CircularProgressIndicator(
-                                                        strokeWidth: 2.4,
-                                                        color: Colors.white,
-                                                      ),
-                                                    )
-                                                  : const Text(
-                                                      'এগিয়ে যাও',
-                                                      style: TextStyle(
-                                                        fontFamily: 'HindSiliguri',
-                                                        fontSize: 17,
-                                                        fontWeight: FontWeight.w700,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                            ),
-                                          ),
-                                        ),
+                                      // Primary Button ("এগিয়ে যাও" - 3D Deepest Green)
+                                      AppButton3D(
+                                        text: 'এগিয়ে যাও',
+                                        onPressed: isLoading ? null : _handleLogin,
+                                        isLoading: isLoading,
+                                        baseColor: AppColors.viridianForest,
+                                        shadowColor: AppColors.brandGreenDark,
+                                        height: 52,
+                                        borderRadius: 16,
+                                        depth: 4.5,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
                                       ),
 
                                       const SizedBox(height: 24),

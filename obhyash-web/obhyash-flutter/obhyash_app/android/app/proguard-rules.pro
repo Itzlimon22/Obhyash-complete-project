@@ -80,8 +80,14 @@
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.** { *; }
 
+# ── Google Play In-App Updates ────────────────────────────────────
+-keep class com.google.android.play.core.appupdate.** { *; }
+-keep class com.google.android.play.core.install.** { *; }
+-dontwarn com.google.android.play.core.**
+
 # ── General Android / Java ───────────────────────────────────────
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
 -dontwarn java.lang.invoke.**
 -dontwarn **$$Lambda$*
+

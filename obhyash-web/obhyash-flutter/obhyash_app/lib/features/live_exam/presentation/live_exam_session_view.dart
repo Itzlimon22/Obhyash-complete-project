@@ -34,6 +34,7 @@ class LiveExamSessionView extends ConsumerStatefulWidget {
 class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     with WidgetsBindingObserver {
   final Map<String, int> _userAnswers = {};
+  final Map<String, int> _selectionCounts = {};
   final Set<String> _flaggedIds = {};
   final Set<String> _bookmarkedIds = {};
   final ScrollController _scrollController = ScrollController();
@@ -476,12 +477,14 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               (existing == null || existing['status'] != 'submitted') &&
               !isPast;
 
+          final maxDurationSec = (widget.exam?.durationMinutes ?? 30) * 60;
+          final maxDurationMs = maxDurationSec * 1000;
           final submitTime = DateTime.now().toUtc();
           timeTakenMs = submitTime
               .difference(_sessionStartTime)
               .inMilliseconds
-              .clamp(0, 86400000);
-          timeTakenSeconds = (timeTakenMs / 1000).round().clamp(0, 86400);
+              .clamp(0, maxDurationMs);
+          timeTakenSeconds = (timeTakenMs / 1000).round().clamp(0, maxDurationSec);
 
           if (isFirstOfficialAttempt) {
             // 1. Official Live Attempt -> Determines Leaderboard Rank
@@ -675,7 +678,13 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               builder: (_) => ResultView(
                 result: examResult,
                 onRestart: () {
-                  Navigator.of(context).pop();
+                  if (context.mounted && Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else if (context.mounted && context.canPop()) {
+                    context.pop();
+                  } else if (context.mounted) {
+                    context.go('/live_exam');
+                  }
                 },
               ),
             ),
@@ -1056,39 +1065,138 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     );
   }
 
-  void _showCancelConfirmation() {
+  void _showBackConfirmDialog() {
+    if (_isSubmitting) return;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text(
-          'পরীক্ষা বাতিল করবে?',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        content: const Text(
-          'এখন বের হয়ে গেলে তোমার উত্তরপত্র জমা হবে না।',
-          style: TextStyle(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('না, ফিরে যাই', style: TextStyle()),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF740A03), // Solid #740A03
-              foregroundColor: Colors.white,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+              width: 1,
             ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.pop();
-            },
-            child: const Text('হ্যাঁ, বের হন', style: TextStyle()),
           ),
-        ],
-      ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEA580C).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFFEA580C).withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      LucideIcons.alertTriangle,
+                      color: Color(0xFFF97316),
+                      size: 28,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'সতর্কতা',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'পরীক্ষা চলাকালীন বের হওয়া যাবে না। পরীক্ষাটি এখনই জমা দিতে চাও?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(ctx),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'চালিয়ে যাও',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF4B5563),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _submitExam();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF004633), Color(0xFF00664B)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF004633).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'জমা দাও',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1101,7 +1209,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) _showCancelConfirmation();
+        if (!didPop && !_isSubmitting) _showBackConfirmDialog();
       },
       child: Scaffold(
         backgroundColor: isDark ? Colors.black : const Color(0xFFF8FAFC),
@@ -1433,7 +1541,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   );
                 }
 
-                final isAnswered = _userAnswers.containsKey(q.id);
+                final isLocked = (_selectionCounts[q.id] ?? 0) >= 2;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1448,12 +1556,18 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         selectedOptionIndex: _userAnswers[q.id],
                         isFlagged: _flaggedIds.contains(q.id),
                         isBookmarked: _bookmarkedIds.contains(q.id),
-                        readOnly: isAnswered, // Locked after selection
+                        readOnly: isLocked, // Locked after 2 selections
                         hideSourceTag: true,
                         onSelectOption: (optIndex) {
-                          if (_userAnswers.containsKey(q.id))
-                            return; // Locked: no change allowed
+                          final currentCount = _selectionCounts[q.id] ?? 0;
+                          if (currentCount >= 2) {
+                            return; // Locked: no change allowed after 2 selections
+                          }
+                          if (_userAnswers[q.id] == optIndex) {
+                            return; // Same option tapped
+                          }
                           setState(() {
+                            _selectionCounts[q.id] = currentCount + 1;
                             _userAnswers[q.id] = optIndex;
                           });
                         },

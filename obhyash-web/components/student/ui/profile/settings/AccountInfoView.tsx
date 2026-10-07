@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   User,
   Hash,
@@ -15,10 +15,10 @@ import {
   ArrowLeft,
   ShieldCheck,
   Target,
-} from 'lucide-react';
-import { UserProfile } from '@/lib/types';
-import { toast } from 'sonner';
-import UserAvatar from '../../common/UserAvatar';
+} from "lucide-react";
+import { UserProfile } from "@/lib/types";
+import { toast } from "sonner";
+import UserAvatar from "../../common/UserAvatar";
 
 interface AccountInfoViewProps {
   user: UserProfile;
@@ -34,10 +34,10 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
   const displayStudentId =
     (user as any)?.student_id ||
     (user as any)?.displayStudentId ||
-    (user.id ? `OBH-${user.id.slice(0, 5).toUpperCase()}` : 'N/A');
+    (user.id ? `OBH-${user.id.slice(0, 5).toUpperCase()}` : "N/A");
 
   const copySingle = (label: string, value: string, key: string) => {
-    if (!value || value === 'N/A') return;
+    if (!value || value === "N/A") return;
     navigator.clipboard.writeText(value);
     setCopiedKey(key);
     toast.success(`${label} কপি করা হয়েছে!`);
@@ -46,55 +46,56 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
 
   const copyAll = () => {
     const lines = [
-      '📋 Obhyash Account Info:',
+      "📋 Obhyash Account Info:",
       `• Student ID: ${displayStudentId}`,
-      `• User Name: ${user.name || 'N/A'}`,
+      `• User Name: ${user.name || "N/A"}`,
     ];
     if (user.email) lines.push(`• Email: ${user.email}`);
     if (user.phone) lines.push(`• Phone: ${user.phone}`);
     if (user.stream) {
       lines.push(
-        `• Stream: ${user.stream}${user.batch ? ` (${user.batch})` : ''}`
+        `• Stream: ${user.stream}${user.batch ? ` (${user.batch})` : ""}`,
       );
     }
     if (user.institute) lines.push(`• Institute: ${user.institute}`);
     if (user.target) lines.push(`• Target: ${user.target}`);
-    lines.push(`• System UUID: ${user.id || 'N/A'}`);
+    lines.push("• App Version: v1.0.3");
+    lines.push(`• System UUID: ${user.id || "N/A"}`);
 
-    navigator.clipboard.writeText(lines.join('\n'));
-    toast.success('সব অ্যাকাউন্ট ইনফো কপি করা হয়েছে!');
+    navigator.clipboard.writeText(lines.join("\n"));
+    toast.success("সব অ্যাকাউন্ট ইনফো কপি করা হয়েছে!");
   };
 
   const infoRows = [
     {
-      key: 'name',
-      label: 'User Name',
-      bengaliLabel: 'ব্যবহারকারীর নাম',
-      value: user.name || 'শিক্ষার্থী',
+      key: "name",
+      label: "User Name",
+      bengaliLabel: "ব্যবহারকারীর নাম",
+      value: user.name || "শিক্ষার্থী",
       icon: User,
-      iconBg: 'bg-[#0D9488]',
+      iconBg: "bg-[#0D9488]",
       isMonospace: false,
       showCopy: true,
     },
     {
-      key: 'userId',
-      label: 'User ID (Student ID)',
-      bengaliLabel: 'স্টুডেন্ট আইডি',
+      key: "userId",
+      label: "User ID (Student ID)",
+      bengaliLabel: "স্টুডেন্ট আইডি",
       value: displayStudentId,
       icon: Hash,
-      iconBg: 'bg-[#0D9488]',
+      iconBg: "bg-[#0D9488]",
       isMonospace: true,
       showCopy: true,
     },
     ...(user.email
       ? [
           {
-            key: 'email',
-            label: 'Email',
-            bengaliLabel: 'ইমেইল',
+            key: "email",
+            label: "Email",
+            bengaliLabel: "ইমেইল",
             value: user.email,
             icon: Mail,
-            iconBg: 'bg-[#0D9488]',
+            iconBg: "bg-[#0D9488]",
             isMonospace: false,
             showCopy: true,
           },
@@ -103,66 +104,24 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
     ...(user.phone
       ? [
           {
-            key: 'phone',
-            label: 'Phone',
-            bengaliLabel: 'ফোন নম্বর',
+            key: "phone",
+            label: "Phone",
+            bengaliLabel: "ফোন নম্বর",
             value: user.phone,
             icon: Phone,
-            iconBg: 'bg-[#0D9488]',
-            isMonospace: false,
-            showCopy: true,
-          },
-        ]
-      : []),
-    ...(user.stream
-      ? [
-          {
-            key: 'stream',
-            label: 'Stream & Batch',
-            bengaliLabel: 'বিভাগ ও ব্যাচ',
-            value: `${user.stream}${user.batch ? ` (${user.batch})` : ''}`,
-            icon: GraduationCap,
-            iconBg: 'bg-[#0D9488]',
-            isMonospace: false,
-            showCopy: true,
-          },
-        ]
-      : []),
-    ...(user.institute
-      ? [
-          {
-            key: 'institute',
-            label: 'Institute',
-            bengaliLabel: 'শিক্ষা প্রতিষ্ঠান',
-            value: user.institute,
-            icon: School,
-            iconBg: 'bg-[#0D9488]',
-            isMonospace: false,
-            showCopy: true,
-          },
-        ]
-      : []),
-    ...(user.target
-      ? [
-          {
-            key: 'target',
-            label: 'Target',
-            bengaliLabel: 'টার্গেট',
-            value: user.target,
-            icon: Target,
-            iconBg: 'bg-[#0D9488]',
+            iconBg: "bg-[#0D9488]",
             isMonospace: false,
             showCopy: true,
           },
         ]
       : []),
     {
-      key: 'uuid',
-      label: 'System UUID',
-      bengaliLabel: 'সিস্টেম আইডি (UUID)',
-      value: user.id || 'N/A',
-      icon: KeyRound,
-      iconBg: 'bg-[#0D9488]',
+      key: "appVersion",
+      label: "App Version",
+      bengaliLabel: "অ্যাপ সংস্করণ",
+      value: "v1.0.3",
+      icon: ShieldCheck,
+      iconBg: "bg-[#0D9488]",
       isMonospace: true,
       showCopy: true,
     },
@@ -183,16 +142,13 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
 
         <div>
           <h2 className="text-[19px] font-bold text-[#0F172A] dark:text-white font-['Anek_Bangla',sans-serif]">
-            {user.name || 'শিক্ষার্থী'}
+            {user.name || "শিক্ষার্থী"}
           </h2>
           <div className="mt-1 flex items-center justify-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-[#ECFDF5] dark:bg-[#064E3B]/30 text-[#12544F] dark:text-[#34D399] font-mono text-xs font-bold border border-[#A7F3D0] dark:border-[#12544F]/40">
               {displayStudentId}
             </span>
           </div>
-          <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1.5 font-['HindSiliguri',sans-serif]">
-            সাপোর্ট বা অ্যাডমিনের সহায়তার জন্য প্রয়োজনীয় তথ্য
-          </p>
         </div>
       </div>
 
@@ -227,7 +183,7 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
                     </div>
                     <p
                       className={`text-sm sm:text-[15px] font-bold text-[#0F172A] dark:text-white truncate mt-0.5 font-['Anek_Bangla',sans-serif] ${
-                        row.isMonospace ? 'font-mono text-xs sm:text-sm' : ''
+                        row.isMonospace ? "font-mono text-xs sm:text-sm" : ""
                       }`}
                     >
                       {row.value}
@@ -274,8 +230,11 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
       <div className="mt-4 p-3.5 rounded-[14px] bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 flex items-start gap-2.5">
         <ShieldCheck className="w-4.5 h-4.5 text-[#12544F] dark:text-[#34D399] shrink-0 mt-0.5" />
         <p className="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed font-medium">
-          যেকোনো অভিযোগ বা সাপোর্টের জন্য যোগাযোগ করার সময় তোমার{' '}
-          <strong className="font-bold">স্টুডেন্ট আইডি ({displayStudentId})</strong> উল্লেখ করো।
+          যেকোনো অভিযোগ বা সাপোর্টের জন্য যোগাযোগ করার সময় তোমার{" "}
+          <strong className="font-bold">
+            স্টুডেন্ট আইডি ({displayStudentId})
+          </strong>{" "}
+          উল্লেখ করো।
         </p>
       </div>
     </div>

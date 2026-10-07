@@ -741,12 +741,13 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
       );
     }
 
+    final cleanLatex = QuestionFormatter.autoHealRawLatex(latex.trim());
     final mathWidget = Math.tex(
-      latex,
+      cleanLatex,
       mathStyle: MathStyle.text,
       textStyle: style,
       onErrorFallback: (_) => Text(
-        latex,
+        cleanLatex,
         style: style,
       ),
     );
@@ -779,6 +780,7 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
       );
     }
 
+    final cleanLatex = QuestionFormatter.autoHealRawLatex(latex.trim());
     return Align(
       alignment: Alignment.center,
       child: SingleChildScrollView(
@@ -786,12 +788,12 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Math.tex(
-            latex,
+            cleanLatex,
             mathStyle: MathStyle.display,
             textStyle: style,
             onErrorFallback: (_) => Text(
-              '\$\$$latex\$\$',
-              style: style.copyWith(color: Colors.redAccent),
+              cleanLatex,
+              style: style,
             ),
           ),
         ),

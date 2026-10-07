@@ -55,12 +55,12 @@ class _WelcomeViewState extends State<WelcomeView> {
     _startAutoPlay();
   }
 
-  void _startAutoPlay() {
+  void _startAutoPlay([int totalSlides = 8]) {
     _autoPlayTimer?.cancel();
     _autoPlayTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (!mounted) return;
       if (_pageController.hasClients) {
-        final nextPage = (_currentPage + 1) % 5;
+        final nextPage = (_currentPage + 1) % totalSlides;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 600),
@@ -70,8 +70,8 @@ class _WelcomeViewState extends State<WelcomeView> {
     });
   }
 
-  void _onUserSwiped() {
-    _startAutoPlay();
+  void _onUserSwiped([int totalSlides = 8]) {
+    _startAutoPlay(totalSlides);
   }
 
   @override
@@ -96,8 +96,8 @@ class _WelcomeViewState extends State<WelcomeView> {
 
       // SLIDE 2: EXAM RUNNER
       OnboardingSlide(
-        tag: 'রিয়েল-টাইম এক্সাম',
-        title: 'লাইভ কাউন্টডাউন ও টাইমড পরীক্ষা',
+        tag: 'মক পরীক্ষা',
+        title: 'লাইভ কাউন্টডাউন ও রিয়েল-টাইম পরীক্ষা',
         icon: LucideIcons.timer,
         imageAssetPath: 'assets/images/onboarding/exam.png',
         accentColor: const Color(0xFF059669),
@@ -106,7 +106,7 @@ class _WelcomeViewState extends State<WelcomeView> {
 
       // SLIDE 3: TOPIC PRACTICE & QUESTION SOLVING
       OnboardingSlide(
-        tag: 'টপিকভিত্তিক অনুশীলন',
+        tag: 'অনুশীলন',
         title: 'হাজারো অধ্যায়ভিত্তিক প্রশ্ন ও নির্ভুল ব্যাখ্যা',
         icon: LucideIcons.bookOpen,
         imageAssetPath: 'assets/images/onboarding/practice.png',
@@ -127,11 +127,41 @@ class _WelcomeViewState extends State<WelcomeView> {
       // SLIDE 5: LIVE MODEL TESTS
       OnboardingSlide(
         tag: 'লাইভ মডেল টেস্ট',
-        title: 'ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি প্রস্তুতি',
+        title: 'ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি লাইভ টেস্ট',
         icon: LucideIcons.trophy,
         imageAssetPath: 'assets/images/onboarding/live_exam.png',
         accentColor: const Color(0xFFD97706),
         fallbackWidget: _buildMinimalLeaderboardCard(),
+      ),
+
+      // SLIDE 6: LEADERBOARD
+      OnboardingSlide(
+        tag: 'লিডারবোর্ড',
+        title: 'দেশসেরাদের সাথে জাতীয় লিডারবোর্ড র‍্যাঙ্কিং',
+        icon: LucideIcons.crown,
+        imageAssetPath: 'assets/images/onboarding/leaderboard.png',
+        accentColor: const Color(0xFFF59E0B),
+        fallbackWidget: _buildMinimalLeaderboardCard(),
+      ),
+
+      // SLIDE 7: QUESTION BANK
+      OnboardingSlide(
+        tag: 'প্রশ্নব্যাংক',
+        title: 'বিগত বছরের বোর্ড ও প্রতিষ্ঠান ভিত্তিক প্রশ্নব্যাংক',
+        icon: LucideIcons.library,
+        imageAssetPath: 'assets/images/onboarding/question_bank.png',
+        accentColor: const Color(0xFF7C3AED),
+        fallbackWidget: _buildMinimalExamCard(),
+      ),
+
+      // SLIDE 8: SMART ANALYSIS
+      OnboardingSlide(
+        tag: 'স্মার্ট অ্যানালাইসিস',
+        title: 'স্মার্ট এআই অ্যানালিটিক্স ও দুর্বলতা বিশ্লেষণ',
+        icon: LucideIcons.barChart2,
+        imageAssetPath: 'assets/images/onboarding/analysis.png',
+        accentColor: const Color(0xFFE11D48),
+        fallbackWidget: _buildMinimalAnalysisCard(),
       ),
     ];
 
@@ -154,7 +184,7 @@ class _WelcomeViewState extends State<WelcomeView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Top Brand Logo (Transparent BG, Black Text)
+                // Top Brand Logo
                 Padding(
                   padding: const EdgeInsets.only(top: 14, bottom: 4),
                   child: Center(
@@ -182,68 +212,34 @@ class _WelcomeViewState extends State<WelcomeView> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 6),
 
-                            // Showcase Image
+                            // Showcase Image (Full S25 Device Frame)
                             Center(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: ConstrainedBox(
                                   constraints: BoxConstraints(
-                                    maxHeight: MediaQuery.of(context).size.height * 0.47,
+                                    maxHeight: MediaQuery.of(context).size.height * 0.49,
                                   ),
                                   child: _buildShowcaseCard(slide),
                                 ),
                               ),
                             ),
 
-                            const SizedBox(height: 14),
+                            const SizedBox(height: 18),
 
-                            // Slide Tag Pill
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: slide.accentColor.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: slide.accentColor.withValues(alpha: 0.20),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    slide.icon,
-                                    size: 13,
-                                    color: slide.accentColor,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    slide.tag,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: slide.accentColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-
-                            // Slide Title
+                            // Slide Title (Bold text right below image - No pill badge!)
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Text(
                                 slide.title,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontSize: 18.5,
+                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 19.5,
                                   fontWeight: FontWeight.w800,
-                                  height: 1.3,
+                                  height: 1.35,
                                   color: textPrimary,
                                   letterSpacing: -0.2,
                                 ),
@@ -333,34 +329,13 @@ class _WelcomeViewState extends State<WelcomeView> {
   Widget _buildShowcaseCard(OnboardingSlide slide) {
     if (slide.imageAssetPath != null) {
       return Center(
-        child: AspectRatio(
-          aspectRatio: 9 / 19.5,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: surfaceBorder, width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 20,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(21),
-              child: Image.asset(
-                slide.imageAssetPath!,
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.high,
-                errorBuilder: (context, error, stackTrace) {
-                  return slide.fallbackWidget;
-                },
-              ),
-            ),
-          ),
+        child: Image.asset(
+          slide.imageAssetPath!,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (context, error, stackTrace) {
+            return slide.fallbackWidget;
+          },
         ),
       );
     }

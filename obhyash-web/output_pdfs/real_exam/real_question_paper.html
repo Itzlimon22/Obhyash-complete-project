@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>Medical Daily Exam - 3 ফাইনাল মডেল টেস্ট — প্রশ্নপত্র</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" crossorigin="anonymous">
+<style>
+@font-face {
+  font-family: 'Kalpurush';
+  src: url('/fonts/Kalpurush.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@page {
+  size: 210mm 297mm;
+  margin: 10mm 12mm 12mm 12mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+}
+
+body {
+  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'SolaimanLipi', 'Kohinoor Bangla', 'FreeSans', serif;
+  font-size: 9.4pt;
+  color: #000000;
+  line-height: 1.35;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Watermark in page center */
+.watermark-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 110pt;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.045);
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+  white-space: nowrap;
+  letter-spacing: 4px;
+  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'SolaimanLipi', 'Kohinoor Bangla', 'FreeSans', serif;
+}
+
+.passage-box {
+  background: #f8fafc;
+  border-left: 2.5px solid #475569;
+  padding: 3px 6px;
+  margin-bottom: 4px;
+  font-size: 8.8pt;
+  font-weight: 500;
+  color: #1e293b;
+  border-radius: 2px;
+}
+
+/* ── Standard Bangladeshi Exam Header (Exact Replica of Reference) ── */
+.header-box {
+  position: relative;
+  text-align: center;
+  margin-bottom: 6px;
+  padding-bottom: 2px;
+}
+
+.brand-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1.2px solid #006A4E;
+  background: #E8F5E9;
+  color: #006A4E;
+  font-size: 8pt;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.cat-title {
+  font-size: 10.5pt;
+  font-weight: 700;
+  color: #222222;
+  margin-bottom: 1px;
+}
+
+.main-title {
+  font-size: 13pt;
+  font-weight: 800;
+  color: #000000;
+  margin-bottom: 1px;
+}
+
+.sub-title {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 5px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9pt;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 8.8pt;
+  font-weight: 600;
+  color: #222222;
+  margin-bottom: 3px;
+  padding: 0 2px;
+}
+
+.name-dots {
+  display: inline-block;
+  flex: 1;
+  border-bottom: 1px dotted #333333;
+  margin: 0 10px 0 6px;
+  height: 11px;
+}
+
+.roll-dots {
+  display: inline-block;
+  width: 140px;
+  border-bottom: 1px dotted #333333;
+  margin-left: 6px;
+  height: 11px;
+}
+
+.note-line {
+  font-size: 7.8pt;
+  font-weight: 500;
+  color: #333333;
+  text-align: center;
+  margin: 3px 0 5px 0;
+  letter-spacing: 0.1px;
+}
+
+.header-hr {
+  border: 0;
+  border-top: 1px solid #000000;
+  margin: 0 0 9px 0;
+}
+
+/* ── 2-Column Newspaper Exam Layout ── */
+.columns-wrapper {
+  column-count: 2;
+  column-gap: 22px;
+  column-rule: 0.7px solid #444444;
+  -webkit-column-count: 2;
+  -webkit-column-gap: 22px;
+  -webkit-column-rule: 0.7px solid #444444;
+  text-align: justify;
+}
+
+.q-block {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 8.5px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.q-row {
+  display: flex;
+  align-items: flex-start;
+  font-size: 9.4pt;
+  line-height: 1.34;
+  color: #000000;
+}
+
+.q-num {
+  font-weight: 700;
+  min-width: 20px;
+  flex-shrink: 0;
+  padding-right: 2px;
+  font-size: 9.4pt;
+}
+
+.q-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.opt-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 2.5px;
+  margin-left: 20px;
+}
+
+.opt-col {
+  width: 50%;
+  padding-right: 4px;
+  margin-bottom: 1.5px;
+  font-size: 8.9pt;
+  line-height: 1.3;
+  display: flex;
+  align-items: flex-start;
+}
+
+.opt-col.full-w {
+  width: 100%;
+}
+
+.opt-lbl {
+  font-weight: 600;
+  margin-right: 3px;
+  flex-shrink: 0;
+  font-size: 8.7pt;
+}
+
+.opt-val {
+  flex: 1;
+}
+
+/* ── KaTeX Math Adjustments for Print ── */
+.katex {
+  font-size: 1.02em;
+  text-rendering: auto;
+}
+
+.katex-display {
+  margin: 2px 0 !important;
+  font-size: 0.95em;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.m {
+  display: inline;
+}
+
+.dm {
+  display: block;
+  text-align: center;
+  margin: 3px 0;
+}
+
+.dl {
+  display: inline-block;
+  width: 2px;
+}
+
+/* ── Screen Controls (hidden when printed) ── */
+@media screen {
+  body {
+    padding: 20px;
+    background: #eef2f5;
+  }
+  .page-card {
+    max-width: 210mm;
+    margin: 0 auto 30px auto;
+    background: #ffffff;
+    padding: 12mm;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    border-radius: 4px;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="watermark-bg">অভ্যাস</div>
+
+<div class="page-card">
+  <!-- Exam Header -->
+  <div class="header-box">
+    <div class="brand-badge">অভ্যাস</div>
+    <div class="cat-title">মডেল টেস্ট</div>
+    <div class="main-title">Medical Daily Exam - 3 ফাইনাল মডেল টেস্ট</div>
+    <div class="sub-title">বিষয়ঃ Medical Daily Exam - 3 (MCQ)</div>
+
+    <div class="meta-row">
+      <div class="meta-item">অধ্যায়: সম্পূর্ণ সিলেবাস</div>
+      <div class="meta-item">মোট প্রশ্ন: ৫০টি</div>
+      <div class="meta-item">সময়: ৫০ মিনিট</div>
+      <div class="meta-item">পূর্ণমান: ৫০</div>
+      <div class="meta-item">প্রাপ্ত নম্বর: ________</div>
+    </div>
+
+    <div class="student-row">
+      <span style="white-space:nowrap;">শিক্ষার্থীর নাম:</span>
+      <span class="name-dots"></span>
+      <span style="white-space:nowrap;">রোল নং:</span>
+      <span class="roll-dots"></span>
+    </div>
+
+    <div class="note-line">[বি:দ্র: সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট কর। প্রতিটি প্রশ্নের মান-১]</div>
+    <hr class="header-hr">
+  </div>
+
+  <!-- 2 Column Question Body -->
+  <div class="columns-wrapper">
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১।</span>
+          <div class="q-text">মাইটোসিসের কোন পর্যায়ে মধ্যপর্দার সূচনা ঘটে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Prophase</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Metaphase</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Anaphase</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Telophase</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২।</span>
+          <div class="q-text">কোন পর্বে কলার কোষ পাওয়া যায়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Porifera</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Arthropoda</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Mollusca</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Echinodermata</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩।</span>
+          <div class="q-text">মানবদেহে কোন ধরনের মায়োসিস হয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Zygotic meiosis</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Sporic meiosis</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Terminal meiosis</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Gametic meiosis</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪।</span>
+          <div class="q-text">Pteris এর গ্যামিটোফাইটিক পর্যায়ের প্রথম প্রতিনিধি কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">জাইগোট</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">স্পোর</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">প্রোথ্যালাস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">ভ্রূণ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৫।</span>
+          <div class="q-text">কোন ধাপে অ্যাস্টার রশির সৃষ্টি হয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">প্রো-মেটাফেজ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">মেটাফেজ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">অ্যানাফেজ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">টেলোফেজ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৬।</span>
+          <div class="q-text">আয়তনের দিক থেকে মানবদেহে সবচেয়ে ছোট কোষ কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">লোহিত রক্তকণিকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">শুক্রাণু</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ডিম্বাণু</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">স্নায়ুকোষ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৭।</span>
+          <div class="q-text">প্রকৃতকোষে রাইবোসোমের একটি উপ-একক 40S হলে অপরটি কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">30S</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">50S</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">60S</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">80S</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৮।</span>
+          <div class="q-text">প্রকৃত কোষে RNA পলিমারেজ কত প্রকার?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">২</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">৩</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">৪</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">৫</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৯।</span>
+          <div class="q-text">ডিফিসার্কাল ধরনের পুচ্ছ-পাখনা উপস্থিত কোনটিতে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">রুই মাছ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">হাঙ্গর মাছ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">শাপলাপাতা মাছ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">সিলাকাছ মাছ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১০।</span>
+          <div class="q-text">লবণ সেতুর কাজ হলো-</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col full-w"><span class="opt-lbl">(ক)</span><span class="opt-val">দুটি অর্ধকোষের দ্রবণের মধ্যে সংযোগ সৃষ্টি করা</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(খ)</span><span class="opt-val">আয়নকে অ্যানোড ও ক্যাথোডের মধ্যে চলাচল বিরত রাখে</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(গ)</span><span class="opt-val">দুটি অর্ধকোষের দ্রবণকে তড়িৎ নিরপেক্ষ রাখে</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(ঘ)</span><span class="opt-val">দুটি অর্ধকোষের দ্রবণের মধ্যে বিভব বৈষম্যের সৃষ্টি করে</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১১।</span>
+          <div class="q-text">কোনো জটিল মাধ্যমিক পর্যায় ছাড়াই দুটি অপত্য কোষের সৃষ্টি হয় কোন প্রকার কোষ বিভাজনে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col full-w"><span class="opt-lbl">(ক)</span><span class="opt-val">মাইটোসিস</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(খ)</span><span class="opt-val">মিয়োসিস</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(গ)</span><span class="opt-val">অ্যামাইটোসিস (প্রত্যক্ষ কোষ বিভাজন)</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(ঘ)</span><span class="opt-val">এন্ডোমাইটোসিস</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১২।</span>
+          <div class="q-text">অক্টোপাস Mollusca পর্বের কোন class এর অন্তর্ভুক্ত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Gastropoda</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Bivalvia</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Cephalopoda</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Polyplacophora</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৩।</span>
+          <div class="q-text">অক্ষিগোলকের অগ্রপ্রকোষ্ঠ কোনটি দিয়ে পূর্ণ থাকে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ভিট্রিয়াস হিউমার</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">অ্যাকুয়াস হিউমার</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">লেন্স</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">কর্নিয়া</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৪।</span>
+          <div class="q-text">প্রতি কোষে প্লাসমিডের সংখ্যা-</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">১ - ১০</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">১ - ১০০</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">১ - ১০০০</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">১০ - ১০০০০</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৫।</span>
+          <div class="q-text">বেসিডিয়াম উপস্থিত কোন ছত্রকে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">মাশরুম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">ইস্ট</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">পেনিসিলিয়াম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">মিউকর</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৬।</span>
+          <div class="q-text">কোন প্রাণী অযৌন ও যৌন দুভাবেই প্রজনন সম্পন্ন করে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">হাইড্রা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">রুই মাছ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ঘাসফড়িং</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">মানুষ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৭।</span>
+          <div class="q-text">কোষের কোনটি বিভিন্ন রকম তথ্যের ভিত্তি হিসেবে কাজ করে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">কোষঝিল্লি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">রাইবোসোম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">লাইসোজোম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">মাইটোকন্ড্রিয়া</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৮।</span>
+          <div class="q-text">হেরিংগাল এর খাদ্যগ্রহণ প্রক্রিয়া কোন ধরনের সংকেতিক উদ্দীপনা?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">মোটিভেশনাল উদ্দীপনা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">রিফ্লেক্স</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">টার্মিনেটিং উদ্দীপনা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">রিলিজিং উদ্দীপনা</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৯।</span>
+          <div class="q-text">রক্তের গ্লুকোজ লেভেল বেড়ে গেলে নিচের কোন কোষ উদ্দীপিত হয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">আলফা কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">বিটা কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ডেল্টা কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">পিপি কোষ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২০।</span>
+          <div class="q-text">কর্নিয়ার বাইরের কোষের পুনরুৎপাদন কোন প্রক্রিয়ায় ঘটে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">অ্যামাইটোসিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">মায়োসিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">মাইটোসিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">এন্ডোমাইটোসিস</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২১।</span>
+          <div class="q-text">নিচের কোনটি ইন্টারমিডিয়েট ফিলামেন্ট নয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">কেরাটিন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">ল্যামিনিন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">নিউরোফিলামেন্ট</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">অ্যাকটিন</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২২।</span>
+          <div class="q-text">নিচের কোনটি সরীসৃপ ও পাখির মিশ্র চরিত্রবাহী?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Archaeopteryx</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Pterosaurus</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Ichthyosaurus</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Dimetrodon</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৩।</span>
+          <div class="q-text">দেহের সঞ্চিত রাসায়নিক শক্তির আধার হিসেবে কাজ করে নিচের কোন কোষ?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">অস্টিওব্লাস্ট</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">অস্টিওসাইট</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">অ্যাডিপোজ কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">কনড্রোসাইট</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৪।</span>
+          <div class="q-text">আয়তনে মানবদেহের সবচেয়ে ছোট কোষ কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">শুক্রাণু</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">ডিম্বাণু</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">লোহিত রক্তকণিকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">স্নায়ুকোষ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৫।</span>
+          <div class="q-text">বৃহদন্ত্রের কোন স্তরে গবলেট কোষ পাওয়া যায়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">সেরোসা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">মাসকুলারিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">সাব-মিউকোসা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">মিউকোসা</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৬।</span>
+          <div class="q-text">নিচের কোনটিতে অ্যামাইটোসিস দেখা যায় না?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ইস্ট</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">অ্যামিবা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ব্যাকটেরিয়া</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">ফানজাই</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৭।</span>
+          <div class="q-text">Stabilizer এবং Labilizer নিচের কোন অঙ্গাণুর বৈশিষ্ট্য?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">মাইটোকন্ড্রিয়া</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">রাইবোসোম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">লাইসোসোম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">গলগি বডি</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৮।</span>
+          <div class="q-text">কোষ্ঠকাঠিন্য দূর করতে বা কোষ্ঠ পরিষ্কারে সাহায্য করে কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">পিত্ত লবণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">গ্যাস্ট্রিক জুস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">মিউসিন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">লাইপেজ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২৯।</span>
+          <div class="q-text">এন্ডোডার্মিসের ভান্ডার কোষ হিসেবে কাজ করে-</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">স্টার্চ সিথ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">প্যারেনকাইমা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">কোলেনকাইমা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">স্ক্লেরেনকাইমা</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩০।</span>
+          <div class="q-text">নিচের কোন তথ্যটি ঘাসফড়িং এর হৃদযন্ত্র সম্পর্কে সঠিক?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col full-w"><span class="opt-lbl">(ক)</span><span class="opt-val">৭ জোড়া প্রকোষ্ঠ বিশিষ্ট</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(খ)</span><span class="opt-val">৬ টি আলারি পেশি বিদ্যমান</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(গ)</span><span class="opt-val">হৃদযন্ত্রের স্পন্দন প্রতি সেকেন্ড ১০০-১১০ বার</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(ঘ)</span><span class="opt-val">সমগ্র দেহে একবার রক্ত প্রবাহিত হতে ৩০-৬০ মিনিট সময় লাগে</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩১।</span>
+          <div class="q-text">হাইড্রার গ্যাস্ট্রোডার্মিসের কোন কোষে মায়োনিম পাওয়া যায়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">পুষ্টি কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">পেশি আবরণী কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">গ্রন্থি কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">ইন্টারস্টিশিয়াল কোষ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩২।</span>
+          <div class="q-text">কোষ চক্রের কোন দশায় হিস্টোন প্রোটিন সংশ্লেষণ ঘটে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">G_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> দশা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">S দশা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">G_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> দশা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">M দশা</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৩।</span>
+          <div class="q-text">নিচের কোন পর্বে বিশেষ ধরনের পানি সংবহনতন্ত্র পাওয়া যায়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Echinodermata</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Porifera</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Cnidaria</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Arthropoda</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৪।</span>
+          <div class="q-text">ছত্রাকের কোষ প্রাচীরের প্রধান উপাদান কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">সেলুলোজ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">কাইটিন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">পেপটিডোগ্লাইকান</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">লিগনিন</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৫।</span>
+          <div class="q-text">ট্রান্সজেনিক প্রাণীর ক্ষেত্রে-</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col full-w"><span class="opt-lbl">(ক)</span><span class="opt-val">বিশেষ বৈশিষ্ট্যের সমাহার ঘটে</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(খ)</span><span class="opt-val">প্রজনন ক্ষমতা হ্রাস পায়</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(গ)</span><span class="opt-val">আয়ুষ্কাল কমে যায়</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(ঘ)</span><span class="opt-val">রোগ প্রতিরোধ ক্ষমতা কমে যায়</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৬।</span>
+          <div class="q-text">মানুষের জীবনকালে কোষগুলো প্রায় কতবার বিভাজিত হয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>10</mn></msup></mrow><annotation encoding="application/x-tex">10^{10}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>15</mn></msup></mrow><annotation encoding="application/x-tex">10^{15}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>20</mn></msup></mrow><annotation encoding="application/x-tex">10^{20}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>25</mn></msup></mrow><annotation encoding="application/x-tex">10^{25}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">25</span></span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৭।</span>
+          <div class="q-text">কোষপ্রাচীর গঠনে ক্রসলিংক হিসেবে কাজ করে কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Hemicellulose</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Pectin</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Lignin</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Suberin</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৮।</span>
+          <div class="q-text">কোষ প্রাচীরের ক্ষেত্রে প্রযোজ্য-</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col full-w"><span class="opt-lbl">(ক)</span><span class="opt-val">সাইটোকাইনেসিস পর্যায়ে এর সূচনা ঘটে</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(খ)</span><span class="opt-val">প্রাথমিক প্রাচীর বিগলিত হলে দুটি কোষ পৃথক হয়ে যায়</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(গ)</span><span class="opt-val">পাতা, ফল, কর্টেক্সে সাধারণত কেবল সেকেন্ডারি প্রাচীর থাকে</span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(ঘ)</span><span class="opt-val">গলগি বডি কোষ প্রাচীর গঠনে ভূমিকা পালন করে</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩৯।</span>
+          <div class="q-text">অপ্রতিসম প্রাণী নিচের কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">Volvox</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">Hydra</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">Frog</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">Pila globosa</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪০।</span>
+          <div class="q-text">পাশাপাশি কোষ প্রাচীরের সূক্ষ্ম ছিদ্রপথে সাইটোপ্লাজমিক সংযোগ স্থাপিত হলে তাকে কী বলে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">প্লাজমোডেজমাটা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">ডেসমোজোম</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">টাইট জাংশন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">গ্যাপ জাংশন</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪১।</span>
+          <div class="q-text">কোন বিজ্ঞানী কোষ বিভাজন আবিষ্কার করেন?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ওয়াল্টার ফ্লেমিং</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">রবার্ট হুক</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">রবার্ট ব্রাউন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">লিউয়েন হুক</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪২।</span>
+          <div class="q-text">অডিটরিয়ামে কতজন দর্শক ঢুকছেন বা বের হচ্ছেন তা গণনার জন্য স্বয়ংক্রিয় যন্ত্রে নিচের কোনটি ব্যবহৃত হয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">আলোকতড়িৎ কোষ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">ট্রানজিস্টর</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ডায়োড</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">রেক্টিফায়ার</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৩।</span>
+          <div class="q-text">নিচের কোন অঙ্গের কোষে ETC ধারণকারী অঙ্গাণুর উপস্থিতি বেশি থাকে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ত্বক</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">পাকস্থলী</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">যকৃত</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">চোখ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৪।</span>
+          <div class="q-text">হৃৎপিণ্ডের পেশি থেকে <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>O</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">CO_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>-সমৃদ্ধ রক্ত করোনারি সাইনাসের মাধ্যমে হৃৎপিণ্ডের কোন প্রকোষ্ঠে ফিরে আসে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ডান অলিন্দে</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">বাম অলিন্দে</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ডান নিলয়ে</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">বাম নিলয়ে</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৫।</span>
+          <div class="q-text">ছত্রাক কোষ প্রাচীরের প্রধান উপাদান কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">সেলুলোজ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">কাইটিন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">পেপটিডোগ্লাইকান</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">লিগনিন</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৬।</span>
+          <div class="q-text">ঘাসফড়িংয়ে নাইট্রোজেন ঘটিত বর্জ্য নিষ্কাশনের প্রধান অঙ্গ কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ম্যালপিজিয়ান নালিকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">নেফ্রিডিয়া</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">বৃক্ক</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">ফ্লেম কোষ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৭।</span>
+          <div class="q-text">প্লাজমিডকে প্রকৃতকোষে প্রবেশ করানোকে কী বলে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">ট্রান্সডাকশন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">ট্রান্সফরমেশন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ট্রান্সফেকশন</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">কনজুগেশন</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৮।</span>
+          <div class="q-text">Spirogyra এর কোষে নিচের কোন প্রকৃতির ক্লোরোপ্লাস্ট পাওয়া যায়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">পেয়ালাকৃতি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">জালিকার</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">সর্পিল আকার</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">তারকাকার</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪৯।</span>
+          <div class="q-text">ককলিয়ার সবচেয়ে উপরের প্রকোষ্ঠ কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">স্কালা ভেস্টিবুলি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">স্কালা মিডিয়া</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">স্কালা টিম্পানি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">বেসিলার মেমব্রেন</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৫০।</span>
+          <div class="q-text">কোনটি প্রোগ্রামড সেল ডেথ?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">নেক্রোসিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">প্লাজমোলাইসিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">অ্যাপোপটোসিস</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">সাইটোলাইসিস</span></div>
+        </div>
+      </div>
+    
+  </div>
+</div>
+
+
+</body>
+</html>

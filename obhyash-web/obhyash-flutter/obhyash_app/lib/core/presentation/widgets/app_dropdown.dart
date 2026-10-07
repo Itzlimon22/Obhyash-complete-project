@@ -26,6 +26,9 @@ class AppDropdown<T> extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final double? fontSize;
   final double? borderRadius;
+  final List<BoxShadow>? boxShadow;
+  final bool hasBorder;
+  final Color? backgroundColor;
 
   const AppDropdown({
     super.key,
@@ -38,6 +41,9 @@ class AppDropdown<T> extends StatelessWidget {
     this.padding,
     this.fontSize,
     this.borderRadius,
+    this.boxShadow,
+    this.hasBorder = true,
+    this.backgroundColor,
   });
 
   void _showPicker(BuildContext context) {
@@ -207,7 +213,7 @@ class AppDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA);
+    final bgColor = backgroundColor ?? (isDark ? const Color(0xFF141417) : Colors.white);
     final borderColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
 
     String? displayLabel;
@@ -241,9 +247,17 @@ class AppDropdown<T> extends StatelessWidget {
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(borderRadius ?? 12),
-              border: Border.all(
-                color: borderColor,
-              ),
+              border: hasBorder ? Border.all(color: borderColor) : null,
+              boxShadow: boxShadow ??
+                  (!hasBorder
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                            blurRadius: 7,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null),
             ),
             padding: padding ?? const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             child: Row(

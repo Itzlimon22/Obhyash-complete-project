@@ -255,7 +255,7 @@ class _LoginSupportViewState extends State<LoginSupportView> {
       setState(() => _isLoading = false);
       AppPopups.show(
         context,
-        message: 'অনুরোধটি পাঠানো সম্ভব হয়নি। সরাসরি WhatsApp-এ বার্তা দিন।',
+        message: 'অনুরোধটি পাঠানো সম্ভব হয়নি। সরাসরি WhatsApp-এ বার্তা দাও।',
         isError: true,
       );
     }

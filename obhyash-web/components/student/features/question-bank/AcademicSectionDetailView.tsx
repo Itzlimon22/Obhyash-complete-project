@@ -494,9 +494,26 @@ export default function AcademicSectionDetailView({
 
             const boardName =
               q.examHistory && q.examHistory.length > 0
-                ? `${q.examHistory[0].institute} '${String(q.examHistory[0].year).slice(-2)}`
+                ? q.examHistory
+                    .map((h: any) => {
+                      const code = h.code || BanglaNameHelper.getInstituteCode(h.institute || "");
+                      const isAuth = BanglaNameHelper.isTextbookAuthor(code) || BanglaNameHelper.isTextbookAuthor(h.institute || "");
+                      const yr = h.year && !isAuth ? `'${String(h.year).slice(-2)}` : "";
+                      return `${code}${yr}`;
+                    })
+                    .filter(Boolean)
+                    .join(", ")
                 : q.institutes && q.institutes.length > 0
-                ? `${q.institutes[0]}${q.years && q.years[0] ? ` '${String(q.years[0]).slice(-2)}` : ""}`
+                ? q.institutes
+                    .map((inst: any, i: number) => {
+                      const code = BanglaNameHelper.getInstituteCode(String(inst));
+                      const isAuth = BanglaNameHelper.isTextbookAuthor(code) || BanglaNameHelper.isTextbookAuthor(String(inst));
+                      const yrVal = q.years && q.years[i] ? q.years[i] : (q.years && q.years[0] ? q.years[0] : 0);
+                      const yr = yrVal && !isAuth ? `'${String(yrVal).slice(-2)}` : "";
+                      return `${code}${yr}`;
+                    })
+                    .filter(Boolean)
+                    .join(", ")
                 : "বোর্ড প্রশ্ন";
 
             if (isCQ) {

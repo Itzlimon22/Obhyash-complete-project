@@ -127,10 +127,13 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
         const examId = a.live_exam_id;
         const userScore = Number(a.score || 0);
 
+        const maxExamSecs = (examData?.duration_minutes || 30) * 60;
         let durationSecs = 0;
-        if (a.start_time && a.submit_time) {
+        if (a.time_taken_seconds != null && Number(a.time_taken_seconds) > 0) {
+          durationSecs = Math.min(Number(a.time_taken_seconds), maxExamSecs);
+        } else if (a.start_time && a.submit_time) {
           const diff = (new Date(a.submit_time).getTime() - new Date(a.start_time).getTime()) / 1000;
-          durationSecs = Math.max(0, Math.floor(diff));
+          durationSecs = Math.max(0, Math.min(Math.floor(diff), maxExamSecs));
         }
 
         const isMock = String(examId).startsWith("mock-");

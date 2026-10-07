@@ -55,6 +55,7 @@ class _PorashonaViewState extends ConsumerState<PorashonaView> {
     final subjects = getPersonalizedFormulaSubjects(
       level: userProfile?.level,
       stream: userProfile?.stream,
+      batch: userProfile?.batch,
       division: userProfile?.division,
       target: userProfile?.target,
       examTarget: userProfile?.examTarget,
@@ -94,9 +95,10 @@ class _PorashonaViewState extends ConsumerState<PorashonaView> {
         centerTitle: true,
       ),
       body: SafeArea(
+        bottom: false,
         child: _activeTab == 'formula'
             ? Padding(
-                padding: const EdgeInsets.fromLTRB(10, 18, 10, 24),
+                padding: const EdgeInsets.fromLTRB(10, 14, 10, 0),
                 child: AppRefreshIndicator(
                   onRefresh: () async {
                     ref.invalidate(userProfileProvider);
@@ -105,6 +107,7 @@ class _PorashonaViewState extends ConsumerState<PorashonaView> {
                     } catch (_) {}
                   },
                   child: GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 12),
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
                     ),
@@ -128,13 +131,14 @@ class _PorashonaViewState extends ConsumerState<PorashonaView> {
               )
             : (_activeTab == 'notes'
                 ? Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 18, 10, 24),
+                    padding: const EdgeInsets.fromLTRB(10, 14, 10, 0),
                     child: AppRefreshIndicator(
                       onRefresh: () async {
                         await NotesR2Service.fetchAvailablePdfs(forceRefresh: true);
                         if (mounted) setState(() {});
                       },
                       child: GridView.count(
+                        padding: const EdgeInsets.only(bottom: 12),
                         crossAxisCount: 2,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,

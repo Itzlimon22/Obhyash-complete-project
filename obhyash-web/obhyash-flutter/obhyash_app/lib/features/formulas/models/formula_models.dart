@@ -238,9 +238,32 @@ List<SubjectMeta> getAllFormulaSubjects() => [
       ...kSscFormulaSubjects,
     ];
 
-List<SubjectMeta> getFormulaSubjectsForLevel(String level) {
-  final l = level.toUpperCase();
-  if (l.contains('SSC') || l.contains('CLASS 10') || l.contains('CLASS 9') || l.contains('৯ম') || l.contains('১০ম')) {
+bool isSscLevel({String? stream, String? batch, String? level}) {
+  final s = (stream ?? '').toUpperCase();
+  if (s.contains('SSC') ||
+      s.contains('CLASS 10') ||
+      s.contains('CLASS 9') ||
+      s.contains('৯ম') ||
+      s.contains('১০ম')) {
+    return true;
+  }
+  final b = (batch ?? '').toUpperCase();
+  if (b.contains('SSC')) {
+    return true;
+  }
+  final l = (level ?? '').toUpperCase();
+  if (l.contains('SSC') ||
+      l.contains('CLASS 10') ||
+      l.contains('CLASS 9') ||
+      l.contains('৯ম') ||
+      l.contains('১০ম')) {
+    return true;
+  }
+  return false;
+}
+
+List<SubjectMeta> getFormulaSubjectsForLevel(String? level, {String? stream, String? batch}) {
+  if (isSscLevel(stream: stream, batch: batch, level: level)) {
     return kSscFormulaSubjects;
   }
   return kHscFormulaSubjects;
@@ -249,17 +272,13 @@ List<SubjectMeta> getFormulaSubjectsForLevel(String level) {
 List<SubjectMeta> getPersonalizedFormulaSubjects({
   String? level,
   String? stream,
+  String? batch,
   String? division,
   String? target,
   String? examTarget,
   String? optionalSubject,
 }) {
-  final l = (level ?? stream ?? '').toUpperCase();
-  final isSSC = l.contains('SSC') ||
-      l.contains('CLASS 10') ||
-      l.contains('CLASS 9') ||
-      l.contains('৯ম') ||
-      l.contains('১০ম');
+  final isSSC = isSscLevel(stream: stream, batch: batch, level: level);
 
   final baseList = isSSC
       ? List<SubjectMeta>.from(kSscFormulaSubjects)

@@ -45,17 +45,18 @@ export async function GET(req: NextRequest) {
   const levelKey = level.toLowerCase();
   const threshold = LEVEL_THRESHOLDS[levelKey] || LEVEL_THRESHOLDS.explorer;
   const isMonthly = timeframe === 'monthly';
+  const xpCol = isMonthly ? 'monthly_xp' : 'xp';
   const batch = searchParams.get('batch');
 
-  // Query users belonging to this level tier based on lifetime XP (Only Students)
+  // Query users belonging to this level tier based on active timeframe XP (Only Students)
   let query = supabase
     .from('users')
     .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, avatar_color, streak, batch, role')
     .or('role.ilike.student,role.is.null')
-    .gte('xp', threshold.min);
+    .gte(xpCol, threshold.min);
 
   if (threshold.max < 999999999) {
-    query = query.lte('xp', threshold.max);
+    query = query.lte(xpCol, threshold.max);
   }
 
   if (batch && batch.trim().length > 0 && batch !== 'all') {
@@ -87,7 +88,7 @@ export async function GET(req: NextRequest) {
 
   const users = studentRows.map((user: any) => {
     const effectiveXp = calculateEffectiveXp(user, timeframe);
-    const userLevel = user.level || calculateLevelFromXp(user.xp || 0);
+    const userLevel = calculateLevelFromXp(effectiveXp);
 
     return {
       id: user.id,

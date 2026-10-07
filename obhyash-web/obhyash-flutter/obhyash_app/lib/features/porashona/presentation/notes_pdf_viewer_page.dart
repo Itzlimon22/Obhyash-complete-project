@@ -276,7 +276,7 @@ class _NotesPdfViewerPageState extends State<NotesPdfViewerPage> {
               ),
             ),
             content: Text(
-              'এই নোটটি আপনার অ্যাপে অফলাইনে সংরক্ষিত আছে। আপনি কি এটি মুছে ফেলতে চান?',
+              'এই নোটটি তোমার অ্যাপে অফলাইনে সংরক্ষিত আছে। তুমি কি এটি মুছে ফেলতে চাও?',
               style: TextStyle(
                 fontSize: 13.5,
                 color: isDark

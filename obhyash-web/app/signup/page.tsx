@@ -568,7 +568,7 @@ function SignupForm() {
                   <label className="text-xs sm:text-sm font-semibold text-[#2d3748] dark:text-neutral-300 block">
                     তোমার নাম
                   </label>
-                  <div className="relative flex items-center h-14 bg-[#f6f9f8] dark:bg-[#18201c] border border-[#e4ebe8] dark:border-[#222e28] rounded-2xl px-3.5 focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 focus-within:bg-white dark:focus-within:bg-[#18201c] transition-all">
+                  <div className="relative flex items-center h-11 bg-white dark:bg-[#16171d] border border-transparent rounded-xl px-3 shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 transition-all">
                     <User className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
                     <input
                       type="text"
@@ -576,7 +576,7 @@ function SignupForm() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="পূর্ণ নাম (Full Name)"
-                      className="w-full h-full bg-transparent pl-2.5 pr-2 text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium"
+                      className="w-full h-full bg-transparent pl-2.5 pr-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium"
                     />
                   </div>
                 </div>
@@ -587,16 +587,16 @@ function SignupForm() {
                       মোবাইল নম্বর
                     </label>
                     {isPhoneVerified && verifiedPhone === formData.phone.trim() && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <CheckCircle2 className="w-3 h-3" />
                         যাচাইকৃত
                       </span>
                     )}
                   </div>
-                  <div className="relative flex items-center h-14 bg-[#f6f9f8] dark:bg-[#18201c] border border-[#e4ebe8] dark:border-[#222e28] rounded-2xl px-3.5 focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 focus-within:bg-white dark:focus-within:bg-[#18201c] transition-all">
-                    <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 select-none pr-2.5 border-r border-[#d9e3df] dark:border-[#2a3832]">
-                      <Phone className="w-4 h-4 text-[#066b4f] dark:text-[#34d399]" />
-                      <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200">
+                  <div className="relative flex items-center h-11 bg-white dark:bg-[#16171d] border border-transparent rounded-xl px-3 shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 transition-all">
+                    <div className="flex items-center gap-1 text-neutral-600 dark:text-neutral-400 select-none pr-2 border-r border-neutral-200 dark:border-neutral-800">
+                      <Phone className="w-3.5 h-3.5 text-[#066b4f] dark:text-[#34d399]" />
+                      <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
                         +88
                       </span>
                     </div>
@@ -606,13 +606,13 @@ function SignupForm() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="01XXXXXXXXX"
-                      className="w-full h-full bg-transparent pl-3 pr-2 text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium tracking-wide"
+                      className="w-full h-full bg-transparent pl-2.5 pr-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium tracking-wide"
                     />
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800/80 flex items-center gap-2.5 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#16171d] shadow-xs shadow-black/[0.03] dark:shadow-black/20 flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>
                     পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইলে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।
                   </span>
@@ -622,13 +622,13 @@ function SignupForm() {
 
             {/* STEP 2: ACADEMIC INFO */}
             {step === 2 && (
-              <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
+              <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                     শিক্ষা প্রতিষ্ঠান
                   </label>
                   <div className="relative group">
-                    <School className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors pointer-events-none" />
+                    <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#006A4E] transition-colors pointer-events-none" />
                     <input
                       type="text"
                       name="institute"
@@ -646,7 +646,7 @@ function SignupForm() {
                       }
                       placeholder="কলেজ / স্কুলের নাম"
                       autoComplete="off"
-                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                      className="w-full pl-10 pr-3.5 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                     />
                     {showCollegeSuggestions &&
                       searchColleges(formData.institute).length > 0 && (
@@ -671,16 +671,16 @@ function SignupForm() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                     স্ট্রিম (Stream)
                   </label>
                   <div className="relative">
-                    <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                    <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <select
                       name="stream"
                       value={formData.stream}
                       onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white appearance-none cursor-pointer"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white appearance-none cursor-pointer"
                     >
                       <option value="HSC">HSC</option>
                       <option value="SSC">SSC</option>
@@ -688,18 +688,18 @@ function SignupForm() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                       বিভাগ (Division)
                     </label>
                     <div className="relative">
-                      <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                       <select
                         name="group"
                         value={formData.group}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white appearance-none cursor-pointer"
                       >
                         <option value="Science">Science (বিজ্ঞান)</option>
                         {formData.stream === 'SSC' ? (
@@ -722,16 +722,16 @@ function SignupForm() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                       ব্যাচ
                     </label>
                     <div className="relative">
-                      <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                       <select
                         name="batch"
                         value={formData.batch}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white appearance-none cursor-pointer"
                       >
                         {(formData.stream === 'SSC' ? [2026, 2027, 2028] : [2025, 2026, 2027, 2028]).map((year) => (
                           <option
@@ -747,7 +747,7 @@ function SignupForm() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                     লিঙ্গ (Gender)
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -756,122 +756,82 @@ function SignupForm() {
                         key={g}
                         type="button"
                         onClick={() => setFormData({ ...formData, gender: g })}
-                        className={`py-3 rounded-xl text-sm font-normal transition-all border ${
+                        className={`py-2.5 rounded-xl text-sm font-medium transition-all shadow-xs shadow-black/[0.04] dark:shadow-black/20 ${
                           formData.gender === g
-                            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
-                            : 'bg-neutral-50 dark:bg-[#16171d] border-neutral-300 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1f2029]'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-2 border-[#006A4E] text-[#006A4E] dark:text-[#34d399] font-semibold'
+                            : 'bg-white dark:bg-[#16171d] border border-transparent text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1f2029]'
                         }`}
                       >
-                        {g === 'Male' ? 'পুরুষ' : 'মহিলা'}
+                        {g === 'Male' ? 'ছেলে' : 'মেয়ে'}
                       </button>
                     ))}
                   </div>
                 </div>
-
-                {/* Exam Target in Step 2 — Only for HSC Stream (Optional) */}
-                {formData.stream === 'HSC' && (
-                  <div className="space-y-2 pt-2">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
-                      <span>টার্গেট / লক্ষ্য (ঐচ্ছিক)</span>
-                    </label>
-                    <div className="grid grid-cols-3 gap-2.5 mt-2">
-                      {EXAM_TARGETS.map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              examTarget: formData.examTarget === t.id ? '' : t.id,
-                            })
-                          }
-                          className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
-                            formData.examTarget === t.id
-                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
-                              : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#16171d] hover:border-neutral-300 dark:hover:border-neutral-700'
-                          }`}
-                        >
-                          <span className="text-xl">{t.emoji}</span>
-                          <span
-                            className={`text-xs font-normal leading-tight ${
-                              formData.examTarget === t.id
-                                ? 'text-emerald-700 dark:text-emerald-400'
-                                : 'text-neutral-700 dark:text-neutral-300'
-                            }`}
-                          >
-                            {t.label}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
-            {/* STEP 3: CREDENTIALS & GOOGLE (Was Step 1) */}
+            {/* STEP 3: CREDENTIALS */}
             {step === 3 && (
-              <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-
-                <div className="space-y-5">
+              <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
+                <div className="space-y-3.5">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                       ইমেইল এড্রেস
                     </label>
                     <div className="relative group">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#006A4E] transition-colors" />
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="example@mail.com"
-                        className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                       পাসওয়ার্ড
                     </label>
                     <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#006A4E] transition-colors" />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
                         placeholder="কমপক্ষে ৬ অক্ষর"
-                        className="w-full pl-12 pr-12 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                        className="w-full pl-10 pr-10 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                       >
                         {showPassword ? (
-                          <EyeOff className="w-5 h-5" />
+                          <EyeOff className="w-4 h-4" />
                         ) : (
-                          <Eye className="w-5 h-5" />
+                          <Eye className="w-4 h-4" />
                         )}
                       </button>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
                       পাসওয়ার্ড নিশ্চিত করো
                     </label>
                     <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#006A4E] transition-colors" />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         placeholder="পাসওয়ার্ডটি আবার লেখো"
-                        className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                     </div>
                   </div>
@@ -880,14 +840,14 @@ function SignupForm() {
             )}
 
             {/* ACTION BUTTONS */}
-            <div className="pt-2 flex gap-3">
+            <div className="pt-2 flex gap-2.5">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="w-14 h-14 items-center justify-center flex rounded-2xl border border-[#e4ebe8] dark:border-[#222e28] bg-white dark:bg-[#18201c] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1f2924] transition-colors"
+                  className="w-11 h-11 items-center justify-center flex rounded-xl border border-transparent bg-white dark:bg-[#16171d] text-neutral-600 dark:text-neutral-300 shadow-xs shadow-black/[0.05] dark:shadow-black/25 hover:bg-neutral-50 dark:hover:bg-[#1f2924] transition-colors"
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
               )}
 
@@ -895,11 +855,11 @@ function SignupForm() {
                 type="button"
                 onClick={step === 3 ? handleSignup : handleNext}
                 disabled={loading || isSendingOtp}
-                className="flex-1 h-14 bg-gradient-to-r from-[#0a8a66] to-[#066b4f] hover:from-[#087b5a] hover:to-[#055b43] active:scale-[0.99] text-white font-bold rounded-2xl shadow-[0_12px_24px_-8px_rgba(6,107,79,0.5)] transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="flex-1 h-11 bg-gradient-to-r from-[#0a8a66] to-[#066b4f] hover:from-[#087b5a] hover:to-[#055b43] active:scale-[0.99] text-white font-bold rounded-xl shadow-[0_8px_20px_-6px_rgba(6,107,79,0.5)] transition-all flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading || isSendingOtp ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     <span>{isSendingOtp ? 'ওটিপি পাঠানো হচ্ছে...' : 'অপেক্ষা করো...'}</span>
                   </>
                 ) : step === 3 ? (
@@ -907,7 +867,7 @@ function SignupForm() {
                 ) : (
                   <>
                     <span>পরবর্তী ধাপ</span>
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4" />
                   </>
                 )}
               </button>
@@ -930,13 +890,13 @@ function SignupForm() {
 
               <Suspense
                 fallback={
-                  <div className="h-14 w-full bg-[#f6f9f8] dark:bg-[#18201c] rounded-2xl animate-pulse" />
+                  <div className="h-11 w-full bg-[#f6f9f8] dark:bg-[#18201c] rounded-xl animate-pulse" />
                 }
               >
                 <SocialLoginButton
                   mode="signup"
                   label="Google দিয়ে চালিয়ে যান"
-                  className="!h-14 !py-3.5 !rounded-2xl !bg-white dark:!bg-[#18201c] !border !border-[#e4ebe8] dark:!border-[#222e28] !text-neutral-800 dark:!text-neutral-200 !shadow-xs hover:!bg-neutral-50 dark:hover:!bg-[#1f2924] transition-all font-semibold text-sm sm:text-base"
+                  className="!h-11 !py-2.5 !rounded-xl !bg-white dark:!bg-[#16171d] !border-transparent !text-neutral-800 dark:!text-neutral-200 !shadow-xs hover:!bg-neutral-50 dark:hover:!bg-[#1f2924] transition-all font-semibold text-sm"
                 />
               </Suspense>
             </>

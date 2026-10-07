@@ -130,7 +130,8 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
       );
     }
     if (totalSecs !== undefined) {
-      const clamped = Math.max(0, Math.min(86400, totalSecs));
+      const maxDurationSec = (exam.duration_minutes || 30) * 60;
+      const clamped = Math.max(0, Math.min(maxDurationSec, totalSecs));
       const mins = Math.floor(clamped / 60);
       const secs = clamped % 60;
       return `${BanglaNameHelper.toBanglaNumeral(String(mins).padStart(2, "0"))}:${BanglaNameHelper.toBanglaNumeral(String(secs).padStart(2, "0"))} মি.`;

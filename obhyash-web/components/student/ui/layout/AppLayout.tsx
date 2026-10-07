@@ -67,8 +67,6 @@ const SUB_PAGES_WITHOUT_BOTTOM_NAV = new Set([
   'terms',
   'faq',
   'help',
-  'info',
-  'account-info',
   'account-linking',
   'delete-account',
   'personal',

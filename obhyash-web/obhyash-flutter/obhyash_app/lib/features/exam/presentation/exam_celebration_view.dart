@@ -176,9 +176,16 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
         isDark ? const Color(0xFF24242A) : const Color(0xFFE2E8F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: GestureDetector(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _navigateToResult();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _navigateToResult,
         child: Stack(
@@ -443,7 +450,8 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildMetricCard({

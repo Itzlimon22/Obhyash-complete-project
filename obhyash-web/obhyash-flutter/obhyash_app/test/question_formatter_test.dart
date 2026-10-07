@@ -223,5 +223,52 @@ void main() {
       expect(formatted3.contains(r'\\'), isTrue, reason: 'Single backslash row breaks must be converted to double backslash');
       expect(formatted3.contains(r'$$'), isTrue, reason: 'Must be wrapped in display math delimiters');
     });
+
+    test('Heals user screenshot issues: compound units, mum macro, fused Greek letters, nested text, internal dollars', () {
+      // 1. Unwrapped compound unit in question stem
+      const qStem = r'একটি গাড়ি স্থির অবস্থান থেকে 10\,\text{m}\cdot\text{s}^{-2} সমত্বরণে চলতে শুরু করল। 10 সেকেন্ড পর এটি কত দূরত্ব অতিক্রম করবে?';
+      final formattedStem = QuestionFormatter.format(qStem);
+      expect(formattedStem.contains(r'$10\,\text{m}\cdot\text{s}^{-2}$'), isTrue);
+
+      // 2. Internal dollar in \frac
+      const qExp = r'সুতরাং, T = $\frac{$2 \times 4$.9}{9.8}$ = 9.8/9.8 = 1 s ।';
+      final formattedExp = QuestionFormatter.format(qExp);
+      expect(formattedExp.contains(r'\frac{2 \times 4.9}{9.8}'), isTrue);
+
+      // 3. \mum macro replacement
+      const qMum = r'$4.26\,\text{\mum}$';
+      final formattedMum = QuestionFormatter.format(qMum);
+      expect(formattedMum.contains(r'\mum'), isFalse);
+      expect(formattedMum.contains(r'\mu\text{m}'), isTrue);
+
+      // 4. Fused Greek letters \pif and \piN
+      const qPif = r'$\omega = 2\pif$';
+      final formattedPif = QuestionFormatter.format(qPif);
+      expect(formattedPif.contains(r'\pi f'), isTrue);
+
+      const qPiN = r'$\omega = 2\piN/3t$';
+      final formattedPiN = QuestionFormatter.format(qPiN);
+      expect(formattedPiN.contains(r'\pi N/3t'), isTrue);
+
+      // 5. Nested \text{\text{m/s}} and corrupted artifact
+      const qNested = r'(g = 9.8\ $,\text$ { m/s } ^2)';
+      final formattedNested = QuestionFormatter.format(qNested);
+      expect(formattedNested.contains(r'\ $,\text$'), isFalse);
+
+      // 6. Bengali inside math $a এবংb$
+      const qBanglaMath = r'$a  এবংb$ ব্যাসার্ধ এর দুটি গোলাকার সাবান';
+      final formattedBanglaMath = QuestionFormatter.format(qBanglaMath);
+      expect(formattedBanglaMath.contains(r'$a$ এবং $b$'), isTrue);
+
+      // 7. Double exponent 10^{1}^1
+      const qDblExp = r'1.1 \times 10^{1}^1 \text{N/m}^2';
+      final formattedDblExp = QuestionFormatter.format(qDblExp);
+      expect(formattedDblExp.contains(r'10^{11}'), isTrue);
+
+      // 8. Trailing \, in exponent 10^{-7\,}
+      const qTrail = r'10^{-7\,}';
+      final formattedTrail = QuestionFormatter.format(qTrail);
+      expect(formattedTrail.contains(r'10^{-7}'), isTrue);
+    });
   });
 }

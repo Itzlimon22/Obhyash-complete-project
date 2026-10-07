@@ -72,25 +72,56 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   // Parse institute/year/author tags matching Flutter QuestionCard logic
   const sourceTags = React.useMemo(() => {
     const examHist = question.exam_history || question.examHistory;
-    if (examHist && examHist.length > 0) {
-      const first = examHist[0];
-      if (typeof first === 'object' && first) {
-        const rawCode = first.code || BanglaNameHelper.getInstituteCode(first.institute || '');
-        const isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) || BanglaNameHelper.isTextbookAuthor(first.institute || '');
-        const yrNum = Number(first.year) || 0;
-        const yr = yrNum > 0 && !isAuthor ? `'${String(yrNum % 100).padStart(2, '0')}` : '';
-        return `${rawCode}${yr}`;
+    if (examHist && Array.isArray(examHist) && examHist.length > 0) {
+      const tags: string[] = [];
+      for (const item of examHist) {
+        if (typeof item === 'object' && item) {
+          const rawCode = item.code || BanglaNameHelper.getInstituteCode(item.institute || '');
+          const isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) || BanglaNameHelper.isTextbookAuthor(item.institute || '');
+          const yrNum = Number(item.year) || 0;
+          const yr = yrNum > 0 && !isAuthor ? `'${String(yrNum % 100).padStart(2, '0')}` : '';
+          const tag = `${rawCode}${yr}`.trim();
+          if (tag && !tags.includes(tag)) {
+            tags.push(tag);
+          }
+        }
+      }
+      if (tags.length > 0) {
+        tags.sort((a, b) => {
+          const aAuth = BanglaNameHelper.isTextbookAuthor(a);
+          const bAuth = BanglaNameHelper.isTextbookAuthor(b);
+          if (aAuth && !bAuth) return -1;
+          if (!aAuth && bAuth) return 1;
+          return 0;
+        });
+        return tags.join(', ');
       }
     }
     const insts = question.institutes || (question.institute ? [question.institute] : []);
     const yrs = question.years || (question.year ? [question.year] : []);
-    if (insts.length > 0 && insts[0]) {
-      const rawInst = String(insts[0]);
-      const rawCode = BanglaNameHelper.getInstituteCode(rawInst);
-      const isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) || BanglaNameHelper.isTextbookAuthor(rawInst);
-      const yrNum = yrs.length > 0 ? Number(yrs[0]) : 0;
-      const yr = yrNum > 0 && !isAuthor ? `'${String(yrNum % 100).padStart(2, '0')}` : '';
-      return `${rawCode}${yr}`;
+    if (Array.isArray(insts) && insts.length > 0 && insts[0]) {
+      const tags: string[] = [];
+      insts.forEach((rawInst, idx) => {
+        if (!rawInst) return;
+        const rawCode = BanglaNameHelper.getInstituteCode(String(rawInst));
+        const isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) || BanglaNameHelper.isTextbookAuthor(String(rawInst));
+        const yrNum = yrs.length > idx ? Number(yrs[idx]) : (yrs.length > 0 ? Number(yrs[0]) : 0);
+        const yr = yrNum > 0 && !isAuthor ? `'${String(yrNum % 100).padStart(2, '0')}` : '';
+        const tag = `${rawCode}${yr}`.trim();
+        if (tag && !tags.includes(tag)) {
+          tags.push(tag);
+        }
+      });
+      if (tags.length > 0) {
+        tags.sort((a, b) => {
+          const aAuth = BanglaNameHelper.isTextbookAuthor(a);
+          const bAuth = BanglaNameHelper.isTextbookAuthor(b);
+          if (aAuth && !bAuth) return -1;
+          if (!aAuth && bAuth) return 1;
+          return 0;
+        });
+        return tags.join(', ');
+      }
     }
     return BanglaNameHelper.formatQuestionSource({
       institutes: insts,
@@ -164,26 +195,26 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         )}
 
         {/* ── Tags + Action Buttons Row (Below Question Text - Matching Flutter 1:1) ── */}
-        <div className="mt-2.5 flex items-center justify-between gap-2">
+        <div className="mt-2.5 flex items-start sm:items-center justify-between gap-2 min-w-0">
           {/* Left: Source Tag & Flagged Badge */}
-          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap min-w-0 flex-1">
             {/* Unified Source Tag (Board / University & Year - Short Form e.g. DB '24) */}
             {shouldShowSourceTag && (
-              <span className="inline-flex items-center px-2 py-[3px] rounded-[6px] bg-[#E0F7FA] dark:bg-[#0E3A4A] border border-[#B2EBF2] dark:border-[#164E63] text-[11px] font-semibold text-[#006064] dark:text-[#A5F3FC] leading-none tracking-tight">
+              <span className="inline-block px-2 py-0.5 sm:py-[3px] rounded-[6px] bg-[#E0F7FA] dark:bg-[#0E3A4A] border border-[#B2EBF2] dark:border-[#164E63] text-[11px] font-semibold text-[#006064] dark:text-[#A5F3FC] leading-snug tracking-tight max-w-full break-words whitespace-normal">
                 {sourceTags}
               </span>
             )}
 
             {/* Flagged Badge */}
             {isFlagged && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] bg-[#FEF3C7] dark:bg-[#78350F]/30 text-[11.5px] font-semibold text-[#D97706] dark:text-[#FBBF24] leading-none">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] bg-[#FEF3C7] dark:bg-[#78350F]/30 text-[11.5px] font-semibold text-[#D97706] dark:text-[#FBBF24] leading-none shrink-0">
                 চিহ্নিত
               </span>
             )}
           </div>
 
           {/* Right: Actions (Flag, Bookmark, Delete, Report) */}
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 shrink-0 ml-auto">
             {/* Flag Button (during active exam) */}
             {onToggleFlag && !showFeedback && (
               <button

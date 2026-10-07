@@ -87,6 +87,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   const [showExitModal, setShowExitModal] = useState<boolean>(false);
   const [showCheatingWarning, setShowCheatingWarning] =
     useState<boolean>(false);
+  const [selectionCounts, setSelectionCounts] = useState<Record<string | number, number>>({});
   const [reportingQuestionId, setReportingQuestionId] = useState<
     string | number | null
   >(null);
@@ -192,7 +193,14 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   }, [orderedQuestions]);
 
   const handleOptionSelect = (qId: string | number, optionIndex: number) => {
-    if (userAnswers[qId] !== undefined) return; // Locked after one selected
+    const currentCount = selectionCounts[qId] ?? (userAnswers[qId] !== undefined ? 1 : 0);
+    if (currentCount >= 2) return; // Locked after 2 selections
+    if (userAnswers[qId] === optionIndex) return; // Same option tapped
+
+    setSelectionCounts((prev) => ({
+      ...prev,
+      [qId]: currentCount + 1,
+    }));
     setUserAnswers((prev) => ({
       ...prev,
       [qId]: optionIndex,
@@ -347,7 +355,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                     selectedOptionIndex={userAnswers[question.id]}
                     isFlagged={isFlagged}
                     isBookmarked={isBookmarked}
-                    readOnly={userAnswers[question.id] !== undefined}
+                    readOnly={(selectionCounts[question.id] ?? (userAnswers[question.id] !== undefined ? 1 : 0)) >= 2}
                     hideSourceTag={shouldHideSource}
                     onSelectOption={(optIdx) =>
                       handleOptionSelect(question.id, optIdx)

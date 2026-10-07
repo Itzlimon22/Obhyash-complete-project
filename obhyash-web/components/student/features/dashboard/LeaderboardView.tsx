@@ -241,6 +241,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const fetchCounts = useCallback(async () => {
     try {
       const counts: Record<string, number> = {};
+      const xpCol = timeframe === "monthly" ? "monthly_xp" : "xp";
 
       await Promise.all(
         LEADERBOARD_LEVELS.map(async (lvl) => {
@@ -249,12 +250,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               .from("users")
               .select("id", { count: "exact", head: true })
               .or("role.ilike.student,role.is.null");
-            // Level tiers are strictly based on lifetime XP
+            // Level tiers are based on active timeframe XP
             if (lvl.minXP > 0) {
-              query = query.gte("xp", lvl.minXP);
+              query = query.gte(xpCol, lvl.minXP);
             }
             if (lvl.maxXP < 999999999) {
-              query = query.lte("xp", lvl.maxXP);
+              query = query.lte(xpCol, lvl.maxXP);
             }
             if (batchFilter === "my_batch" && currentUser?.batch) {
               query = query.ilike("batch", `%${currentUser.batch.trim()}%`);
@@ -271,7 +272,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     } catch (err) {
       console.error("Error fetching level counts:", err);
     }
-  }, [supabase, batchFilter, currentUser]);
+  }, [supabase, batchFilter, currentUser, timeframe]);
 
   useEffect(() => {
     fetchCounts();
@@ -291,7 +292,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       try {
         const currentOffset = isLoadMore ? offset : 0;
         const currentLevelInfo = getLevelById(selectedLevel);
-        const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+        const xpCol = timeframe === "monthly" ? "monthly_xp" : "xp";
 
         let mapped: LeaderboardUser[] = [];
 
@@ -301,13 +302,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             .select("id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
             .or("role.ilike.student,role.is.null");
 
-          // Level tier bounds are strictly based on lifetime XP
+          // Level tier bounds are based on active timeframe XP
           if (currentLevelInfo.minXP > 0) {
-            query = query.gte("xp", currentLevelInfo.minXP);
+            query = query.gte(xpCol, currentLevelInfo.minXP);
           }
 
           if (currentLevelInfo.maxXP < 999999999) {
-            query = query.lte("xp", currentLevelInfo.maxXP);
+            query = query.lte(xpCol, currentLevelInfo.maxXP);
           }
 
           if (batchFilter === "my_batch" && currentUser?.batch) {
@@ -341,7 +342,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 xp: effXp,
                 allTimeXp: u.xp || 0,
                 monthly_xp: mXp,
-                level: u.level || calculateLevelFromXp(u.xp || 0),
+                level: calculateLevelFromXp(effXp),
                 exams_taken: u.exams_taken || 0,
                 avatar_url: u.avatar_url || undefined,
                 batch: u.batch || undefined,
@@ -372,21 +373,24 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           if (currentUser && !isLoadMore) {
             try {
               const myEffXp = calculateEffectiveXp(currentUser, timeframe);
-              let countQuery = supabase
-                .from("users")
-                .select("id", { count: "exact", head: true })
-                .or("role.ilike.student,role.is.null")
-                .gte("xp", currentLevelInfo.minXP);
-              if (currentLevelInfo.maxXP < 999999999) {
-                countQuery = countQuery.lte("xp", currentLevelInfo.maxXP);
-              }
-              if (batchFilter === "my_batch" && currentUser.batch) {
-                countQuery = countQuery.ilike("batch", `%${currentUser.batch.trim()}%`);
-              }
-              countQuery = countQuery.gt(sortColumn, myEffXp);
-              const { count: rankCount } = await countQuery;
-              if (typeof rankCount === "number") {
-                setMyExactRank(myEffXp > 0 ? rankCount + 1 : 0);
+              const myLevelName = calculateLevelFromXp(myEffXp);
+              if (myLevelName.toLowerCase() === selectedLevel.toLowerCase()) {
+                let countQuery = supabase
+                  .from("users")
+                  .select("id", { count: "exact", head: true })
+                  .or("role.ilike.student,role.is.null")
+                  .gte(xpCol, currentLevelInfo.minXP);
+                if (currentLevelInfo.maxXP < 999999999) {
+                  countQuery = countQuery.lte(xpCol, currentLevelInfo.maxXP);
+                }
+                if (batchFilter === "my_batch" && currentUser.batch) {
+                  countQuery = countQuery.ilike("batch", `%${currentUser.batch.trim()}%`);
+                }
+                countQuery = countQuery.gt(xpCol, myEffXp);
+                const { count: rankCount } = await countQuery;
+                if (typeof rankCount === "number") {
+                  setMyExactRank(myEffXp > 0 ? rankCount + 1 : 0);
+                }
               }
             } catch (rankErr) {
               console.warn("[LeaderboardView] Rank count error:", rankErr);
@@ -813,7 +817,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-[#1F1F23] border border-neutral-200 dark:border-[#2E2E33] p-0.5 shadow-2xs">
               <button
                 type="button"
-                onClick={() => setTimeframe("monthly")}
+                onClick={() => {
+                  setTimeframe("monthly");
+                  if (currentUser) {
+                    const effXp = currentUser.monthly_xp || 0;
+                    setSelectedLevel(calculateLevelFromXp(effXp));
+                  }
+                }}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   timeframe === "monthly"
                     ? "bg-white dark:bg-[#2C2C30] text-blue-600 dark:text-blue-400 shadow-xs"
@@ -826,7 +836,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
               <button
                 type="button"
-                onClick={() => setTimeframe("all_time")}
+                onClick={() => {
+                  setTimeframe("all_time");
+                  if (currentUser) {
+                    const effXp = currentUser.xp || 0;
+                    setSelectedLevel(calculateLevelFromXp(effXp));
+                  }
+                }}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   timeframe === "all_time"
                     ? "bg-white dark:bg-[#2C2C30] text-amber-600 dark:text-amber-400 shadow-xs"

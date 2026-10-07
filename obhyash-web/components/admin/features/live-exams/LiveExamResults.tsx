@@ -232,6 +232,26 @@ export default function LiveExamResults({ examId }: { examId: string }) {
     return Array.from(set).sort();
   }, [leaderboard]);
 
+  // Safe Time Taken Calculation helper (caps at exam duration, prioritizes time_taken_seconds)
+  const getTimeTakenSeconds = (entry: any, examDurationMinutes?: number) => {
+    const maxDurationSec = (examDurationMinutes || 30) * 60;
+
+    if (entry.time_taken_seconds != null && Number(entry.time_taken_seconds) > 0) {
+      return Math.min(Number(entry.time_taken_seconds), maxDurationSec);
+    }
+
+    if (entry.start_time && entry.submit_time) {
+      const rawDiffSec = Math.floor(
+        (new Date(entry.submit_time).getTime() - new Date(entry.start_time).getTime()) / 1000
+      );
+      if (rawDiffSec > 0) {
+        return Math.min(rawDiffSec, maxDurationSec);
+      }
+    }
+
+    return 0;
+  };
+
   // Processed, Filtered & Sorted Leaderboard
   const processedLeaderboard = useMemo(() => {
     let list = [...leaderboard];
@@ -289,10 +309,8 @@ export default function LiveExamResults({ examId }: { examId: string }) {
     // 4. Sorting
     if (sortBy === 'fastest') {
       list.sort((a, b) => {
-        const timeA =
-          new Date(a.submit_time).getTime() - new Date(a.start_time).getTime();
-        const timeB =
-          new Date(b.submit_time).getTime() - new Date(b.start_time).getTime();
+        const timeA = getTimeTakenSeconds(a, exam?.duration_minutes);
+        const timeB = getTimeTakenSeconds(b, exam?.duration_minutes);
         return timeA - timeB;
       });
     } else if (sortBy === 'correct') {
@@ -305,11 +323,20 @@ export default function LiveExamResults({ examId }: { examId: string }) {
           new Date(b.submit_time).getTime() - new Date(a.submit_time).getTime(),
       );
     } else {
-      // Default rank: score DESC, wrong_count ASC, submit_time ASC
+      // Default rank: score DESC, wrong_count ASC, time_taken ASC (faster ranks higher), submit_time ASC
       list.sort((a, b) => {
-        if (b.score !== a.score) return (b.score || 0) - (a.score || 0);
-        if (a.wrong_count !== b.wrong_count)
-          return (a.wrong_count || 0) - (b.wrong_count || 0);
+        const scoreA = a.score != null ? Number(a.score) : 0;
+        const scoreB = b.score != null ? Number(b.score) : 0;
+        if (scoreB !== scoreA) return scoreB - scoreA;
+
+        const wrongA = a.wrong_count || 0;
+        const wrongB = b.wrong_count || 0;
+        if (wrongA !== wrongB) return wrongA - wrongB;
+
+        const timeA = getTimeTakenSeconds(a, exam?.duration_minutes);
+        const timeB = getTimeTakenSeconds(b, exam?.duration_minutes);
+        if (timeA !== timeB) return timeA - timeB;
+
         return (
           new Date(a.submit_time).getTime() - new Date(b.submit_time).getTime()
         );
@@ -324,6 +351,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
     selectedScoreTier,
     sortBy,
     exam?.total_marks,
+    exam?.duration_minutes,
   ]);
 
   const handleExport = () => {
@@ -349,10 +377,8 @@ export default function LiveExamResults({ examId }: { examId: string }) {
       ],
       rows: processedLeaderboard.map((entry, index) => {
         const student = entry.users || entry.user || {};
-        const timeTakenMs =
-          new Date(entry.submit_time).getTime() -
-          new Date(entry.start_time).getTime();
-        const timeTakenMins = (timeTakenMs / 1000 / 60).toFixed(2);
+        const totalSec = getTimeTakenSeconds(entry, exam?.duration_minutes);
+        const timeTakenMins = (totalSec / 60).toFixed(2);
 
         return [
           index + 1,
@@ -361,7 +387,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
           student.email || 'N/A',
           student.phone || 'N/A',
           student.institute || 'N/A',
-          entry.score,
+          entry.score != null ? entry.score : 0,
           entry.correct_count || 0,
           entry.wrong_count || 0,
           timeTakenMins,
@@ -811,11 +837,9 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                   const avatarColor =
                     student.avatar_color || student.avatarColor || '#059669';
 
-                  const timeTakenMs =
-                    new Date(entry.submit_time).getTime() -
-                    new Date(entry.start_time).getTime();
-                  const mins = Math.floor(timeTakenMs / 1000 / 60);
-                  const secs = Math.floor((timeTakenMs / 1000) % 60);
+                  const totalSec = getTimeTakenSeconds(entry, exam?.duration_minutes);
+                  const mins = Math.floor(totalSec / 60);
+                  const secs = totalSec % 60;
 
                   const isTop3 = index < 3 && sortBy === 'rank';
 
@@ -918,19 +942,32 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                       {/* Score */}
                       <td className="p-4 text-center">
                         <span className="text-base font-black text-emerald-600 dark:text-emerald-400 font-mono">
-                          {entry.score}
+                          {entry.score != null ? entry.score : 0}
                         </span>
                       </td>
 
                       {/* Correct / Wrong */}
                       <td className="p-4 text-center font-mono text-[11px]">
-                        <span className="text-emerald-600 font-bold">
-                          ✓ {entry.correct_count || 0}
-                        </span>
-                        <span className="text-neutral-400 mx-1">/</span>
-                        <span className="text-rose-500 font-bold">
-                          ✗ {entry.wrong_count || 0}
-                        </span>
+                        {(entry.correct_count || 0) === 0 && (entry.wrong_count || 0) === 0 ? (
+                          <div className="inline-flex flex-col items-center">
+                            <span className="text-neutral-400 font-semibold text-[11px]">
+                              ✓ 0 / ✗ 0
+                            </span>
+                            <span className="text-[9px] text-amber-600 dark:text-amber-400 font-sans font-medium bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-200/50 dark:border-amber-800/40 mt-0.5">
+                              উত্তরহীন
+                            </span>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="text-emerald-600 font-bold">
+                              ✓ {entry.correct_count || 0}
+                            </span>
+                            <span className="text-neutral-400 mx-1">/</span>
+                            <span className="text-rose-500 font-bold">
+                              ✗ {entry.wrong_count || 0}
+                            </span>
+                          </>
+                        )}
                       </td>
 
                       {/* Time Taken */}
@@ -1099,19 +1136,19 @@ export default function LiveExamResults({ examId }: { examId: string }) {
               <div>
                 <p className="text-neutral-500 text-[10px]">অর্জিত নম্বর</p>
                 <p className="text-base font-black text-emerald-600 font-mono">
-                  {selectedAttempt.score}
+                  {selectedAttempt.score != null ? selectedAttempt.score : 0}
                 </p>
               </div>
               <div>
                 <p className="text-neutral-500 text-[10px]">সঠিক উত্তর</p>
                 <p className="text-base font-black text-emerald-500 font-mono">
-                  {selectedAttempt.correct_count} টি
+                  {selectedAttempt.correct_count || 0} টি
                 </p>
               </div>
               <div>
                 <p className="text-neutral-500 text-[10px]">ভুল উত্তর</p>
                 <p className="text-base font-black text-rose-500 font-mono">
-                  {selectedAttempt.wrong_count} টি
+                  {selectedAttempt.wrong_count || 0} টি
                 </p>
               </div>
             </div>
@@ -1149,19 +1186,12 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                     : 'নির্ধারিত নয়'}
                 </span>
               </p>
-              {selectedAttempt.start_time && selectedAttempt.submit_time && (
+              {(selectedAttempt.start_time || selectedAttempt.time_taken_seconds) && (
                 <p className="flex justify-between items-center pt-1.5 border-t border-neutral-200/60 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 font-bold">
                   <span>মোট সময় লেগেছে:</span>
                   <span className="font-mono">
                     {(() => {
-                      const diffSec = Math.max(
-                        0,
-                        Math.round(
-                          (new Date(selectedAttempt.submit_time).getTime() -
-                            new Date(selectedAttempt.start_time).getTime()) /
-                            1000,
-                        ),
-                      );
+                      const diffSec = getTimeTakenSeconds(selectedAttempt, exam?.duration_minutes);
                       const m = Math.floor(diffSec / 60);
                       const s = diffSec % 60;
                       return `${m} মিনিট ${s} সেকেন্ড`;

@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,10 +8,12 @@ import '../../../core/constants/app_icons.dart';
 import '../../../core/presentation/widgets/app_icon.dart';
 
 import '../../dashboard/domain/models.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
+import '../../../core/presentation/widgets/user_avatar.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
-import 'widgets/account_info_modal.dart';
+import 'widgets/avatar_picker_modal.dart';
 import 'widgets/delete_account_modal.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
@@ -170,8 +171,16 @@ class SettingsView extends ConsumerWidget {
             actionId: 'openRefund',
           ),
           _SettingsItem(
-            label: 'সাহায্য',
-            description: 'সাধারণ প্রশ্নের উত্তর',
+            label: 'সাপোর্ট',
+            description: 'হেল্পলাইন, হোয়াটসঅ্যাপ ও ইমেইল',
+            icon: LucideIcons.headphones,
+            svgAsset: 'assets/dashboard-icons/help_question.svg',
+            type: _ItemType.navigate,
+            route: '/profile/support',
+          ),
+          _SettingsItem(
+            label: 'জিজ্ঞাসা (FAQ)',
+            description: 'সাধারণ প্রশ্নের বিস্তারিত উত্তর',
             icon: LucideIcons.helpCircle,
             svgAsset: 'assets/dashboard-icons/help_question.svg',
             type: _ItemType.navigate,
@@ -187,8 +196,8 @@ class SettingsView extends ConsumerWidget {
             description: 'ইউজার আইডি ও সাপোর্টে দেওয়ার জরুরি তথ্য',
             icon: LucideIcons.fingerprint,
             svgAsset: 'assets/dashboard-icons/account_card.svg',
-            type: _ItemType.action,
-            actionId: 'accountInfo',
+            type: _ItemType.navigate,
+            route: '/profile/account-info',
           ),
           _SettingsItem(
             label: 'অ্যাকাউন্ট লিংকিং',
@@ -246,9 +255,10 @@ class SettingsView extends ConsumerWidget {
         } else if (item.actionId == 'openRefund') {
           _launchPolicyUrl(context, 'https://obhyash.com/refund');
         } else if (item.actionId == 'accountInfo') {
-          AccountInfoModal.show(context, user);
+          context.push('/profile/account-info');
         } else if (item.actionId == 'deleteAccount') {
-          DeleteAccountModal.show(context, user);
+          final liveUser = ref.read(userProfileProvider).value ?? user;
+          DeleteAccountModal.show(context, liveUser);
         } else if (item.actionId == 'toggleTheme') {
           ref.read(themeModeProvider.notifier).toggle();
         } else if (item.actionId == 'logout') {
@@ -309,6 +319,7 @@ class SettingsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final liveUser = ref.watch(userProfileProvider).value ?? user;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
     final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA);
@@ -354,8 +365,8 @@ class SettingsView extends ConsumerWidget {
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
-                    _HeroBanner(user: user),
-                    _CardBody(user: user, isDark: isDark),
+                    _HeroBanner(user: liveUser),
+                    _CardBody(user: liveUser, isDark: isDark),
                   ],
                 ),
               ),
@@ -656,79 +667,72 @@ class _GoldenAvatarRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 126,
-      height: 126,
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 7,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
-            spreadRadius: -8,
+    return GestureDetector(
+      onTap: () => AvatarPickerModal.show(context, user),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 110,
+            height: 110,
+            margin: const EdgeInsets.only(bottom: 14),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.16),
+                width: 3.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ClipOval(
+              child: UserAvatar(
+                avatarUrl: user.avatarUrl,
+                name: user.name,
+                gender: user.gender,
+                id: user.id,
+                size: 103,
+                showProRing: false,
+                showBorder: false,
+                useDiceBearFallback: true,
+              ),
+            ),
+          ),
+          // Camera / Edit badge at bottom-right
+          Positioned(
+            right: 2,
+            bottom: 16,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF047857),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                LucideIcons.camera,
+                size: 14,
+                color: Colors.white,
+              ),
+            ),
           ),
         ],
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(3),
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: SweepGradient(
-            transform: GradientRotation(200 * math.pi / 180),
-            colors: [
-              Color(0xFFF6E6AE),
-              Color(0xFFC9A24B),
-              Color(0xFF8A6A1C),
-              Color(0xFFECD78F),
-              Color(0xFFF6E6AE),
-            ],
-          ),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(3),
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFF052E22),
-          ),
-          child: ClipOval(
-            child: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty)
-                ? Image.network(
-                    user.avatarUrl!,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildMetallicSphere(),
-                  )
-                : _buildMetallicSphere(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMetallicSphere() {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          center: Alignment(-0.04, -0.16),
-          radius: 0.85,
-          colors: [
-            Color(0xFFE4DCCB),
-            Color(0xFF6B6F76),
-            Color(0xFF171A1F),
-          ],
-          stops: [0.0, 0.20, 0.65],
-        ),
       ),
     );
   }
@@ -849,7 +853,7 @@ class _CardBody extends StatelessWidget {
                   icon: LucideIcons.info,
                   label: 'ইনফো',
                   isDark: isDark,
-                  onTap: () => AccountInfoModal.show(context, user),
+                  onTap: () => context.push('/profile/account-info'),
                 ),
               ),
               const SizedBox(width: 10),

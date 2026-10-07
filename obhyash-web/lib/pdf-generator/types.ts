@@ -8,6 +8,7 @@ export interface QuestionItem {
   isContinuation?: boolean;
   continuationPart?: number;
   cardType?: 'question' | 'explanation' | 'unified';
+  passage?: string;
 }
 
 export interface GeneratorSettings {
@@ -20,6 +21,7 @@ export interface GeneratorSettings {
 
   // First page Hero Header
   title: string;
+  subTitleLabel?: string; // e.g. "সমাধান ও ব্যাখ্যা"
   subtitle: string;
   hasHeader: boolean; // true = 1st page full header, false = mini header from page 1
 

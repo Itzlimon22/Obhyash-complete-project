@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/presentation/widgets/app_button_3d.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_popups.dart';
 
 class LoginSupportSheet extends StatefulWidget {
@@ -103,7 +105,7 @@ class _LoginSupportSheetState extends State<LoginSupportSheet> {
       setState(() => _isLoading = false);
       AppPopups.show(
         context,
-        message: 'অনুরোধটি পাঠানো সম্ভব হয়নি। সরাসরি WhatsApp-এ বার্তা দিন।',
+        message: 'অনুরোধটি পাঠানো সম্ভব হয়নি। সরাসরি WhatsApp-এ বার্তা দাও।',
         isError: true,
       );
     }
@@ -334,41 +336,19 @@ class _LoginSupportSheetState extends State<LoginSupportSheet> {
               ),
               const SizedBox(height: 18),
 
-              // Submit Button
-              ElevatedButton(
+              // Submit Button (3D Deepest Green)
+              AppButton3D(
+                prefixIcon: const Icon(LucideIcons.send, size: 16, color: Colors.white),
+                text: 'অনুরোধ জমা দিন',
                 onPressed: _isLoading ? null : _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryGreen,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(LucideIcons.send, size: 16),
-                          SizedBox(width: 8),
-                          Text(
-                            'অনুরোধ জমা দিন',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                isLoading: _isLoading,
+                baseColor: AppColors.viridianForest,
+                shadowColor: AppColors.brandGreenDark,
+                height: 50,
+                borderRadius: 16,
+                depth: 4.5,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
               ),
               const SizedBox(height: 12),
 

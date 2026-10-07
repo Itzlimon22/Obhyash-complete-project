@@ -257,6 +257,7 @@ export async function submitLiveExam(
   }
 
   // Official First-Time Attempt -> Updates live_exam_attempts for official Leaderboard
+  const safeTimeTaken = Math.max(0, timeTakenSeconds || 0);
   const { error } = await supabase
     .from("live_exam_attempts")
     .update({
@@ -264,6 +265,8 @@ export async function submitLiveExam(
       correct_count: correctCount,
       wrong_count: wrongCount,
       score: score,
+      time_taken_seconds: safeTimeTaken,
+      time_taken_ms: safeTimeTaken * 1000,
       submit_time: new Date().toISOString(),
       status: "submitted",
     })

@@ -13,15 +13,17 @@ class FormulaSubjectsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // Personalize level based on student profile (level or stream)
-    // 100% offline resilient: defaults to 'HSC' if profile is not available offline
+    // Personalize subjects based on student profile (stream: SSC vs HSC)
     final userProfile = ref.watch(userProfileProvider).value;
-    final level = (userProfile?.level?.isNotEmpty == true)
-        ? userProfile!.level!
-        : (userProfile?.stream?.isNotEmpty == true
-            ? userProfile!.stream!
-            : 'HSC');
-    final subjects = getFormulaSubjectsForLevel(level);
+    final subjects = getPersonalizedFormulaSubjects(
+      level: userProfile?.level,
+      stream: userProfile?.stream,
+      batch: userProfile?.batch,
+      division: userProfile?.division,
+      target: userProfile?.target,
+      examTarget: userProfile?.examTarget,
+      optionalSubject: userProfile?.optionalSubject,
+    );
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),

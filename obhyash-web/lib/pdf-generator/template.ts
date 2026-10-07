@@ -23,7 +23,7 @@ const LET: Record<string, string> = {
   'd': 'ঘ',
 };
 
-function escapeHtml(str: string): string {
+export function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -34,7 +34,7 @@ function escapeHtml(str: string): string {
 
 const DOL = '\ue000';
 
-function renderKatex(mathStr: string, displayMode: boolean = false): string {
+export function renderKatex(mathStr: string, displayMode: boolean = false): string {
   try {
     return katex.renderToString(mathStr.trim(), {
       displayMode,
@@ -236,7 +236,7 @@ function breakLongMath(t: string): string {
   return t;
 }
 
-function inlineMath(s: string): string {
+export function inlineMath(s: string): string {
   if (!s) return '';
   const normalized = normalizeMathText(s).replace(/\\\$/g, DOL);
   const parts = normalized.split(/(\${1,2}[^\$]+\${1,2})/g);
@@ -257,7 +257,7 @@ function inlineMath(s: string): string {
   return out;
 }
 
-function displayMath(t: string): string {
+export function displayMath(t: string): string {
   const processed = breakLongMath(t);
   const rendered = renderKatex(processed, true);
   return `<div class="dm m">${rendered}</div>`;
@@ -614,31 +614,48 @@ body {
   left: 40px;
   top: 40px;
   width: 714px;
-  height: 128px;
-  border-radius: 28px;
+  height: 136px;
+  border-radius: 24px;
   background: ${th.heroBg};
   overflow: hidden;
   color: #fff;
   text-align: center;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px 22px 20px;
 }
 .hdr .t {
-  font-size: 42px;
-  font-weight: bold;
-  margin-top: 14px;
+  font-size: 26px;
+  font-weight: 700;
   line-height: 1.25;
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
+}
+.hdr .tag {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 14px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
 }
 .hdr .s {
-  font-size: 16.5px;
-  margin-top: 6px;
-  opacity: 0.95;
+  font-size: 13px;
+  opacity: 0.92;
+  line-height: 1.3;
 }
 .hdr .bar {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 24px;
+  height: 18px;
   background: ${th.heroBar};
 }
 
@@ -1065,6 +1082,7 @@ window.build = function(plan, off, hdr) {
       top = 196;
       p.innerHTML = \`<div class="hdr">
         <div class="t">\${SETTINGS.title}</div>
+        <div class="tag">\${SETTINGS.subTitleLabel || 'সমাধান ও ব্যাখ্যা'}</div>
         <div class="s">\${SETTINGS.subtitle}</div>
         <div class="bar"></div>
       </div>\`;

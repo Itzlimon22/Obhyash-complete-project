@@ -265,7 +265,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       AppPopups.warning(
         context,
         message:
-            'পরবর্তী বার্তা পাঠানোর জন্য আর $min মিনিট $sec সেকেন্ড অপেক্ষা করুন।',
+            'পরবর্তী বার্তা পাঠানোর জন্য আর $min মিনিট $sec সেকেন্ড অপেক্ষা করো।',
       );
       return;
     }

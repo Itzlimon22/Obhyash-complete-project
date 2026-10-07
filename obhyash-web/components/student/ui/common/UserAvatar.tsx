@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Crown } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 import { isUserPro } from '@/lib/subscription-utils';
+import { getAvatarUrl } from '@/services/storage-service';
 
 interface UserAvatarProps {
   user?: (Partial<UserProfile> & {
@@ -32,6 +33,14 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   const [customAvatarError, setCustomAvatarError] = useState(false);
   const [fallbackAvatarError, setFallbackAvatarError] = useState(false);
 
+  const rawAvatarUrl = user?.avatarUrl || (user as any)?.avatar_url;
+
+  // Reset errors whenever user's avatar changes so new avatar is never blocked
+  useEffect(() => {
+    setCustomAvatarError(false);
+    setFallbackAvatarError(false);
+  }, [rawAvatarUrl, user?.id]);
+
   if (!user) {
     return (
       <div
@@ -49,8 +58,10 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   // 2. If it fails or doesn't exist, try the gender-based DiceBear avatar.
   // 3. If that also fails, show initials as the final fallback.
 
-  const effectiveAvatarUrl = user.avatarUrl || (user as any).avatar_url;
-  const hasCustomAvatar = !!effectiveAvatarUrl && !customAvatarError;
+  const resolvedAvatarUrl = rawAvatarUrl
+    ? (rawAvatarUrl.startsWith('http') ? rawAvatarUrl : getAvatarUrl(rawAvatarUrl))
+    : null;
+  const hasCustomAvatar = !!resolvedAvatarUrl && !customAvatarError;
   const diceBearAvatar = getRandomAvatar(
     user.gender || null,
     user.id || user.name || 'default',
@@ -58,7 +69,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   const hasFallbackAvatar = !fallbackAvatarError;
 
   const showImage = hasCustomAvatar || (diceBearAvatar && hasFallbackAvatar);
-  const currentSrc = hasCustomAvatar ? effectiveAvatarUrl! : diceBearAvatar;
+  const currentSrc = hasCustomAvatar ? resolvedAvatarUrl! : diceBearAvatar;
 
   const avatarNode = (
     <div
@@ -72,6 +83,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     >
       {showImage ? (
         <Image
+          key={currentSrc}
           src={currentSrc}
           alt={user.name || 'User'}
           fill

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 export '../../theme/button_3d_theme.dart';
 
@@ -26,6 +25,7 @@ class AppButton3D extends StatefulWidget {
   final bool isFullWidth;
   final EdgeInsetsGeometry? padding;
   final Border? border;
+  final String? fontFamily;
 
   const AppButton3D({
     super.key,
@@ -47,6 +47,7 @@ class AppButton3D extends StatefulWidget {
     this.isFullWidth = true,
     this.padding,
     this.border,
+    this.fontFamily,
   }) : assert(text != null || child != null, 'Either text or child must be provided');
 
   @override
@@ -113,7 +114,7 @@ class _AppButton3DState extends State<AppButton3D> {
                   color: widget.textColor,
                   fontSize: widget.fontSize,
                   fontWeight: widget.fontWeight,
-                  fontFamily: GoogleFonts.inter().fontFamily,
+                  fontFamily: widget.fontFamily ?? 'HindSiliguri',
                   fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
                   letterSpacing: 0.2,
                 ),

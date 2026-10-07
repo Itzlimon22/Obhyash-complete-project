@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/presentation/widgets/app_button_3d.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_popups.dart';
 
 class OtpVerificationDialog extends StatefulWidget {
@@ -391,31 +393,18 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
 
           const SizedBox(height: 20),
 
-          // Verify Button
-          ElevatedButton(
+          // Verify Button (3D Deepest Green)
+          AppButton3D(
+            text: 'যাচাই করে এগিয়ে যাও',
             onPressed: _isVerifying ? null : _handleVerify,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF064E3B),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              
-              ),
-            child: _isVerifying
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text(
-                    'যাচাই করে এগিয়ে যাও',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.normal,
-                      ),
-                  ),
+            isLoading: _isVerifying,
+            baseColor: AppColors.viridianForest,
+            shadowColor: AppColors.brandGreenDark,
+            height: 48,
+            borderRadius: 14,
+            depth: 4.0,
+            fontSize: 15.5,
+            fontWeight: FontWeight.w700,
           ),
 
           const SizedBox(height: 16),

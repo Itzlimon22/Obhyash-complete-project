@@ -33,6 +33,7 @@ class ExamEngineState {
   final ExamDetails? examDetails;
   final List<Question> questions;
   final Map<String, int> userAnswers;
+  final Map<String, int> answerSelectionCounts;
   final Set<String> flaggedQuestions;
   final Set<String> bookmarkedQuestions;
   final int timeLeft;
@@ -47,6 +48,7 @@ class ExamEngineState {
     this.examDetails,
     this.questions = const [],
     this.userAnswers = const {},
+    this.answerSelectionCounts = const {},
     this.flaggedQuestions = const {},
     this.bookmarkedQuestions = const {},
     this.timeLeft = 0,
@@ -62,6 +64,7 @@ class ExamEngineState {
     ExamDetails? examDetails,
     List<Question>? questions,
     Map<String, int>? userAnswers,
+    Map<String, int>? answerSelectionCounts,
     Set<String>? flaggedQuestions,
     Set<String>? bookmarkedQuestions,
     int? timeLeft,
@@ -76,6 +79,7 @@ class ExamEngineState {
       examDetails: examDetails ?? this.examDetails,
       questions: questions ?? this.questions,
       userAnswers: userAnswers ?? this.userAnswers,
+      answerSelectionCounts: answerSelectionCounts ?? this.answerSelectionCounts,
       flaggedQuestions: flaggedQuestions ?? this.flaggedQuestions,
       bookmarkedQuestions: bookmarkedQuestions ?? this.bookmarkedQuestions,
       timeLeft: timeLeft ?? this.timeLeft,
@@ -456,6 +460,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         questions: generatedQuestions,
         examDetails: details,
         userAnswers: {},
+        answerSelectionCounts: {},
         flaggedQuestions: {},
         bookmarkedQuestions: initialBookmarks,
         dbSessionId: sessionId,
@@ -479,6 +484,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       questions: questions,
       examDetails: details,
       userAnswers: {},
+      answerSelectionCounts: {},
       flaggedQuestions: {},
       errorDetails: '',
     );
@@ -868,6 +874,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         questions: allPresetQuestions,
         examDetails: details,
         userAnswers: {},
+        answerSelectionCounts: {},
         flaggedQuestions: {},
         bookmarkedQuestions: initialBookmarks,
         dbSessionId: sessionId,
@@ -1047,6 +1054,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               }
             : null,
         'userAnswers': state.userAnswers,
+        'answerSelectionCounts': state.answerSelectionCounts,
         'flaggedQuestions': state.flaggedQuestions.toList(),
         'bookmarkedQuestions': state.bookmarkedQuestions.toList(),
         'dbSessionId': state.dbSessionId,
@@ -1092,6 +1100,10 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       final rawAnswers = draft['userAnswers'] as Map<String, dynamic>? ?? {};
       final userAnswers = rawAnswers
           .map((k, v) => MapEntry(k, (v as num).toInt()));
+      final rawCounts = draft['answerSelectionCounts'] as Map<String, dynamic>? ?? {};
+      final answerSelectionCounts = rawCounts.isNotEmpty
+          ? rawCounts.map((k, v) => MapEntry(k, (v as num).toInt()))
+          : userAnswers.map((k, v) => MapEntry(k, 1));
       final flagged = (draft['flaggedQuestions'] as List<dynamic>? ?? [])
           .map((e) => e.toString())
           .toSet();
@@ -1111,6 +1123,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           questions: questions,
           examDetails: details,
           userAnswers: userAnswers,
+          answerSelectionCounts: answerSelectionCounts,
           flaggedQuestions: flagged,
           bookmarkedQuestions: bookmarked,
           dbSessionId: dbSessionId,
@@ -1127,6 +1140,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           questions: questions,
           examDetails: details,
           userAnswers: userAnswers,
+          answerSelectionCounts: answerSelectionCounts,
           flaggedQuestions: flagged,
           bookmarkedQuestions: bookmarked,
           dbSessionId: dbSessionId,
@@ -1140,10 +1154,23 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
   }
 
   void setAnswer(String questionId, int optionIndex) {
-    if (state.userAnswers.containsKey(questionId)) return; // Locked once selected
+    final currentCount = state.answerSelectionCounts[questionId] ?? 0;
+    // Allow up to 2 selections per question (locks on/after 2nd selection)
+    if (currentCount >= 2) return;
+
+    // Ignore tap on already selected option to prevent wasting attempt
+    if (state.userAnswers[questionId] == optionIndex) return;
+
+    final updatedCounts = Map<String, int>.from(state.answerSelectionCounts);
+    updatedCounts[questionId] = currentCount + 1;
+
     final updated = Map<String, int>.from(state.userAnswers);
     updated[questionId] = optionIndex;
-    state = state.copyWith(userAnswers: updated);
+
+    state = state.copyWith(
+      userAnswers: updated,
+      answerSelectionCounts: updatedCounts,
+    );
     _persistActiveDraft();
   }
 

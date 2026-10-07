@@ -653,7 +653,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       if (mounted) {
         AppPopups.success(
           context,
-          message: '$targetEmail ঠিকানায় ৬ ডিজিটের ওটিপি পাঠানো হয়েছে। ইনবক্স চেক করুন।',
+          message: '$targetEmail ঠিকানায় ৬ ডিজিটের ওটিপি পাঠানো হয়েছে। ইনবক্স চেক করো।',
         );
       }
     } catch (e) {

@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/app_popups.dart';
+import '../../../core/providers/auth_provider.dart';
 import '../providers/auth_controller.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/presentation/widgets/app_button_3d.dart';
 
 class UpdatePasswordView extends ConsumerStatefulWidget {
   const UpdatePasswordView({super.key});
@@ -42,6 +44,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
     try {
       await ref.read(authControllerProvider.notifier).updatePassword(password);
       if (mounted) {
+        ref.read(authProvider.notifier).refreshUser();
         AppPopups.show(context, message: 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে', isError: false);
         context.go('/');
       }
@@ -158,29 +161,17 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 32),
-                ElevatedButton(
+                AppButton3D(
+                  text: 'পাসওয়ার্ড সংরক্ষণ করো',
                   onPressed: _isLoading ? null : _handleUpdate,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059669),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'পাসওয়ার্ড সংরক্ষণ করো',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                  isLoading: _isLoading,
+                  baseColor: AppColors.viridianForest,
+                  shadowColor: AppColors.brandGreenDark,
+                  height: 52,
+                  borderRadius: 16,
+                  depth: 4.5,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
                 ),
               ],
             ),

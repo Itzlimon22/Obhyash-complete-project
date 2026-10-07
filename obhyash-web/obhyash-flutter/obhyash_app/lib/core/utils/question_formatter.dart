@@ -65,6 +65,44 @@ class QuestionFormatter {
       (m) => '\$${m.group(1)}:${m.group(2)}\$',
     );
 
+    // 0g. Separate Bengali conjunctions/words attached to Latin letters: e.g. এবংb -> এবং b
+    text = text.replaceAllMapped(
+      RegExp(r'([\u0980-\u09FF]+)([a-zA-Z])'),
+      (m) => '${m.group(1)} ${m.group(2)}',
+    );
+    text = text.replaceAllMapped(
+      RegExp(r'([a-zA-Z])([\u0980-\u09FF]+)'),
+      (m) => '${m.group(1)} ${m.group(2)}',
+    );
+
+    // 0h. Un-trap Bengali conjunctions from math delimiters: $a এবং b$ -> $a$ এবং $b$
+    text = text.replaceAllMapped(
+      RegExp(r'\$([^\$\n]+?)\s+(এবং|বা|ও|হলে|এর)\s+([^\$\n]+?)\$'),
+      (m) => '\$${m.group(1)}\$ ${m.group(2)} \$${m.group(3)}\$',
+    );
+
+    // 0i. Auto-wrap unwrapped compound scientific units with LaTeX commands ONLY outside existing math blocks
+    final mathBlockRegex = RegExp(r'(\$\$[\s\S]*?\$\$|\$[^\$\n]*?\$)');
+    final unitParts = <String>[];
+    int lastUnitIdx = 0;
+    for (final match in mathBlockRegex.allMatches(text)) {
+      if (match.start > lastUnitIdx) {
+        unitParts.add(text.substring(lastUnitIdx, match.start));
+      }
+      unitParts.add(match.group(0)!);
+      lastUnitIdx = match.end;
+    }
+    if (lastUnitIdx < text.length) {
+      unitParts.add(text.substring(lastUnitIdx));
+    }
+    text = unitParts.map((part) {
+      if (part.startsWith(r'$')) return part;
+      return part.replaceAllMapped(
+        RegExp(r'(?<!\$)\b(\d+(?:\.\d+)?\s*(?:\\,)?\s*\\text\{[^{}]+\}(?:\s*(?:\\cdot|\\times)?\s*\\text\{[^{}]+\}(?:\^\{?-?\d+\}?)?)*)(?!\$)'),
+        (m) => '\$${m.group(1)}\$',
+      );
+    }).join('');
+
     // 1. Convert short $$...$$ display math into inline $...$ so they flow naturally in sentences
     text = text.replaceAllMapped(
       RegExp(r'\$\$([^\n]{1,120}?)\$\$'),
@@ -471,6 +509,50 @@ class QuestionFormatter {
     res = res.replaceAll(RegExp(r'(?<!\\)\bight([)\]}|.])'), r'\right$1');
     res = res.replaceAll(RegExp(r'(?<!\\)\bightarrow\b'), r'\rightarrow');
     res = res.replaceAll(RegExp(r'(?<!\\)\bightleftharpoons\b'), r'\rightleftharpoons');
+
+    // Fix non-standard macros e.g. \mum or \text{\mum} -> \mu\text{m}
+    res = res.replaceAll(RegExp(r'\\(?:text\{)?\\mum\}?'), r'\mu\text{m}');
+
+    // Fix fused Greek letters followed by Latin variable e.g. \pif -> \pi f, \piN -> \pi N
+    res = res.replaceAllMapped(
+      RegExp(r'\\(pi|mu|alpha|beta|theta|omega|gamma|lambda|sigma|tau|phi|psi|rho|delta|epsilon|eta|xi|zeta|chi|nu|kappa)([a-zA-Z])(?![a-zA-Z])'),
+      (m) => '\\${m.group(1)} ${m.group(2)}',
+    );
+
+    // Fix nested \text{\text{...}} or \text{\mathrm{...}}
+    res = res.replaceAllMapped(
+      RegExp(r'\\(?:text|mathrm|textbf)\{\s*\\(?:text|mathrm|textbf)\{([^}]+)\}\s*\}'),
+      (m) => '\\text{${m.group(1)}}',
+    );
+
+    // Fix corrupted regex artifacts like "(g = 9.8\ $,\text$ { m/s } ^2)"
+    res = res.replaceAllMapped(
+      RegExp(r'\\\s*\$,\\text\$\s*\{?\s*([a-zA-Z\/]+)\s*\}?\s*\^?(\-?\d+)?'),
+      (m) => '\\text{${m.group(1)}}^{${m.group(2) ?? "2"}}',
+    );
+    res = res.replaceAll(r'\ $,\text$', r'\text');
+
+    // Fix double exponent syntax errors: 10^{1}^1 -> 10^{11}
+    res = res.replaceAllMapped(
+      RegExp(r'10\^\{(\d+)\}\^(\d+)'),
+      (m) => '10^{${m.group(1)}${m.group(2)}}',
+    );
+
+    // Fix trailing \, or \; inside exponents: 10^{-7\,} -> 10^{-7}
+    res = res.replaceAllMapped(
+      RegExp(r'\^\{([^}]+)\\[,;]\}'),
+      (m) => '^{${m.group(1)}}',
+    );
+
+    // Fix illegal internal dollar signs inside fraction arguments: \frac{$2 \times 4$.9}{9.8}
+    res = res.replaceAllMapped(
+      RegExp(r'\\frac\{([^}]*\$[^}]*)\}\{([^}]*)\}'),
+      (m) => '\\frac{${m.group(1)!.replaceAll(r'$', '')}}{${m.group(2)!.replaceAll(r'$', '')}}',
+    );
+    res = res.replaceAllMapped(
+      RegExp(r'\\frac\{([^}]*)\}\{([^}]*\$[^}]*)\}'),
+      (m) => '\\frac{${m.group(1)!.replaceAll(r'$', '')}}{${m.group(2)!.replaceAll(r'$', '')}}',
+    );
 
     return res;
   }

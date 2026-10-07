@@ -24,11 +24,13 @@ import {
   Trash2,
   ChevronRight,
   RefreshCw,
+  Camera,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
 import AccountInfoModal from './settings/AccountInfoModal';
 import DeleteAccountModal from './settings/DeleteAccountModal';
+import AvatarPickerModal from './dashboard/AvatarPickerModal';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -58,6 +60,7 @@ interface SettingsGroup {
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   user,
+  onSave,
   onNavigate,
   onLogout,
   toggleTheme,
@@ -66,6 +69,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [showAccountInfoModal, setShowAccountInfoModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   // 1:1 matching Flutter settings_view.dart _buildGroups
   const groups: SettingsGroup[] = [
@@ -182,8 +186,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           label: 'অ্যাকাউন্ট ইনফো',
           icon: Fingerprint,
           svgAsset: '/dashboard-icons/account_card.svg',
-          type: 'action',
-          actionId: 'accountInfo',
+          type: 'navigate',
+          actionId: 'account-info',
         },
         {
           label: 'অ্যাকাউন্ট লিংকিং',
@@ -226,7 +230,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       return;
     }
     if (item.actionId === 'accountInfo' || item.actionId === 'account-info') {
-      setShowAccountInfoModal(true);
+      onNavigate?.('account-info');
       return;
     }
     if (item.actionId === 'deleteAccount' || item.actionId === 'delete-account') {
@@ -295,8 +299,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <div className="rounded-[20px] border border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#18181B] shadow-xs overflow-hidden">
         {/* Deep Green Gradient Header (Matching Flutter 1:1) */}
         <div className="w-full pt-7 pb-6 px-5 flex flex-col items-center text-center text-white bg-gradient-to-br from-[#064E3B] to-[#047857] dark:from-[#064E3B] dark:to-[#022C22]">
-          <div className="ring-[3px] ring-white/30 rounded-full shadow-md">
+          {/* Golden/White Ring Avatar with Edit Overlay (Matching Flutter 1:1) */}
+          <div
+            onClick={() => setShowAvatarPicker(true)}
+            className="relative ring-[3px] ring-white/30 rounded-full shadow-md cursor-pointer group hover:scale-[1.02] transition-transform"
+            title="প্রোফাইল ছবি পরিবর্তন করো"
+          >
             <UserAvatar user={user} size="2xl" priority className="w-20 h-20" />
+            <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-[#047857] text-white border-2 border-white dark:border-[#022C22] shadow-sm flex items-center justify-center hover:bg-[#059669] transition-colors">
+              <Camera size={13} />
+            </div>
           </div>
           <h2 className="text-[17px] sm:text-[18px] font-bold text-white leading-tight mt-3">
             {user.name || 'শিক্ষার্থী'}
@@ -370,7 +382,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             {/* 3. Info */}
             <button
               type="button"
-              onClick={() => setShowAccountInfoModal(true)}
+              onClick={() => onNavigate?.('account-info')}
               className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:bg-neutral-200/80 dark:hover:bg-[#323236] transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-[0.97]"
             >
               <Info size={16} />
@@ -524,6 +536,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Avatar Picker Modal ── */}
+      {showAvatarPicker && (
+        <AvatarPickerModal
+          user={user}
+          onClose={() => setShowAvatarPicker(false)}
+          onAvatarUpdated={(newUrl) => {
+            if (user) {
+              user.avatarUrl = newUrl;
+              (user as any).avatar_url = newUrl;
+            }
+            onSave?.({ avatarUrl: newUrl, avatar_url: newUrl } as any);
+          }}
+        />
       )}
     </div>
   );

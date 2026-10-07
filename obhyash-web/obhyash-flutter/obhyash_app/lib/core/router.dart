@@ -16,6 +16,7 @@ import '../features/auth/presentation/complete_profile_view.dart';
 import '../features/auth/presentation/login_support_view.dart';
 import '../features/profile/presentation/profile_route_view.dart';
 import '../features/profile/presentation/profile_stats_page.dart';
+import '../features/profile/presentation/account_info_view.dart';
 import '../features/subscription/presentation/subscription_view.dart';
 import '../features/subscription/presentation/my_subscription_view.dart';
 import '../features/subscription/presentation/plan_selection_view.dart';
@@ -25,6 +26,7 @@ import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
 import '../features/subject_report/presentation/subject_report_view.dart';
 import '../features/profile/presentation/faq_view.dart';
+import '../features/profile/presentation/support_view.dart';
 import '../features/profile/presentation/account_linking_view.dart';
 import '../features/leaderboard/presentation/leaderboard_view.dart';
 import '../features/analysis/presentation/analysis_view.dart';
@@ -718,12 +720,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) => const FaqView(),
                   ),
                   GoRoute(
+                    path: 'support',
+                    builder: (context, state) => const SupportView(),
+                  ),
+                  GoRoute(
                     path: 'referral',
                     builder: (context, state) => const ReferralView(),
                   ),
                   GoRoute(
                     path: 'account-linking',
                     builder: (context, state) => const AccountLinkingView(),
+                  ),
+                  GoRoute(
+                    path: 'account-info',
+                    builder: (context, state) => const AccountInfoView(),
                   ),
                 ],
               ),

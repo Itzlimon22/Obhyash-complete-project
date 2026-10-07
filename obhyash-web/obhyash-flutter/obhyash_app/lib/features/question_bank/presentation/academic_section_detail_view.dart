@@ -1450,14 +1450,30 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     final banglaNum = BanglaNameHelper.toBanglaNumeral(number);
     final String boardName;
     if (q.examHistory.isNotEmpty) {
-      final h = q.examHistory.first;
-      final code = h.code.isNotEmpty ? h.code : BanglaNameHelper.getInstituteCode(h.institute);
-      final yr = h.year > 0 ? "'${(h.year % 100).toString().padLeft(2, '0')}" : '';
-      boardName = '$code$yr';
+      final tags = <String>[];
+      for (final h in q.examHistory) {
+        final code = h.code.isNotEmpty ? h.code : BanglaNameHelper.getInstituteCode(h.institute);
+        final isAuthor = BanglaNameHelper.isTextbookAuthor(code) || BanglaNameHelper.isTextbookAuthor(h.institute);
+        final yr = (h.year > 0 && !isAuthor) ? "'${(h.year % 100).toString().padLeft(2, '0')}" : '';
+        final tag = '$code$yr'.trim();
+        if (tag.isNotEmpty && !tags.contains(tag)) {
+          tags.add(tag);
+        }
+      }
+      boardName = tags.isNotEmpty ? tags.join(', ') : 'বোর্ড প্রশ্ন';
     } else if (q.institutes.isNotEmpty) {
-      final code = BanglaNameHelper.getInstituteCode(q.institutes.first);
-      final yr = q.years.isNotEmpty && q.years.first > 0 ? "'${(q.years.first % 100).toString().padLeft(2, '0')}" : '';
-      boardName = '$code$yr';
+      final tags = <String>[];
+      for (var i = 0; i < q.institutes.length; i++) {
+        final code = BanglaNameHelper.getInstituteCode(q.institutes[i]);
+        final isAuthor = BanglaNameHelper.isTextbookAuthor(code) || BanglaNameHelper.isTextbookAuthor(q.institutes[i]);
+        final yrNum = i < q.years.length ? q.years[i] : (q.years.isNotEmpty ? q.years.first : 0);
+        final yr = (yrNum > 0 && !isAuthor) ? "'${(yrNum % 100).toString().padLeft(2, '0')}" : '';
+        final tag = '$code$yr'.trim();
+        if (tag.isNotEmpty && !tags.contains(tag)) {
+          tags.add(tag);
+        }
+      }
+      boardName = tags.isNotEmpty ? tags.join(', ') : 'বোর্ড প্রশ্ন';
     } else {
       boardName = 'বোর্ড প্রশ্ন';
     }

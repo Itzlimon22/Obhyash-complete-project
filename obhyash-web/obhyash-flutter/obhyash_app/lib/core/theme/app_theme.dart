@@ -136,6 +136,7 @@ class AppTheme {
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimaryLight,
         elevation: 0,
+        centerTitle: true,
         titleTextStyle: TextStyle(
           fontFamily: 'HindSiliguri',
           fontSize: 18,

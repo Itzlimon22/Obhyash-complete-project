@@ -214,28 +214,55 @@ class _QuestionCardState extends State<QuestionCard>
                             () {
                               final String sourceText;
                               if (widget.question.examHistory.isNotEmpty) {
-                                final h = widget.question.examHistory.first;
-                                final rawCode = h.code.isNotEmpty
-                                    ? h.code
-                                    : BanglaNameHelper.getInstituteCode(h.institute);
-                                final isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) ||
-                                    BanglaNameHelper.isTextbookAuthor(h.institute);
-                                final yr = (h.year > 0 && !isAuthor)
-                                    ? "'${(h.year % 100).toString().padLeft(2, '0')}"
-                                    : '';
-                                sourceText = '$rawCode$yr';
+                                final tags = <String>[];
+                                for (final h in widget.question.examHistory) {
+                                  final rawCode = h.code.isNotEmpty
+                                      ? h.code
+                                      : BanglaNameHelper.getInstituteCode(h.institute);
+                                  final isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) ||
+                                      BanglaNameHelper.isTextbookAuthor(h.institute);
+                                  final yr = (h.year > 0 && !isAuthor)
+                                      ? "'${(h.year % 100).toString().padLeft(2, '0')}"
+                                      : '';
+                                  final tag = '$rawCode$yr'.trim();
+                                  if (tag.isNotEmpty && !tags.contains(tag)) {
+                                    tags.add(tag);
+                                  }
+                                }
+                                tags.sort((a, b) {
+                                  final aAuth = BanglaNameHelper.isTextbookAuthor(a);
+                                  final bAuth = BanglaNameHelper.isTextbookAuthor(b);
+                                  if (aAuth && !bAuth) return -1;
+                                  if (!aAuth && bAuth) return 1;
+                                  return 0;
+                                });
+                                sourceText = tags.join(', ');
                               } else if (widget.question.institutes.isNotEmpty) {
-                                final rawInst = widget.question.institutes.first;
-                                final rawCode = BanglaNameHelper.getInstituteCode(rawInst);
-                                final isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) ||
-                                    BanglaNameHelper.isTextbookAuthor(rawInst);
-                                final yrNum = widget.question.years.isNotEmpty
-                                    ? widget.question.years.first
-                                    : 0;
-                                final yr = (yrNum > 0 && !isAuthor)
-                                    ? "'${(yrNum % 100).toString().padLeft(2, '0')}"
-                                    : '';
-                                sourceText = '$rawCode$yr';
+                                final tags = <String>[];
+                                for (var i = 0; i < widget.question.institutes.length; i++) {
+                                  final rawInst = widget.question.institutes[i];
+                                  final rawCode = BanglaNameHelper.getInstituteCode(rawInst);
+                                  final isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) ||
+                                      BanglaNameHelper.isTextbookAuthor(rawInst);
+                                  final yrNum = i < widget.question.years.length
+                                      ? widget.question.years[i]
+                                      : (widget.question.years.isNotEmpty ? widget.question.years.first : 0);
+                                  final yr = (yrNum > 0 && !isAuthor)
+                                      ? "'${(yrNum % 100).toString().padLeft(2, '0')}"
+                                      : '';
+                                  final tag = '$rawCode$yr'.trim();
+                                  if (tag.isNotEmpty && !tags.contains(tag)) {
+                                    tags.add(tag);
+                                  }
+                                }
+                                tags.sort((a, b) {
+                                  final aAuth = BanglaNameHelper.isTextbookAuthor(a);
+                                  final bAuth = BanglaNameHelper.isTextbookAuthor(b);
+                                  if (aAuth && !bAuth) return -1;
+                                  if (!aAuth && bAuth) return 1;
+                                  return 0;
+                                });
+                                sourceText = tags.join(', ');
                               } else {
                                 sourceText = BanglaNameHelper.formatQuestionSource(
                                   examHistory: widget.question.examHistory,
@@ -249,7 +276,7 @@ class _QuestionCardState extends State<QuestionCard>
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
-                                    vertical: 3,
+                                    vertical: 3.5,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isDark
@@ -273,7 +300,7 @@ class _QuestionCardState extends State<QuestionCard>
                                           ? const Color(0xFFA5F3FC)
                                           : const Color(0xFF006064),
                                       letterSpacing: 0.2,
-                                      height: 1.25,
+                                      height: 1.3,
                                     ),
                                   ),
                                 ),

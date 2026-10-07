@@ -69,6 +69,7 @@ class UserAvatar extends ConsumerWidget {
   final double borderWidth;
   final bool useDiceBearFallback;
   final bool isPro;
+  final bool showProRing;
 
   const UserAvatar({
     super.key,
@@ -82,6 +83,7 @@ class UserAvatar extends ConsumerWidget {
     this.borderWidth = 2,
     this.useDiceBearFallback = true,
     this.isPro = false,
+    this.showProRing = true,
   });
 
   @override
@@ -102,7 +104,6 @@ class UserAvatar extends ConsumerWidget {
     final effectiveId = (id != null && id!.isNotEmpty)
         ? id
         : (isMe ? (myProfile?.id ?? currentAuthId) : null);
-    final effectiveIsPro = isPro || (isMe && (myProfile?.isPro ?? false));
 
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
     final resolvedCustom = resolveAvatarUrl(effectiveAvatarUrl);
@@ -156,8 +157,8 @@ class UserAvatar extends ConsumerWidget {
         fit: BoxFit.cover,
         width: size,
         height: size,
-        placeholder: (_, __) => fallbackInitials(),
-        errorWidget: (_, __, ___) => fallbackInitials(),
+        placeholder: (context, url) => fallbackInitials(),
+        errorWidget: (context, url, error) => fallbackInitials(),
       );
     }
 
@@ -167,7 +168,7 @@ class UserAvatar extends ConsumerWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: bgColor,
-        border: showBorder && !effectiveIsPro
+        border: showBorder
             ? Border.all(
                 color: borderColor ?? Colors.white,
                 width: borderWidth,
@@ -188,38 +189,6 @@ class UserAvatar extends ConsumerWidget {
       ),
     );
 
-    if (!effectiveIsPro) return baseAvatar;
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final ringPad = size >= 60 ? 3.5 : 2.5;
-    final gapPad = size >= 60 ? 2.0 : 1.5;
-
-    return Container(
-      width: size + (ringPad + gapPad) * 2,
-      height: size + (ringPad + gapPad) * 2,
-      padding: EdgeInsets.all(ringPad),
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: SweepGradient(
-          colors: [
-            Color(0xFFD4AF37), // Gold
-            Color(0xFFE8843A), // Orange
-            Color(0xFFD94F7E), // Rose
-            Color(0xFF9B72CB), // Purple
-            Color(0xFF12544F), // Teal (app primary)
-            Color(0xFF34D399), // Emerald
-            Color(0xFFD4AF37), // Loop back to Gold
-          ],
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isDark ? const Color(0xFF0C0C0C) : Colors.white,
-        ),
-        padding: EdgeInsets.all(gapPad),
-        child: baseAvatar,
-      ),
-    );
+    return baseAvatar;
   }
 }

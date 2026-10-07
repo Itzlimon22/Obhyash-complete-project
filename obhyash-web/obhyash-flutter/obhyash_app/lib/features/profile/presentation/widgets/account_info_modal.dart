@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../dashboard/domain/models.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 
@@ -12,14 +13,8 @@ class AccountInfoModal extends StatelessWidget {
   const AccountInfoModal({super.key, required this.user});
 
   static Future<void> show(BuildContext context, UserProfile user) {
-    return showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.55),
-      builder: (ctx) => AccountInfoModal(user: user),
-    );
+    context.push('/profile/account-info');
+    return Future.value();
   }
 
   void _copySingle(BuildContext context, String label, String value) {

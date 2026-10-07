@@ -18,6 +18,7 @@ import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../gamification/services/gamification_service.dart';
 import '../../notifications/services/notification_manager.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../providers/exam_provider.dart';
 
 class ResultView extends ConsumerStatefulWidget {
   final ExamResult result;
@@ -182,6 +183,43 @@ class _ResultViewState extends ConsumerState<ResultView> {
     QuestionReportDialog.show(context, questionId);
   }
 
+  void _handleExit() {
+    if (!mounted) return;
+    if (widget.isHistoryMode) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else {
+        context.go('/history');
+      }
+    } else if (widget.result.examType == 'live_exam_practice') {
+      String? examId;
+      if (widget.result.id.startsWith('live_practice_')) {
+        final rest = widget.result.id.replaceFirst('live_practice_', '');
+        final lastUnderscore = rest.lastIndexOf('_');
+        if (lastUnderscore != -1) {
+          examId = rest.substring(0, lastUnderscore);
+        } else {
+          examId = rest;
+        }
+      }
+      if (examId != null && examId.isNotEmpty) {
+        context.go('/live_exam_details/$examId');
+      } else {
+        context.go('/live_exam');
+      }
+    } else {
+      try {
+        ref.read(examEngineProvider.notifier).resetExam();
+      } catch (_) {}
+
+      if (widget.result.examType == 'question_bank') {
+        context.go('/question-bank');
+      } else {
+        context.go('/setup');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -229,37 +267,30 @@ class _ResultViewState extends ConsumerState<ResultView> {
       return true;
     }).toList();
 
-    return Scaffold(
-      backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        title: const Text(
-          'পরীক্ষার ফলাফল',
-          style: TextStyle(
-            fontSize: 15.5,
-            fontWeight: FontWeight.w600,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _handleExit();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
+        appBar: AppBar(
+          title: const Text(
+            'পরীক্ষার ফলাফল',
+            style: TextStyle(
+              fontSize: 15.5,
+              fontWeight: FontWeight.w600,
             ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(widget.isHistoryMode ? Icons.arrow_back : Icons.close, size: 20),
+            onPressed: _handleExit,
+          ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(widget.isHistoryMode ? Icons.arrow_back : Icons.close, size: 20),
-          onPressed: () {
-            if (widget.isHistoryMode) {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else {
-                context.go('/history');
-              }
-            } else {
-              if (Navigator.of(context, rootNavigator: true).canPop()) {
-                Navigator.of(context, rootNavigator: true)
-                    .popUntil((route) => route.isFirst);
-              }
-              context.go('/');
-            }
-          },
-        ),
-      ),
-      body: CustomScrollView(
+        body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           // ── Top Summary & Stats Section ──
@@ -733,20 +764,28 @@ class _ResultViewState extends ConsumerState<ResultView> {
                   height: 48,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if (context.mounted) {
-                        Navigator.of(context, rootNavigator: true)
-                            .popUntil((route) => route.isFirst);
+                      if (!mounted) return;
+                      if (widget.result.examType == 'live_exam_practice') {
+                        _handleExit();
+                      } else {
+                        try {
+                          ref.read(examEngineProvider.notifier).resetExam();
+                        } catch (_) {}
                         context.go('/setup');
                       }
                     },
-                    icon: const Icon(
-                      LucideIcons.rotateCcw,
+                    icon: Icon(
+                      widget.result.examType == 'live_exam_practice'
+                          ? LucideIcons.arrowLeft
+                          : LucideIcons.rotateCcw,
                       size: 18,
                       color: Colors.white,
                     ),
-                    label: const Text(
-                      'আবার পরীক্ষা দাও',
-                      style: TextStyle(
+                    label: Text(
+                      widget.result.examType == 'live_exam_practice'
+                          ? 'পরীক্ষা বিবরণীতে ফিরে যান'
+                          : 'আবার পরীক্ষা দাও',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         color: Colors.white,
@@ -755,7 +794,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
-                      ),
+                    ),
                   ),
                 ),
               ),
@@ -784,6 +823,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
                 createParticlePath: drawStar,
               ),
             ),
+      ),
     );
   }
 

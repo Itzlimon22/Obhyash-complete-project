@@ -122,7 +122,7 @@ class _GooglePlayPurchaseViewState
             ],
           ),
           content: const Text(
-            'আপনার প্রো সাবস্ক্রিপশন সফলভাবে সক্রিয় হয়েছে! এখন সকল ফিচার আনলক।',
+            'তোমার প্রো সাবস্ক্রিপশন সফলভাবে সক্রিয় হয়েছে! এখন সকল ফিচার আনলক।',
             style: TextStyle(fontSize: 14, height: 1.5),
           ),
           actions: [
@@ -214,12 +214,12 @@ class _GooglePlayPurchaseViewState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'আপনি অ্যাপটি লোকাল ডিবাগ মোডে চালাচ্ছেন। গুগল প্লে বিলিং সিকিউরিটির জন্য আন-রিলিজড ডিবাগ বিল্ডে প্রোডাক্ট রিটার্ন করে না।',
+              'তুমি অ্যাপটি লোকাল ডিবাগ মোডে চালাচ্ছ। গুগল প্লে বিলিং সিকিউরিটির জন্য আন-রিলিজড ডিবাগ বিল্ডে প্রোডাক্ট রিটার্ন করে না।',
               style: TextStyle(fontSize: 13, height: 1.4),
             ),
             SizedBox(height: 12),
             Text(
-              'রিয়েল গুগল প্লে উইন্ডো দেখতে অ্যাপটি প্লে-স্টোরের Internal Testing ট্র্যাক থেকে ইনস্টল করুন।',
+              'রিয়েল গুগল প্লে উইন্ডো দেখতে অ্যাপটি প্লে-স্টোরের Internal Testing ট্র্যাক থেকে ইনস্টল করো।',
               style: TextStyle(fontSize: 12, color: Colors.grey, height: 1.3),
             ),
           ],

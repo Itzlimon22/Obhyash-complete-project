@@ -244,6 +244,7 @@ class _LiveExamHistoryPageState extends ConsumerState<LiveExamHistoryPage> {
         backgroundColor: isDark ? const Color(0xFF14151B) : Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        centerTitle: false,
         leading: IconButton(
           icon: Icon(
             LucideIcons.arrowLeft,
@@ -305,7 +306,7 @@ class _LiveExamHistoryPageState extends ConsumerState<LiveExamHistoryPage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'আপনি এখনো কোনো লাইভ পরীক্ষায় অংশগ্রহণ করেননি',
+                          'তুমি এখনো কোনো লাইভ পরীক্ষায় অংশগ্রহণ করোনি',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'HindSiliguri',

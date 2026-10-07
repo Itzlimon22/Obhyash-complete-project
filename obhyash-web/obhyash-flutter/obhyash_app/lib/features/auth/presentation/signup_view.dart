@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/presentation/widgets/app_button_3d.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/config/app_config.dart';
@@ -61,7 +63,6 @@ class _SignupViewState extends ConsumerState<SignupView>
   String _stream = 'HSC';
   String _group = 'Science';
   String _batch = 'HSC 2026';
-  String _examTarget = '';
 
   List<String> _collegeSuggestions = [];
   bool _showCollegeSuggestions = false;
@@ -261,7 +262,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           stream: _stream,
           group: _group,
           batch: _batch,
-          examTarget: _examTarget.isEmpty ? null : _examTarget,
+          examTarget: null,
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -506,73 +507,28 @@ class _SignupViewState extends ConsumerState<SignupView>
                                                       const SizedBox(width: 12),
                                                     ],
                                                     Expanded(
-                                                      child: Container(
-                                                        height: 54,
-                                                        decoration: BoxDecoration(
-                                                          gradient: const LinearGradient(
-                                                            colors: [Color(0xFF0A8A66), Color(0xFF066B4F)],
-                                                            begin: Alignment.topLeft,
-                                                            end: Alignment.bottomRight,
-                                                          ),
-                                                          borderRadius: BorderRadius.circular(16),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: const Color(0xFF066B4F).withValues(alpha: 0.40),
-                                                              blurRadius: 18,
-                                                              offset: const Offset(0, 8),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        child: Material(
-                                                          color: Colors.transparent,
-                                                          child: InkWell(
-                                                            onTap: (isLoading || _isSendingOtp)
-                                                                ? null
-                                                                : (_step == 3 ? _handleSignup : _handleNext),
-                                                            borderRadius: BorderRadius.circular(16),
-                                                            child: Center(
-                                                              child: (isLoading || _isSendingOtp)
-                                                                  ? const SizedBox(
-                                                                      height: 20,
-                                                                      width: 20,
-                                                                      child: CircularProgressIndicator(
-                                                                        strokeWidth: 2.2,
-                                                                        color: Colors.white,
-                                                                      ),
-                                                                    )
-                                                                  : _step == 3
-                                                                  ? const Text(
-                                                                      'অ্যাকাউন্ট তৈরি করো',
-                                                                      style: TextStyle(
-                                                                        fontFamily: 'HindSiliguri',
-                                                                        fontSize: 16.5,
-                                                                        fontWeight: FontWeight.w700,
-                                                                        color: Colors.white,
-                                                                      ),
-                                                                    )
-                                                                  : const Row(
-                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                      children: [
-                                                                        Text(
-                                                                          'পরবর্তী ধাপ',
-                                                                          style: TextStyle(
-                                                                            fontFamily: 'HindSiliguri',
-                                                                            fontSize: 16.5,
-                                                                            fontWeight: FontWeight.w700,
-                                                                            color: Colors.white,
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(width: 6),
-                                                                        Icon(
-                                                                          LucideIcons.chevronRight,
-                                                                          size: 18,
-                                                                          color: Colors.white,
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                            ),
-                                                          ),
-                                                        ),
+                                                      child: AppButton3D(
+                                                        text: _step == 3
+                                                            ? 'অ্যাকাউন্ট তৈরি করো'
+                                                            : 'পরবর্তী ধাপ',
+                                                        suffixIcon: _step == 3
+                                                            ? null
+                                                            : const Icon(
+                                                                LucideIcons.chevronRight,
+                                                                size: 18,
+                                                                color: Colors.white,
+                                                              ),
+                                                        onPressed: (isLoading || _isSendingOtp)
+                                                            ? null
+                                                            : (_step == 3 ? _handleSignup : _handleNext),
+                                                        isLoading: (isLoading || _isSendingOtp),
+                                                        baseColor: AppColors.viridianForest,
+                                                        shadowColor: AppColors.brandGreenDark,
+                                                        height: 52,
+                                                        borderRadius: 16,
+                                                        depth: 4.5,
+                                                        fontSize: 16.5,
+                                                        fontWeight: FontWeight.w700,
                                                       ),
                                                     ),
                                                   ],
@@ -1081,28 +1037,35 @@ class _SignupViewState extends ConsumerState<SignupView>
                 padding: EdgeInsets.only(right: g == 'Male' ? 10 : 0),
                 child: InkWell(
                   onTap: () => setState(() => _gender = g),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 9.5),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? const Color(0xFF006A4E).withValues(alpha: 0.15)
                           : (isDark
                                 ? const Color(0xFF141417)
                                 : const Color(0xFFFFFFFF)),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF006A4E)
-                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
-                        width: isSelected ? 1.5 : 1,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
+                      border: isSelected
+                          ? Border.all(
+                              color: const Color(0xFF006A4E),
+                              width: 1.5,
+                            )
+                          : null,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                          blurRadius: 7,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      g == 'Male' ? 'পুরুষ' : 'মহিলা',
+                      g == 'Male' ? 'ছেলে' : 'মেয়ে',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13.5,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                         color: isSelected
                             ? (isDark ? const Color(0xFF34D399) : const Color(0xFF006A4E))
@@ -1115,76 +1078,7 @@ class _SignupViewState extends ConsumerState<SignupView>
             );
           }).toList(),
         ),
-        if (_stream == 'HSC') ...[
-          const SizedBox(height: 12),
-          _buildLabel(
-            'টার্গেট / লক্ষ্য (ঐচ্ছিক)',
-            isDark,
-          ),
-          const SizedBox(height: 6),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1.35,
-            children: [
-              _examTargetOption('Medical', '🩺', 'মেডিকেল', isDark),
-              _examTargetOption('Engineering', '⚙️', 'ইঞ্জিনিয়ারিং', isDark),
-              _examTargetOption('University', '🏛️', 'ভার্সিটি', isDark),
-            ],
-          ),
-        ],
       ],
-    );
-  }
-
-  Widget _examTargetOption(String id, String emoji, String label, bool isDark) {
-    final isSelected = _examTarget == id;
-    const primaryGreen = Color(0xFF006A4E);
-    return GestureDetector(
-      onTap: () => setState(() => _examTarget = isSelected ? '' : id),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? primaryGreen.withValues(alpha: 0.15)
-              : (isDark ? const Color(0xFF141417) : const Color(0xFFFFFFFF)),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected
-                ? primaryGreen
-                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 4),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected
-                      ? (isDark ? const Color(0xFF34D399) : primaryGreen)
-                      : (isDark ? Colors.white70 : const Color(0xFF18181B)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1241,8 +1135,11 @@ class _SignupViewState extends ConsumerState<SignupView>
     return AppDropdown<String>(
       value: value,
       icon: icon,
-      borderRadius: 16,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      hasBorder: false,
+      borderRadius: 12,
+      backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9.5),
+      fontSize: 14,
       options: customOptions ?? options.map((opt) => AppDropdownOption(value: opt, label: opt)).toList(),
       onChanged: onChanged,
     );
@@ -1261,7 +1158,6 @@ class _SignupViewState extends ConsumerState<SignupView>
   }) {
     final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
     final fieldBg = isDark ? const Color(0xFF141417) : const Color(0xFFFFFFFF);
-    final fieldBorder = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
     final textPrimary = isDark ? Colors.white : const Color(0xFF18181B);
     const primaryGreen = Color(0xFF006A4E);
 
@@ -1270,47 +1166,60 @@ class _SignupViewState extends ConsumerState<SignupView>
       children: [
         if (label.isNotEmpty) ...[
           _buildLabel(label, isDark, tooltip: tooltip),
-          const SizedBox(height: 7),
+          const SizedBox(height: 5),
         ],
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: textPrimary,
+        Container(
+          decoration: BoxDecoration(
+            color: fieldBg,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                blurRadius: 7,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: 14.5,
-              fontWeight: FontWeight.normal,
-              color: textMuted.withValues(alpha: 0.7),
+          child: TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: textPrimary,
             ),
-            prefixIcon: Icon(
-              icon,
-              size: 18,
-              color: textMuted,
-            ),
-            suffixIcon: suffixIcon,
-            filled: true,
-            fillColor: fieldBg,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 15,
-              horizontal: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: fieldBorder),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: fieldBorder),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-              borderSide: BorderSide(color: primaryGreen, width: 1.5),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.normal,
+                color: textMuted.withValues(alpha: 0.7),
+              ),
+              prefixIcon: Icon(
+                icon,
+                size: 17,
+                color: textMuted,
+              ),
+              suffixIcon: suffixIcon,
+              filled: true,
+              fillColor: Colors.transparent,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 9.5,
+                horizontal: 12,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                borderSide: BorderSide(color: primaryGreen, width: 1.5),
+              ),
             ),
           ),
         ),

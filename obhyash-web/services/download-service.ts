@@ -1,6 +1,7 @@
 import { Question, ExamDetails, UserAnswers } from '@/lib/types';
 import katex from 'katex';
 import { generateTemplateHtml } from '@/lib/pdf-generator/template';
+import { generateQuestionPaperHtml } from '@/lib/pdf-generator/question-paper';
 import { QuestionItem, GeneratorSettings } from '@/lib/pdf-generator/types';
 
 // --- Bengali Number Conversion Helper ---
@@ -438,35 +439,24 @@ export const downloadQuestionPaper = (
     },
     A: '', // Question paper has no answers marked
     E: [], // No explanation box
+    passage: (q as any).passage || undefined,
   }));
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
-  const theme = resolveTheme(details.examType, subjectTitle, details.subject);
 
-  const settings: GeneratorSettings = {
-    theme,
-    title: `${subjectTitle} — প্রশ্নপত্র`,
-    subtitle: `উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · মোট প্রশ্ন: ${toBengaliNumber(totalCount)}টি · পূর্ণমান: ${toBengaliNumber(marks)} · সময়: ${toBengaliNumber(duration)} মিনিট`,
-    hasHeader: true,
-    headerLeftText: 'অ্যাপ ইনস্টল করো',
-    headerLeftUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
-    headerRightText: `${subjectTitle} — প্রশ্নপত্র`,
-    showHeaderLeftIcon: true,
-    footerLeftPrefix: 'আনলিমিটেড এক্সাম দাও',
-    footerSiteText: 'www.obhyash.com',
-    footerLeftUrl: 'https://www.obhyash.com',
-    footerLeftSuffix: 'এ',
-    footerPagePrefix: 'পৃষ্ঠা',
-    useBanglaDigits: true,
-    pageOffset: 0,
-    density: 'balanced',
-    balanceColumns: true,
-    standaloneToolbar: true,
-    autoPrint: true,
+  const html = generateQuestionPaperHtml(mappedQuestions, {
+    category: details.chapters ? 'অধ্যায় ভিত্তিক' : 'মডেল টেস্ট',
+    title: details.examType ? `${details.examType} মডেল টেস্ট` : `${subjectTitle} মডেল টেস্ট`,
+    subject: subjectTitle,
+    subjectCode: getSubjectCode(details.subject, details.subjectLabel) || undefined,
+    chapters: Array.isArray(details.chapters) ? details.chapters.join(', ') : details.chapters || undefined,
+    durationMinutes: duration,
+    totalMarks: marks,
+    institutionLogoText: 'অভ্যাস',
     baseUrl: origin,
-  };
+    autoPrint: true,
+  });
 
-  const html = generateTemplateHtml(mappedQuestions, settings);
   printOrOpenHtml(html);
 };
 
@@ -494,27 +484,13 @@ export const downloadResult = (
 
     const expLines: string[] = [];
 
-    // Add student choice badge if user answers are provided
-    if (hasUserAnswers) {
-      if (isAnswered) {
-        const userChoiceLetter = banglaLetters[ua] || String(ua);
-        if (isCorrect) {
-          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — সঠিক হয়েছে ✓]`);
-        } else {
-          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — ভুল হয়েছে ✗]`);
-        }
-      } else {
-        expLines.push(`[তোমার উত্তর: দেওয়া হয়নি (অনুত্তর)]`);
-      }
-    }
-
     if (q.explanation && q.explanation.trim()) {
       q.explanation
         .split('\n')
         .map(l => l.trim())
         .filter(Boolean)
         .forEach(l => expLines.push(l));
-    } else if (expLines.length === 0) {
+    } else {
       expLines.push('এই প্রশ্নের জন্য অতিরিক্ত কোনো ব্যাখ্যা নেই।');
     }
 
@@ -542,7 +518,8 @@ export const downloadResult = (
 
   const settings: GeneratorSettings = {
     theme,
-    title: `${subjectTitle} — সমাধান ও ব্যাখ্যা`,
+    title: subjectTitle,
+    subTitleLabel: 'সমাধান ও ব্যাখ্যা',
     subtitle,
     hasHeader: true,
     headerLeftText: 'অ্যাপ ইনস্টল করো',
@@ -623,27 +600,13 @@ export const downloadLiveExamResult = (
 
     const expLines: string[] = [];
 
-    // Add student choice badge if user answers are provided
-    if (hasUserAnswers) {
-      if (isAnswered) {
-        const userChoiceLetter = banglaLetters[ua] || String(ua);
-        if (isCorrect) {
-          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — সঠিক হয়েছে ✓]`);
-        } else {
-          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — ভুল হয়েছে ✗]`);
-        }
-      } else {
-        expLines.push(`[তোমার উত্তর: দেওয়া হয়নি (অনুত্তর)]`);
-      }
-    }
-
     if (q.explanation && q.explanation.trim()) {
       q.explanation
         .split('\n')
         .map(l => l.trim())
         .filter(Boolean)
         .forEach(l => expLines.push(l));
-    } else if (expLines.length === 0) {
+    } else {
       expLines.push('এই প্রশ্নের জন্য অতিরিক্ত কোনো ব্যাখ্যা নেই।');
     }
 
@@ -672,7 +635,8 @@ export const downloadLiveExamResult = (
 
   const settings: GeneratorSettings = {
     theme,
-    title: `${exam.title} — ফলাফল ও সমাধান পত্র`,
+    title: exam.title,
+    subTitleLabel: 'ফলাফল ও সমাধান',
     subtitle,
     hasHeader: true,
     headerLeftText: 'অ্যাপ ইনস্টল করো',

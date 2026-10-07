@@ -240,8 +240,53 @@ function sanitizeLatexTokens(s: string): string {
   // 13. Fix degree Celsius e.g. ^\circC -> ^\circ \text{C}
   res = res.replace(/\^\\circ([A-Z])/g, "^{\\circ}\\text{$1}");
 
-  // 14. Fix empty \text{}
+  // 14. Fix non-standard macros e.g. \mum or \text{\mum} -> \mu\text{m}
+  res = res.replace(/\\(?:text\{)?\\mum\}?/g, "\\mu\\text{m}");
+
+  // 15. Fix fused Greek letters followed by Latin variable e.g. \pif -> \pi f, \piN -> \pi N
+  res = res.replace(
+    /\\(pi|mu|alpha|beta|theta|omega|gamma|lambda|sigma|tau|phi|psi|rho|delta|epsilon|eta|xi|zeta|chi|nu|kappa)([a-zA-Z])(?![a-zA-Z])/g,
+    "\\$1 $2"
+  );
+
+  // 16. Fix nested \text{\text{...}} or \text{\mathrm{...}}
+  res = res.replace(
+    /\\(?:text|mathrm|textbf)\{\s*\\(?:text|mathrm|textbf)\{([^}]+)\}\s*\}/g,
+    "\\text{$1}"
+  );
+
+  // 17. Fix corrupted regex artifacts like "(g = 9.8\ $,\text$ { m/s } ^2)"
+  res = res.replace(
+    /\\\s*\$,\\text\$\s*\{?\s*([a-zA-Z\/]+)\s*\}?\s*\^?(\-?\d+)?/g,
+    "\\text{$1}^{$2}"
+  );
+  res = res.replace(/\\\s*\$,\\text\$/g, "\\text");
+
+  // 18. Fix double exponent syntax errors: 10^{1}^1 -> 10^{11}
+  res = res.replace(/10\^\{(\d+)\}\^(\d+)/g, "10^{$1$2}");
+
+  // 19. Fix trailing \, or \; inside exponents: 10^{-7\,} -> 10^{-7}
+  res = res.replace(/\^\{([^}]+)\\[,;]\}/g, "^{$1}");
+
+  // 20. Fix illegal internal dollar signs inside fraction arguments: \frac{$2 \times 4$.9}{9.8}
+  res = res.replace(/\\frac\{([^}]*\$[^}]*)\}\{([^}]*)\}/g, (_m, n, d) => `\\frac{${n.replace(/\$/g, "")}}{${d.replace(/\$/g, "")}}`);
+  res = res.replace(/\\frac\{([^}]*)\}\{([^}]*\$[^}]*)\}/g, (_m, n, d) => `\\frac{${n.replace(/\$/g, "")}}{${d.replace(/\$/g, "")}}`);
+
+  // 21. Fix empty \text{}
   res = res.replace(/\\text\{\s*\}/g, "");
+
+  // 22. Separate Bengali conjunctions attached to Latin letters: e.g. এবংb -> এবং b
+  res = res.replace(/([\u0980-\u09FF]+)([a-zA-Z])/g, "$1 $2");
+  res = res.replace(/([a-zA-Z])([\u0980-\u09FF]+)/g, "$1 $2");
+
+  // 23. Un-trap Bengali conjunctions from math delimiters: $a এবং b$ -> $a$ এবং $b$
+  res = res.replace(/\$([^\$\n]+?)\s+(এবং|বা|ও|হলে|এর)\s+([^\$\n]+?)\$/g, "$$$1$$ $2 $$$3$$");
+
+  // 24. Auto-wrap unwrapped compound scientific units with LaTeX commands: 10\,\text{m}\cdot\text{s}^{-2} -> $10\,\text{m}\cdot\text{s}^{-2}$
+  res = res.replace(
+    /(?<!\$)\b(\d+(?:\.\d+)?\s*(?:\\,)?\s*\\text\{[^{}]+\}(?:\s*(?:\\cdot|\\times)?\s*\\text\{[^{}]+\}(?:\^\{?-?\d+\}?)?)*)(?!\$)/g,
+    "$$$1$$"
+  );
 
   return res;
 }

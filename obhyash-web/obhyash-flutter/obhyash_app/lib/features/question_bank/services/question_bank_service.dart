@@ -108,12 +108,100 @@ class QuestionBankService {
     }
 
     // For consecutive year sessions Y and Y+1 (e.g. 2022-23 -> 2022, 2023),
-    // the canonical question bank database session year is the start year Y.
+    // questions in question bank can be tagged with either start year Y or conduct year Y+1.
+    // Return both Y and Y+1 to capture all authentic questions belonging to this session.
     if (nums.length == 2 && nums[1] == nums[0] + 1) {
-      return [nums[0]];
+      return [nums[0], nums[1]];
     }
 
     return nums;
+  }
+
+  /// Checks whether a question subject matches a selected target subject.
+  /// Handles Bengali Unicode normalization (e.g. \u09df vs \u09af\u09bc),
+  /// compound slash labels (e.g. 'জীববিজ্ঞান / অন্যান্য', 'জীববিজ্ঞান / আইসিটি'),
+  /// and English/Bengali cross-language root keywords.
+  static bool matchesSubject(String rowSubjectRaw, String targetSubjectRaw) {
+    if (rowSubjectRaw.isEmpty || targetSubjectRaw.isEmpty) return false;
+
+    final rowSubject = BanglaNameHelper.normalizeBengali(rowSubjectRaw).toLowerCase();
+    final targetSubject = BanglaNameHelper.normalizeBengali(targetSubjectRaw).toLowerCase();
+
+    // Direct substring check
+    if (rowSubject.contains(targetSubject) || targetSubject.contains(rowSubject)) {
+      return true;
+    }
+
+    // Split compound UI labels: e.g. "জীববিজ্ঞান / অন্যান্য", "জীববিজ্ঞান / আইসিটি", "বাংলা ও ইংরেজি"
+    final subTargets = targetSubject
+        .split(RegExp(r'[/,]|(?:\s+এবং\s+)|\s+ও\s+'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    for (final t in subTargets) {
+      if (rowSubject.contains(t) || t.contains(rowSubject)) return true;
+      if (_matchesSubjectRoot(rowSubject, t)) return true;
+    }
+
+    return _matchesSubjectRoot(rowSubject, targetSubject);
+  }
+
+  static bool _matchesSubjectRoot(String row, String target) {
+    const rootMappings = [
+      (
+        'পদার্থ',
+        ['পদার্থবিজ্ঞান', 'physics']
+      ),
+      (
+        'রসায়ন',
+        ['রসায়ন', 'রসায়ন', 'chemistry']
+      ),
+      (
+        'গণিত',
+        ['উচ্চতর গণিত', 'সাধারণ গণিত', 'গণিত', 'math', 'higher math', 'general math']
+      ),
+      (
+        'জীব',
+        ['জীববিজ্ঞান', 'biology', 'উদ্ভিদবিজ্ঞান', 'প্রাণিবিজ্ঞান', 'botany', 'zoology']
+      ),
+      (
+        'ইংরেজি',
+        ['ইংরেজি', 'english']
+      ),
+      (
+        'বাংলা',
+        ['বাংলা', 'bangla', 'bengali']
+      ),
+      (
+        'আইসিটি',
+        ['তথ্য ও যোগাযোগ প্রযুক্তি', 'আইসিটি', 'ict']
+      ),
+      (
+        'জ্ঞান',
+        ['সাধারণ জ্ঞান', 'gk', 'general knowledge']
+      ),
+      (
+        'হিসাব',
+        ['হিসাববিজ্ঞান', 'accounting']
+      ),
+      (
+        'ব্যবসায়',
+        ['ব্যবসায় উদ্যোগ', 'ব্যবসায় সংগঠন', 'business']
+      ),
+      (
+        'ফিন্যান্স',
+        ['ফিন্যান্স ও ব্যাংকিং', 'ফিন্যান্স', 'finance']
+      ),
+    ];
+
+    for (final r in rootMappings) {
+      final isTargetMatch = r.$2.any((t) => target.contains(t)) || target.contains(r.$1);
+      final isRowMatch = r.$2.any((t) => row.contains(t)) || row.contains(r.$1);
+      if (isTargetMatch && isRowMatch) return true;
+    }
+
+    return false;
   }
 
   /// Sorts questions serially subject-wise (Physics → Chemistry → Higher Math → Biology → etc.)
@@ -141,7 +229,7 @@ class QuestionBankService {
   /// 1. ZERO QUESTION LEAKAGE: When a year is specified, ONLY return questions
   ///    tagged with that exact session year. Never combine subsequent or prior sessions.
   /// 2. ZERO INSTITUTE LEAKAGE: Institute tags are strictly isolated. CKRUET never pulls RUET/KUET/CUET.
-  /// 3. FASTEST LOADING: Targeted lean column queries on institute tags only; instant memory caching.
+  /// 3. FASTEST LOADING: Targeted lean column queries on institute tags using overlaps operator; instant memory caching.
   static Future<List<Question>> fetchExamSetQuestions({
     required String instituteId,
     required InstituteExamSet examSet,
@@ -164,42 +252,49 @@ class QuestionBankService {
 
     try {
       // ======================================================================
-      // TARGETED FAST LEAN FETCH
-      // Only query by specific institute tag(s). Never run unconstrained
-      // overlaps('years') across 76k rows, which causes 57014 timeouts and leaks.
+      // FAST TARGETED OVERLAPS FETCH
+      // Uses the Postgres GIN array overlaps (&&) operator on institutes.
+      // Sub-second execution; paginates if dataset exceeds 1,000 rows.
       // ======================================================================
-      final List<Future<List<Map<String, dynamic>>>> queryFutures = [];
+      List<Map<String, dynamic>> rawRows = [];
 
-      if (tags.isNotEmpty) {
-        queryFutures.add(
-          supabase
+      try {
+        final res = await supabase
+            .from('questions')
+            .select(_leanQuestionFields)
+            .overlaps('institutes', tags)
+            .range(0, 999);
+        rawRows.addAll(List<Map<String, dynamic>>.from(res));
+
+        // If exactly 1,000 rows were returned, fetch page 2 to avoid data cutoff
+        if (res.length == 1000) {
+          final res2 = await supabase
               .from('questions')
               .select(_leanQuestionFields)
-              .contains('institutes', [tags[0]])
-              .then((res) => List<Map<String, dynamic>>.from(res)),
-        );
-        if (tags.length > 1) {
-          queryFutures.add(
-            supabase
+              .overlaps('institutes', tags)
+              .range(1000, 1999);
+          rawRows.addAll(List<Map<String, dynamic>>.from(res2));
+        }
+      } catch (queryErr) {
+        debugPrint('[QuestionBankService] Overlaps query error: $queryErr. Trying fallback.');
+        for (final tag in tags.take(2)) {
+          try {
+            final res = await supabase
                 .from('questions')
                 .select(_leanQuestionFields)
-                .contains('institutes', [tags[1]])
-                .then((res) => List<Map<String, dynamic>>.from(res)),
-          );
+                .contains('institutes', [tag])
+                .limit(1000);
+            rawRows.addAll(List<Map<String, dynamic>>.from(res));
+          } catch (_) {}
         }
       }
 
-      final List<List<Map<String, dynamic>>> queryResults =
-          await Future.wait(queryFutures);
-
       // Deduplicate raw rows by id
       final Map<String, Map<String, dynamic>> seenRaw = {};
-      for (final rows in queryResults) {
-        for (final row in rows) {
-          final id = row['id']?.toString() ?? '';
-          if (id.isNotEmpty && !seenRaw.containsKey(id)) {
-            seenRaw[id] = row;
-          }
+      for (final row in rawRows) {
+        final id = row['id']?.toString() ?? '';
+        if (id.isNotEmpty && !seenRaw.containsKey(id)) {
+          seenRaw[id] = row;
         }
       }
 
@@ -207,7 +302,8 @@ class QuestionBankService {
       // STRICT IN-MEMORY FILTER — ZERO QUESTION & INSTITUTE LEAKAGE
       // Question included ONLY IF:
       //   (a) institutes array contains this institute tag, AND
-      //   (b) years array contains the requested session year(s)
+      //   (b) years array contains the requested session year(s), AND
+      //   (c) question matches the selected subject(s)
       // ======================================================================
       final normalizedTags =
           tags.map((t) => t.toLowerCase().trim()).toList();
@@ -250,14 +346,10 @@ class QuestionBankService {
           if (isQWritten && rawOpts.length < 2) continue;
         }
 
-        // 4. Subject filter (e.g. for Board exam subject selection)
+        // 4. Robust Subject filter (Unicode-safe & compound label matching)
         if (selectedSubjects.isNotEmpty) {
-          final rowSubject =
-              (row['subject'] ?? '').toString().toLowerCase();
-          final matchesSub = selectedSubjects.any((s) {
-            final sl = s.toLowerCase();
-            return rowSubject.contains(sl) || sl.contains(rowSubject);
-          });
+          final rowSubject = (row['subject'] ?? '').toString();
+          final matchesSub = selectedSubjects.any((s) => matchesSubject(rowSubject, s));
           if (!matchesSub) continue;
         }
 
@@ -272,16 +364,10 @@ class QuestionBankService {
       if (selectedSubjects.isNotEmpty) {
         final indexed = matched.asMap().entries.toList();
         indexed.sort((a, b) {
-          final subA = a.value.subject.toLowerCase();
-          final subB = b.value.subject.toLowerCase();
-          var idxA = selectedSubjects.indexWhere((s) {
-            final sl = s.toLowerCase();
-            return subA.contains(sl) || sl.contains(subA);
-          });
-          var idxB = selectedSubjects.indexWhere((s) {
-            final sl = s.toLowerCase();
-            return subB.contains(sl) || sl.contains(subB);
-          });
+          final subA = a.value.subject;
+          final subB = b.value.subject;
+          var idxA = selectedSubjects.indexWhere((s) => matchesSubject(subA, s));
+          var idxB = selectedSubjects.indexWhere((s) => matchesSubject(subB, s));
           if (idxA < 0) idxA = 999;
           if (idxB < 0) idxB = 999;
           if (idxA != idxB) return idxA.compareTo(idxB);
@@ -298,23 +384,13 @@ class QuestionBankService {
       }
 
       // ======================================================================
-      // FALLBACK: only when DB returns 0 results for this specific year/institute.
-      // Never mix years — use offline cache only.
+      // EMPTY STATE HANDLING:
+      // If DB returns 0 authentic results for this specific session, return empty.
+      // NEVER silently dump random 25 physics questions into an admission test!
       // ======================================================================
       if (sortedQuestions.isEmpty) {
         debugPrint(
-            '[QuestionBankService] No DB questions for $instituteId ${examSet.year}. Trying offline cache.');
-        final offlineQs = await OfflineQuestionBankService.getQuestions(
-          subject:
-              selectedSubjects.isNotEmpty ? selectedSubjects.first : 'physics',
-          count: isWritten ? 11 : 25,
-        );
-        if (offlineQs.isNotEmpty) {
-          final sortedOffline = sortSeriallySubjectwise(offlineQs);
-          _examSetCache[cacheKey] = sortedOffline;
-          OfflineQuestionBankService.cacheQuestions(sortedOffline);
-          return sortedOffline;
-        }
+            '[QuestionBankService] No DB questions for $instituteId ${examSet.year}.');
         return [];
       }
 
@@ -325,16 +401,25 @@ class QuestionBankService {
       return sortedQuestions;
     } catch (e) {
       debugPrint('[QuestionBankService] General error: $e');
+      // In extreme case of no internet connectivity, try offline questions for selected subjects proportionally
       try {
-        final offlineQs = await OfflineQuestionBankService.getQuestions(
-          subject:
-              selectedSubjects.isNotEmpty ? selectedSubjects.first : 'physics',
-          count: isWritten ? 11 : 25,
-        );
-        return offlineQs;
-      } catch (_) {
-        return [];
-      }
+        final List<Question> offlineAll = [];
+        final subs = selectedSubjects.isNotEmpty
+            ? selectedSubjects
+            : ['physics', 'chemistry'];
+        final perSub = (isWritten ? 11 : 25) ~/ subs.length;
+        for (final sub in subs) {
+          final subQs = await OfflineQuestionBankService.getQuestions(
+            subject: sub,
+            count: perSub > 0 ? perSub : 5,
+          );
+          offlineAll.addAll(subQs);
+        }
+        if (offlineAll.isNotEmpty) {
+          return sortSeriallySubjectwise(offlineAll);
+        }
+      } catch (_) {}
+      return [];
     }
   }
 }

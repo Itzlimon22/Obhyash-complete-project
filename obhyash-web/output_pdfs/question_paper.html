@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>এস এস সি মডেল টেস্ট ২০২৬ — প্রশ্নপত্র</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" crossorigin="anonymous">
+<style>
+@page {
+  size: 210mm 297mm;
+  margin: 10mm 12mm 12mm 12mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+}
+
+body {
+  font-family: 'Hind Siliguri', 'SolaimanLipi', 'Kalpurush', 'Times New Roman', serif;
+  font-size: 9.4pt;
+  color: #000000;
+  line-height: 1.35;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.passage-box {
+  background: #f8fafc;
+  border-left: 2.5px solid #475569;
+  padding: 3px 6px;
+  margin-bottom: 4px;
+  font-size: 8.8pt;
+  font-weight: 500;
+  color: #1e293b;
+  border-radius: 2px;
+}
+
+/* ── Standard Bangladeshi Exam Header (Exact Replica of Reference) ── */
+.header-box {
+  position: relative;
+  text-align: center;
+  margin-bottom: 6px;
+  padding-bottom: 2px;
+}
+
+.brand-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1.2px solid #006A4E;
+  background: #E8F5E9;
+  color: #006A4E;
+  font-size: 8pt;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.cat-title {
+  font-size: 10.5pt;
+  font-weight: 700;
+  color: #222222;
+  margin-bottom: 1px;
+}
+
+.main-title {
+  font-size: 13pt;
+  font-weight: 800;
+  color: #000000;
+  margin-bottom: 1px;
+}
+
+.sub-title {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 5px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9pt;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 8.8pt;
+  font-weight: 600;
+  color: #222222;
+  margin-bottom: 3px;
+  padding: 0 2px;
+}
+
+.name-dots {
+  display: inline-block;
+  flex: 1;
+  border-bottom: 1px dotted #333333;
+  margin: 0 10px 0 6px;
+  height: 11px;
+}
+
+.roll-dots {
+  display: inline-block;
+  width: 140px;
+  border-bottom: 1px dotted #333333;
+  margin-left: 6px;
+  height: 11px;
+}
+
+.note-line {
+  font-size: 7.8pt;
+  font-weight: 500;
+  color: #333333;
+  text-align: center;
+  margin: 3px 0 5px 0;
+  letter-spacing: 0.1px;
+}
+
+.header-hr {
+  border: 0;
+  border-top: 1px solid #000000;
+  margin: 0 0 9px 0;
+}
+
+/* ── 2-Column Newspaper Exam Layout ── */
+.columns-wrapper {
+  column-count: 2;
+  column-gap: 22px;
+  column-rule: 0.7px solid #444444;
+  -webkit-column-count: 2;
+  -webkit-column-gap: 22px;
+  -webkit-column-rule: 0.7px solid #444444;
+  text-align: justify;
+}
+
+.q-block {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 8.5px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.q-row {
+  display: flex;
+  align-items: flex-start;
+  font-size: 9.4pt;
+  line-height: 1.34;
+  color: #000000;
+}
+
+.q-num {
+  font-weight: 700;
+  min-width: 20px;
+  flex-shrink: 0;
+  padding-right: 2px;
+  font-size: 9.4pt;
+}
+
+.q-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.opt-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 2.5px;
+  margin-left: 20px;
+}
+
+.opt-col {
+  width: 50%;
+  padding-right: 4px;
+  margin-bottom: 1.5px;
+  font-size: 8.9pt;
+  line-height: 1.3;
+  display: flex;
+  align-items: flex-start;
+}
+
+.opt-col.full-w {
+  width: 100%;
+}
+
+.opt-lbl {
+  font-weight: 600;
+  margin-right: 3px;
+  flex-shrink: 0;
+  font-size: 8.7pt;
+}
+
+.opt-val {
+  flex: 1;
+}
+
+/* ── KaTeX Math Adjustments for Print ── */
+.katex {
+  font-size: 1.02em;
+  text-rendering: auto;
+}
+
+.katex-display {
+  margin: 2px 0 !important;
+  font-size: 0.95em;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.m {
+  display: inline;
+}
+
+.dm {
+  display: block;
+  text-align: center;
+  margin: 3px 0;
+}
+
+.dl {
+  display: inline-block;
+  width: 2px;
+}
+
+/* ── Screen Controls (hidden when printed) ── */
+@media screen {
+  body {
+    padding: 20px;
+    background: #eef2f5;
+  }
+  .page-card {
+    max-width: 210mm;
+    margin: 0 auto 30px auto;
+    background: #ffffff;
+    padding: 12mm;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    border-radius: 4px;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="page-card">
+  <!-- Exam Header -->
+  <div class="header-box">
+    <div class="brand-badge">MATH CARE BD</div>
+    <div class="cat-title">অধ্যায় ভিত্তিক</div>
+    <div class="main-title">এস এস সি মডেল টেস্ট ২০২৬</div>
+    <div class="sub-title">বিষয়ঃ গণিত (MCQ)</div>
+
+    <div class="meta-row">
+      <div class="meta-item">অধ্যায়: ১১</div>
+      <div class="meta-item">সময়: ৪০ মিনিট</div>
+      <div class="meta-item">প্রাপ্ত নম্বর: ________</div>
+      <div class="meta-item">পূর্ণমান: ৪০</div>
+    </div>
+
+    <div class="student-row">
+      <span style="white-space:nowrap;">শিক্ষার্থীর নাম:</span>
+      <span class="name-dots"></span>
+      <span style="white-space:nowrap;">রোল নং:</span>
+      <span class="roll-dots"></span>
+    </div>
+
+    <div class="note-line">[বি:দ্র: সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট কর। প্রতিটি প্রশ্নের মান-১]</div>
+    <hr class="header-hr">
+  </div>
+
+  <!-- 2 Column Question Body -->
+  <div class="columns-wrapper">
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১।</span>
+          <div class="q-text">অনুপাত একটি-</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">প্রকৃত ভগ্নাংশ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">অপ্রকৃত ভগ্নাংশ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">প্রকৃত বা অপ্রকৃত ভগ্নাংশ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">মিশ্র ভগ্নাংশ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২।</span>
+          <div class="q-text">অনুপাতের প্রথম রাশিকে কী বলে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">পূর্ব রাশি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">উত্তর রাশি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">পূর্ব ও উত্তর রাশি</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">দ্বিতীয় রাশি</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৩।</span>
+          <div class="q-text">অনুপাতের পূর্বরাশি কোথায় বসে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">শেষে</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">মাঝখানে</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">প্রথমে</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">নিচে</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৪।</span>
+          <div class="q-text">দুইটি বর্গক্ষেত্রের বাহুর দৈর্ঘ্য যথাক্রমে <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span></span> ও <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></span> মিটার। তাদের পরিসীমার অনুপাত কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>:</mo><msup><mi>y</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">x^2 : y^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0085em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>:</mo><mi>y</mi></mrow><annotation encoding="application/x-tex">x : y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mi>x</mi><mo>:</mo><mn>4</mn><mi>y</mi></mrow><annotation encoding="application/x-tex">4x : 4y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>:</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">y : x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৫।</span>
+          <div class="q-text">দুইটি সংখ্যার অনুপাত <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mo>:</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">4 : 3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></span>। তাদের ল.সা.গু. <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>180</mn></mrow><annotation encoding="application/x-tex">180</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span></span></span></span></span> হলে, বড় সংখ্যাটি কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>45</mn></mrow><annotation encoding="application/x-tex">45</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">45</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>50</mn></mrow><annotation encoding="application/x-tex">50</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">50</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>55</mn></mrow><annotation encoding="application/x-tex">55</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">55</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>60</mn></mrow><annotation encoding="application/x-tex">60</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">60</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৬।</span>
+          <div class="q-text">একটি বর্গের বাহুর দৈর্ঘ্য <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{1}{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span> গুণ হলে, উহার ক্ষেত্রফল কতগুণ বৃদ্ধি পাবে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><mn>9</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{1}{9}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">9</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span> গুণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn></mrow><annotation encoding="application/x-tex">3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></span> গুণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{1}{4}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span> গুণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span> গুণ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৭।</span>
+          <div class="q-text">পিতা ও পুত্রের বয়সের সমষ্টি <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>48</mn></mrow><annotation encoding="application/x-tex">48</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">48</span></span></span></span></span> বছর এবং তাদের বয়সের অনুপাত <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>:</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">3 : 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span> হলে পিতার বয়স কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>42</mn></mrow><annotation encoding="application/x-tex">42</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">42</span></span></span></span></span> বছর</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>36</mn></mrow><annotation encoding="application/x-tex">36</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">36</span></span></span></span></span> বছর</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>32</mn></mrow><annotation encoding="application/x-tex">32</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">32</span></span></span></span></span> বছর</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>12</mn></mrow><annotation encoding="application/x-tex">12</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">12</span></span></span></span></span> বছর</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৮।</span>
+          <div class="q-text">i. অনুপাত একটি প্রকৃত বা অপ্রকৃত ভগ্নাংশ
+ii. অনুপাতের প্রথম রাশিকে পূর্ব রাশি বলে
+iii. অনুপাতের দ্বিতীয় রাশিকে উত্তর রাশি বলে
+নিচের কোনটি সঠিক?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">i ও ii</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">i ও iii</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ii ও iii</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">i, ii ও iii</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">৯।</span>
+          <div class="q-text">i. বৃত্তের ক্ষেত্রফল = <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\pi r^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span>
+ii. বর্গের ক্ষেত্রফল = <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span></span>
+iii. দুইটি বর্গক্ষেত্রের বাহুর দৈর্ঘ্য যথাক্রমে <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span></span> ও <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></span> হলে তাদের ক্ষেত্রফলের অনুপাত <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>:</mo><msup><mi>b</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">a^2 : b^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span>
+নিচের কোনটি সঠিক?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val">i ও ii</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val">i ও iii</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val">ii ও iii</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val">i, ii ও iii</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        <div class="passage-box">নিচের তথ্যের আলোকে ১০-১২নং প্রশ্নের উত্তর দাও:
+ক্রয়মূল্য : বিক্রয়মূল্য = ৫ : ৬ এবং ক্রয়মূল্য ৫০ টাকা।</div>
+        <div class="q-row">
+          <span class="q-num">১০।</span>
+          <div class="q-text">বিক্রয়মূল্য কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>40</mn></mrow><annotation encoding="application/x-tex">40</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">40</span></span></span></span></span> টাকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>50</mn></mrow><annotation encoding="application/x-tex">50</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">50</span></span></span></span></span> টাকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>60</mn></mrow><annotation encoding="application/x-tex">60</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">60</span></span></span></span></span> টাকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>70</mn></mrow><annotation encoding="application/x-tex">70</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">70</span></span></span></span></span> টাকা</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১১।</span>
+          <div class="q-text">শতকরা কত লাভ হয়?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>20</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">20\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">20%</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>30</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">30\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">30%</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>40</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">40\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">40%</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>25</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">25\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">25%</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১২।</span>
+          <div class="q-text">বিক্রয়মূল্য <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>600</mn></mrow><annotation encoding="application/x-tex">600</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">600</span></span></span></span></span> টাকা হলে ক্রয়মূল্য কত হবে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>300</mn></mrow><annotation encoding="application/x-tex">300</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">300</span></span></span></span></span> টাকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>400</mn></mrow><annotation encoding="application/x-tex">400</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">400</span></span></span></span></span> টাকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>500</mn></mrow><annotation encoding="application/x-tex">500</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">500</span></span></span></span></span> টাকা</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>600</mn></mrow><annotation encoding="application/x-tex">600</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">600</span></span></span></span></span> টাকা</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৩।</span>
+          <div class="q-text"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>:</mo><mi>b</mi><mo>=</mo><mn>2</mn><mo>:</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">a : b = 2 : 3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></span> এবং <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>:</mo><mi>c</mi><mo>=</mo><mn>3</mn><mo>:</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">a : c = 3 : 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></span> হলে <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>:</mo><mi>c</mi><mo>=</mo><mo stretchy="false">?</mo></mrow><annotation encoding="application/x-tex">b : c = ?</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mclose">?</span></span></span></span></span></div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>:</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">1 : 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>:</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">3 : 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>8</mn><mo>:</mo><mn>9</mn></mrow><annotation encoding="application/x-tex">8 : 9</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>9</mn><mo>:</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">9 : 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৪।</span>
+          <div class="q-text">দুইটি সংখ্যার অনুপাত <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>:</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">5 : 7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">7</span></span></span></span></span> এবং তাদের গ.সা.গু. <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn></mrow><annotation encoding="application/x-tex">4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></span> হলে, সংখ্যা দুটির ল.সা.গু. কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>110</mn></mrow><annotation encoding="application/x-tex">110</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">110</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>120</mn></mrow><annotation encoding="application/x-tex">120</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">120</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>130</mn></mrow><annotation encoding="application/x-tex">130</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">130</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>140</mn></mrow><annotation encoding="application/x-tex">140</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">140</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৫।</span>
+          <div class="q-text"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>:</mo><mi>y</mi><mo>=</mo><mn>2</mn><mo>:</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">x : y = 2 : 3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></span> হলে <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi>x</mi><mo>:</mo><mn>4</mn><mi>y</mi></mrow><annotation encoding="application/x-tex">3x : 4y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></span> এর মান নিচের কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>:</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">1 : 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>:</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2 : 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>:</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">2 : 3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>:</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">3 : 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৬।</span>
+          <div class="q-text"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">a, b, c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">c</span></span></span></span></span> ক্রমিক সমানুপাতী হলে, নিচের কোনটি সঠিক?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col full-w"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>:</mo><mi>b</mi><mo>=</mo><mi>a</mi><mo>:</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">a : b = a : c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></span></span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><mi>a</mi><mi>c</mi></mrow><annotation encoding="application/x-tex">b^2 = ac</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span></span></span></span></span></span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>=</mo><mi>b</mi><mi>c</mi></mrow><annotation encoding="application/x-tex">a^2 = bc</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal">c</span></span></span></span></span></span></div>
+          <div class="opt-col full-w"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mi>a</mi><mi>c</mi></mfrac><mo>=</mo><mfrac><mi>b</mi><mi>c</mi></mfrac></mrow><annotation encoding="application/x-tex">\frac{a}{c} = \frac{b}{c}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0404em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6954em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2251em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">b</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৭।</span>
+          <div class="q-text"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>:</mo><mi>b</mi><mo>=</mo><mi>c</mi><mo>:</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">a : b = c : d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span></span> এর একান্তরকরণ কোনটি?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>:</mo><mi>d</mi><mo>=</mo><mi>b</mi><mo>:</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">a : d = b : c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>:</mo><mi>c</mi><mo>=</mo><mi>b</mi><mo>:</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">a : c = b : d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>c</mi><mo>=</mo><mi>b</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">ac = bd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal">d</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>:</mo><mi>a</mi><mo>=</mo><mi>d</mi><mo>:</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">b : a = d : c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৮।</span>
+          <div class="q-text">একটি বর্গের বাহুর দৈর্ঘ্য দ্বিগুণ হলে ক্ষেত্রফল কতগুণ হবে?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span> গুণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn></mrow><annotation encoding="application/x-tex">4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></span> গুণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>8</mn></mrow><annotation encoding="application/x-tex">8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></span> গুণ</span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn></mrow><annotation encoding="application/x-tex">6</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">6</span></span></span></span></span> গুণ</span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">১৯।</span>
+          <div class="q-text">দুইটি সম্পূরক কোণের পরিমাপের অনুপাত <span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>:</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">3 : 7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">7</span></span></span></span></span> হলে বৃহত্তম কোণ কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>121</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">121^\circ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6741em;"></span><span class="mord">12</span><span class="mord"><span class="mord">1</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6741em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∘</span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>124</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">124^\circ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6741em;"></span><span class="mord">12</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6741em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∘</span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>126</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">126^\circ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6741em;"></span><span class="mord">12</span><span class="mord"><span class="mord">6</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6741em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∘</span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>139</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">139^\circ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6741em;"></span><span class="mord">13</span><span class="mord"><span class="mord">9</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6741em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∘</span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+      <div class="q-block">
+        
+        <div class="q-row">
+          <span class="q-num">২০।</span>
+          <div class="q-text">বৃত্তের পরিধি ও ব্যাসের অনুপাত কত?</div>
+        </div>
+        
+        <div class="opt-grid">
+          <div class="opt-col"><span class="opt-lbl">(ক)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>:</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pi : 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(খ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>π</mi><mo>:</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2\pi : 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(গ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>π</mi><mn>2</mn></msup><mo>:</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pi^2 : 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></span></div>
+          <div class="opt-col"><span class="opt-lbl">(ঘ)</span><span class="opt-val"><span class="m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>π</mi><mn>3</mn></msup><mo>:</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\pi^3 : 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></span></div>
+        </div>
+      </div>
+    
+  </div>
+</div>
+
+
+</body>
+</html>
