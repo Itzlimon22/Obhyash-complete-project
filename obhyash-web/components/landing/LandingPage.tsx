@@ -1,6 +1,9 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { GooglePlayButton } from './GooglePlayButton';
+import { AppShowcaseSection } from './AppShowcaseSection';
+import { MobileAppInstallBanner } from './MobileAppInstallBanner';
 import {
   BookOpen,
   Clock,
@@ -477,7 +480,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   .getElementById('features')
                   ?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="px-3 py-2 text-sm font-medium hover:text-emerald-400"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-400 cursor-pointer"
             >
               ফিচার
             </button>
@@ -487,32 +490,35 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   .getElementById('pricing')
                   ?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="px-3 py-2 text-sm font-medium hover:text-emerald-400"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-400 cursor-pointer"
             >
               প্রাইসিং
             </button>
             <Link
               href="/blog"
-              className="px-3 py-2 text-sm font-medium hover:text-emerald-400"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-400 cursor-pointer"
             >
               ব্লগ
             </Link>
 
+            <GooglePlayButton variant="navbar" />
+
             <button
               onClick={onLogin}
-              className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-sm transition-all shadow-md shadow-emerald-500/20"
+              className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-sm transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
             >
               লগইন / রেজিস্ট্রেশন
             </button>
           </div>
 
-          {/* Mobile Navigation - Single Login/Register Button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center gap-2">
+            <GooglePlayButton variant="navbar" />
             <button
               onClick={onLogin}
-              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs transition-all shadow-sm shadow-emerald-500/20"
+              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs transition-all shadow-sm shadow-emerald-500/20 cursor-pointer"
             >
-              লগইন / রেজিস্ট্রেশন
+              লগইন
             </button>
           </div>
         </div>
@@ -534,7 +540,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               ২,০০,০০০+ অধ্যায়ভিত্তিক ও বিগত বছরের প্রশ্নব্যাংক, রিয়েল টাইমার এক্সাম, একবার ক্লিকেই অপশন লকিং, মূল পাঠ্যবইয়ের প্রমাণসহ নিখুঁত সমাধান এবং অফলাইন PDF ডাউনলোড—সবকিছু এক প্ল্যাটফর্মে।
             </p>
 
-            <div className="flex flex-row gap-2.5 sm:gap-3 justify-center lg:justify-start pt-1 sm:pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 justify-center lg:justify-start pt-1 sm:pt-2">
               <button
                 onClick={onGetStarted}
                 className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer"
@@ -550,6 +556,20 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-300" />
                 <span>ডেমো পরীক্ষা দাও</span>
               </Link>
+
+              <GooglePlayButton variant="hero" />
+            </div>
+
+            {/* Play Store Live Trust Indicator */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-1 text-xs text-neutral-400">
+              <div className="flex items-center gap-1 text-amber-400 text-xs">
+                <span>★★★★★</span>
+                <span className="font-black text-white">৪.৯</span>
+              </div>
+              <span className="text-neutral-600 dark:text-neutral-500">•</span>
+              <span className="text-neutral-300 font-medium">Google Play Store App</span>
+              <span className="text-neutral-600 dark:text-neutral-500 hidden sm:inline">•</span>
+              <span className="text-emerald-400 font-semibold hidden sm:inline">১০০% ফ্রি প্র্যাকটিস</span>
             </div>
           </div>
 
@@ -1704,6 +1724,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* ── OBHYASH MOBILE APP SHOWCASE SECTION (Play Store) ── */}
+      <AppShowcaseSection />
+
       {/* Footer */}
       <footer className="bg-black pt-10 sm:pt-14 md:pt-20 pb-8 sm:pb-10 font-sans border-t border-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1760,6 +1783,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.438 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
                 </a>
+              </div>
+
+              {/* Play Store Badge */}
+              <div className="pt-1">
+                <GooglePlayButton variant="footer" />
               </div>
             </div>
 
@@ -1990,6 +2018,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
           }
         }
       `}</style>
+
+      {/* ── MOBILE SMART APP INSTALL BANNER ── */}
+      <MobileAppInstallBanner />
     </div>
   );
 };

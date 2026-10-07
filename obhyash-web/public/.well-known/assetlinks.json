@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.obhyash.app",
+      "sha256_cert_fingerprints": [
+        "BB:93:24:C8:ED:88:52:62:B3:35:9B:C8:17:A2:03:41:1C:18:EA:1A:EC:38:1A:EE:89:7C:25:D4:9F:42:57:D1"
+      ]
+    }
+  }
+]

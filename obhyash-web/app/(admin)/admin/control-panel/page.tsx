@@ -1049,10 +1049,10 @@ export default function ControlPanelPage() {
             </label>
             <input
               type="text"
-              value={config.latest_app_version || '1.0.0'}
+              value={config.latest_app_version || '1.0.3'}
               onChange={(e) => setConfig({ ...config, latest_app_version: e.target.value })}
               onBlur={() => saveConfig(config)}
-              placeholder="1.0.0"
+              placeholder="1.0.3"
               className="w-full text-xs p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none shadow-xs"
             />
             <p className="text-[10px] text-slate-400">গুগল প্লে স্টোরের বর্তমান অফিসিয়াল রিলিজ ভার্সন</p>
@@ -1064,7 +1064,7 @@ export default function ControlPanelPage() {
             </label>
             <input
               type="text"
-              value={config.update_url || ''}
+              value={config.update_url || 'https://play.google.com/store/apps/details?id=com.obhyash.app'}
               onChange={(e) => setConfig({ ...config, update_url: e.target.value })}
               onBlur={() => saveConfig(config)}
               placeholder="https://play.google.com/store/apps/details?id=com.obhyash.app"

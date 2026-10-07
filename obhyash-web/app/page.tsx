@@ -55,8 +55,10 @@ const homeSchema = {
       ],
       applicationCategory: 'EducationalApplication',
       applicationSubCategory: 'Exam Preparation & Practice',
-      operatingSystem: 'Android, iOS, Web (Browser)',
+      operatingSystem: 'Android, Web (Browser)',
       url: 'https://obhyash.com',
+      downloadUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
+      installUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
       image: 'https://obhyash.com/og-image.png',
       screenshot: 'https://obhyash.com/og-image.png',
       description:
