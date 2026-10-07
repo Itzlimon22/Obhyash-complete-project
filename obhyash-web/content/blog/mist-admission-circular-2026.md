@@ -22,7 +22,7 @@ author:
   initials: MW
 readTime: 13
 coverColor: from-slate-900 via-stone-900 to-amber-950
-publishedAt: '2026-09-27T09:48:00.000Z'
+publishedAt: '2026-10-07T08:00:00.000Z'
 featured: false
 coverImage: /images/blog-covers/titles/mist-admission-circular-2026.svg
 ---

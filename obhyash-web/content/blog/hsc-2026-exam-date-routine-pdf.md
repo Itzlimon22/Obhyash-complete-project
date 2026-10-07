@@ -23,7 +23,7 @@ author:
   initials: OT
 readTime: 8
 coverColor: from-blue-600 to-indigo-950
-publishedAt: '2026-09-29T11:00:00.000Z'
+publishedAt: '2026-10-07T10:00:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/hsc-2026-exam-date-routine-pdf.svg
 ---

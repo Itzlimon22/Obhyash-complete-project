@@ -18,7 +18,7 @@ author:
   initials: AW
 readTime: 18
 coverColor: from-violet-600 to-purple-800
-publishedAt: '2026-09-23T11:35:00.000Z'
+publishedAt: '2026-10-07T10:15:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/chemistry-periodic-table-tricks.svg
 ---

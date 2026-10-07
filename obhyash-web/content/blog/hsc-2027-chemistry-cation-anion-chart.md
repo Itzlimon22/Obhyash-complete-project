@@ -19,7 +19,7 @@ author:
   initials: AW
 readTime: 18
 coverColor: from-amber-600 to-rose-900
-publishedAt: '2026-09-25T09:00:00.000Z'
+publishedAt: '2026-10-07T08:00:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/hsc-2027-chemistry-cation-anion-chart.svg
 ---

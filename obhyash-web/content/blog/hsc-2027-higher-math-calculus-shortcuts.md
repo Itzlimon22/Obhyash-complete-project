@@ -19,7 +19,7 @@ author:
   initials: AW
 readTime: 18
 coverColor: from-emerald-700 to-teal-950
-publishedAt: '2026-09-25T10:00:00.000Z'
+publishedAt: '2026-10-07T08:00:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/hsc-2027-higher-math-calculus-shortcuts.svg
 ---

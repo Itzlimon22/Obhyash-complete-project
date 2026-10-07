@@ -20,7 +20,7 @@ author:
   initials: AW
 readTime: 15
 coverColor: from-rose-600 via-red-900 to-slate-950
-publishedAt: '2026-10-05T07:50:00.000Z'
+publishedAt: '2026-10-07T08:00:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/hsc-2026-bangla-1st-paper-mcq-solutions.svg
 ---

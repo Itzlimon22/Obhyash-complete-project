@@ -46,7 +46,7 @@
     <g transform="translate(-195, 0)">
       <rect x="0" y="0" width="195" height="42" rx="21" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
       <text x="97.5" y="27" class="badge-text" font-size="15" fill="#475569" text-anchor="middle">
-        এইচএসসি ২০২৭
+        পরীক্ষা ২০২৬
       </text>
     </g>
   </g>
@@ -54,13 +54,13 @@
   <!-- 4. Center Hero Headline (Guaranteed Safe Width) -->
   <g transform="translate(600, 275)">
     <!-- Line 1: Dark Slate -->
-    <text x="0" y="0" class="title" font-size="44" fill="#0F172A" text-anchor="middle">
-      HSC 2027 বিজ্ঞান বিভাগের সেরা বই
+    <text x="0" y="0" class="title" font-size="34" fill="#0F172A" text-anchor="middle">
+      মেডিকেল ভর্তি বিগত ১০ বছরের প্রশ্ন ও সমাধান
     </text>
 
     <!-- Line 2: Thematic Accent Color -->
     <text x="0" y="68" class="title" font-size="44" fill="#0284C7" text-anchor="middle">
-      বোর্ড ও ভর্তি গাইড
+      ২০২৬-২৭ গাইড
     </text>
   </g>
 

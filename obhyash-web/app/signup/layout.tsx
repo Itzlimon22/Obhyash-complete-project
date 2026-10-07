@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: 'নতুন একাউন্ট তৈরি করুন (Sign Up) | Obhyash (অভ্যাস)',
   description:
     'বিনামূল্যে অভ্যাস একাউন্ট খুলে ফ্রি ডেমো টেস্ট ও অধ্যায়ভিত্তিক প্রশ্নব্যাংক প্র্যাকটিস শুরু করুন।',
+  alternates: {
+    canonical: 'https://obhyash.com/signup',
+  },
   openGraph: {
     title: 'নতুন একাউন্ট তৈরি করুন | Obhyash',
     description:

@@ -18,7 +18,7 @@ author:
   initials: AW
 readTime: 18
 coverColor: from-blue-600 to-indigo-800
-publishedAt: '2026-09-23T10:00:00.000Z'
+publishedAt: '2026-10-07T08:00:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/hsc-physics-1st-paper-formula.svg
 ---

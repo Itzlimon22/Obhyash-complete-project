@@ -18,7 +18,7 @@ author:
   initials: AW
 readTime: 14
 coverColor: from-blue-600 via-indigo-900 to-slate-950
-publishedAt: '2026-10-02T16:30:00.000Z'
+publishedAt: '2026-10-07T08:00:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/nctb-hsc-2027-books-list-syllabus-pdf.svg
 ---
