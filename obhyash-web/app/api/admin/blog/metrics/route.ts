@@ -31,6 +31,15 @@ export async function GET() {
     let totalConversions = 0;
     let topConvertingPosts: { slug: string; appDownloads: number; signups: number; total: number }[] = [];
     let recentConversions: any[] = [];
+    let buttonBreakdown: {
+      location: string;
+      nameBn: string;
+      nameEn: string;
+      totalClicks: number;
+      appDownloads: number;
+      signups: number;
+      percentage: number;
+    }[] = [];
     let tableExists = true;
 
     try {
@@ -42,6 +51,7 @@ export async function GET() {
         { count: todaySgnps },
         { count: allConv },
         { data: recentList, error: listError },
+        { data: allButtonsList },
       ] = await Promise.all([
         supabaseAdmin
           .from('blog_conversions')
@@ -69,6 +79,10 @@ export async function GET() {
           .select('id, event_type, source_slug, source_category, button_location, created_at')
           .order('created_at', { ascending: false })
           .limit(100),
+        supabaseAdmin
+          .from('blog_conversions')
+          .select('event_type, button_location')
+          .limit(5000),
       ]);
 
       if (listError && listError.code === '42P01') {
@@ -95,6 +109,72 @@ export async function GET() {
           .map(([slug, stats]) => ({ slug, ...stats }))
           .sort((a, b) => b.total - a.total)
           .slice(0, 5);
+
+        // Aggregate Button Breakdown
+        const LOCATION_CONFIG: Record<string, { nameBn: string; nameEn: string }> = {
+          mobile_sticky: { nameBn: 'মোবাইল স্টিকি বার', nameEn: 'Mobile Sticky Bar' },
+          quick_action: { nameBn: 'মোবাইল স্টিকি বার', nameEn: 'Mobile Sticky Bar' },
+          header: { nameBn: 'হেডার ন্যাভ বার', nameEn: 'Header Navbar' },
+          drawer: { nameBn: 'মোবাইল স্লাইড ড্রয়ার', nameEn: 'Mobile Drawer' },
+          in_article: { nameBn: 'আর্টিকেলের ভেতরে', nameEn: 'In-Article CTA' },
+          sidebar: { nameBn: 'ব্লগ সাইডবার', nameEn: 'Sidebar Widget' },
+          footer: { nameBn: 'ফুটার সেকশন', nameEn: 'Footer' },
+          floating_next: { nameBn: 'ফ্লোটিং নেক্সট বক্স', nameEn: 'Floating Next Box' },
+        };
+
+        const bMap: Record<string, {
+          location: string;
+          nameBn: string;
+          nameEn: string;
+          totalClicks: number;
+          appDownloads: number;
+          signups: number;
+        }> = {};
+
+        // Pre-populate core locations so admin can monitor all active buttons
+        const coreKeys = ['mobile_sticky', 'header', 'in_article', 'drawer', 'footer'];
+        coreKeys.forEach((k) => {
+          bMap[k] = {
+            location: k,
+            nameBn: LOCATION_CONFIG[k].nameBn,
+            nameEn: LOCATION_CONFIG[k].nameEn,
+            totalClicks: 0,
+            appDownloads: 0,
+            signups: 0,
+          };
+        });
+
+        const allRows = allButtonsList || [];
+        const totalRowsCount = allRows.length;
+
+        allRows.forEach((row) => {
+          // Normalize quick_action to mobile_sticky
+          let loc = row.button_location || 'other';
+          if (loc === 'quick_action') loc = 'mobile_sticky';
+
+          if (!bMap[loc]) {
+            const cfg = LOCATION_CONFIG[loc] || { nameBn: loc, nameEn: loc };
+            bMap[loc] = {
+              location: loc,
+              nameBn: cfg.nameBn,
+              nameEn: cfg.nameEn,
+              totalClicks: 0,
+              appDownloads: 0,
+              signups: 0,
+            };
+          }
+
+          bMap[loc].totalClicks++;
+          if (row.event_type === 'app_download') bMap[loc].appDownloads++;
+          if (row.event_type === 'signup_click') bMap[loc].signups++;
+        });
+
+        buttonBreakdown = Object.values(bMap)
+          .map((item) => ({
+            ...item,
+            percentage: totalRowsCount > 0 ? Math.round((item.totalClicks / totalRowsCount) * 100) : 0,
+          }))
+          .sort((a, b) => b.totalClicks - a.totalClicks);
       }
     } catch (e: any) {
       console.warn('Could not query blog_conversions:', e?.message);
@@ -110,6 +190,7 @@ export async function GET() {
       totalConversions,
       topConvertingPosts,
       recentConversions,
+      buttonBreakdown,
       tableExists,
     });
   } catch (error: any) {

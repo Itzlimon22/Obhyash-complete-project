@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import BlogHeader from '@/components/blog/BlogHeader';
 import BlogFooter from '@/components/blog/BlogFooter';
+import BlogMobileStickyBar from '@/components/blog/BlogMobileStickyBar';
 import { BlogThemeProvider } from '@/components/blog/BlogThemeContext';
 
 export const metadata: Metadata = {
@@ -47,8 +48,9 @@ export default function BlogLayout({
     <BlogThemeProvider>
       <div className="min-h-screen w-full min-w-0 overflow-x-clip flex flex-col bg-white dark:bg-[#0e0e0e] text-slate-900 dark:text-slate-100 font-sans tracking-tight transition-colors duration-200">
         <BlogHeader />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-16 md:pb-0">{children}</main>
         <BlogFooter />
+        <BlogMobileStickyBar />
       </div>
     </BlogThemeProvider>
   );

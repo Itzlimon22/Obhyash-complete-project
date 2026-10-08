@@ -17,7 +17,8 @@ export interface TrackConversionOptions {
     | 'footer'
     | 'in_article'
     | 'floating_next'
-    | 'quick_action';
+    | 'quick_action'
+    | 'mobile_sticky';
 }
 
 /**
