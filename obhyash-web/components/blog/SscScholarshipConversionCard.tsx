@@ -1,13 +1,15 @@
 'use client';
 
 import React from 'react';
-import { ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import Link from 'next/link';
+import { ShieldCheck } from 'lucide-react';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.obhyash.app&referrer=utm_source%3Dblog%26utm_medium%3Dcta%26utm_campaign%3Dssc_britti_2026';
 
-function GooglePlayIcon({ className = 'w-5 h-5' }: { className?: string }) {
+// Crisp Official Google Play Store Vector Icon
+function GooglePlayColorIcon({ className = 'w-7 h-7 sm:w-8 sm:h-8' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none">
       <path
@@ -49,58 +51,55 @@ export default function SscScholarshipConversionCard({
   };
 
   return (
-    <div className="my-8 not-prose rounded-2xl sm:rounded-3xl border border-emerald-500/30 dark:border-emerald-500/20 bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/70 dark:from-emerald-950/30 dark:via-[#0f1715] dark:to-teal-950/20 p-5 sm:p-7 shadow-md transition-all duration-300 font-sans">
-      <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
-        {/* Left: App Identity + Authentic Value Hook */}
-        <div className="flex items-start gap-4">
-          {/* App Icon */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#065f46] to-[#10b981] p-0.5 shadow-md shrink-0 flex items-center justify-center text-white">
-            <span className="font-extrabold text-2xl sm:text-3xl font-anek tracking-tight">অ</span>
+    <div className="my-8 sm:my-10 not-prose rounded-3xl bg-[#111417] text-white p-6 sm:p-10 shadow-xl border border-white/5 font-sans transition-all duration-300">
+      {/* 1. Main Title */}
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-['Anek_Bangla',sans-serif] leading-[1.25] tracking-tight mb-3">
+        {isAlert
+          ? 'বৃত্তির তালিকা এলেই সরাসরি ফোনে নোটিফিকেশন পাবে।'
+          : 'কলেজের প্রথম দিন থেকেই এগিয়ে থাকো।'}
+      </h2>
+
+      {/* 2. Subtitle / Description */}
+      <p className="text-sm sm:text-base md:text-lg text-slate-300 font-['Hind_Siliguri',sans-serif] leading-relaxed mb-8 max-w-2xl">
+        {isAlert
+          ? 'তোমার শিক্ষা বোর্ডের মেধা ও সাধারণ বৃত্তির গেজেট প্রকাশমাত্রই মোবাইলে অ্যালার্ট পেতে যুক্ত হও অভ্যাস অ্যাপে।'
+          : 'অধ্যায়ভিত্তিক ফ্রি টেস্ট দাও, আর প্রতিটি ভুলের ব্যাখ্যাসহ সমাধান দেখে নাও।'}
+      </p>
+
+      {/* 3. Big White Google Play Download Pill Button */}
+      <div className="flex flex-col items-center">
+        <a
+          href={PLAY_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleDownloadClick}
+          className="w-full max-w-xl flex items-center justify-center gap-3.5 py-3 sm:py-3.5 px-6 rounded-2xl bg-[#F1F3F4] hover:bg-white text-slate-900 shadow-md hover:shadow-xl transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+        >
+          <GooglePlayColorIcon className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
+          <div className="flex flex-col items-start leading-tight">
+            <span className="text-[11px] sm:text-xs text-slate-600 font-medium font-['Hind_Siliguri',sans-serif] -mb-0.5">
+              বিনামূল্যে ডাউনলোড
+            </span>
+            <span className="text-xl sm:text-2xl font-black text-slate-900 font-sans tracking-tight">
+              Google Play
+            </span>
           </div>
+        </a>
 
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-hind">
-                <Sparkles className="w-3 h-3 text-emerald-600" />
-                {isAlert ? 'বোর্ড নোটিফিকেশন অ্যালার্ট' : 'একাদশ শ্রেণির প্রস্তুতি'}
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-hind">
-                অফিশিয়াল অ্যান্ড্রয়েড অ্যাপ
-              </span>
-            </div>
-
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-anek leading-tight">
-              {isAlert
-                ? 'বৃত্তির তালিকা এলেই সরাসরি ফোনে নোটিফিকেশন পাবে'
-                : 'কলেজে প্রথম দিন থেকেই এগিয়ে থাকতে ফ্রি প্র্যাকটিস করো'}
-            </h3>
-
-            <p className="text-sm text-slate-600 dark:text-slate-300 font-hind leading-relaxed">
-              {isAlert
-                ? 'তোমার শিক্ষা বোর্ডের মেধা ও সাধারণ বৃত্তির গেজেট প্রকাশমাত্রই ফোনে নোটিফিকেশন পেতে যুক্ত হও অভ্যাস অ্যাপে।'
-                : 'একাদশের জন্য তোমার বেসিক কেমন তা যাচাই করো। অধ্যায়ভিত্তিক ফ্রি টেস্ট ও সমাধান দেখতে ডাউনলোড করো অভ্যাস।'}
-            </p>
-          </div>
+        {/* 4. Secondary Action Link: ডেমো টেস্ট দিয়ে দেখো */}
+        <div className="mt-5 text-center">
+          <Link
+            href="/demo"
+            className="text-sm sm:text-base text-slate-200 hover:text-white underline underline-offset-4 decoration-slate-400 hover:decoration-white font-['Hind_Siliguri',sans-serif] font-medium transition-colors"
+          >
+            ডেমো টেস্ট দিয়ে দেখো
+          </Link>
         </div>
 
-        {/* Right: Direct 1-Click Play Store Action */}
-        <div className="w-full md:w-auto shrink-0 flex flex-col items-center sm:items-end gap-2.5">
-          <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={handleDownloadClick}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#065f46] hover:bg-[#047857] active:bg-[#022c22] text-white font-anek font-bold text-base shadow-md hover:shadow-lg transition-all group scale-100 hover:scale-[1.02]"
-          >
-            <GooglePlayIcon className="w-5 h-5 shrink-0" />
-            <span>Play Store থেকে ইনস্টল করুন</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
-
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-hind">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>Google Play ভেরিফাইড অ্যাপ</span>
-          </div>
+        {/* 5. Google Play Verified App Badge */}
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-400 font-['Hind_Siliguri',sans-serif]">
+          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>Google Play ভেরিফাইড অ্যাপ</span>
         </div>
       </div>
     </div>

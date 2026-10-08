@@ -1,0 +1,495 @@
+{
+  "subjects": [
+    {
+      "id": "hsc_biology_1",
+      "name": "জীববিজ্ঞান ১ম পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_ict",
+      "name": "তথ্য ও যোগাযোগ প্রযুক্তি",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_physics_1",
+      "name": "পদার্থবিজ্ঞান ১ম পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_physics_2",
+      "name": "পদার্থবিজ্ঞান ২য় পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_chemistry_1",
+      "name": "রসায়ন ১ম পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_chemistry_2",
+      "name": "রসায়ন ২য় পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_math_1",
+      "name": "উচ্চতর গণিত ১ম পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_math_2",
+      "name": "উচ্চতর গণিত ২য় পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "hsc_biology_2",
+      "name": "জীববিজ্ঞান ২য় পত্র",
+      "level": "HSC"
+    },
+    {
+      "id": "ssc_math",
+      "name": "SSC সাধারণ গণিত",
+      "level": "SSC"
+    },
+    {
+      "id": "ssc_ict",
+      "name": "SSC তথ্য ও যোগাযোগ প্রযুক্তি",
+      "level": "SSC"
+    },
+    {
+      "id": "ssc_physics",
+      "name": "SSC পদার্থবিজ্ঞান",
+      "level": "SSC"
+    },
+    {
+      "id": "ssc_chemistry",
+      "name": "SSC রসায়ন",
+      "level": "SSC"
+    },
+    {
+      "id": "ssc_biology",
+      "name": "SSC জীববিজ্ঞান",
+      "level": "SSC"
+    },
+    {
+      "id": "ssc_higher_math",
+      "name": "SSC উচ্চতর গণিত",
+      "level": "SSC"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "hsc_ict_ch01",
+      "subjectId": "hsc_ict",
+      "name": "বিশ্ব ও বাংলাদেশ প্রেক্ষিতে",
+      "questionCount": 20
+    },
+    {
+      "id": "hsc_ict_ch02",
+      "subjectId": "hsc_ict",
+      "name": "কম্পিউটার সিস্টেম ও নেটওয়ার্কিং",
+      "questionCount": 20
+    },
+    {
+      "id": "hsc_ict_ch03",
+      "subjectId": "hsc_ict",
+      "name": "সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
+      "questionCount": 20
+    },
+    {
+      "id": "hsc_ict_ch04",
+      "subjectId": "hsc_ict",
+      "name": "ওয়েব ডিজাইন পরিচিতি এবং এইচটিএমএল",
+      "questionCount": 20
+    },
+    {
+      "id": "hsc_ict_ch05",
+      "subjectId": "hsc_ict",
+      "name": "প্রোগ্রামিং ভাষা",
+      "questionCount": 20
+    },
+    {
+      "id": "hsc_ict_ch06",
+      "subjectId": "hsc_ict",
+      "name": "ডেটাবেস ম্যানেজমেন্ট সিস্টেম",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch01",
+      "subjectId": "hsc_physics_1",
+      "name": "ভৌতজগত ও পরিমাপ",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch02",
+      "subjectId": "hsc_physics_1",
+      "name": "ভেক্টর",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch03",
+      "subjectId": "hsc_physics_1",
+      "name": "গতিবিদ্যা",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch04",
+      "subjectId": "hsc_physics_1",
+      "name": "নিউটনিয়ান বলবিদ্যা",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch05",
+      "subjectId": "hsc_physics_1",
+      "name": "কাজ, শক্তি ও ক্ষমতা",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch06",
+      "subjectId": "hsc_physics_1",
+      "name": "মহাকর্ষ ও অভিকর্ষ",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch07",
+      "subjectId": "hsc_physics_1",
+      "name": "পদার্থের গাঠনিক ধর্ম",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch08",
+      "subjectId": "hsc_physics_1",
+      "name": "পর্যায়বৃত্ত গতি",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch09",
+      "subjectId": "hsc_physics_1",
+      "name": "তরঙ্গ",
+      "questionCount": 20
+    },
+    {
+      "id": "phy1_ch10",
+      "subjectId": "hsc_physics_1",
+      "name": "আদর্শ গ্যাস ও গ্যাসের গতিতত্ত্ব",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch01",
+      "subjectId": "hsc_physics_2",
+      "name": "তাপগতিবিদ্যা",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch02",
+      "subjectId": "hsc_physics_2",
+      "name": "স্থির তড়িৎ",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch03",
+      "subjectId": "hsc_physics_2",
+      "name": "চল তড়িৎ",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch04",
+      "subjectId": "hsc_physics_2",
+      "name": "তড়িৎ প্রবাহের চৌম্বক ক্রিয়া ও চুম্বকত্ব",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch05",
+      "subjectId": "hsc_physics_2",
+      "name": "তাড়িতচৌম্বকীয় আবেশ ও দিক পরিবর্তী প্রবাহ",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch06",
+      "subjectId": "hsc_physics_2",
+      "name": "জ্যামিতিক আলোকবিজ্ঞান",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch07",
+      "subjectId": "hsc_physics_2",
+      "name": "ভৌত আলোকবিজ্ঞান",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch08",
+      "subjectId": "hsc_physics_2",
+      "name": "আধুনিক পদার্থবিজ্ঞানের সূচনা",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch09",
+      "subjectId": "hsc_physics_2",
+      "name": "পরমাণুর মডেল এবং নিউক্লিয়ার পদার্থবিজ্ঞান",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch10",
+      "subjectId": "hsc_physics_2",
+      "name": "সেমিকন্ডাক্টর ও ইলেকট্রনিক্স",
+      "questionCount": 20
+    },
+    {
+      "id": "phy2_ch11",
+      "subjectId": "hsc_physics_2",
+      "name": "জ্যোতির্বিজ্ঞান",
+      "questionCount": 20
+    },
+    {
+      "id": "chem1_ch01",
+      "subjectId": "hsc_chemistry_1",
+      "name": "ল্যাবরেটরীর নিরাপদ ব্যবহার",
+      "questionCount": 20
+    },
+    {
+      "id": "chem1_ch02",
+      "subjectId": "hsc_chemistry_1",
+      "name": "গুণগত রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem1_ch03",
+      "subjectId": "hsc_chemistry_1",
+      "name": "মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem1_ch04",
+      "subjectId": "hsc_chemistry_1",
+      "name": "রাসায়নিক পরিবর্তন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem1_ch05",
+      "subjectId": "hsc_chemistry_1",
+      "name": "কর্মমুখী রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem2_ch01",
+      "subjectId": "hsc_chemistry_2",
+      "name": "পরিবেশ রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem2_ch02",
+      "subjectId": "hsc_chemistry_2",
+      "name": "জৈব যৌগ",
+      "questionCount": 20
+    },
+    {
+      "id": "chem2_ch03",
+      "subjectId": "hsc_chemistry_2",
+      "name": "পরিমাণগত রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem2_ch04",
+      "subjectId": "hsc_chemistry_2",
+      "name": "তড়িৎ রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "chem2_ch05",
+      "subjectId": "hsc_chemistry_2",
+      "name": "অর্থনৈতিক রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch01",
+      "subjectId": "hsc_math_1",
+      "name": "ম্যাট্রিক্স ও নির্ণায়ক",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch02",
+      "subjectId": "hsc_math_1",
+      "name": "ভেক্টর",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch03",
+      "subjectId": "hsc_math_1",
+      "name": "সরলরেখা",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch04",
+      "subjectId": "hsc_math_1",
+      "name": "বৃত্ত",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch05",
+      "subjectId": "hsc_math_1",
+      "name": "বিন্যাস ও সমাবেশ",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch06",
+      "subjectId": "hsc_math_1",
+      "name": "ত্রিকোণমিতিক অনুপাত",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch07",
+      "subjectId": "hsc_math_1",
+      "name": "সংযুক্ত কোণের ত্রিকোণমিতিক অনুপাত",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch08",
+      "subjectId": "hsc_math_1",
+      "name": "ফাংশন ও ফাংশনের লেখচিত্র",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch09",
+      "subjectId": "hsc_math_1",
+      "name": "অন্তরীকরণ",
+      "questionCount": 20
+    },
+    {
+      "id": "math1_ch10",
+      "subjectId": "hsc_math_1",
+      "name": "যোগজীকরণ",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch01",
+      "subjectId": "hsc_math_2",
+      "name": "বাস্তব সংখ্যা ও অসমতা",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch02",
+      "subjectId": "hsc_math_2",
+      "name": "যোগাশ্রয়ী প্রোগ্রাম",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch03",
+      "subjectId": "hsc_math_2",
+      "name": "জটিল সংখ্যা",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch04",
+      "subjectId": "hsc_math_2",
+      "name": "বহুপদী ও বহুপদী সমীকরণ",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch05",
+      "subjectId": "hsc_math_2",
+      "name": "দ্বিপদী বিস্তৃতি",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch06",
+      "subjectId": "hsc_math_2",
+      "name": "কণিক",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch07",
+      "subjectId": "hsc_math_2",
+      "name": "বিপরীত ত্রিকোণমিতিক ফাংশন ও ত্রিকোণমিতিক সমীকরণ",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch08",
+      "subjectId": "hsc_math_2",
+      "name": "স্থিতিবিদ্যা",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch09",
+      "subjectId": "hsc_math_2",
+      "name": "সমতলে বস্তুকণার গতি",
+      "questionCount": 20
+    },
+    {
+      "id": "math2_ch10",
+      "subjectId": "hsc_math_2",
+      "name": "বিস্তার পরিমাপ ও সম্ভাবনা",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch01",
+      "subjectId": "hsc_biology_2",
+      "name": "প্রাণীর বিভিন্নতা ও শ্রেণিবিন্যাস",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch02",
+      "subjectId": "hsc_biology_2",
+      "name": "প্রাণীর পরিচিতি",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch03",
+      "subjectId": "hsc_biology_2",
+      "name": "মানব শারীরতত্ত্ব: পরিপাক ও শোষণ",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch07",
+      "subjectId": "hsc_biology_2",
+      "name": "মানব শারীরতত্ত্ব: চলন ও অঙ্গচালনা",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch09",
+      "subjectId": "hsc_biology_2",
+      "name": "মানব জীবনের ধারাবাহিকতা",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch10",
+      "subjectId": "hsc_biology_2",
+      "name": "মানবদেহের প্রতিরক্ষা",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch11",
+      "subjectId": "hsc_biology_2",
+      "name": "জিনতত্ত্ব ও বিবর্তন",
+      "questionCount": 20
+    },
+    {
+      "id": "bio2_ch12",
+      "subjectId": "hsc_biology_2",
+      "name": "প্রাণীর আচরণ",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_p_c2",
+      "subjectId": "ssc_physics",
+      "name": "গতি",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_p_c3",
+      "subjectId": "ssc_physics",
+      "name": "বল",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_c_c3",
+      "subjectId": "ssc_chemistry",
+      "name": "পদার্থের গঠন",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_m_c2",
+      "subjectId": "ssc_math",
+      "name": "সেট ও ফাংশন",
+      "questionCount": 20
+    }
+  ]
+}

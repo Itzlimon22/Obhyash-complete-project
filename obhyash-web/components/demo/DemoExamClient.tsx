@@ -3,72 +3,151 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Question, UserAnswers, ExamConfig, ExamDetails, AppState } from '@/lib/types';
-import { DEMO_QUESTION_POOL } from '@/lib/data/demo-questions';
+import { PUBLIC_QUESTIONS } from '@/lib/data/public-mock-data';
+import PublicExamSetupForm from '@/components/demo/PublicExamSetupForm';
 import { ExamInstructionsView } from '@/components/student/features/exam/ExamInstructionsView';
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 import ResultView from '@/components/student/ui/ResultView';
 import { useTheme } from '@/components/providers/ThemeProvider';
-import { Trophy } from 'lucide-react';
+import AppInstallPromptModal from '@/components/demo/AppInstallPromptModal';
 
-// Fisher-Yates shuffle algorithm to pick 10 random questions
-function pickRandomQuestions(pool: Question[], count: number = 10): Question[] {
-  const array = [...pool];
-  for (let i = array.length - 1; i > 0; i--) {
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return array.slice(0, count);
+  return arr;
 }
 
-const TOTAL_DURATION_SECONDS = 10 * 60; // 10 minutes
+// Pick questions matching subject and chapters, fall back to pool if not enough
+function getQuestionsForConfig(
+  pool: Question[],
+  subject: string,
+  chapterNames: string[],
+  count: number = 25
+): Question[] {
+  // 1. Try to find questions strictly matching subject
+  let matching = pool.filter(
+    (q) =>
+      (q.subject || '').toLowerCase() === subject.toLowerCase() ||
+      (q.subjectLabel || '').toLowerCase().includes(subject.toLowerCase())
+  );
+
+  // If chapter filter specified and not 'All'
+  if (chapterNames.length > 0 && !chapterNames.includes('All')) {
+    const chapterFiltered = matching.filter((q) =>
+      chapterNames.some((c) => q.chapter.toLowerCase().includes(c.toLowerCase()))
+    );
+    if (chapterFiltered.length >= 5) {
+      matching = chapterFiltered;
+    }
+  }
+
+  // 2. If matching count is less than requested, backfill from general pool
+  if (matching.length < count) {
+    const remaining = pool.filter((q) => !matching.some((m) => m.id === q.id));
+    matching = [...matching, ...shuffleArray(remaining)];
+  }
+
+  return shuffleArray(matching).slice(0, Math.min(count, matching.length));
+}
 
 export default function DemoExamClient() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
 
-  const [stage, setStage] = useState<'instructions' | 'exam' | 'result'>(
-    'instructions',
-  );
-  const [questions, setQuestions] = useState<Question[]>(() =>
-    pickRandomQuestions(DEMO_QUESTION_POOL, 10),
-  );
-  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
-  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number | string>>(
-    new Set(),
-  );
-  const [timeLeft, setTimeLeft] = useState<number>(TOTAL_DURATION_SECONDS);
-  const [timeTaken, setTimeTaken] = useState<number>(0);
-  const [appState, setAppState] = useState<AppState>(AppState.RUNNING);
+  // 4-Stage Flow: setup -> instructions -> exam -> result
+  const [stage, setStage] = useState<'setup' | 'instructions' | 'exam' | 'result'>('setup');
 
-  // Re-initialize/reset demo with 10 random questions from the pool
-  const initializeDemo = useCallback(() => {
-    const picked = pickRandomQuestions(DEMO_QUESTION_POOL, 10);
+  const [currentConfig, setCurrentConfig] = useState<ExamConfig>({
+    subject: 'physics',
+    subjectLabel: 'পদার্থবিজ্ঞান ১ম পত্র',
+    examType: 'Academic+Board',
+    chapters: 'All',
+    topics: 'General',
+    difficulty: 'Medium',
+    questionCount: 25,
+    durationMinutes: 25,
+    negativeMarking: 0.25,
+  });
+
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number | string>>(new Set());
+  const [timeLeft, setTimeLeft] = useState<number>(25 * 60);
+  const [timeTaken, setTimeTaken] = useState<number>(0);
+  const [appState, setAppState] = useState<AppState>(AppState.IDLE);
+
+  // Freemium Gate State (Limit to 1 Free Exam)
+  const [showSecondExamGate, setShowSecondExamGate] = useState<boolean>(false);
+
+  // Handle Setup Form "Start Exam" Click -> Moves to Instructions
+  const handleSetupComplete = (config: ExamConfig) => {
+    // Check if user already took their 1 free demo exam
+    if (typeof window !== 'undefined') {
+      const completedCount = parseInt(
+        localStorage.getItem('obhyash_demo_exams_completed') || '0',
+        10
+      );
+      if (completedCount >= 1) {
+        setShowSecondExamGate(true);
+        return;
+      }
+    }
+
+    setCurrentConfig(config);
+    setStage('instructions');
+  };
+
+  // Handle Proceed from Instructions View -> Moves to Exam Runner
+  const handleProceedToExam = async (): Promise<boolean> => {
+    const chapterList = currentConfig.chapters
+      ? currentConfig.chapters.split(',').map((c) => c.trim())
+      : ['All'];
+
+    const picked = getQuestionsForConfig(
+      PUBLIC_QUESTIONS,
+      currentConfig.subject,
+      chapterList,
+      currentConfig.questionCount || 25
+    );
+
     setQuestions(picked);
     setUserAnswers({});
     setFlaggedQuestions(new Set());
-    setTimeLeft(TOTAL_DURATION_SECONDS);
+    const totalSec = (currentConfig.durationMinutes || 25) * 60;
+    setTimeLeft(totalSec);
     setTimeTaken(0);
-    setStage('instructions');
     setAppState(AppState.RUNNING);
-  }, []);
-
-  const handleStartExam = async (): Promise<boolean> => {
-    setTimeLeft(TOTAL_DURATION_SECONDS);
     setStage('exam');
     return true;
   };
 
+  // Handle Exam Submit -> Moves to Result View
   const handleExamSubmit = useCallback((_manual = false) => {
+    const totalSec = (currentConfig.durationMinutes || 25) * 60;
     setTimeLeft((currentLeft) => {
-      const spent = TOTAL_DURATION_SECONDS - currentLeft;
+      const spent = totalSec - currentLeft;
       setTimeTaken(Math.max(1, spent));
       return currentLeft;
     });
+
+    // Record completion in localStorage
+    if (typeof window !== 'undefined') {
+      const prev = parseInt(
+        localStorage.getItem('obhyash_demo_exams_completed') || '0',
+        10
+      );
+      localStorage.setItem('obhyash_demo_exams_completed', String(prev + 1));
+    }
+
     setStage('result');
     setAppState(AppState.COMPLETED);
-  }, []);
+  }, [currentConfig.durationMinutes]);
 
-  // Active Countdown Timer for Exam Stage
+  // Active Countdown Timer for Exam Runner
   useEffect(() => {
     if (stage !== 'exam') return;
 
@@ -86,56 +165,64 @@ export default function DemoExamClient() {
     return () => clearInterval(timer);
   }, [stage, handleExamSubmit]);
 
-  const examConfig: ExamConfig = useMemo(
-    () => ({
-      subject: 'physics',
-      subjectLabel: 'ডেমো মডেল টেস্ট',
-      examType: 'মডেল টেস্ট',
-      chapters: 'পদার্থবিজ্ঞান, রসায়ন, উচ্চতর গণিত, জীববিজ্ঞান',
-      topics: 'বাছাইকৃত গুরুত্বপূর্ণ MCQ প্রশ্নাবলি',
-      difficulty: 'Medium',
-      questionCount: 10,
-      durationMinutes: 10,
-      negativeMarking: 0.25,
-    }),
-    [],
-  );
+  // Handle "Take Another Exam" from Result View -> Triggers Gate Modal
+  const handleAttemptAnotherExam = () => {
+    if (typeof window !== 'undefined') {
+      const completedCount = parseInt(
+        localStorage.getItem('obhyash_demo_exams_completed') || '0',
+        10
+      );
+      if (completedCount >= 1) {
+        setShowSecondExamGate(true);
+        return;
+      }
+    }
+    setStage('setup');
+  };
 
   const examDetails: ExamDetails = useMemo(
     () => ({
-      subject: 'demo',
-      subjectLabel: 'ডেমো মডেল টেস্ট',
-      chapters: 'পদার্থবিজ্ঞান, রসায়ন, উচ্চতর গণিত, জীববিজ্ঞান',
-      topics: 'বাছাইকৃত গুরুত্বপূর্ণ MCQ প্রশ্নাবলি',
-      totalQuestions: 10,
-      durationMinutes: 10,
-      totalMarks: 10,
-      negativeMarking: 0.25,
-      examType: 'Demo Practice',
+      subject: currentConfig.subject,
+      subjectLabel: currentConfig.subjectLabel,
+      chapters: currentConfig.chapters,
+      topics: currentConfig.topics,
+      totalQuestions: questions.length,
+      durationMinutes: currentConfig.durationMinutes,
+      totalMarks: questions.length,
+      negativeMarking: currentConfig.negativeMarking || 0.25,
+      examType: currentConfig.examType || 'Mock Test',
     }),
-    [],
+    [currentConfig, questions.length]
   );
-
-  if (!questions.length) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF9] dark:bg-[#0C0A09]">
-        <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif]">
-      {/* ── 1. Instructions View ── */}
+      {/* ── 1. Setup Stage (Identical to ExamSetupForm with Class Dropdown) ── */}
+      {stage === 'setup' && (
+        <div className="py-6 sm:py-10 px-3 sm:px-6">
+          <div className="max-w-xl mx-auto mb-4 text-center">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              ফ্রি ডেমো মডেল টেস্ট
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-['Anek_Bangla',sans-serif]">
+              লগইন ছাড়াই সরাসরি বোর্ডের মানসম্মত মডেল টেস্ট দিয়ে নিজের প্রস্তুতি যাচাই করো
+            </p>
+          </div>
+
+          <PublicExamSetupForm onStartExam={handleSetupComplete} />
+        </div>
+      )}
+
+      {/* ── 2. Instructions Stage (Exact ExamInstructionsView) ── */}
       {stage === 'instructions' && (
         <ExamInstructionsView
-          config={examConfig}
-          onStart={handleStartExam}
-          onBack={() => router.push('/')}
+          config={currentConfig}
+          onStart={handleProceedToExam}
+          onBack={() => setStage('setup')}
         />
       )}
 
-      {/* ── 2. Active Exam Runner View ── */}
+      {/* ── 3. Exam Runner Stage (Exact ExamRunner like Flutter App) ── */}
       {stage === 'exam' && (
         <ExamRunner
           appState={appState}
@@ -147,42 +234,37 @@ export default function DemoExamClient() {
           setFlaggedQuestions={setFlaggedQuestions}
           timeLeft={timeLeft}
           onSubmit={handleExamSubmit}
-          onExit={() => router.push('/')}
+          onExit={() => setStage('setup')}
           setAppState={setAppState}
         />
       )}
 
-      {/* ── 3. Result View with Sign Up Prompt ── */}
+      {/* ── 4. Result Stage (Exact ResultView with Explanations & 2nd Exam Gate) ── */}
       {stage === 'result' && (
         <div className="flex flex-col min-h-screen">
-          {/* Guest Demo Header Notification Banner */}
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-4 py-3 text-center text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-md">
-            <Trophy size={18} className="animate-pulse" />
-            <span>
-              তুমি ডেমো পরীক্ষা সম্পন্ন করেছ! পূর্ণাঙ্গ সিলেবাস ও আনলিমিটেড পরীক্ষার জন্য ফ্রি অ্যাকাউন্ট খোলো।
-            </span>
-            <button
-              type="button"
-              onClick={() => router.push('/signup')}
-              className="ml-2 px-3 py-1 bg-white text-emerald-800 rounded-lg text-xs sm:text-sm font-black hover:bg-emerald-50 transition cursor-pointer"
-            >
-              সাইন আপ
-            </button>
-          </div>
-
           <ResultView
             questions={questions}
             userAnswers={userAnswers}
             timeTaken={timeTaken}
-            onRestart={() => router.push('/')}
+            onRestart={handleAttemptAnotherExam}
             isDarkMode={isDark}
             onToggleTheme={toggleTheme}
-            negativeMarking={0.25}
+            negativeMarking={currentConfig.negativeMarking || 0.25}
             examDetails={examDetails}
-            onReexam={initializeDemo}
+            onReexam={handleAttemptAnotherExam}
           />
         </div>
       )}
+
+      {/* ── Freemium Gate: 2nd Exam App Install Prompt ── */}
+      <AppInstallPromptModal
+        isOpen={showSecondExamGate}
+        onClose={() => setShowSecondExamGate(false)}
+        title="১ম ফ্রি ডেমো টেস্ট সম্পন্ন হয়েছে! 🏆"
+        message="তুমি সফলভাবে তোমার ১ম ফ্রি টেস্ট শেষ করেছ! পরবর্তী আনলিমিটেড মডেল টেস্ট দিতে, মেধা তালিকায় নিজের বোর্ড র‍্যাঙ্ক দেখতে এবং ভুল উত্তরের অধ্যায়ভিত্তিক প্রস্তুতি নিতে এখনই প্লে স্টোর থেকে Obhyash অ্যাপ ইনস্টল করো।"
+        featureBadge="আনলিমিটেড মডেল টেস্ট"
+        utmContent="second_exam_gate"
+      />
     </div>
   );
 }
