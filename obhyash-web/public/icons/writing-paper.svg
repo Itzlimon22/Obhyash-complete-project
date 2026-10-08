@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- Exam Paper Document -->
+  <path
+    d="M4 4C4 2.89543 4.89543 2 6 2H14L19 7V20C19 21.1046 18.1046 22 17 22H6C4.89543 22 4 21.1046 4 20V4Z"
+    stroke="#F59E0B"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="#F59E0B"
+    fill-opacity="0.1"
+  />
+  <!-- Folded Corner -->
+  <path
+    d="M14 2V7H19"
+    stroke="#F59E0B"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Question Lines on Paper -->
+  <line x1="7" y1="8" x2="11" y2="8" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="7" y1="12" x2="11" y2="12" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="7" y1="16" x2="10" y2="16" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round" />
+  <!-- Writing Pen drawing a stroke on paper -->
+  <path
+    d="M13.5 17.5L13 20L15.5 19.5L21.5 13.5C22.0523 12.9477 22.0523 12.0523 21.5 11.5L20.5 10.5C19.9477 9.94772 19.0523 9.94772 18.5 10.5L13.5 17.5Z"
+    fill="#F59E0B"
+    stroke="#F59E0B"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+  />
+  <!-- Tip dot / Writing line -->
+  <path
+    d="M11.5 19.5C12 19.5 12.5 19.8 13 20"
+    stroke="#F59E0B"
+    stroke-width="1.8"
+    stroke-linecap="round"
+  />
+</svg>

@@ -55,6 +55,108 @@ const YouTubeIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 );
 
+// Custom crafted "Writing on Paper / Exam Test" SVG Icon
+const WritingOnPaperIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Paper Sheet Shadow/Back Layer */}
+    <rect x="4" y="3" width="13" height="18" rx="2" fill="currentColor" fillOpacity="0.15" />
+    
+    {/* Exam Paper Sheet Outline */}
+    <path
+      d="M5 4C5 2.89543 5.89543 2 7 2H13.5858C14.1162 2 14.6249 2.21071 14.9999 2.58579L18.4142 6C18.7893 6.37508 19 6.88378 19 7.41421V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V4Z"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Folded paper corner notch */}
+    <path
+      d="M13.5 2V5.5C13.5 6.60457 14.3954 7.5 15.5 7.5H19"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    {/* Paper Header / Exam MCQ Checkmarks & Answer Lines */}
+    {/* Line 1 with checkmark */}
+    <path
+      d="M7.5 7.5L8.2 8.2L9.5 6.8"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10.8 7.5H12"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+    />
+
+    {/* Line 2 with checkmark */}
+    <path
+      d="M7.5 11.5L8.2 12.2L9.5 10.8"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10.8 11.5H13"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+    />
+
+    {/* Line 3 (being actively written) */}
+    <path
+      d="M7.5 15.5H11.5"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+    />
+    {/* Line 4 */}
+    <path
+      d="M7.5 18.5H10.5"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+    />
+
+    {/* Tilted Fountain/Ballpoint Pen actively writing on paper */}
+    <g transform="translate(1, 0)">
+      {/* Pen nib touching paper */}
+      <path
+        d="M13.2 19.8L12.5 20.5L13.8 20L13.2 19.8Z"
+        fill="currentColor"
+      />
+      {/* Pen body angled */}
+      <path
+        d="M13.8 20L12.5 20.5L13 19.2L19.3 12.9C19.7 12.5 20.3 12.5 20.7 12.9L21.1 13.3C21.5 13.7 21.5 14.3 21.1 14.7L13.8 20Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="currentColor"
+        fillOpacity="0.2"
+      />
+      {/* Pen clip/collar ring */}
+      <path
+        d="M18.2 14L19.8 15.6"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </g>
+  </svg>
+);
+
 function NavLinks() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -204,7 +306,7 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             {/* Subtle Divider (Desktop only) */}
             <div className="hidden lg:block w-px h-5 bg-slate-200 dark:bg-white/10 mx-0.5" />
 
-            {/* Free Exam Button (Clean Neutral Slate/White) */}
+            {/* Exam Button (Deep Cyan) */}
             <Link
               href="/demo"
               onClick={() =>
@@ -213,10 +315,10 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
                   buttonLocation: 'header',
                 })
               }
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 active:scale-95 text-white dark:text-slate-900 text-xs sm:text-sm font-bold font-anek shadow-xs transition-all shrink-0"
+              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs sm:text-sm font-bold font-anek shadow-xs transition-all shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400/40" />
-              <span>ফ্রি এক্সাম দাও</span>
+              <WritingOnPaperIcon className="w-3.5 h-3.5 text-cyan-200" />
+              <span>এক্সাম দাও</span>
             </Link>
 
             {/* Dark / Light Mode Toggle */}
@@ -327,7 +429,7 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
 
-            {/* Free Exam Demo Link */}
+            {/* Exam Demo Link */}
             <Link
               href="/demo"
               onClick={() => {
@@ -340,8 +442,8 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-sm transition-all"
             >
               <span className="flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                <span>ফ্রি এক্সাম দাও (ডেমো টেস্ট)</span>
+                <WritingOnPaperIcon className="w-4 h-4 text-[#0e7490] dark:text-cyan-400" />
+                <span>এক্সাম দাও (ডেমো টেস্ট)</span>
               </span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>

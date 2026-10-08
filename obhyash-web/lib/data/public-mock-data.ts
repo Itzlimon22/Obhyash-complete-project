@@ -27,8 +27,8 @@ export interface PublicTopic {
 }
 
 export const PUBLIC_LEVELS: PublicLevel[] = [
-  { id: 'HSC', name: 'HSC (একাদশ-দ্বাদশ শ্রেণি)' },
-  { id: 'SSC', name: 'SSC (৯ম-১০ম শ্রেণি)' },
+  { id: 'HSC', name: 'HSC' },
+  { id: 'SSC', name: 'SSC' },
 ];
 
 // Helper to determine subject code name
