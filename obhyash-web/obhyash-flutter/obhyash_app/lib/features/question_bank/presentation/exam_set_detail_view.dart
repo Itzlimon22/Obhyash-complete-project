@@ -828,13 +828,34 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     final qs = await _getQuestions();
     if (!mounted) return;
     if (qs.isEmpty) {
+      final isWritten = widget.examSet.type == 'written' ||
+          widget.examSet.id.toLowerCase().contains('written') ||
+          widget.examSet.title.toLowerCase().contains('written') ||
+          widget.examSet.title.contains('লিখিত') ||
+          widget.examSet.id.contains('_cq') ||
+          widget.examSet.title.contains('সৃজনশীল');
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'এই পরীক্ষার প্রশ্নপত্র বর্তমানে ডাটাবেজে উপলব্ধ নেই। শীঘ্রই যুক্ত করা হবে।',
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(LucideIcons.info, color: Colors.white, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  isWritten
+                      ? 'এই পরীক্ষার লিখিত প্রশ্নপত্র বর্তমানে ডাটাবেজে উপলব্ধ নেই। শীঘ্রই যুক্ত করা হবে।'
+                      : 'এই পরীক্ষার প্রশ্নপত্র বর্তমানে ডাটাবেজে উপলব্ধ নেই। শীঘ্রই যুক্ত করা হবে।',
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          duration: Duration(seconds: 3),
+          backgroundColor: const Color(0xFF1E293B),
           behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       );
       return;
@@ -853,6 +874,17 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     required int calculatedDuration,
     required int calculatedMarks,
   }) async {
+    final isWritten = widget.examSet.type == 'written' ||
+        widget.examSet.id.toLowerCase().contains('written') ||
+        widget.examSet.title.toLowerCase().contains('written') ||
+        widget.examSet.title.contains('লিখিত') ||
+        widget.examSet.id.contains('_cq') ||
+        widget.examSet.title.contains('সৃজনশীল');
+    if (isWritten) {
+      _handleViewQuestions();
+      return;
+    }
+
     HapticFeedback.mediumImpact();
     var profile = ref.read(userProfileProvider).value;
     if (profile == null) {
@@ -901,10 +933,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     }
 
     final instName = (widget.institute['name'] ?? 'ইনস্টিটিউট').toString();
-    final isWritten = widget.examSet.type == 'written' ||
-        widget.examSet.id.toLowerCase().contains('written') ||
-        widget.examSet.title.toLowerCase().contains('written') ||
-        widget.examSet.title.contains('লিখিত');
 
     final rawTitle = widget.examSet.title.trim();
     final cleanSubjectLabel = BanglaNameHelper.deduplicateExamTitle(
@@ -958,7 +986,9 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     final isWritten = widget.examSet.type == 'written' ||
         widget.examSet.id.toLowerCase().contains('written') ||
         widget.examSet.title.toLowerCase().contains('written') ||
-        widget.examSet.title.contains('লিখিত');
+        widget.examSet.title.contains('লিখিত') ||
+        widget.examSet.id.contains('_cq') ||
+        widget.examSet.title.contains('সৃজনশীল');
 
     // Initialize default selection once
     if (!_initializedSubjects && distributions.isNotEmpty) {
@@ -1389,46 +1419,12 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                       ),
                     ],
                   ),
-                  child: Row(
-                    children: [
-                      // Button 1: প্রশ্ন দেখো (View Questions) - Works for all users
-                      Expanded(
-                        child: SizedBox(
-                          height: 48,
-                          child: OutlinedButton(
-                            onPressed: _isLoading ? null : _handleViewQuestions,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
-                              side: BorderSide(
-                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: const Text(
-                              'প্রশ্ন দেখো',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Button 2: পরীক্ষা দাও (Take Exam) - Only for premium members
-                      Expanded(
-                        child: SizedBox(
+                  child: isWritten
+                      ? SizedBox(
+                          width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () => _handleStartExam(
-                                      calculatedDuration: calculatedDuration,
-                                      calculatedMarks: calculatedMarks,
-                                    ),
+                            onPressed: _isLoading ? null : _handleViewQuestions,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF004633),
                               elevation: 0,
@@ -1438,12 +1434,13 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
                               children: const [
+                                Icon(LucideIcons.fileText, color: Colors.white, size: 18),
+                                SizedBox(width: 8),
                                 Text(
-                                  'পরীক্ষা দাও',
+                                  'লিখিত প্রশ্ন ও সমাধান দেখুন',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 15.5,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
@@ -1451,10 +1448,73 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                               ],
                             ),
                           ),
+                        )
+                      : Row(
+                          children: [
+                            // Button 1: প্রশ্ন দেখো (View Questions) - Works for all users
+                            Expanded(
+                              child: SizedBox(
+                                height: 48,
+                                child: OutlinedButton(
+                                  onPressed: _isLoading ? null : _handleViewQuestions,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
+                                    side: BorderSide(
+                                      color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'প্রশ্ন দেখো',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+
+                            // Button 2: পরীক্ষা দাও (Take Exam) - Only for premium members
+                            Expanded(
+                              child: SizedBox(
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () => _handleStartExam(
+                                            calculatedDuration: calculatedDuration,
+                                            calculatedMarks: calculatedMarks,
+                                          ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF004633),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Text(
+                                        'পরীক্ষা দাও',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),

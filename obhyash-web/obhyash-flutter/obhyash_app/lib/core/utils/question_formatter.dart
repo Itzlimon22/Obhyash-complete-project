@@ -19,7 +19,9 @@ class QuestionFormatter {
 
     // Extract and protect Markdown tables first so pipes and row newlines are completely preserved
     final (textWithoutTables, tables) = extractAndProtectTables(text);
-    text = autoHealRawLatex(textWithoutTables);
+    // Extract and protect Markdown images, links, and HTML img tags so LaTeX and units don't touch URLs
+    final (textWithoutMedia, media) = extractAndProtectMedia(textWithoutTables);
+    text = autoHealRawLatex(textWithoutMedia);
 
     // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols
     text = text.replaceAll(RegExp(r'\\?rightleftharpoons', caseSensitive: false), ' ⇌ ');
@@ -195,7 +197,10 @@ class QuestionFormatter {
     // Clean up excessive blank lines (max 2)
     text = text.replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
 
-    // Restore protected Markdown tables
+    // Restore protected media and Markdown tables
+    if (media.isNotEmpty) {
+      text = restoreMedia(text, media);
+    }
     if (tables.isNotEmpty) {
       text = restoreTables(text, tables);
     }
@@ -409,6 +414,47 @@ class QuestionFormatter {
     var result = text;
     for (int i = 0; i < tables.length; i++) {
       result = result.replaceAll('@@TABLEBLOCK$i@@', '\n\n${tables[i]}\n\n');
+    }
+    return result;
+  }
+
+  /// Extracts Markdown images, links, and HTML img tags, replacing them with unique placeholders
+  /// so that LaTeX math auto-healing and unit regexes do not corrupt URLs.
+  static (String, List<String>) extractAndProtectMedia(String text) {
+    if (!text.contains('![') &&
+        !text.contains('<img') &&
+        !text.contains('](') &&
+        !text.contains('http://') &&
+        !text.contains('https://')) {
+      return (text, const []);
+    }
+
+    final mediaList = <String>[];
+    // Matches:
+    // 1. Markdown images: ![alt](url)
+    // 2. HTML images: <img ...>
+    // 3. Markdown links: [text](url)
+    // 4. Standalone image URLs: (http... .png/.jpg/.jpeg/.svg/.webp/.gif)
+    final mediaRegex = RegExp(
+      r'!\[[^\]]*\]\([^\)]+\)|<img\b[^>]*>|(?<!!)\[[^\]]*\]\([^\)]+\)|https?:\/\/[^\s\)\"\>]+\.(?:png|jpg|jpeg|svg|webp|gif)',
+      caseSensitive: false,
+    );
+
+    final replaced = text.replaceAllMapped(mediaRegex, (m) {
+      final placeholder = '@@MEDIABLOCK${mediaList.length}@@';
+      mediaList.add(m.group(0)!);
+      return placeholder;
+    });
+
+    return (replaced, mediaList);
+  }
+
+  /// Restores protected media and links from placeholders
+  static String restoreMedia(String text, List<String> mediaList) {
+    if (mediaList.isEmpty) return text;
+    var result = text;
+    for (int i = 0; i < mediaList.length; i++) {
+      result = result.replaceAll('@@MEDIABLOCK$i@@', mediaList[i]);
     }
     return result;
   }

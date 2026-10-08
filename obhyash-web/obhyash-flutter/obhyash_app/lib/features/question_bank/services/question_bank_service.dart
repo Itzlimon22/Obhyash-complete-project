@@ -9,10 +9,24 @@ class QuestionBankService {
   static const String _leanQuestionFields =
       'id, question, options, correct_answer_indices, explanation, type, difficulty, subject, chapter, topic, image_url, option_images, explanation_image_url, status, institutes, years, tags, exam_type, passage, section';
 
+  static const String _leanWrittenQuestionFields =
+      'id, question, explanation, total_marks, type, difficulty, stream, division, subject, chapter, topic, image_url, explanation_image_url, status, institutes, years, exam_history, tags, exam_type, sub_questions';
+
   static final Map<String, List<Question>> _examSetCache = {};
 
   static void clearCache() {
     _examSetCache.clear();
+  }
+
+  static Future<bool> hasWrittenQuestions({
+    required String instituteId,
+    required InstituteExamSet examSet,
+  }) async {
+    final qs = await fetchExamSetQuestions(
+      instituteId: instituteId,
+      examSet: examSet,
+    );
+    return qs.isNotEmpty;
   }
 
   static List<String> getInstituteSearchTags(String instituteId) {
@@ -244,18 +258,148 @@ class QuestionBankService {
     final isWritten = examSet.type == 'written' ||
         examSet.id.toLowerCase().contains('written') ||
         examSet.title.toLowerCase().contains('written') ||
-        examSet.title.contains('লিখিত');
+        examSet.title.contains('লিখিত') ||
+        examSet.id.contains('_cq') ||
+        examSet.title.contains('সৃজনশীল');
 
     final tags = getInstituteSearchTags(instituteId);
     final years = extractYearsFromSession(examSet.year, instituteId: instituteId);
     final supabase = Supabase.instance.client;
 
+    // ======================================================================
+    // 1. DEDICATED FETCH FOR WRITTEN EXAMS (written_questions table)
+    // ======================================================================
+    if (isWritten) {
+      try {
+        List<Map<String, dynamic>> rawRows = [];
+
+        try {
+          final res = await supabase
+              .from('written_questions')
+              .select(_leanWrittenQuestionFields)
+              .overlaps('institutes', tags)
+              .range(0, 999);
+          rawRows.addAll(List<Map<String, dynamic>>.from(res));
+
+          if (res.length == 1000) {
+            final res2 = await supabase
+                .from('written_questions')
+                .select(_leanWrittenQuestionFields)
+                .overlaps('institutes', tags)
+                .range(1000, 1999);
+            rawRows.addAll(List<Map<String, dynamic>>.from(res2));
+          }
+        } catch (queryErr) {
+          debugPrint('[QuestionBankService] written_questions query error: $queryErr. Trying fallback.');
+          for (final tag in tags.take(2)) {
+            try {
+              final res = await supabase
+                  .from('written_questions')
+                  .select(_leanWrittenQuestionFields)
+                  .contains('institutes', [tag])
+                  .limit(1000);
+              rawRows.addAll(List<Map<String, dynamic>>.from(res));
+            } catch (_) {}
+          }
+        }
+
+        final Map<String, Map<String, dynamic>> seenRaw = {};
+        for (final row in rawRows) {
+          final id = row['id']?.toString() ?? '';
+          if (id.isNotEmpty && !seenRaw.containsKey(id)) {
+            seenRaw[id] = row;
+          }
+        }
+
+        final normalizedTags = tags.map((t) => t.toLowerCase().trim()).toList();
+        final List<Question> matched = [];
+
+        for (final row in seenRaw.values) {
+          // Strict Year check (supports years array and exam_history fallback)
+          List<int> rowYears = (row['years'] as List?)
+                  ?.map((y) => int.tryParse(y.toString()) ?? 0)
+                  .toList() ??
+              [];
+          if (rowYears.isEmpty && row['exam_history'] is List) {
+            rowYears = (row['exam_history'] as List)
+                .map((h) => int.tryParse((h is Map ? h['year'] : null)?.toString() ?? '') ?? 0)
+                .where((y) => y > 0)
+                .toList();
+          }
+          if (years.isNotEmpty) {
+            final hasYear = years.any((y) => rowYears.contains(y));
+            if (!hasYear) continue;
+          }
+
+          // Strict Institute check (supports institutes array and exam_history fallback)
+          List<String> rowInstitutes = (row['institutes'] as List?)
+                  ?.map((i) => i.toString().toLowerCase().trim())
+                  .toList() ??
+              [];
+          if (rowInstitutes.isEmpty && row['exam_history'] is List) {
+            rowInstitutes = (row['exam_history'] as List)
+                .map((h) => (h is Map ? (h['institute'] ?? h['code']) : null)?.toString().toLowerCase().trim() ?? '')
+                .where((s) => s.isNotEmpty)
+                .toList();
+          }
+          final hasInst = normalizedTags.any((t) => rowInstitutes.contains(t));
+          if (!hasInst) continue;
+
+          // Subject filter
+          if (selectedSubjects.isNotEmpty) {
+            final rowSubject = (row['subject'] ?? '').toString();
+            final matchesSub = selectedSubjects.any((s) => matchesSubject(rowSubject, s));
+            if (!matchesSub) continue;
+          }
+
+          // Ensure type is Written
+          final rowCopy = Map<String, dynamic>.from(row);
+          rowCopy['type'] = (rowCopy['type'] ?? 'Written').toString();
+          matched.add(Question.fromJson(rowCopy));
+        }
+
+        List<Question> sortedQuestions;
+        if (selectedSubjects.isNotEmpty) {
+          final indexed = matched.asMap().entries.toList();
+          indexed.sort((a, b) {
+            final subA = a.value.subject;
+            final subB = b.value.subject;
+            var idxA = selectedSubjects.indexWhere((s) => matchesSubject(subA, s));
+            var idxB = selectedSubjects.indexWhere((s) => matchesSubject(subB, s));
+            if (idxA < 0) idxA = 999;
+            if (idxB < 0) idxB = 999;
+            if (idxA != idxB) return idxA.compareTo(idxB);
+            final pA = BanglaNameHelper.getWrittenSubjectSortPriority(
+                a.value.subject, a.value.subjectLabel);
+            final pB = BanglaNameHelper.getWrittenSubjectSortPriority(
+                b.value.subject, b.value.subjectLabel);
+            if (pA != pB) return pA.compareTo(pB);
+            return a.key.compareTo(b.key);
+          });
+          sortedQuestions = indexed.map((e) => e.value).toList();
+        } else {
+          sortedQuestions = sortSeriallySubjectwise(matched);
+        }
+
+        if (sortedQuestions.isEmpty) {
+          debugPrint(
+              '[QuestionBankService] No written questions found for $instituteId ${examSet.year}.');
+          return [];
+        }
+
+        _examSetCache[cacheKey] = sortedQuestions;
+        OfflineQuestionBankService.cacheQuestions(sortedQuestions);
+        return sortedQuestions;
+      } catch (e) {
+        debugPrint('[QuestionBankService] Written fetch error: $e');
+        return [];
+      }
+    }
+
+    // ======================================================================
+    // 2. DEDICATED FETCH FOR MCQ EXAMS (questions table)
+    // ======================================================================
     try {
-      // ======================================================================
-      // FAST TARGETED OVERLAPS FETCH
-      // Uses the Postgres GIN array overlaps (&&) operator on institutes.
-      // Sub-second execution; paginates if dataset exceeds 1,000 rows.
-      // ======================================================================
       List<Map<String, dynamic>> rawRows = [];
 
       try {
@@ -298,37 +442,42 @@ class QuestionBankService {
         }
       }
 
-      // ======================================================================
-      // STRICT IN-MEMORY FILTER — ZERO QUESTION & INSTITUTE LEAKAGE
-      // Question included ONLY IF:
-      //   (a) institutes array contains this institute tag, AND
-      //   (b) years array contains the requested session year(s), AND
-      //   (c) question matches the selected subject(s)
-      // ======================================================================
       final normalizedTags =
           tags.map((t) => t.toLowerCase().trim()).toList();
       final List<Question> matched = [];
 
       for (final row in seenRaw.values) {
-        // 1. Strict Year check (zero-leak)
+        // 1. Strict Year check (supports years array and exam_history fallback)
+        List<int> rowYears = (row['years'] as List?)
+                ?.map((y) => int.tryParse(y.toString()) ?? 0)
+                .toList() ??
+            [];
+        if (rowYears.isEmpty && row['exam_history'] is List) {
+          rowYears = (row['exam_history'] as List)
+              .map((h) => int.tryParse((h is Map ? h['year'] : null)?.toString() ?? '') ?? 0)
+              .where((y) => y > 0)
+              .toList();
+        }
         if (years.isNotEmpty) {
-          final rowYears = (row['years'] as List?)
-                  ?.map((y) => int.tryParse(y.toString()) ?? 0)
-                  .toList() ??
-              [];
           final hasYear = years.any((y) => rowYears.contains(y));
-          if (!hasYear) continue; // STRICT ZERO LEAK: Must contain requested session year
+          if (!hasYear) continue;
         }
 
-        // 2. Strict Institute check (zero-leak)
-        final rowInstitutes = (row['institutes'] as List?)
+        // 2. Strict Institute check (supports institutes array and exam_history fallback)
+        List<String> rowInstitutes = (row['institutes'] as List?)
                 ?.map((i) => i.toString().toLowerCase().trim())
                 .toList() ??
             [];
+        if (rowInstitutes.isEmpty && row['exam_history'] is List) {
+          rowInstitutes = (row['exam_history'] as List)
+              .map((h) => (h is Map ? (h['institute'] ?? h['code']) : null)?.toString().toLowerCase().trim() ?? '')
+              .where((s) => s.isNotEmpty)
+              .toList();
+        }
         final hasInst = normalizedTags.any((t) => rowInstitutes.contains(t));
-        if (!hasInst) continue; // STRICT ZERO LEAK: Must belong to this institute
+        if (!hasInst) continue;
 
-        // 3. Written vs MCQ type check
+        // 3. Strict MCQ check — exclude written/cq questions without valid options
         final qType = (row['type'] ?? '').toString().toLowerCase();
         final isQWritten = qType.contains('written') ||
             qType.contains('cq') ||
@@ -340,11 +489,7 @@ class QuestionBankService {
                 .toList() ??
             [];
 
-        if (isWritten) {
-          if (!isQWritten && rawOpts.length >= 2) continue;
-        } else {
-          if (isQWritten && rawOpts.length < 2) continue;
-        }
+        if (isQWritten || rawOpts.length < 2) continue;
 
         // 4. Robust Subject filter (Unicode-safe & compound label matching)
         if (selectedSubjects.isNotEmpty) {
@@ -358,7 +503,6 @@ class QuestionBankService {
 
       // ======================================================================
       // SERIAL-WISE SUBJECT SORTING
-      // Physics 1st → Physics 2nd → Chemistry 1st → Chemistry 2nd → ...
       // ======================================================================
       List<Question> sortedQuestions;
       if (selectedSubjects.isNotEmpty) {
@@ -383,11 +527,6 @@ class QuestionBankService {
         sortedQuestions = sortSeriallySubjectwise(matched);
       }
 
-      // ======================================================================
-      // EMPTY STATE HANDLING:
-      // If DB returns 0 authentic results for this specific session, return empty.
-      // NEVER silently dump random 25 physics questions into an admission test!
-      // ======================================================================
       if (sortedQuestions.isEmpty) {
         debugPrint(
             '[QuestionBankService] No DB questions for $instituteId ${examSet.year}.');
@@ -401,13 +540,12 @@ class QuestionBankService {
       return sortedQuestions;
     } catch (e) {
       debugPrint('[QuestionBankService] General error: $e');
-      // In extreme case of no internet connectivity, try offline questions for selected subjects proportionally
       try {
         final List<Question> offlineAll = [];
         final subs = selectedSubjects.isNotEmpty
             ? selectedSubjects
             : ['physics', 'chemistry'];
-        final perSub = (isWritten ? 11 : 25) ~/ subs.length;
+        final perSub = 25 ~/ subs.length;
         for (final sub in subs) {
           final subQs = await OfflineQuestionBankService.getQuestions(
             subject: sub,

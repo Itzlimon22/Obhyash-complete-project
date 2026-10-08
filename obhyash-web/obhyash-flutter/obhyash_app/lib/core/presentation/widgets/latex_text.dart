@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:obhyash_app/core/utils/question_formatter.dart';
 
@@ -239,10 +241,11 @@ String _cleanIntraSentenceNewlines(String text) {
 
 
 String _preprocess(String text) {
-  // Extract and protect Markdown tables first so dollar balancing, arrows, etc. don't touch tables
+  // Extract and protect Markdown tables and media/links first so regexes don't corrupt URLs
   final (textWithoutTables, tables) = QuestionFormatter.extractAndProtectTables(text);
+  final (textWithoutMedia, media) = QuestionFormatter.extractAndProtectMedia(textWithoutTables);
 
-  var processedText = QuestionFormatter.format(textWithoutTables);
+  var processedText = QuestionFormatter.format(textWithoutMedia);
 
   // Single dollar balancing per line
   final rawLines = processedText.split('\n');
@@ -646,6 +649,9 @@ String _preprocess(String text) {
   if (tables.isNotEmpty) {
     result = QuestionFormatter.restoreTables(result, tables);
   }
+  if (media.isNotEmpty) {
+    result = QuestionFormatter.restoreMedia(result, media);
+  }
 
   return result;
 }
@@ -1039,7 +1045,11 @@ class LatexText extends StatelessWidget {
         text.contains('⇌') ||
         text.contains('⇄') ||
         text.contains('→') ||
-        text.contains('^');
+        text.contains('^') ||
+        text.contains('![') ||
+        text.contains('<img') ||
+        text.contains('http://') ||
+        text.contains('https://');
 
     if (!hasSpecialSyntax) {
       return Text(
@@ -1059,9 +1069,22 @@ class LatexText extends StatelessWidget {
     return MarkdownBody(
       data: processed,
       extensionSet: md.ExtensionSet.gitHubFlavored,
+      // ignore: deprecated_member_use
       imageBuilder: (uri, title, alt) {
-        final url = uri.toString();
-        if (url.toLowerCase().endsWith('.svg') || url.toLowerCase().contains('.svg')) {
+        final rawUrl = uri.toString().trim();
+        if (rawUrl.isEmpty) return const SizedBox.shrink();
+
+        // Safely encode URLs with non-ASCII characters (e.g. Bengali chapter names/digits)
+        final String safeUrl;
+        if (rawUrl.contains('%')) {
+          safeUrl = rawUrl;
+        } else {
+          safeUrl = Uri.encodeFull(rawUrl);
+        }
+
+        final isSvg = safeUrl.toLowerCase().endsWith('.svg') || safeUrl.toLowerCase().contains('.svg');
+
+        if (isSvg) {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
             alignment: Alignment.center,
@@ -1076,7 +1099,7 @@ class LatexText extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: SvgPicture.network(
-                url,
+                safeUrl,
                 fit: BoxFit.contain,
                 placeholderBuilder: (_) => const SizedBox(
                   height: 140,
@@ -1088,15 +1111,60 @@ class LatexText extends StatelessWidget {
             ),
           );
         }
+
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 8),
           alignment: Alignment.center,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              url,
+            child: CachedNetworkImage(
+              imageUrl: safeUrl,
               fit: BoxFit.contain,
-              errorBuilder: (ctx, err, stack) => const SizedBox(),
+              placeholder: (ctx, url) => Container(
+                height: 140,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF004633)),
+                ),
+              ),
+              errorWidget: (ctx, url, err) {
+                debugPrint('[LatexText Image Error] $url : $err');
+                return Image.network(
+                  safeUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (c, e, s) => Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(LucideIcons.imageOff, size: 18, color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'চিত্রটি লোড করা যায়নি',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
@@ -1180,7 +1248,9 @@ class LatexText extends StatelessWidget {
 Widget? _tryBuildRichText(String text, TextStyle style) {
   // Complex markdown structures that need MarkdownBody
   if (text.contains('@@TABLEBLOCK') ||
+      text.contains('@@MEDIABLOCK') ||
       text.contains('![') ||
+      text.contains('<img') ||
       text.contains('```') ||
       text.contains(r'$$') ||
       text.contains('|') ||

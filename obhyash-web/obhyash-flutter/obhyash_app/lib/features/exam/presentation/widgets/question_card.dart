@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/presentation/widgets/app_icon.dart';
@@ -192,6 +194,13 @@ class _QuestionCardState extends State<QuestionCard>
                     height: 1.5,
                   ),
                 ),
+
+                if (widget.question.imageUrl != null &&
+                    widget.question.imageUrl!.trim().isNotEmpty &&
+                    !widget.question.question.contains(widget.question.imageUrl!)) ...[
+                  const SizedBox(height: 8),
+                  _buildDedicatedQuestionImage(widget.question.imageUrl!, isDark),
+                ],
 
                 const SizedBox(height: 6),
 
@@ -404,8 +413,9 @@ class _QuestionCardState extends State<QuestionCard>
           ),
 
           // ── Options ───────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 14),
+          if (widget.question.options.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 14),
             child: Column(
               children: List.generate(widget.question.options.length, (idx) {
                 final option = widget.question.options[idx];
@@ -846,6 +856,12 @@ class _ExplanationPanel extends StatelessWidget {
                         color: bodyTextColor,
                       ),
                     ),
+                    if (question.explanationImageUrl != null &&
+                        question.explanationImageUrl!.trim().isNotEmpty &&
+                        !(question.explanation?.contains(question.explanationImageUrl!) ?? false)) ...[
+                      const SizedBox(height: 8),
+                      _buildDedicatedQuestionImage(question.explanationImageUrl!, isDark),
+                    ],
                   ],
                 ],
               ),
@@ -855,6 +871,73 @@ class _ExplanationPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildDedicatedQuestionImage(String rawUrl, bool isDark) {
+  final url = rawUrl.trim();
+  final safeUrl = url.contains('%') ? url : Uri.encodeFull(url);
+  final isSvg = safeUrl.toLowerCase().endsWith('.svg') || safeUrl.toLowerCase().contains('.svg');
+
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 6),
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+      ),
+    ),
+    padding: const EdgeInsets.all(6),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: isSvg
+          ? SvgPicture.network(
+              safeUrl,
+              fit: BoxFit.contain,
+              placeholderBuilder: (_) => const SizedBox(
+                height: 120,
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF004633)),
+                ),
+              ),
+            )
+          : CachedNetworkImage(
+              imageUrl: safeUrl,
+              fit: BoxFit.contain,
+              placeholder: (ctx, u) => Container(
+                height: 120,
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF004633)),
+                ),
+              ),
+              errorWidget: (ctx, u, err) => Image.network(
+                safeUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (c, e, s) => Container(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.imageOff, size: 16, color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                      const SizedBox(width: 8),
+                      Text(
+                        'চিত্রটি লোড করা যায়নি',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+    ),
+  );
 }
 
 // ── Small icon button helper ──────────────────────────────────────────────────

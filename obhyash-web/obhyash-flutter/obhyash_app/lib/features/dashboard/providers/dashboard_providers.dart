@@ -482,9 +482,15 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
           .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      // Filter: keep ongoing or upcoming exams
-      final activeExams =
-          allExams.where((e) => e.isOngoing || e.isUpcoming).toList();
+      // Filter: keep ongoing exams or upcoming exams scheduled for today or tomorrow
+      final now = DateTime.now();
+      final endOfTomorrow = DateTime(now.year, now.month, now.day + 2);
+
+      final activeExams = allExams.where((e) {
+        if (e.isPast) return false;
+        if (e.isOngoing) return true;
+        return e.isUpcoming && e.startTime.isBefore(endOfTomorrow);
+      }).toList();
 
       // Sort: ongoing exams first, then upcoming exams by nearest start time
       activeExams.sort((a, b) {

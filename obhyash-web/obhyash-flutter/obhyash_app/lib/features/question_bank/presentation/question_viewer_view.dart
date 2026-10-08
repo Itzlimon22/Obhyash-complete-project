@@ -8,6 +8,7 @@ import '../../../../core/presentation/widgets/theme_toggle_button.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
+import '../../exam/presentation/widgets/written_question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -155,7 +156,14 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '${BanglaNameHelper.toBanglaNumeral(_answeredCount)} / ${BanglaNameHelper.toBanglaNumeral(totalCount)}',
+                          (widget.examSet.type == 'written' ||
+                                  widget.examSet.id.toLowerCase().contains('written') ||
+                                  widget.examSet.title.toLowerCase().contains('written') ||
+                                  widget.examSet.title.contains('লিখিত') ||
+                                  widget.examSet.id.contains('_cq') ||
+                                  widget.examSet.title.contains('সৃজনশীল'))
+                              ? '${BanglaNameHelper.toBanglaNumeral(totalCount)}টি লিখিত প্রশ্ন'
+                              : '${BanglaNameHelper.toBanglaNumeral(_answeredCount)} / ${BanglaNameHelper.toBanglaNumeral(totalCount)}',
                           style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
@@ -298,43 +306,77 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                       )
                     : null;
 
+                final isWrittenExam = widget.examSet.type == 'written' ||
+                    widget.examSet.id.toLowerCase().contains('written') ||
+                    widget.examSet.title.toLowerCase().contains('written') ||
+                    widget.examSet.title.contains('লিখিত') ||
+                    widget.examSet.id.contains('_cq') ||
+                    widget.examSet.title.contains('সৃজনশীল');
+                final isWrittenQuestion = isWrittenExam ||
+                    q.options.isEmpty ||
+                    q.type?.toLowerCase() == 'written';
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ?subjectHeader,
-                    QuestionCard(
-                      question: q,
-                      serialNumber: index + 1,
-                      selectedOptionIndex: _selectedAnswers[q.id],
-                      isFlagged: _flaggedQuestions.contains(q.id),
-                      showFeedback: _selectedAnswers.containsKey(q.id) || q.options.isEmpty,
-                      showAnswer: false,
-                      hideSourceTag: true,
-                      hideExplanation: !isPro,
-                      showReport: true,
-                      initiallyExpanded: true,
-                      onSelectOption: (optIndex) {
-                        HapticFeedback.mediumImpact();
-                        setState(() {
-                          _selectedAnswers[q.id] = optIndex;
-                        });
-                      },
-                      onToggleFlag: () {
-                        HapticFeedback.lightImpact();
-                        setState(() {
-                          if (_flaggedQuestions.contains(q.id)) {
-                            _flaggedQuestions.remove(q.id);
-                          } else {
-                            _flaggedQuestions.add(q.id);
-                          }
-                        });
-                      },
-                      onReport: () {
-                        QuestionReportDialog.show(context, q.id);
-                      },
-                      isBookmarked: _bookmarkedQuestions.contains(q.id),
-                      onToggleBookmark: () => _toggleBookmark(q.id),
-                    ),
+                    if (isWrittenQuestion)
+                      WrittenQuestionCard(
+                        question: q,
+                        serialNumber: index + 1,
+                        isBookmarked: _bookmarkedQuestions.contains(q.id),
+                        isFlagged: _flaggedQuestions.contains(q.id),
+                        hideExplanation: !isPro,
+                        initiallyExpanded: true,
+                        onToggleBookmark: () => _toggleBookmark(q.id),
+                        onToggleFlag: () {
+                          HapticFeedback.lightImpact();
+                          setState(() {
+                            if (_flaggedQuestions.contains(q.id)) {
+                              _flaggedQuestions.remove(q.id);
+                            } else {
+                              _flaggedQuestions.add(q.id);
+                            }
+                          });
+                        },
+                        onReport: () {
+                          QuestionReportDialog.show(context, q.id);
+                        },
+                      )
+                    else
+                      QuestionCard(
+                        question: q,
+                        serialNumber: index + 1,
+                        selectedOptionIndex: _selectedAnswers[q.id],
+                        isFlagged: _flaggedQuestions.contains(q.id),
+                        showFeedback: _selectedAnswers.containsKey(q.id) || q.options.isEmpty,
+                        showAnswer: false,
+                        hideSourceTag: true,
+                        hideExplanation: !isPro,
+                        showReport: true,
+                        initiallyExpanded: true,
+                        onSelectOption: (optIndex) {
+                          HapticFeedback.mediumImpact();
+                          setState(() {
+                            _selectedAnswers[q.id] = optIndex;
+                          });
+                        },
+                        onToggleFlag: () {
+                          HapticFeedback.lightImpact();
+                          setState(() {
+                            if (_flaggedQuestions.contains(q.id)) {
+                              _flaggedQuestions.remove(q.id);
+                            } else {
+                              _flaggedQuestions.add(q.id);
+                            }
+                          });
+                        },
+                        onReport: () {
+                          QuestionReportDialog.show(context, q.id);
+                        },
+                        isBookmarked: _bookmarkedQuestions.contains(q.id),
+                        onToggleBookmark: () => _toggleBookmark(q.id),
+                      ),
                   ],
                 );
               },

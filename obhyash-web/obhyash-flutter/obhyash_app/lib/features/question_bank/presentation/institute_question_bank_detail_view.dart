@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../services/question_bank_service.dart';
 
 class InstituteExamSet {
   final String id;
@@ -51,6 +52,8 @@ class InstituteQuestionBankDetailView extends StatefulWidget {
 
 class _InstituteQuestionBankDetailViewState
     extends State<InstituteQuestionBankDetailView> {
+  String? _checkingExamSetId;
+
   static List<InstituteExamSet> getInstituteExamSets(String instituteId) {
     final sets = <InstituteExamSet>[];
     final id = instituteId.toLowerCase();
@@ -555,7 +558,12 @@ class _InstituteQuestionBankDetailViewState
     bool isDark,
     String instName,
   ) {
-    final isWritten = item.type == 'written';
+    final isWritten = item.type == 'written' ||
+        item.id.toLowerCase().contains('written') ||
+        item.title.toLowerCase().contains('written') ||
+        item.title.contains('লিখিত') ||
+        item.id.contains('_cq') ||
+        item.title.contains('সৃজনশীল');
     final isCombined = item.type == 'combined';
     final isBuet = (widget.institute['id'] ?? '').toString().toLowerCase() == 'buet';
 
@@ -592,8 +600,52 @@ class _InstituteQuestionBankDetailViewState
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
+          onTap: () async {
             HapticFeedback.lightImpact();
+            if (isWritten) {
+              if (_checkingExamSetId != null) return;
+              setState(() => _checkingExamSetId = item.id);
+              try {
+                final hasQuestions = await QuestionBankService.hasWrittenQuestions(
+                  instituteId: widget.institute['id'] ?? '',
+                  examSet: item,
+                );
+                if (!mounted) return;
+                setState(() => _checkingExamSetId = null);
+                if (!hasQuestions) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: const [
+                          Icon(LucideIcons.info, color: Colors.white, size: 20),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'এই পরীক্ষার লিখিত প্রশ্নপত্র বর্তমানে ডাটাবেজে উপলব্ধ নেই। শীঘ্রই যুক্ত করা হবে।',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: const Color(0xFF1E293B),
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 3),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  );
+                  return;
+                }
+              } catch (_) {
+                if (mounted) setState(() => _checkingExamSetId = null);
+              }
+            }
+
             context.push('/question-bank/exam-set-details', extra: {
               'institute': widget.institute,
               'examSet': item,
@@ -697,12 +749,22 @@ class _InstituteQuestionBankDetailViewState
 
                     const Spacer(),
 
-                    // Action chevron
-                    Icon(
-                      LucideIcons.chevronRight,
-                      size: 18,
-                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                    ),
+                    // Action chevron or spinner
+                    if (_checkingExamSetId == item.id)
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
+                        ),
+                      )
+                    else
+                      Icon(
+                        LucideIcons.chevronRight,
+                        size: 18,
+                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      ),
                   ],
                 ),
               ],

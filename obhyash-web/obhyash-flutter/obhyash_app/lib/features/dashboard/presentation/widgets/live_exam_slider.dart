@@ -111,7 +111,17 @@ class _LiveExamSliderState extends ConsumerState<LiveExamSlider> {
 
     return liveExamsAsync.when(
       data: (exams) {
-        if (exams.isEmpty) {
+        final now = DateTime.now();
+        final endOfTomorrow = DateTime(now.year, now.month, now.day + 2);
+
+        // Filter: only exams for today and tomorrow (ongoing or starting today/tomorrow)
+        final relevantExams = exams.where((exam) {
+          if (exam.isPast) return false;
+          if (exam.isOngoing) return true;
+          return exam.isUpcoming && exam.startTime.isBefore(endOfTomorrow);
+        }).toList();
+
+        if (relevantExams.isEmpty) {
           return const SizedBox.shrink();
         }
 
@@ -120,13 +130,13 @@ class _LiveExamSliderState extends ConsumerState<LiveExamSlider> {
           child: CarouselSlider(
             options: CarouselOptions(
               height: 100.0,
-              autoPlay: exams.length > 1,
+              autoPlay: relevantExams.length > 1,
               autoPlayInterval: const Duration(seconds: 5),
               enlargeCenterPage: false,
               viewportFraction: 0.95,
-              enableInfiniteScroll: exams.length > 1,
+              enableInfiniteScroll: relevantExams.length > 1,
             ),
-            items: exams.map((exam) {
+            items: relevantExams.map((exam) {
               return Builder(
                 builder: (BuildContext context) {
                   return _buildExamCard(context, exam, isDark);

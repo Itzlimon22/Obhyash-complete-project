@@ -75,6 +75,9 @@ class Question {
   final String? section;
   final String? passage;
   final List<String> tags;
+  final String? imageUrl;
+  final String? explanationImageUrl;
+  final List<String> optionImages;
 
   const Question({
     required this.id,
@@ -99,6 +102,9 @@ class Question {
     this.section,
     this.passage,
     this.tags = const [],
+    this.imageUrl,
+    this.explanationImageUrl,
+    this.optionImages = const [],
   });
 
   /// Check whether a selected index is correct (supports single & multiple correct answers)
@@ -270,6 +276,18 @@ class Question {
           .toList();
     }
 
+    final rawImageUrl = j['image_url'] ?? j['imageUrl'];
+    final rawExplanationImageUrl =
+        j['explanation_image_url'] ?? j['explanationImageUrl'];
+    List<String> validOptionImages = [];
+    final rawOptionImages = j['option_images'] ?? j['optionImages'];
+    if (rawOptionImages is List) {
+      validOptionImages = rawOptionImages
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+
     return Question(
       id: j['id']?.toString() ?? '',
       subject: j['subject']?.toString() ?? 'general',
@@ -285,7 +303,9 @@ class Question {
       options: validOptions,
       correctAnswerIndex: resolvedCorrectAnswerIndex,
       correctAnswerIndices: resolvedCorrectAnswerIndices,
-      points: (j['points'] as num?)?.toInt() ?? 1,
+      points: (j['points'] as num?)?.toInt() ??
+          (j['total_marks'] as num?)?.toInt() ??
+          1,
       examHistory: validExamHistory,
       institutes: validInstitutes,
       years: validYears,
@@ -300,6 +320,14 @@ class Question {
       section: rawSection,
       passage: rawPassage,
       tags: validTags,
+      imageUrl: rawImageUrl?.toString().trim().isNotEmpty == true
+          ? rawImageUrl.toString().trim()
+          : null,
+      explanationImageUrl:
+          rawExplanationImageUrl?.toString().trim().isNotEmpty == true
+              ? rawExplanationImageUrl.toString().trim()
+              : null,
+      optionImages: validOptionImages,
     );
   }
 
@@ -320,6 +348,9 @@ class Question {
     'exam_history': examHistory.map((e) => e.toJson()).toList(),
     'institutes': institutes,
     'years': years,
+    'image_url': imageUrl,
+    'explanation_image_url': explanationImageUrl,
+    'option_images': optionImages,
     'exam_type': examType,
     'difficulty': difficulty,
     'type': type,

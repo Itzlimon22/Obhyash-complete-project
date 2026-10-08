@@ -702,9 +702,14 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final list = _currentList;
 
-    return _isLoading
-        ? const BookmarksListSkeleton()
-        : CustomScrollView(
+    if (_isLoading) {
+      return const BookmarksListSkeleton();
+    }
+
+    return Column(
+      children: [
+        Expanded(
+          child: CustomScrollView(
             controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
@@ -742,62 +747,20 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   ),
                 ),
               ),
-              if (_availableSubjects.isNotEmpty || list.isNotEmpty)
+              if (list.isNotEmpty)
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _StickyHeaderDelegate(
                     isDark: isDark,
-                    height: (_availableSubjects.isNotEmpty ? 48.0 : 0.0) +
-                        (list.isNotEmpty ? 44.0 : 0.0),
+                    height: 44.0,
                     child: SizedBox(
-                      height: (_availableSubjects.isNotEmpty ? 48.0 : 0.0) +
-                          (list.isNotEmpty ? 44.0 : 0.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (_availableSubjects.isNotEmpty)
-                            SizedBox(
-                              height: 48,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 6,
-                                ),
-                                children: [
-                                  _Pill(
-                                    label: 'সব বিষয়',
-                                    active: _subjectFilter == 'all',
-                                    isDark: isDark,
-                                    onTap: () => setState(() {
-                                      _subjectFilter = 'all';
-                                    }),
-                                  ),
-                                  ..._availableSubjects.map(
-                                    (s) => _Pill(
-                                      label: s.value,
-                                      active: _subjectFilter == s.key,
-                                      isDark: isDark,
-                                      onTap: () => setState(() {
-                                        _subjectFilter = s.key;
-                                      }),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (list.isNotEmpty)
-                            SizedBox(
-                              height: 44,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                  vertical: 4.0,
-                                ),
-                                child: _buildToolbar(list, isDark),
-                              ),
-                            ),
-                        ],
+                      height: 44,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 4.0,
+                        ),
+                        child: _buildToolbar(list, isDark),
                       ),
                     ),
                   ),
@@ -829,7 +792,66 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 ),
               ],
             ],
-          );
+          ),
+        ),
+        if (_availableSubjects.isNotEmpty)
+          _buildBottomSubjectBar(isDark),
+      ],
+    );
+  }
+
+  Widget _buildBottomSubjectBar(bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
+        border: Border(
+          top: BorderSide(
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+            width: 1.0,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 48,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 6,
+            ),
+            children: [
+              _Pill(
+                label: 'সব বিষয়',
+                active: _subjectFilter == 'all',
+                isDark: isDark,
+                onTap: () => setState(() {
+                  _subjectFilter = 'all';
+                }),
+              ),
+              ..._availableSubjects.map(
+                (s) => _Pill(
+                  label: s.value,
+                  active: _subjectFilter == s.key,
+                  isDark: isDark,
+                  onTap: () => setState(() {
+                    _subjectFilter = s.key;
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildLoadMoreButton(bool isDark) {
