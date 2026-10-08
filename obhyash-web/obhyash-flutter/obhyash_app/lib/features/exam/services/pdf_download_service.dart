@@ -1,9 +1,6 @@
-import 'dart:convert';
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -48,11 +45,23 @@ class PdfDownloadService {
   /// Ensures perfectly equal, harmonious, and readable typography across all generated PDFs.
   static const double _fontSizeBody = 8.2;
 
-  /// Pre-configures BanglaPdf with HindSiliguri if available in assets to guarantee
-  /// native rendering of math symbols (√, ≤, ≥, ≠, ∞, ∫, ∑, °, ², ³, ¹, ±, π, •).
+  static pw.Font? _cachedHindRegular;
+  static pw.Font? _cachedHindBold;
+
+  /// Pre-configures BanglaPdf with HindSiliguri from assets and caches fonts
   static Future<void> _configureBanglaPdf() async {
+    if (_cachedHindRegular != null && _cachedHindBold != null) return;
     try {
       final fontData = await rootBundle.load('assets/fonts/HindSiliguri-Regular.ttf');
+      _cachedHindRegular = pw.Font.ttf(fontData);
+
+      try {
+        final boldData = await rootBundle.load('assets/fonts/HindSiliguri-Bold.ttf');
+        _cachedHindBold = pw.Font.ttf(boldData);
+      } catch (_) {
+        _cachedHindBold = _cachedHindRegular;
+      }
+
       final customFont = bn.BanglaPdf.loadFont(fontData);
       if (customFont != null) {
         bn.BanglaPdf.configure(
@@ -65,6 +74,52 @@ class PdfDownloadService {
       debugPrint('[PdfDownloadService] Font loading fallback: $e');
     }
     bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.auto);
+  }
+
+  /// Builds a high-speed, crash-resilient PDF theme with bundled fonts and fast fallback
+  static Future<pw.ThemeData> _buildPdfTheme() async {
+    await _configureBanglaPdf();
+
+    pw.Font? roboto;
+    pw.Font? robotoBold;
+    pw.Font? notoSans;
+    pw.Font? mathFont;
+    pw.Font? symbolFont;
+
+    try {
+      final fonts = await Future.wait([
+        PdfGoogleFonts.robotoRegular(),
+        PdfGoogleFonts.robotoBold(),
+        PdfGoogleFonts.notoSansRegular(),
+        PdfGoogleFonts.notoSansMathRegular(),
+        PdfGoogleFonts.notoSansSymbolsRegular(),
+      ]).timeout(const Duration(milliseconds: 1500));
+      roboto = fonts[0];
+      robotoBold = fonts[1];
+      notoSans = fonts[2];
+      mathFont = fonts[3];
+      symbolFont = fonts[4];
+    } catch (fontErr) {
+      debugPrint('[PdfDownloadService] Font network timeout/fallback: $fontErr');
+    }
+
+    final fontFallbacks = <pw.Font>[
+      bn.BanglaPdf.defaultFont,
+      ?notoSans,
+      ?mathFont,
+      ?symbolFont,
+      ?roboto,
+      ?robotoBold,
+    ];
+
+    final base = _cachedHindRegular ?? roboto ?? pw.Font.helvetica();
+    final bold = _cachedHindBold ?? robotoBold ?? pw.Font.helveticaBold();
+
+    return pw.ThemeData.withFont(
+      base: base,
+      bold: bold,
+      fontFallback: fontFallbacks,
+    );
   }
 
   static String _toBanglaDigits(dynamic number) {
@@ -686,506 +741,14 @@ class PdfDownloadService {
     );
   }
 
-  static String _escapeHtml(String s) {
-    return s
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-  }
 
-  /// Fetches pre-rendered KaTeX HTML from Obhyash web's PDF generator endpoint
-  static Future<String?> _fetchHtmlFromGenerator({
-    required String type, // 'question_paper' or 'solution'
-    required ExamResult result,
-  }) async {
-    http.Client? client;
-    try {
-      client = http.Client();
-      final url = Uri.parse('https://obhyash.com/api/pdf/generate');
-
-      final formattedSubject = BanglaNameHelper.formatSubject(
-        result.subject,
-        result.subjectLabel,
-      );
-      final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
-      final subjectCode = BanglaNameHelper.getSubjectCode(result.subject, result.subjectLabel);
-
-      final chaptersSet = result.questions
-          .map((q) => q.chapter.trim())
-          .where((c) => c.isNotEmpty && c.toLowerCase() != 'general')
-          .toSet();
-      final chaptersStr = chaptersSet.isNotEmpty ? chaptersSet.join(', ') : '';
-
-      final totalQ = result.questions.length;
-      final durationMins = (result.totalMarks > 0 && result.totalMarks != totalQ)
-          ? result.totalMarks.toInt()
-          : (totalQ > 0 ? totalQ : 40);
-
-      final questionsPayload = result.questions.asMap().entries.map((entry) {
-        final idx = entry.key;
-        final q = entry.value;
-        return {
-          'id': q.id,
-          'serial': idx + 1,
-          'question': q.question,
-          'options': q.options,
-          'correctAnswerIndex': q.correctAnswerIndex,
-          'correct_answer_indices': q.correctAnswerIndices,
-          'explanation': q.explanation,
-          'passage': q.passage,
-          'subject': q.subject,
-          'subjectLabel': q.subjectLabel,
-          'chapter': q.chapter,
-        };
-      }).toList();
-
-      final body = jsonEncode({
-        'type': type,
-        'examDetails': {
-          'title': examTitle,
-          'category': chaptersStr.isNotEmpty ? 'অধ্যায় ভিত্তিক' : 'মডেল টেস্ট',
-          'subject': formattedSubject,
-          'subjectLabel': result.subjectLabel ?? formattedSubject,
-          'subjectCode': subjectCode,
-          'chapters': chaptersStr,
-          'durationMinutes': durationMins,
-          'totalMarks': result.totalMarks.toInt(),
-          'examType': result.examType,
-        },
-        'questions': questionsPayload,
-        'userAnswers': result.userAnswers,
-      });
-
-      final response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: body,
-          )
-          .timeout(const Duration(seconds: 8));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data is Map && data['success'] == true && data['html'] is String) {
-          final html = data['html'] as String;
-          if (html.trim().isNotEmpty) {
-            return html;
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('[PdfDownloadService] API HTML fetch error: $e');
-    } finally {
-      client?.close();
-    }
-    return null;
-  }
-
-  /// Builds local Question Paper HTML matching the user's authentic 2-column model test image
-  static String _generateLocalQuestionPaperHtml(ExamResult result) {
-    final formattedSubject = BanglaNameHelper.formatSubject(
-      result.subject,
-      result.subjectLabel,
-    );
-    final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
-    final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
-
-    final chaptersSet = result.questions
-        .map((q) => q.chapter.trim())
-        .where((c) => c.isNotEmpty && c.toLowerCase() != 'general')
-        .toSet();
-    final chaptersStr = chaptersSet.isNotEmpty
-        ? _toBanglaDigits(chaptersSet.join(', '))
-        : 'সম্পূর্ণ সিলেবাস';
-
-    final totalQ = result.questions.length;
-    final durationMins = (result.totalMarks > 0 && result.totalMarks != totalQ)
-        ? result.totalMarks.toInt()
-        : (totalQ > 0 ? totalQ : 40);
-
-    final questions = result.questions;
-    const banglaLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
-
-    final qHtmlBuffer = StringBuffer();
-    for (int i = 0; i < questions.length; i++) {
-      final q = questions[i];
-      final qNum = _toBanglaDigits(i + 1);
-      final stem = _escapeHtml(q.question);
-
-      final optBuffers = <String>[];
-      for (int oi = 0; oi < q.options.length && oi < 4; oi++) {
-        final optText = _escapeHtml(q.options[oi]);
-        final lbl = oi < banglaLetters.length ? banglaLetters[oi] : '(${oi + 1})';
-        optBuffers.add('<div class="opt-col"><span class="opt-lbl">$lbl</span><span class="opt-val">$optText</span></div>');
-      }
-
-      final passageHtml = (q.passage != null && q.passage!.trim().isNotEmpty)
-          ? '<div class="passage-box">${_escapeHtml(q.passage!)}</div>'
-          : '';
-
-      qHtmlBuffer.write('''
-        <div class="q-block">
-          $passageHtml
-          <div class="q-row">
-            <span class="q-num">$qNum।</span>
-            <div class="q-text">$stem</div>
-          </div>
-          <div class="opt-grid">
-            ${optBuffers.join('')}
-          </div>
-        </div>
-      ''');
-    }
-
-    return '''<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="utf-8">
-<title>${_escapeHtml(cleanTitle)} — প্রশ্নপত্র</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" crossorigin="anonymous">
-<style>
-@font-face {
-  font-family: 'Kalpurush';
-  src: url('/fonts/Kalpurush.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-@page {
-  size: 210mm 297mm;
-  margin: 10mm 12mm 12mm 12mm;
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: #ffffff; }
-body {
-  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'SolaimanLipi', 'Kohinoor Bangla', 'FreeSans', serif;
-  font-size: 9.4pt;
-  color: #000000;
-  line-height: 1.35;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.watermark-bg {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-30deg);
-  font-size: 110pt;
-  font-weight: 800;
-  color: rgba(0, 0, 0, 0.045);
-  pointer-events: none;
-  z-index: 9999;
-  user-select: none;
-  white-space: nowrap;
-  letter-spacing: 4px;
-  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'SolaimanLipi', 'Kohinoor Bangla', 'FreeSans', serif;
-}
-.header-box { position: relative; text-align: center; margin-bottom: 6px; padding-bottom: 2px; }
-.brand-badge { position: absolute; top: 0; right: 0; border: 1.2px solid #006A4E; background: #E8F5E9; color: #006A4E; font-size: 8pt; font-weight: bold; padding: 2px 7px; border-radius: 4px; }
-.cat-title { font-size: 10.5pt; font-weight: 700; color: #222222; margin-bottom: 1px; }
-.main-title { font-size: 13pt; font-weight: 800; color: #000000; margin-bottom: 1px; }
-.sub-title { font-size: 11pt; font-weight: 700; color: #000000; margin-bottom: 5px; }
-.meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 9pt; font-weight: 700; color: #111111; margin-bottom: 4px; padding: 0 2px; }
-.meta-item { display: inline-flex; align-items: center; }
-.student-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 8.8pt; font-weight: 600; color: #222222; margin-bottom: 3px; padding: 0 2px; }
-.name-dots { display: inline-block; flex: 1; border-bottom: 1px dotted #333333; margin: 0 10px 0 6px; height: 11px; }
-.roll-dots { display: inline-block; width: 140px; border-bottom: 1px dotted #333333; margin-left: 6px; height: 11px; }
-.note-line { font-size: 7.8pt; font-weight: 500; color: #333333; text-align: center; margin: 3px 0 5px 0; letter-spacing: 0.1px; }
-.header-hr { border: 0; border-top: 1px solid #000000; margin: 0 0 9px 0; }
-.passage-box { background: #f8fafc; border-left: 2.5px solid #475569; padding: 3px 6px; margin-bottom: 4px; font-size: 8.8pt; font-weight: 500; color: #1e293b; border-radius: 2px; }
-.columns-wrapper { column-count: 2; column-gap: 22px; column-rule: 0.7px solid #444444; -webkit-column-count: 2; -webkit-column-gap: 22px; -webkit-column-rule: 0.7px solid #444444; text-align: justify; }
-.q-block { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; margin-bottom: 8.5px; overflow-wrap: break-word; word-break: break-word; }
-.q-row { display: flex; align-items: flex-start; font-size: 9.4pt; line-height: 1.34; color: #000000; }
-.q-num { font-weight: 700; min-width: 20px; flex-shrink: 0; padding-right: 2px; font-size: 9.4pt; }
-.q-text { flex: 1; font-weight: 500; }
-.opt-grid { display: flex; flex-wrap: wrap; margin-top: 2.5px; margin-left: 20px; }
-.opt-col { width: 50%; padding-right: 4px; margin-bottom: 1.5px; font-size: 9.1pt; line-height: 1.3; display: flex; align-items: flex-start; }
-.opt-lbl { font-weight: 700; margin-right: 3px; flex-shrink: 0; font-size: 9pt; }
-.opt-val { flex: 1; }
-.katex { font-size: 1.02em; text-rendering: auto; }
-</style>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof renderMathInElement === 'function') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "\$\$", right: "\$\$", display: true},
-        {left: "\$", right: "\$", display: false}
-      ],
-      throwOnError: false
-    });
-  }
-});
-</script>
-</head>
-<body>
-<div class="watermark-bg">অভ্যাস</div>
-<div class="header-box">
-  <div class="brand-badge">অভ্যাস</div>
-  <div class="cat-title">${chaptersSet.isNotEmpty ? 'অধ্যায় ভিত্তিক' : 'মডেল টেস্ট'}</div>
-  <div class="main-title">${_escapeHtml(cleanTitle)}</div>
-  <div class="sub-title">বিষয়ঃ ${_escapeHtml(formattedSubject)} (MCQ)</div>
-  <div class="meta-row">
-    <div class="meta-item">অধ্যায়: $chaptersStr</div>
-    <div class="meta-item">মোট প্রশ্ন: ${_toBanglaDigits(totalQ)}টি</div>
-    <div class="meta-item">সময়: ${_toBanglaDigits(durationMins)} মিনিট</div>
-    <div class="meta-item">পূর্ণমান: ${_toBanglaDigits(result.totalMarks > 0 ? result.totalMarks.toInt() : totalQ)}</div>
-    <div class="meta-item">প্রাপ্ত নম্বর: ________</div>
-  </div>
-  <div class="student-row">
-    <span style="white-space:nowrap;">শিক্ষার্থীর নাম:</span>
-    <span class="name-dots"></span>
-    <span style="white-space:nowrap;">রোল নং:</span>
-    <span class="roll-dots"></span>
-  </div>
-  <div class="note-line">[বি:দ্র: সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট কর। প্রতিটি প্রশ্নের মান-১]</div>
-  <hr class="header-hr">
-</div>
-<div class="columns-wrapper">
-  $qHtmlBuffer
-</div>
-</body>
-</html>''';
-  }
-
-  /// Builds local Solution HTML with explanations matching Obhyash solutions layout
-  static String _generateLocalSolutionHtml(ExamResult result) {
-    final formattedSubject = BanglaNameHelper.formatSubject(
-      result.subject,
-      result.subjectLabel,
-    );
-    final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
-    final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
-
-    final questions = result.questions;
-    final totalQ = questions.length;
-    final unattempted = totalQ - result.correctCount - result.wrongCount;
-    const banglaLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
-
-    final itemsHtml = StringBuffer();
-    for (int i = 0; i < questions.length; i++) {
-      final q = questions[i];
-      final qNum = _toBanglaDigits(i + 1);
-      final stem = _escapeHtml(q.question);
-      final userAnsIdx = result.userAnswers[q.id];
-      final isAnswered = userAnsIdx != null && userAnsIdx >= 0;
-      final isCorrect = q.isCorrectAnswer(userAnsIdx);
-
-      final optBuffers = <String>[];
-      for (int oi = 0; oi < q.options.length && oi < 4; oi++) {
-        final optText = _escapeHtml(q.options[oi]);
-        final lbl = oi < banglaLetters.length ? banglaLetters[oi] : '(${oi + 1})';
-        final isCorrectOpt = oi == q.correctAnswerIndex;
-        String optClass = 'opt-col';
-        if (isCorrectOpt) optClass += ' is-correct';
-
-        optBuffers.add('<div class="$optClass"><span class="opt-lbl">$lbl</span><span class="opt-val">$optText</span></div>');
-      }
-
-      final correctLetter = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < banglaLetters.length)
-          ? banglaLetters[q.correctAnswerIndex]
-          : '';
-      final correctText = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < q.options.length)
-          ? _escapeHtml(q.options[q.correctAnswerIndex])
-          : '';
-
-      final userChoiceLetter = (userAnsIdx != null && userAnsIdx >= 0 && userAnsIdx < banglaLetters.length)
-          ? banglaLetters[userAnsIdx]
-          : '';
-
-      final explanationText = (q.explanation != null && q.explanation!.trim().isNotEmpty)
-          ? '<div class="exp-text"><strong>ব্যাখ্যা:</strong> ${_escapeHtml(q.explanation!)}</div>'
-          : '';
-
-      final passageHtml = (q.passage != null && q.passage!.trim().isNotEmpty)
-          ? '<div class="passage-box">${_escapeHtml(q.passage!)}</div>'
-          : '';
-
-      itemsHtml.write('''
-        <div class="q-block">
-          $passageHtml
-          <div class="q-row">
-            <span class="q-num">$qNum।</span>
-            <div class="q-text">$stem</div>
-          </div>
-          <div class="opt-grid">
-            ${optBuffers.join('')}
-          </div>
-          <div class="sol-box">
-            <div class="sol-correct">সঠিক উত্তর: <strong>$correctLetter $correctText</strong></div>
-            $explanationText
-          </div>
-        </div>
-      ''');
-    }
-
-    return '''<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="utf-8">
-<title>${_escapeHtml(cleanTitle)} — সমাধান ও ব্যাখ্যা</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" crossorigin="anonymous">
-<style>
-@font-face {
-  font-family: 'Kalpurush';
-  src: url('/fonts/Kalpurush.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-@page { size: 210mm 297mm; margin: 10mm 12mm 12mm 12mm; }
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: #ffffff; }
-body {
-  font-family: 'Times New Roman', 'Liberation Serif', 'Kalpurush', 'SolaimanLipi', 'Kohinoor Bangla', 'FreeSans', serif;
-  font-size: 9.2pt;
-  color: #0f172a;
-  line-height: 1.35;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.header-box { text-align: center; margin-bottom: 8px; }
-.main-title { font-size: 13.5pt; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
-.sub-badge { display: inline-block; font-size: 9pt; font-weight: 700; color: #0f766e; background: #f0fdfa; border: 1px solid #99f6e4; padding: 1.5px 8px; border-radius: 4px; margin-bottom: 3px; }
-.sub-title { font-size: 8pt; color: #475569; margin-bottom: 6px; }
-.summary-bar {
-  display: flex; justify-content: space-around; align-items: center;
-  background: #f8fafc; border: 0.8px solid #cbd5e1; border-radius: 5px;
-  padding: 4px 12px; font-size: 8.4pt; font-weight: 700; margin-bottom: 8px;
-}
-.summary-item { color: #0f172a; }
-.columns-wrapper {
-  column-count: 2; column-gap: 20px; column-rule: 0.7px solid #cbd5e1;
-  -webkit-column-count: 2; -webkit-column-gap: 20px; -webkit-column-rule: 0.7px solid #cbd5e1;
-}
-.q-block { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; margin-bottom: 9px; }
-.q-row { display: flex; align-items: flex-start; font-size: 9.3pt; font-weight: 700; color: #0f172a; line-height: 1.34; }
-.q-num { min-width: 20px; flex-shrink: 0; padding-right: 2px; }
-.q-text { flex: 1; }
-.opt-grid { display: flex; flex-wrap: wrap; margin-top: 2.5px; margin-left: 20px; }
-.opt-col { width: 50%; padding-right: 4px; margin-bottom: 1.5px; font-size: 9pt; line-height: 1.3; display: flex; align-items: flex-start; }
-.opt-col.is-correct { color: #15803d; font-weight: 700; }
-.opt-col.is-wrong { color: #dc2626; font-weight: 600; }
-.opt-lbl { font-weight: 700; margin-right: 3px; flex-shrink: 0; }
-.opt-val { flex: 1; }
-.sol-box {
-  margin-top: 3.5px; margin-left: 18px; padding: 4px 7px;
-  background: #f8fafc; border-left: 2.5px solid #94a3b8; border-radius: 2px;
-  font-size: 8pt; line-height: 1.32;
-}
-.sol-box.correct { border-left-color: #16a34a; }
-.sol-box.wrong { border-left-color: #dc2626; }
-.sol-correct { color: #15803d; font-weight: 700; }
-.sol-user { color: #334155; font-weight: 600; margin-top: 1.5px; }
-.exp-text { color: #334155; margin-top: 2.5px; }
-.passage-box { background: #f8fafc; border-left: 2.5px solid #475569; padding: 3px 6px; margin-bottom: 4px; font-size: 8.8pt; font-weight: 500; color: #1e293b; border-radius: 2px; }
-.katex { font-size: 1.02em; }
-</style>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof renderMathInElement === 'function') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "\$\$", right: "\$\$", display: true},
-        {left: "\$", right: "\$", display: false}
-      ],
-      throwOnError: false
-    });
-  }
-});
-</script>
-</head>
-<body>
-<div class="header-box">
-  <div class="main-title">${_escapeHtml(cleanTitle)}</div>
-  <div class="sub-badge">সমাধান ও ব্যাখ্যা</div>
-  <div class="sub-title">উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · মোট প্রশ্ন: ${_toBanglaDigits(totalQ)}টি · পূর্ণমান: ${_toBanglaDigits(result.totalMarks.toInt())}</div>
-  <div class="summary-bar">
-    <span class="summary-item">মোট প্রশ্ন: ${_toBanglaDigits(totalQ)}টি</span>
-    <span class="summary-item">পূর্ণমান: ${_toBanglaDigits(result.totalMarks.toInt())}</span>
-    <span class="summary-item">সময়: ${_toBanglaDigits(result.timeTaken > 0 ? (result.timeTaken / 60).ceil() : 25)} মিনিট</span>
-  </div>
-</div>
-<div class="columns-wrapper">
-  $itemsHtml
-</div>
-</body>
-</html>''';
-  }
 
   /// Directly generates and downloads the Question Paper as a standard 2-Column Print-Ready PDF
   static Future<void> downloadQuestionPaper(
     ExamResult result,
     BuildContext context,
   ) async {
-    final formattedSubject = BanglaNameHelper.formatSubject(
-      result.subject,
-      result.subjectLabel,
-    );
-    final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
-    final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
-    final filename = '${cleanTitle}_প্রশ্নপত্র';
-
-    try {
-      // 1. Fetch pre-rendered HTML with KaTeX from our web generator API
-      String? html = await _fetchHtmlFromGenerator(
-        type: 'question_paper',
-        result: result,
-      );
-
-      // Fallback to local HTML generator if offline or network error
-      html ??= _generateLocalQuestionPaperHtml(result);
-
-      // 2. Render to vector PDF using native WebKit / Android WebView
-      Uint8List? bytes;
-      try {
-        // ignore: deprecated_member_use
-        bytes = await Printing.convertHtml(
-          html: html,
-          format: PdfPageFormat.a4,
-          baseUrl: 'https://www.obhyash.com',
-        );
-      } catch (convErr) {
-        debugPrint('[PdfDownloadService] convertHtml error: $convErr');
-      }
-
-      if (bytes != null && bytes.isNotEmpty) {
-        final file = await DownloadNotificationService().savePdfAndNotify(
-          bytes: bytes,
-          rawFileName: filename,
-          notificationTitle: '$cleanTitle — প্রশ্নপত্র',
-          subtitle: 'ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন',
-          context: context.mounted ? context : null,
-        );
-
-        if (file == null) {
-          await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
-        }
-        return;
-      }
-
-      // 3. Fallback to native pw.Document generator if convertHtml fails
-      if (context.mounted) {
-        await _downloadQuestionPaperFallbackPw(result, context);
-      }
-    } catch (e) {
-      debugPrint('[PdfDownloadService] downloadQuestionPaper error: $e');
-      if (context.mounted) {
-        AppPopups.error(
-          context,
-          message: 'প্রশ্নপত্র PDF তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
-        );
-      }
-    }
+    await _downloadQuestionPaperFallbackPw(result, context);
   }
 
   /// Directly generates and downloads Question Paper with Correct Answers & Detailed Explanations
@@ -1193,65 +756,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ExamResult result,
     BuildContext context,
   ) async {
-    final formattedSubject = BanglaNameHelper.formatSubject(
-      result.subject,
-      result.subjectLabel,
-    );
-    final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
-    final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
-    final filename = '${cleanTitle}_সমাধান';
-
-    try {
-      // 1. Fetch pre-rendered HTML with KaTeX from our web generator API
-      String? html = await _fetchHtmlFromGenerator(
-        type: 'solution',
-        result: result,
-      );
-
-      // Fallback to local HTML generator if offline or network error
-      html ??= _generateLocalSolutionHtml(result);
-
-      // 2. Render to vector PDF using native WebKit / Android WebView
-      Uint8List? bytes;
-      try {
-        // ignore: deprecated_member_use
-        bytes = await Printing.convertHtml(
-          html: html,
-          format: PdfPageFormat.a4,
-          baseUrl: 'https://www.obhyash.com',
-        );
-      } catch (convErr) {
-        debugPrint('[PdfDownloadService] convertHtml error: $convErr');
-      }
-
-      if (bytes != null && bytes.isNotEmpty) {
-        final file = await DownloadNotificationService().savePdfAndNotify(
-          bytes: bytes,
-          rawFileName: filename,
-          notificationTitle: '$cleanTitle — সমাধান ও ব্যাখ্যা',
-          subtitle: 'ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন',
-          context: context.mounted ? context : null,
-        );
-
-        if (file == null) {
-          await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
-        }
-        return;
-      }
-
-      // 3. Fallback to native pw.Document generator if convertHtml fails
-      if (context.mounted) {
-        await _downloadResultFallbackPw(result, context);
-      }
-    } catch (e) {
-      debugPrint('[PdfDownloadService] downloadResultWithExplanations error: $e');
-      if (context.mounted) {
-        AppPopups.error(
-          context,
-          message: 'ফলাফল ও ব্যাখ্যা PDF তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
-        );
-      }
-    }
+    await _downloadResultFallbackPw(result, context);
   }
 
   /// Fallback pw.Document implementation for Question Paper
@@ -1269,46 +774,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
     final subjectCode = BanglaNameHelper.getSubjectCode(result.subject, result.subjectLabel);
 
-    try {
-      await _configureBanglaPdf();
-
-      pw.Font? roboto;
-      pw.Font? robotoBold;
-      pw.Font? notoSans;
-      pw.Font? mathFont;
-      pw.Font? symbolFont;
-
-      try {
-        roboto = await PdfGoogleFonts.robotoRegular();
-        robotoBold = await PdfGoogleFonts.robotoBold();
-        notoSans = await PdfGoogleFonts.notoSansRegular();
-        mathFont = await PdfGoogleFonts.notoSansMathRegular();
-        symbolFont = await PdfGoogleFonts.notoSansSymbolsRegular();
-      } catch (fontErr) {
-        debugPrint('[PdfDownloadService] Font loading fallback: $fontErr');
+    final sortedQuestions = List<Question>.from(result.questions);
+    final totalQ = sortedQuestions.length;
+    if (totalQ == 0) {
+      if (context.mounted) {
+        AppPopups.warning(context, message: 'ডাউনলোড করার মতো কোনো প্রশ্ন নেই।');
       }
+      return;
+    }
 
-      final fontFallbacks = <pw.Font>[
-        bn.BanglaPdf.defaultFont,
-        ?notoSans,
-        ?mathFont,
-        ?symbolFont,
-        ?roboto,
-        ?robotoBold,
-      ];
-
-      final theme = (roboto != null && robotoBold != null)
-          ? pw.ThemeData.withFont(
-              base: roboto,
-              bold: robotoBold,
-              fontFallback: fontFallbacks,
-            )
-          : pw.ThemeData.base();
-
+    try {
+      final theme = await _buildPdfTheme();
       final pdf = pw.Document(theme: theme);
-
-      final sortedQuestions = List<Question>.from(result.questions);
-      final totalQ = sortedQuestions.length;
       final durationMins = result.timeTaken > 0
           ? (result.timeTaken / 60).ceil()
           : totalQ;
@@ -1693,7 +1170,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       final bytes = await pdf.save();
 
-      final file = await DownloadNotificationService().savePdfAndNotify(
+      await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
         notificationTitle: '$cleanTitle — প্রশ্নপত্র',
@@ -1701,8 +1178,13 @@ document.addEventListener("DOMContentLoaded", function() {
         context: context.mounted ? context : null,
       );
 
-      if (file == null) {
-        await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
+      await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
+
+      if (context.mounted) {
+        AppPopups.success(
+          context,
+          message: 'প্রশ্নপত্র PDF সফলভাবে ডাউনলোড হয়েছে!',
+        );
       }
     } catch (e) {
       debugPrint('[PdfDownloadService] downloadQuestionPaper error: $e');
@@ -1729,47 +1211,19 @@ document.addEventListener("DOMContentLoaded", function() {
     final filename = '${cleanTitle}_সমাধান';
     final subjectCode = BanglaNameHelper.getSubjectCode(result.subject, result.subjectLabel);
 
-    try {
-      await _configureBanglaPdf();
-
-      pw.Font? roboto;
-      pw.Font? robotoBold;
-      pw.Font? notoSans;
-      pw.Font? mathFont;
-      pw.Font? symbolFont;
-
-      try {
-        roboto = await PdfGoogleFonts.robotoRegular();
-        robotoBold = await PdfGoogleFonts.robotoBold();
-        notoSans = await PdfGoogleFonts.notoSansRegular();
-        mathFont = await PdfGoogleFonts.notoSansMathRegular();
-        symbolFont = await PdfGoogleFonts.notoSansSymbolsRegular();
-      } catch (fontErr) {
-        debugPrint('[PdfDownloadService] Font loading fallback: $fontErr');
+    final sortedQuestions = List<Question>.from(result.questions);
+    final totalQ = sortedQuestions.length;
+    if (totalQ == 0) {
+      if (context.mounted) {
+        AppPopups.warning(context, message: 'ডাউনলোড করার মতো কোনো প্রশ্ন নেই।');
       }
+      return;
+    }
 
-      final fontFallbacks = <pw.Font>[
-        bn.BanglaPdf.defaultFont,
-        ?notoSans,
-        ?mathFont,
-        ?symbolFont,
-        ?roboto,
-        ?robotoBold,
-      ];
-
-      final theme = (roboto != null && robotoBold != null)
-          ? pw.ThemeData.withFont(
-              base: roboto,
-              bold: robotoBold,
-              fontFallback: fontFallbacks,
-            )
-          : pw.ThemeData.base();
-
+    try {
+      final theme = await _buildPdfTheme();
       final pdf = pw.Document(theme: theme);
       const optionLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
-
-      final sortedQuestions = List<Question>.from(result.questions);
-      final totalQ = sortedQuestions.length;
       final unattemptedCount = totalQ - result.correctCount - result.wrongCount;
 
       // Calculate distinct main subjects
@@ -2211,7 +1665,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       final bytes = await pdf.save();
 
-      final file = await DownloadNotificationService().savePdfAndNotify(
+      await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
         notificationTitle: '$cleanTitle — সমাধান ও ব্যাখ্যা',
@@ -2219,8 +1673,13 @@ document.addEventListener("DOMContentLoaded", function() {
         context: context.mounted ? context : null,
       );
 
-      if (file == null) {
-        await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
+      await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
+
+      if (context.mounted) {
+        AppPopups.success(
+          context,
+          message: 'ফলাফল ও ব্যাখ্যা PDF সফলভাবে ডাউনলোড হয়েছে!',
+        );
       }
     } catch (e) {
       debugPrint('[PdfDownloadService] downloadResultWithExplanations error: $e');

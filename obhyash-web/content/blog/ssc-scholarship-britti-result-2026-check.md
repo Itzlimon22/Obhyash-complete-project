@@ -16,7 +16,7 @@ author:
 readTime: 12
 coverColor: from-blue-600 via-indigo-900 to-slate-950
 publishedAt: '2026-10-04T06:30:00.000Z'
-updatedAt: '2026-10-08T14:30:00.000Z'
+updatedAt: '2026-10-09T01:10:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.svg
 ---
@@ -28,7 +28,7 @@ coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.
 এই পূর্ণাঙ্গ নির্দেশিকায় মাধ্যমিক ও উচ্চশিক্ষা অধিদপ্তর (মাউশি) এবং বিভিন্ন শিক্ষা বোর্ডের সর্বশেষ হালনাগাদ তথ্যের ভিত্তিতে বৃত্তির নিয়ম, কোটা বণ্টন, টাকার অঙ্ক এবং বোর্ডভিত্তিক গেজেট দেখার নিয়ম তুলে ধরা হলো।
 
 > [!NOTE]
-> **এক নজরে গুরুত্বপূর্ণ তথ্য (সর্বশেষ হালনাগাদ: ৮ অক্টোবর ২০২৬)**
+> **এক নজরে গুরুত্বপূর্ণ তথ্য (সর্বশেষ হালনাগাদ: ৯ অক্টোবর ২০২৬)**
 > - **ফল প্রকাশ:** এসএসসি ও সমমান পরীক্ষা ২০২৬-এর ফল প্রকাশিত হয়েছিল **১০ আগস্ট ২০২৬**।
 > - **আলাদা কোনো আবেদন নেই:** বৃত্তির জন্য শিক্ষার্থীদের আলাদা কোনো ফর্ম পূরণ বা ফি দিতে হয় না। বোর্ড ফলাফলের মেধাক্রম ও কোটার ভিত্তিতে সরাসরি গেজেট প্রকাশ করে।
 > - **বর্তমান অবস্থা:** চট্টগ্রাম, সিলেট ও কুমিল্লা শিক্ষা বোর্ড **১ অক্টোবর ২০২৬** থেকে তাদের অফিশিয়াল ওয়েবসাইটে মেধা ও সাধারণ বৃত্তির গেজেট প্রকাশ শুরু করেছে। ঢাকা, রাজশাহী, যশোর, বরিশাল, দিনাজপুর ও ময়মনসিংহ বোর্ডের গেজেট চূড়ান্ত অনুমোদনের প্রক্রিয়ায় রয়েছে।
@@ -101,19 +101,25 @@ $$\frac{৩,০০০}{১,০৬,০০৯} \times ১০০ \approx ২.৮৩
 
 বৃত্তির গেজেট দেখতে নিজ নিজ বোর্ডের অফিশিয়াল ওয়েবসাইটের নোটিশ বোর্ড চেক করতে হবে। নিচে দেশের সকল শিক্ষা বোর্ডের অফিশিয়াল লিংক ও বর্তমান স্ট্যাটাস দেওয়া হলো:
 
-| শিক্ষা বোর্ড | অফিশিয়াল ওয়েবসাইট | গেজেট স্ট্যাটাস (৮ অক্টোবর ২০২৬) | নোটিশ বিভাগ |
+| শিক্ষা বোর্ড | অফিশিয়াল ওয়েবসাইট | গেজেট স্ট্যাটাস (সর্বশেষ হালনাগাদ) | সরাসরি গেজেট নোটিশ / ডাউনলোড লিংক |
 | :--- | :--- | :--- | :--- |
-| **কুমিল্লা শিক্ষা বোর্ড** | [comillaboard.gov.bd](https://comillaboard.gov.bd) | <span style="color:#16a34a;font-weight:600">গেজেট প্রকাশিত (০১/১০/২৬)</span> | [কুমিল্লা বোর্ড নোটিশ](https://comillaboard.gov.bd) |
-| **চট্টগ্রাম শিক্ষা বোর্ড** | [bise-ctg.gov.bd](https://bise-ctg.gov.bd) | <span style="color:#16a34a;font-weight:600">গেজেট প্রকাশিত (০১/১০/২৬)</span> | [চট্টগ্রাম বোর্ড নোটিশ](https://bise-ctg.gov.bd) |
-| **সিলেট শিক্ষা বোর্ড** | [sylhetboard.gov.bd](https://sylhetboard.gov.bd) | <span style="color:#16a34a;font-weight:600">গেজেট প্রকাশিত (০১/১০/২৬)</span> | [সিলেট বোর্ড নোটিশ](https://sylhetboard.gov.bd) |
-| **ঢাকা শিক্ষা বোর্ড** | [dhakaeducationboard.gov.bd](https://dhakaeducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [ঢাকা বোর্ড নোটিশ](https://dhakaeducationboard.gov.bd) |
-| **রাজশাহী শিক্ষা বোর্ড** | [rajshahieducationboard.gov.bd](https://rajshahieducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [রাজশাহী বোর্ড নোটিশ](https://rajshahieducationboard.gov.bd) |
-| **যশোর শিক্ষা বোর্ড** | [jessoreboard.gov.bd](https://jessoreboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [যশোর বোর্ড নোটিশ](https://jessoreboard.gov.bd) |
-| **বরিশাল শিক্ষা বোর্ড** | [barisalboard.gov.bd](https://barisalboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [বরিশাল বোর্ড নোটিশ](https://barisalboard.gov.bd) |
-| **দিনাজপুর শিক্ষা বোর্ড** | [dinajpureducationboard.gov.bd](https://dinajpureducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [দিনাজপুর বোর্ড নোটিশ](https://dinajpureducationboard.gov.bd) |
-| **ময়মনসিংহ শিক্ষা বোর্ড** | [mymensingheducationboard.gov.bd](https://mymensingheducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [ময়মনসিংহ বোর্ড নোটিশ](https://mymensingheducationboard.gov.bd) |
-| **বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড (BMEB)** | [bmeb.ebmeb.gov.bd](https://bmeb.ebmeb.gov.bd) | প্রকাশ প্রক্রিয়াধীন (দাখিল বৃত্তি) | [মাদ্রাসা বোর্ড নোটিশ](https://bmeb.ebmeb.gov.bd) |
-| **বাংলাদেশ কারিগরি শিক্ষা বোর্ড (BTEB)** | [bteb.gov.bd](https://bteb.gov.bd) | প্রকাশ প্রক্রিয়াধীন (এসএসসি ভোকেশনাল) | [কারিগরি বোর্ড নোটিশ](https://bteb.gov.bd) |
+| **কুমিল্লা শিক্ষা বোর্ড** | [comillaboard.gov.bd](https://comillaboard.gov.bd) | <span style="color:#16a34a;font-weight:600">গেজেট প্রকাশিত (০১/১০/২৬)</span> | [সরাসরি গেজেট নোটিশ](https://web.comillaboard.gov.bd/bisecb/notice_details/%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AC-%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%8F%E0%A6%B8%E0%A6%8F%E0%A6%B8%E0%A6%BF-%E0%A6%AA%E0%A6%B0%E0%A7%80%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0-%E0%A6%AB%E0%A6%B2%E0%A6%AB%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%AD%E0%A6%BF%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%A4%E0%A7%87-%E0%A6%AE%E0%A7%87%E0%A6%A7%E0%A6%BE%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF-%E0%A6%93-%E0%A6%B8%E0%A6%BE%E0%A6%A7%E0%A6%BE%E0%A6%B0%E0%A6%A3-%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AA%E0%A7%8D%E0%A6%A4-%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0-%E0%A6%A4%E0%A6%BE%E0%A6%B2%E0%A6%BF%E0%A6%95%E0%A6%BE-%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%95%E0%A6%BE%E0%A6%B6) |
+| **চট্টগ্রাম শিক্ষা বোর্ড** | [bise-ctg.gov.bd](https://bise-ctg.gov.bd) | <span style="color:#16a34a;font-weight:600">গেজেট প্রকাশিত (০১/১০/২৬)</span> | [সরাসরি গেজেট নোটিশ](https://web.bise-ctg.gov.bd/bisectg/notice_details/%E0%A7%A8%E0%A7%A8%E0%A7%A8%E0%A7%AC-%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%8F%E0%A6%B8%E0%A6%8F%E0%A6%B8%E0%A6%BF-%E0%A6%AA%E0%A7%80%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0-%E0%A6%AB%E0%A6%B2%E0%A6%AB%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%AD%E0%A6%BF%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%A4%E0%A7%87-%E0%A6%AE%E0%A7%87%E0%A6%A7%E0%A6%BE%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF-%E0%A6%93-%E0%A6%B8%E0%A6%BE%E0%A6%A7%E0%A6%BE%E0%A6%B0%E0%A6%A3-%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AA%E0%A7%8D%E0%A6%A4-%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0-%E0%A6%A4%E0%A6%BE%E0%A6%B2%E0%A6%BF%E0%A6%95%E0%A6%BE-%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%95%E0%A6%BE%E0%A6%B6#) |
+| **সিলেট শিক্ষা বোর্ড** | [sylhetboard.gov.bd](https://sylhetboard.gov.bd) | <span style="color:#16a34a;font-weight:600">গেজেট প্রকাশিত (০১/১০/২৬)</span> | [সরাসরি গেজেট নোটিশ](https://sylhetboard.gov.bd/notices/1996) |
+| **ঢাকা শিক্ষা বোর্ড** | [dhakaeducationboard.gov.bd](https://dhakaeducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [ঢাকা বোর্ড নোটিশ বিভাগ](https://dhakaeducationboard.gov.bd) |
+| **রাজশাহী শিক্ষা বোর্ড** | [rajshahieducationboard.gov.bd](https://rajshahieducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [রাজশাহী বোর্ড নোটিশ বিভাগ](https://rajshahieducationboard.gov.bd) |
+| **যশোর শিক্ষা বোর্ড** | [jessoreboard.gov.bd](https://jessoreboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [যশোর বোর্ড নোটিশ বিভাগ](https://jessoreboard.gov.bd) |
+| **বরিশাল শিক্ষা বোর্ড** | [barisalboard.gov.bd](https://barisalboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [বরিশাল বোর্ড নোটিশ বিভাগ](https://barisalboard.gov.bd) |
+| **দিনাজপুর শিক্ষা বোর্ড** | [dinajpureducationboard.gov.bd](https://dinajpureducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [দিনাজপুর বোর্ড নোটিশ বিভাগ](https://dinajpureducationboard.gov.bd) |
+| **ময়মনসিংহ শিক্ষা বোর্ড** | [mymensingheducationboard.gov.bd](https://mymensingheducationboard.gov.bd) | প্রকাশ প্রক্রিয়াধীন | [ময়মনসিংহ বোর্ড নোটিশ বিভাগ](https://mymensingheducationboard.gov.bd) |
+| **বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড (BMEB)** | [bmeb.ebmeb.gov.bd](https://bmeb.ebmeb.gov.bd) | প্রকাশ প্রক্রিয়াধীন (দাখিল বৃত্তি) | [মাদ্রাসা বোর্ড নোটিশ বিভাগ](https://bmeb.ebmeb.gov.bd) |
+| **বাংলাদেশ কারিগরি শিক্ষা বোর্ড (BTEB)** | [bteb.gov.bd](https://bteb.gov.bd) | প্রকাশ প্রক্রিয়াধীন (এসএসসি ভোকেশনাল) | [কারিগরি বোর্ড নোটিশ বিভাগ](https://bteb.gov.bd) |
+
+> [!IMPORTANT]
+> ### ⚡ প্রকাশিত বোর্ডগুলোর সরাসরি গেজেট নোটিশ লিংক (এক ক্লিকে দেখো):
+> - 📄 **কুমিল্লা বোর্ড:** [২০২৬ সালের এসএসসি পরীক্ষার মেধা ও সাধারণ বৃত্তির তালিকা প্রকাশ নোটিশ (সরাসরি লিংক)](https://web.comillaboard.gov.bd/bisecb/notice_details/%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AC-%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%8F%E0%A6%B8%E0%A6%8F%E0%A6%B8%E0%A6%BF-%E0%A6%AA%E0%A6%B0%E0%A7%80%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0-%E0%A6%AB%E0%A6%B2%E0%A6%AB%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%AD%E0%A6%BF%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%A4%E0%A7%87-%E0%A6%AE%E0%A7%87%E0%A6%A7%E0%A6%BE%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF-%E0%A6%93-%E0%A6%B8%E0%A6%BE%E0%A6%A7%E0%A6%BE%E0%A6%B0%E0%A6%A3-%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AA%E0%A7%8D%E0%A6%A4-%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0-%E0%A6%A4%E0%A6%BE%E0%A6%B2%E0%A6%BF%E0%A6%95%E0%A6%BE-%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%95%E0%A6%BE%E0%A6%B6)
+> - 📄 **সিলেট বোর্ড:** [২০২৬ সালের এসএসসি পরীক্ষার মেধা ও সাধারণ বৃত্তি তালিকা নোটিশ (সরাসরি লিংক)](https://sylhetboard.gov.bd/notices/1996)
+> - 📄 **চট্টগ্রাম বোর্ড:** [২০২৬ সালের এসএসসি পরীক্ষার মেধা ও সাধারণ বৃত্তি প্রাপ্তদের তালিকা প্রকাশ নোটিশ (সরাসরি লিংক)](https://web.bise-ctg.gov.bd/bisectg/notice_details/%E0%A7%A8%E0%A7%A8%E0%A7%A8%E0%A7%AC-%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%8F%E0%A6%B8%E0%A6%8F%E0%A6%B8%E0%A6%BF-%E0%A6%AA%E0%A7%80%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0-%E0%A6%AB%E0%A6%B2%E0%A6%AB%E0%A6%B2%E0%A7%87%E0%A6%B0-%E0%A6%AD%E0%A6%BF%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%A4%E0%A7%87-%E0%A6%AE%E0%A7%87%E0%A6%A7%E0%A6%BE%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF-%E0%A6%93-%E0%A6%B8%E0%A6%BE%E0%A6%A7%E0%A6%BE%E0%A6%B0%E0%A6%A3-%E0%A6%AC%E0%A7%83%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%BF%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AA%E0%A7%8D%E0%A6%A4-%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0-%E0%A6%A4%E0%A6%BE%E0%A6%B2%E0%A6%BF%E0%A6%95%E0%A6%BE-%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%95%E0%A6%BE%E0%A6%B6#)
 
 > [!TIP]
 > এক বোর্ডের শিক্ষার্থী অন্য বোর্ডের তালিকায় নিজের রোল খুঁজলে রেজাল্ট মিলবে না। তুমি যে কেন্দ্র বা স্কুলে এসএসসি পরীক্ষা দিয়েছ, সেই বোর্ডের ওয়েবসাইটেই কেবল তোমার রোল সম্বলিত গেজেট থাকবে। কেন্দ্রীয় সার্কুলারের জন্য মাধ্যমিক ও উচ্চশিক্ষা অধিদপ্তরের ওয়েবসাইট ([dshe.gov.bd](http://www.dshe.gov.bd/)) নজর রাখতে পারো।
@@ -124,7 +130,7 @@ $$\frac{৩,০০০}{১,০৬,০০৯} \times ১০০ \approx ২.৮৩
 
 বোর্ডের ওয়েবসাইট থেকে গেজেট ডাউনলোডের পর নিচের নিয়ম মেনে নিজের রোল চেক করো:
 
-1. **সঠিক পিডিএফ ডাউনলোড:** বোর্ডের নোটিশ বোর্ড থেকে "এসএসসি পরীক্ষা ২০২৬ মেধা ও সাধারণ বৃত্তির তালিকা" শীর্ষক পিডিএফ ফাইলটি ডাউনলোড করো।
+1. **সঠিক নোটিশ ও পিডিএফ ডাউনলোড:** উপরের সরাসরি নোটিশ লিংক অথবা নিজ নিজ বোর্ডের নোটিশ বোর্ড থেকে "এসএসসি পরীক্ষা ২০২৬ মেধা ও সাধারণ বৃত্তির তালিকা" শীর্ষক নোটিশ ও মূল পিডিএফ ফাইলটি ওপেন বা ডাউনলোড করো।
 2. **বিভাগ ও কোটা যাচাই:** পিডিএফে সাধারণত বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষা শাখার শিক্ষার্থীদের তালিকা আলাদা থাকে। এছাড়া মেধা বৃত্তি (Talent Pool) ও সাধারণ বৃত্তির (General) তালিকা পৃথক পাতায় থাকে।
 3. **সার্চ অপশন ব্যবহার:** কম্পিউটারে `Ctrl + F` অথবা মোবাইলের পিডিএফ রিডারের Search বক্সে তোমার **এসএসসি রোল নম্বর** লিখে সার্চ করো।
 4. **রেজিস্ট্রেশন ও প্রতিষ্ঠানের নাম মেলানো:** তোমার রোল নম্বরের পাশে থাকা রেজিস্ট্রেশন নম্বর ও স্কুলের নাম ভালোভাবে মিলিয়ে নাও।

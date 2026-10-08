@@ -40,6 +40,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
   final Set<String> _bookmarkedIds = {};
   late final ConfettiController _confettiController;
   String _reviewFilter = 'all'; // 'all', 'correct', 'wrong', 'skipped'
+  String? _downloadingType; // 'question' or 'solution' or null
 
   @override
   void initState() {
@@ -316,6 +317,10 @@ class _ResultViewState extends ConsumerState<ResultView> {
                     builder: (context) {
                       final isPro = ref.watch(userProfileProvider).value?.isPro ?? false;
 
+                      final isDownloadingQuestion = _downloadingType == 'question';
+                      final isDownloadingSolution = _downloadingType == 'solution';
+                      final isAnyDownloading = _downloadingType != null;
+
                       return Row(
                         children: [
                           Expanded(
@@ -325,41 +330,68 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                   : 'প্রশ্নপত্রের PDF ডাউনলোড করো (সাপ্তাহিক কোটা ৩টি)',
                               preferredPosition: TooltipPosition.top,
                               child: OutlinedButton.icon(
-                                onPressed: () async {
-                                  final profile = ref.read(userProfileProvider).value;
-                                  final isUserPro = profile?.isPro ?? false;
+                                onPressed: isAnyDownloading
+                                    ? null
+                                    : () async {
+                                        final profile = ref.read(userProfileProvider).value;
+                                        final isUserPro = profile?.isPro ?? false;
 
-                                  if (!isUserPro) {
-                                    final weeklyCount =
-                                        await PdfDownloadService.getWeeklyDownloadCount();
-                                    if (weeklyCount >=
-                                        PdfDownloadService.maxFreeWeeklyDownloads) {
-                                      if (!context.mounted) return;
-                                      ProUpgradeModal.show(
-                                        context,
-                                        title: 'সাপ্তাহিক PDF কোটা শেষ 🎯',
-                                        message:
-                                            'ফ্রি অ্যাকাউন্টে সপ্তাহে সর্বোচ্চ ৩টি প্রশ্নপত্র PDF ডাউনলোড করা যায়। আনলিমিটেড প্রশ্নপত্র ও উত্তরপত্র ডাউনলোড করতে প্রো সাবস্ক্রিপশন নাও।',
-                                        featurePill: 'সাপ্তাহিক কোটা: ৩/৩',
-                                        icon: LucideIcons.download,
-                                      );
-                                      return;
-                                    }
-                                    await PdfDownloadService.incrementWeeklyDownloadCount();
-                                  }
+                                        if (!isUserPro) {
+                                          final weeklyCount =
+                                              await PdfDownloadService.getWeeklyDownloadCount();
+                                          if (weeklyCount >=
+                                              PdfDownloadService.maxFreeWeeklyDownloads) {
+                                            if (!context.mounted) return;
+                                            ProUpgradeModal.show(
+                                              context,
+                                              title: 'সাপ্তাহিক PDF কোটা শেষ 🎯',
+                                              message:
+                                                  'ফ্রি অ্যাকাউন্টে সপ্তাহে সর্বোচ্চ ৩টি প্রশ্নপত্র PDF ডাউনলোড করা যায়। আনলিমিটেড প্রশ্নপত্র ও উত্তরপত্র ডাউনলোড করতে প্রো সাবস্ক্রিপশন নাও।',
+                                              featurePill: 'সাপ্তাহিক কোটা: ৩/৩',
+                                              icon: LucideIcons.download,
+                                            );
+                                            return;
+                                          }
+                                          await PdfDownloadService.incrementWeeklyDownloadCount();
+                                        }
 
-                                  if (!context.mounted) return;
-                                  AppPopups.info(
-                                    context,
-                                    message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
-                                  );
-                                  await PdfDownloadService.downloadQuestionPaper(
-                                      widget.result, context);
-                                },
-                                icon: const Icon(Icons.download_rounded, size: 15),
-                                label: const Text(
-                                  'প্রশ্নপত্র',
-                                  style: TextStyle(
+                                        if (!context.mounted) return;
+                                        setState(() => _downloadingType = 'question');
+                                        AppPopups.info(
+                                          context,
+                                          message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
+                                        );
+                                        try {
+                                          await PdfDownloadService.downloadQuestionPaper(
+                                              widget.result, context);
+                                        } catch (e) {
+                                          if (context.mounted) {
+                                            AppPopups.error(
+                                              context,
+                                              message: 'PDF তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
+                                            );
+                                          }
+                                        } finally {
+                                          if (mounted) {
+                                            setState(() => _downloadingType = null);
+                                          }
+                                        }
+                                      },
+                                icon: isDownloadingQuestion
+                                    ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            isDark ? Colors.white : const Color(0xFF12544F),
+                                          ),
+                                        ),
+                                      )
+                                    : const Icon(Icons.download_rounded, size: 15),
+                                label: Text(
+                                  isDownloadingQuestion ? 'ডাউনলোড হচ্ছে...' : 'প্রশ্নপত্র',
+                                  style: const TextStyle(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -386,45 +418,72 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                   : 'ব্যাখ্যাসহ উত্তরপত্র PDF ডাউনলোড (প্রো এক্সক্লুসিভ)',
                               preferredPosition: TooltipPosition.top,
                               child: OutlinedButton.icon(
-                                onPressed: () async {
-                                  final profile = ref.read(userProfileProvider).value;
-                                  final isUserPro = profile?.isPro ?? false;
+                                onPressed: isAnyDownloading
+                                    ? null
+                                    : () async {
+                                        final profile = ref.read(userProfileProvider).value;
+                                        final isUserPro = profile?.isPro ?? false;
 
-                                  // ── Strictly Pro Only Gatekeeper ──
-                                  if (!isUserPro) {
-                                    if (!context.mounted) return;
-                                    ProUpgradeModal.show(
-                                      context,
-                                      title: 'ব্যাখ্যাসহ উত্তরপত্র PDF আনলক করো 👑',
-                                      message:
-                                          'প্রতিটি প্রশ্নের সঠিক উত্তর ও পূর্ণাঙ্গ ব্যাখ্যা সহ অফলাইন PDF ডাউনলোড শুধুমাত্র প্রো মেম্বারদের জন্য এক্সক্লুসিভ। এখনই অভ্যাস প্রো-তে আপগ্রেড করো!',
-                                      featurePill: 'প্রো ফিচার',
-                                      icon: LucideIcons.crown,
-                                    );
-                                    return;
-                                  }
+                                        // ── Strictly Pro Only Gatekeeper ──
+                                        if (!isUserPro) {
+                                          if (!context.mounted) return;
+                                          ProUpgradeModal.show(
+                                            context,
+                                            title: 'ব্যাখ্যাসহ উত্তরপত্র PDF আনলক করো 👑',
+                                            message:
+                                                'প্রতিটি প্রশ্নের সঠিক উত্তর ও পূর্ণাঙ্গ ব্যাখ্যা সহ অফলাইন PDF ডাউনলোড শুধুমাত্র প্রো মেম্বারদের জন্য এক্সক্লুসিভ। এখনই অভ্যাস প্রো-তে আপগ্রেড করো!',
+                                            featurePill: 'প্রো ফিচার',
+                                            icon: LucideIcons.crown,
+                                          );
+                                          return;
+                                        }
 
-                                  if (!context.mounted) return;
-                                  AppPopups.info(
-                                    context,
-                                    message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
-                                  );
-                                  await PdfDownloadService.downloadResultWithExplanations(
-                                      widget.result, context);
-                                },
-                                icon: const Icon(Icons.download_done_rounded, size: 15),
+                                        if (!context.mounted) return;
+                                        setState(() => _downloadingType = 'solution');
+                                        AppPopups.info(
+                                          context,
+                                          message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
+                                        );
+                                        try {
+                                          await PdfDownloadService.downloadResultWithExplanations(
+                                              widget.result, context);
+                                        } catch (e) {
+                                          if (context.mounted) {
+                                            AppPopups.error(
+                                              context,
+                                              message: 'PDF তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
+                                            );
+                                          }
+                                        } finally {
+                                          if (mounted) {
+                                            setState(() => _downloadingType = null);
+                                          }
+                                        }
+                                      },
+                                icon: isDownloadingSolution
+                                    ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            isDark ? const Color(0xFF34D399) : const Color(0xFF12544F),
+                                          ),
+                                        ),
+                                      )
+                                    : const Icon(Icons.download_done_rounded, size: 15),
                                 label: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Text(
-                                      'ফলাফল ও ব্যাখ্যা',
-                                      style: TextStyle(
+                                    Text(
+                                      isDownloadingSolution ? 'ডাউনলোড হচ্ছে...' : 'ফলাফল ও ব্যাখ্যা',
+                                      style: const TextStyle(
                                         fontSize: 13.5,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    if (!isPro) ...[
+                                    if (!isPro && !isDownloadingSolution) ...[
                                       const SizedBox(width: 5),
                                       const Icon(
                                         LucideIcons.crown,

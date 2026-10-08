@@ -182,6 +182,7 @@ class _LiveExamLeaderboardViewState
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: false,
         leading: IconButton(
           icon: Icon(
             LucideIcons.arrowLeft,
@@ -190,18 +191,23 @@ class _LiveExamLeaderboardViewState
           onPressed: () => context.pop(),
         ),
         title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'অফিসিয়াল মেধা তালিকা',
               style: TextStyle(
+                fontFamily: 'HindSiliguri',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
               ),
             ),
             if (widget.exam != null)
               Text(
                 widget.exam!.title,
                 style: TextStyle(
+                  fontFamily: 'HindSiliguri',
                   fontSize: 11,
                   color: isDark ? Colors.white54 : Colors.black54,
                 ),
@@ -210,7 +216,6 @@ class _LiveExamLeaderboardViewState
               ),
           ],
         ),
-        centerTitle: true,
       ),
       body: leaderboardAsync.when(
         loading: () => const LeaderboardSkeleton(),
