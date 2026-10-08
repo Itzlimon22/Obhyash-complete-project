@@ -22,6 +22,7 @@ class QuestionCard extends StatefulWidget {
   final bool readOnly;
   final bool showAnswer;
   final bool isBookmarked;
+  final bool hideBookmark;
   final bool initiallyExpanded;
   final bool hideSourceTag;
   final bool alwaysShowSourceTag;
@@ -44,10 +45,11 @@ class QuestionCard extends StatefulWidget {
     this.readOnly = false,
     this.showAnswer = false,
     this.isBookmarked = false,
+    this.hideBookmark = false,
     this.initiallyExpanded = false,
     this.hideSourceTag = false,
     this.alwaysShowSourceTag = false,
-    this.showReport = false,
+    this.showReport = true,
     this.hideExplanation = false,
     this.onToggleBookmark,
     this.onDelete,
@@ -341,23 +343,24 @@ class _QuestionCardState extends State<QuestionCard>
                     const SizedBox(width: 6),
 
                     // Bookmark button
-                    _IconBtn(
-                      onTap: widget.onToggleBookmark,
-                      tooltip: widget.isBookmarked
-                          ? 'বুকমার্ক সরাও'
-                          : 'বুকমার্ক করো',
-                      child: AppIcon(
-                        widget.isBookmarked
-                            ? AppIcons.bookmarkFilled
-                            : AppIcons.bookmark,
-                        size: 18,
-                        color: widget.isBookmarked
-                            ? const Color(0xFFF59E0B) // amber-500
-                            : (isDark
-                                  ? const Color(0xFF525252)
-                                  : const Color(0xFF9CA3AF)),
+                    if (!widget.hideBookmark && widget.onToggleBookmark != null)
+                      _IconBtn(
+                        onTap: widget.onToggleBookmark,
+                        tooltip: widget.isBookmarked
+                            ? 'বুকমার্ক সরাও'
+                            : 'বুকমার্ক করো',
+                        child: AppIcon(
+                          widget.isBookmarked
+                              ? AppIcons.bookmarkFilled
+                              : AppIcons.bookmark,
+                          size: 18,
+                          color: widget.isBookmarked
+                              ? const Color(0xFFF59E0B) // amber-500
+                              : (isDark
+                                    ? const Color(0xFF525252)
+                                    : const Color(0xFF9CA3AF)),
+                        ),
                       ),
-                    ),
 
                     if (widget.onDelete != null) ...[
                       const SizedBox(width: 2),

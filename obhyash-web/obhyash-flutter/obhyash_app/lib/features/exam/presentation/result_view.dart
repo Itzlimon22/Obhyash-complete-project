@@ -191,7 +191,10 @@ class _ResultViewState extends ConsumerState<ResultView> {
       } else {
         context.go('/history');
       }
-    } else if (widget.result.examType == 'live_exam_practice') {
+      return;
+    }
+
+    if (widget.result.examType == 'live_exam_practice') {
       String? examId;
       if (widget.result.id.startsWith('live_practice_')) {
         final rest = widget.result.id.replaceFirst('live_practice_', '');
@@ -202,16 +205,23 @@ class _ResultViewState extends ConsumerState<ResultView> {
           examId = rest;
         }
       }
-      if (examId != null && examId.isNotEmpty) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else if (examId != null && examId.isNotEmpty) {
         context.go('/live_exam_details/$examId');
       } else {
         context.go('/live_exam');
       }
-    } else {
-      try {
-        ref.read(examEngineProvider.notifier).resetExam();
-      } catch (_) {}
+      return;
+    }
 
+    try {
+      ref.read(examEngineProvider.notifier).resetExam();
+    } catch (_) {}
+
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
       if (widget.result.examType == 'question_bank') {
         context.go('/question-bank');
       } else {
@@ -738,8 +748,12 @@ class _ResultViewState extends ConsumerState<ResultView> {
                           selectedOptionIndex: widget.result.userAnswers[q.id],
                           isFlagged: false,
                           isBookmarked: _bookmarkedIds.contains(q.id),
+                          hideBookmark: false,
                           onToggleBookmark: () => _toggleBookmark(q.id),
+                          showReport: true,
                           onReport: () => _showReportModal(q.id),
+                          hideSourceTag: false,
+                          alwaysShowSourceTag: true,
                           onSelectOption: (_) {},
                           onToggleFlag: () {},
                           showFeedback: true,
@@ -763,17 +777,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      if (!mounted) return;
-                      if (widget.result.examType == 'live_exam_practice') {
-                        _handleExit();
-                      } else {
-                        try {
-                          ref.read(examEngineProvider.notifier).resetExam();
-                        } catch (_) {}
-                        context.go('/setup');
-                      }
-                    },
+                    onPressed: _handleExit,
                     icon: Icon(
                       widget.result.examType == 'live_exam_practice'
                           ? LucideIcons.arrowLeft

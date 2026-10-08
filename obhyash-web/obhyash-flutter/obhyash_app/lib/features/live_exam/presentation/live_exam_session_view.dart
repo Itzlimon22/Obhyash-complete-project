@@ -36,7 +36,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
   final Map<String, int> _userAnswers = {};
   final Map<String, int> _selectionCounts = {};
   final Set<String> _flaggedIds = {};
-  final Set<String> _bookmarkedIds = {};
   final ScrollController _scrollController = ScrollController();
   final Map<int, GlobalKey> _itemKeys = {};
 
@@ -61,7 +60,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     _secondsRemaining = durationMins * 60;
     _secondsRemainingNotifier = ValueNotifier<int>(_secondsRemaining);
     _startTimer();
-    _fetchBookmarks();
     _registerAttemptStart();
   }
 
@@ -115,76 +113,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
         _autoSubmit();
       }
     });
-  }
-
-  Future<void> _fetchBookmarks() async {
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
-    if (user == null) return;
-
-    try {
-      final res = await supabase
-          .from('bookmarks')
-          .select('question_id')
-          .eq('user_id', user.id);
-      if (mounted) {
-        setState(() {
-          _bookmarkedIds.addAll(res.map((r) => r['question_id'].toString()));
-        });
-      }
-    } catch (_) {}
-  }
-
-  Future<void> _toggleBookmark(String questionId) async {
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      AppPopups.show(
-        context,
-        message: 'বুকমার্ক করতে লগইন করুন',
-        isError: true,
-      );
-      return;
-    }
-
-    final isBookmarked = _bookmarkedIds.contains(questionId);
-
-    if (!isBookmarked) {
-      final isPro = await resolveUserIsPro(ref);
-      if (!isPro && _bookmarkedIds.length >= 25) {
-        if (!mounted) return;
-        AppPopups.warning(
-          context,
-          message:
-              'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
-        );
-        return;
-      }
-    }
-
-    setState(() {
-      if (isBookmarked) {
-        _bookmarkedIds.remove(questionId);
-      } else {
-        _bookmarkedIds.add(questionId);
-      }
-    });
-
-    try {
-      if (isBookmarked) {
-        await supabase
-            .from('bookmarks')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('question_id', questionId);
-      } else {
-        await supabase.from('bookmarks').insert({
-          'user_id': user.id,
-          'question_id': questionId,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      }
-    } catch (_) {}
   }
 
   @override
@@ -1555,9 +1483,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         serialNumber: index + 1,
                         selectedOptionIndex: _userAnswers[q.id],
                         isFlagged: _flaggedIds.contains(q.id),
-                        isBookmarked: _bookmarkedIds.contains(q.id),
                         readOnly: isLocked, // Locked after 2 selections
                         hideSourceTag: true,
+                        hideBookmark: true,
+                        onToggleBookmark: null,
+                        showReport: true,
                         onSelectOption: (optIndex) {
                           final currentCount = _selectionCounts[q.id] ?? 0;
                           if (currentCount >= 2) {
@@ -1580,7 +1510,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                             }
                           });
                         },
-                        onToggleBookmark: () => _toggleBookmark(q.id),
                         onReport: () =>
                             QuestionReportDialog.show(context, q.id),
                       ),

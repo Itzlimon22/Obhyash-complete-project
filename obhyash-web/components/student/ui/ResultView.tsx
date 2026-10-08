@@ -461,8 +461,12 @@ export const ResultView: React.FC<ResultViewProps> = ({
                   showAnswer={true}
                   readOnly={true}
                   isBookmarked={isBookmarked}
+                  hideBookmark={false}
                   onToggleBookmark={() => handleToggleBookmark(question.id)}
+                  showReport={true}
                   onReport={() => setReportingQuestionId(question.id)}
+                  hideSourceTag={false}
+                  alwaysShowSourceTag={true}
                   initiallyExpanded={false}
                 />
               );

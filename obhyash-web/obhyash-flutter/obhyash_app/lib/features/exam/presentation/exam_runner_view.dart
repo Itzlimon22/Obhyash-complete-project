@@ -7,6 +7,7 @@ import '../services/pdf_download_service.dart';
 import '../domain/exam_models.dart';
 import 'exam_celebration_view.dart';
 import 'widgets/question_card.dart';
+import 'widgets/question_report_dialog.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
@@ -850,6 +851,10 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   selectedOptionIndex: state.userAnswers[q.id],
                   isFlagged: state.flaggedQuestions.contains(q.id),
                   readOnly: (state.answerSelectionCounts[q.id] ?? 0) >= 2,
+                  hideSourceTag: true,
+                  hideBookmark: true,
+                  onToggleBookmark: null,
+                  showReport: true,
                   onSelectOption: (optIndex) {
                     ref
                         .read(examEngineProvider.notifier)
@@ -859,31 +864,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     ref.read(examEngineProvider.notifier).toggleFlag(q.id);
                   },
                   onReport: () {
-                    AppPopups.show(
-                      context,
-                      message: 'Report generated.',
-                      isError: false,
-                    );
-                  },
-                  isBookmarked: state.bookmarkedQuestions.contains(q.id),
-                  onToggleBookmark: () async {
-                    final isPro = await resolveUserIsPro(ref);
-                    final isBookmarked =
-                        state.bookmarkedQuestions.contains(q.id);
-                    if (!isBookmarked &&
-                        !isPro &&
-                        state.bookmarkedQuestions.length >= 25) {
-                      if (!context.mounted) return;
-                      AppPopups.warning(
-                        context,
-                        message:
-                            'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
-                      );
-                      return;
-                    }
-                    ref
-                        .read(examEngineProvider.notifier)
-                        .toggleBookmark(q.id, isPro: isPro);
+                    QuestionReportDialog.show(context, q.id);
                   },
                 ),
               ],

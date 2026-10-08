@@ -2214,17 +2214,31 @@ export default function StudentRoot({
     if (appState === AppState.COMPLETED) {
       return (
         <AppLayout
-          activeTab={isReviewingHistory ? "history" : "dashboard"}
+          activeTab={isReviewingHistory ? "history" : "setup"}
           {...commonLayoutProps}
           title={isReviewingHistory ? "পরীক্ষার ইতিহাস ও ফলাফল" : "পরীক্ষার ফলাফল"}
-          onBack={() => smartBack(isReviewingHistory ? "history" : "dashboard")}
+          onBack={() => {
+            setAppState(AppState.IDLE);
+            if (isReviewingHistory) {
+              smartBack("history");
+            } else {
+              handleTabChange("setup");
+            }
+          }}
         >
           <ResultView
             questions={questions}
             userAnswers={userAnswers}
             timeTaken={timeTaken}
             initialBookmarks={flaggedQuestions}
-            onRestart={() => smartBack(isReviewingHistory ? "history" : "dashboard")}
+            onRestart={() => {
+              setAppState(AppState.IDLE);
+              if (isReviewingHistory) {
+                smartBack("history");
+              } else {
+                handleTabChange("setup");
+              }
+            }}
             isDarkMode={theme === "dark"}
             onToggleTheme={toggleTheme}
             isHistoryMode={isReviewingHistory}

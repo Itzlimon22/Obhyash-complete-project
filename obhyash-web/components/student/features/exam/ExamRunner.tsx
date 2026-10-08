@@ -354,19 +354,16 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                     serialNumber={idx + 1}
                     selectedOptionIndex={userAnswers[question.id]}
                     isFlagged={isFlagged}
-                    isBookmarked={isBookmarked}
                     readOnly={(selectionCounts[question.id] ?? (userAnswers[question.id] !== undefined ? 1 : 0)) >= 2}
-                    hideSourceTag={shouldHideSource}
+                    hideSourceTag={true}
+                    hideBookmark={true}
+                    onToggleBookmark={undefined}
+                    showReport={true}
+                    onReport={() => setReportingQuestionId(question.id)}
                     onSelectOption={(optIdx) =>
                       handleOptionSelect(question.id, optIdx)
                     }
                     onToggleFlag={() => handleToggleFlag(question.id)}
-                    onToggleBookmark={
-                      onToggleBookmark
-                        ? () => onToggleBookmark(question.id)
-                        : undefined
-                    }
-                    showReport={false}
                   />
                 </div>
               </React.Fragment>

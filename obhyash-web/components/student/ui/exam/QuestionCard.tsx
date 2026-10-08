@@ -30,6 +30,7 @@ export interface QuestionCardProps {
   readOnly?: boolean;
   showAnswer?: boolean;
   isBookmarked?: boolean;
+  hideBookmark?: boolean;
   onToggleBookmark?: () => void;
   onDelete?: () => void;
   hideMetadata?: boolean;
@@ -55,12 +56,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   readOnly = false,
   showAnswer = false,
   isBookmarked = false,
+  hideBookmark = false,
   onToggleBookmark,
   onDelete,
   hideMetadata = false,
   hideSourceTag = false,
   alwaysShowSourceTag = false,
-  showReport = false,
+  showReport = true,
   initiallyExpanded = false,
   hideExplanation = false,
   className,
@@ -236,7 +238,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             )}
 
             {/* Bookmark Button (Matching Flutter QuestionCard _IconBtn) */}
-            {onToggleBookmark && (
+            {!hideBookmark && onToggleBookmark && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -273,7 +275,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             )}
 
             {/* Report Button (Matching Flutter QuestionCard _IconBtn: only when showReport is true) */}
-            {onReport && showReport && (
+            {onReport && showReport !== false && (
               <button
                 type="button"
                 onClick={(e) => {
