@@ -8,6 +8,9 @@ import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../exam/services/local_exam_cache_service.dart';
+import '../../../core/providers/auth_provider.dart';
+import '../../../core/router.dart';
+import 'package:go_router/go_router.dart';
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
   () => AuthController(),
@@ -133,6 +136,7 @@ class AuthController extends AsyncNotifier<void> {
   // ── Google Sign-in (Native In-App Sheet with Browser Fallback) ─────────────
 
   Future<void> loginWithGoogle() async {
+    AuthNotifier.isResolvingGoogleAuth = true;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       try {
@@ -147,6 +151,7 @@ class AuthController extends AsyncNotifier<void> {
 
         // User dismissed the bottom sheet dialog without choosing an account
         if (googleUser == null) {
+          AuthNotifier.isResolvingGoogleAuth = false;
           return;
         }
 
@@ -156,15 +161,61 @@ class AuthController extends AsyncNotifier<void> {
         final String? accessToken = googleAuth.accessToken;
 
         if (idToken == null) {
+          AuthNotifier.isResolvingGoogleAuth = false;
           throw Exception('গুগল লগইন টোকেন পাওয়া যায়নি।');
         }
 
-        await _supabase.auth.signInWithIdToken(
+        final authRes = await _supabase.auth.signInWithIdToken(
           provider: OAuthProvider.google,
           idToken: idToken,
           accessToken: accessToken,
         );
+
+        final loggedInUser = authRes.user ?? _supabase.auth.currentUser;
+        if (loggedInUser == null) {
+          AuthNotifier.isResolvingGoogleAuth = false;
+          return;
+        }
+
+        // Direct check in public.users to determine if user has a completed profile (stream + batch)
+        bool isComplete = false;
+        try {
+          final res = await _supabase
+              .from('users')
+              .select('id, stream, batch, role')
+              .or('id.eq.${loggedInUser.id},email.ilike.${loggedInUser.email ?? ''}')
+              .order('created_at', ascending: false)
+              .limit(1)
+              .maybeSingle();
+
+          if (res != null) {
+            final role = (res['role'] as String? ?? '').toLowerCase();
+            final isStaff = role == 'admin' || role == 'teacher';
+            final stream = res['stream'] as String?;
+            final batch = res['batch'] as String?;
+            isComplete = isStaff ||
+                (stream != null &&
+                    stream.isNotEmpty &&
+                    batch != null &&
+                    batch.isNotEmpty);
+          }
+        } catch (profileErr) {
+          debugPrint('[AuthController] Google login profile lookup error: $profileErr');
+        }
+
+        AuthNotifier.needsProfileCompletion = !isComplete;
+        AuthNotifier.isResolvingGoogleAuth = false;
+
+        final ctx = rootNavigatorKey.currentContext;
+        if (ctx != null && ctx.mounted) {
+          if (!isComplete) {
+            GoRouter.of(ctx).go('/complete-profile');
+          } else {
+            GoRouter.of(ctx).go('/');
+          }
+        }
       } catch (e) {
+        AuthNotifier.isResolvingGoogleAuth = false;
         debugPrint('[AuthController] Native Google sign-in failed, trying fallback: $e');
         // Graceful fallback to browser OAuth if native dialog is unavailable
         try {

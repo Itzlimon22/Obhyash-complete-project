@@ -370,9 +370,9 @@ function preprocess(text: string): string {
   processedText = processedText.replace(/\$\s*\\n/g, "\n$");
   processedText = processedText.replace(/(?<=\$)(\s*\\n\s*)+(?=[^\$])/g, " ");
 
-  // 5. Normalize matrix and tabular environments (clean stray dollars and row breaks)
+  // 5. Normalize matrix, aligned, and tabular environments (clean stray dollars and row breaks)
   processedText = processedText.replace(
-    /\$*\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array|align\*?)\}\$*([\s\S]*?)\$*\\end\{\1\}\$*/g,
+    /\$*\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array|align\*?|aligned)\}\$*([\s\S]*?)\$*\\end\{\1\}\$*/g,
     (_full, env, body) => {
       const cleanBody = body
         .replace(/\$/g, "")

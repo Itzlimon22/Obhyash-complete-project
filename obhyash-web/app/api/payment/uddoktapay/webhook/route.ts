@@ -4,7 +4,7 @@ import {
   activateSubscriptionFromUddoktaPay,
 } from '@/lib/payment/uddoktapay-service';
 
-const configuredApiKey = process.env.UDDOKTAPAY_API_KEY || '9KrVMoMyjgX5e5itMtDIz2yvngV8Pzfey3d1qm2p';
+const configuredApiKey = process.env.UDDOKTAPAY_API_KEY || '';
 
 export async function POST(request: NextRequest) {
   try {

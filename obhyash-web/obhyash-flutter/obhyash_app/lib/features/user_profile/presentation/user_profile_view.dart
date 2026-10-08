@@ -591,16 +591,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
               const SizedBox(height: 16),
             ],
 
-            // ── 4. বিষয়ভিত্তিক দক্ষতা (Subjects Progress) ───────────────────
-            SubjectsProgressSection(
-              subjectStats: _targetA.subjects,
-              isViewingSelf: isViewingSelf,
-              studentName: targetUser.name,
-              stream: targetUser.stream,
-            ),
-            const SizedBox(height: 16),
-
-            // ── 5. স্ট্রিক ক্যালেন্ডার (Streak Calendar) ──────────────────────
+            // ── 5. স্ট্রিক ক্যালেন্ডার (Streak Calendar - Directly below Graph Card) ──────
             StreakCalendar(
               calendarData: _targetA.calendarData,
               streakCount: targetStreak,
@@ -610,6 +601,15 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
             // ── 6. অর্জন ও ব্যাজসমূহ (Badges Showcase) ──────────────────────
             BadgesShowcaseSection(
               userId: targetUser.id,
+            ),
+            const SizedBox(height: 16),
+
+            // ── 7. বিষয়ভিত্তিক দক্ষতা (Subjects Progress) ───────────────────
+            SubjectsProgressSection(
+              subjectStats: _targetA.subjects,
+              isViewingSelf: isViewingSelf,
+              studentName: targetUser.name,
+              stream: targetUser.stream,
             ),
           ],
         ),

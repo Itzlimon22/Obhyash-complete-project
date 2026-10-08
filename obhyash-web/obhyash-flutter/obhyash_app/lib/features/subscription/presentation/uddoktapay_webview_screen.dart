@@ -155,25 +155,22 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
     });
 
     try {
-      final url = Uri.parse('https://obhyash.paymently.io/api/checkout-v2');
+      final url = Uri.parse('https://obhyash.com/api/payment/uddoktapay/create');
       final payload = {
-        'full_name': widget.customerName ?? 'Obhyash Student',
-        'email': widget.customerEmail ?? 'student@obhyash.com',
-        'amount': widget.amount.toString(),
-        'metadata': {
-          'user_id': widget.userId,
-          'plan_id': widget.planId,
-          'plan_name': widget.planName,
-        },
-        'redirect_url': 'https://obhyash.paymently.io/success',
-        'cancel_url': 'https://obhyash.paymently.io/cancel',
-        'webhook_url': 'https://obhyash.com/api/payment/uddoktapay/webhook',
+        'userId': widget.userId,
+        'planId': widget.planId,
+        'planName': widget.planName,
+        'amount': widget.amount,
+        'customerName': widget.customerName ?? 'Obhyash Student',
+        'customerEmail': widget.customerEmail ?? 'student@obhyash.com',
+        'customerPhone': widget.customerPhone,
+        'redirectUrl': 'https://obhyash.paymently.io/success',
+        'cancelUrl': 'https://obhyash.paymently.io/cancel',
       };
 
       final response = await http.post(
         url,
         headers: {
-          'RT-UDDOKTAPAY-API-KEY': '9KrVMoMyjgX5e5itMtDIz2yvngV8Pzfey3d1qm2p',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(payload),
@@ -181,12 +178,14 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-      if (response.statusCode == 200 && data['status'] == true && data['payment_url'] != null) {
-        _paymentUrl = data['payment_url'] as String;
+      if (response.statusCode == 200 && data['success'] == true && data['paymentUrl'] != null) {
+        _paymentUrl = data['paymentUrl'] as String;
         _setupWebView(_paymentUrl!);
       } else {
         setState(() {
-          _errorMessage = data['message']?.toString() ?? 'পেমেন্ট গেটওয়ে লোড করা সম্ভব হয়নি';
+          _errorMessage = data['error']?.toString() ??
+              data['message']?.toString() ??
+              'পেমেন্ট গেটওয়ে লোড করা সম্ভব হয়নি';
           _isLoading = false;
         });
       }

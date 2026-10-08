@@ -8,20 +8,17 @@ import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import Link from 'next/link';
 import {
   Gift,
-  Trophy,
   Camera,
-  Layers,
-  Calendar,
-  HelpCircle,
-  ArrowRight,
-  ShieldCheck,
-  Zap,
 } from 'lucide-react';
 import { isUserPro } from '@/lib/subscription-utils';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
 import AvatarPickerModal from './dashboard/AvatarPickerModal';
+import type { DailyXpPoint } from './dashboard/XpGainLineChartCard';
 
 const StatsGrid = dynamic(() => import('./dashboard/StatsGrid'));
+const XpGainLineChartCard = dynamic(
+  () => import('./dashboard/XpGainLineChartCard')
+);
 const SubjectsProgressSection = dynamic(
   () => import('./dashboard/SubjectsProgressSection')
 );
@@ -56,54 +53,10 @@ export default function MyProfileView({
   const calendarData = hookData.calendarData;
   const isLoading = !propHistory && hookData.isLoading;
 
-  // 5-Tier Level Calculation matching Flutter & Leaderboard
-  const getLevelInfo = (xp: number) => {
-    if (xp < 1000) {
-      const p = Math.min(1.0, Math.max(0.0, xp / 1000.0));
-      return {
-        currentRank: 'রুকি',
-        nextRank: 'স্কাউট',
-        progress: p,
-        percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১,০০০ XP`,
-      };
-    } else if (xp < 3000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 1000) / 2000.0));
-      return {
-        currentRank: 'স্কাউট',
-        nextRank: 'ওয়ারিয়র',
-        progress: p,
-        percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৩,০০০ XP`,
-      };
-    } else if (xp < 7000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 3000) / 4000.0));
-      return {
-        currentRank: 'ওয়ারিয়র',
-        nextRank: 'টাইটান',
-        progress: p,
-        percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৭,০০০ XP`,
-      };
-    } else if (xp < 15000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 7000) / 8000.0));
-      return {
-        currentRank: 'টাইটান',
-        nextRank: 'লিজেন্ড',
-        progress: p,
-        percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১৫,০০০ XP`,
-      };
-    } else {
-      return {
-        currentRank: 'লিজেন্ড',
-        nextRank: 'সর্বোচ্চ স্তর',
-        progress: 1.0,
-        percent: 100,
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} XP (সর্বোচ্চ স্তর)`,
-      };
-    }
-  };
+  function getBengaliWeekday(d: Date): string {
+    const days = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'];
+    return days[d.getDay()];
+  }
 
   const evaluatedExams = history.filter(
     (h) => !h.status || h.status === 'evaluated'
@@ -138,8 +91,53 @@ export default function MyProfileView({
 
   if (!user) return null;
 
-  const levelInfo = getLevelInfo(user.xp || 0);
   const isPro = isUserPro(user);
+
+  // 7-day XP data for XpGainLineChartCard
+  const { xpChartData, primaryXpTotal } = React.useMemo(() => {
+    const dateXpMap: Record<string, number> = {};
+    if (history && history.length > 0) {
+      for (const exam of history) {
+        const rawDate = (exam as any).createdAt || (exam as any).date || (exam as any).timestamp;
+        const d = rawDate ? new Date(rawDate) : new Date();
+        const key = d.toISOString().split('T')[0];
+        const earned = (exam as any).xpEarned ?? ((exam.score ?? (exam as any).correctCount ?? 0) * 10);
+        dateXpMap[key] = (dateXpMap[key] || 0) + earned;
+      }
+    }
+
+    if (Object.keys(dateXpMap).length === 0 && (user?.xp || 0) > 0) {
+      const streak = user.streakCount || 1;
+      const avg = Math.min(100, Math.max(10, Math.round((user.xp || 0) / (streak > 0 ? streak : 1))));
+      const activeDays = Math.min(7, Math.max(1, streak));
+      for (let i = 0; i < activeDays; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        dateXpMap[key] = avg;
+      }
+    }
+
+    const list: DailyXpPoint[] = [];
+    let total = 0;
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      const xpVal = dateXpMap[key] || 0;
+      total += xpVal;
+      list.push({
+        date: key,
+        dayLabel: getBengaliWeekday(d),
+        myXP: xpVal,
+      });
+    }
+
+    return {
+      xpChartData: list,
+      primaryXpTotal: total,
+    };
+  }, [history, user?.xp, user?.streakCount]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-5 animate-fade-in pb-24 pt-2 font-['HindSiliguri']">
@@ -225,63 +223,7 @@ export default function MyProfileView({
         </div>
       </div>
 
-      {/* ── 2. Level Progress Bar (Premium Design matching Flutter) ── */}
-      <div className="bg-gradient-to-br from-[#312E81] via-[#3730A3] to-[#4338CA] dark:from-[#1E1B4B] dark:via-[#2E1065] dark:to-[#312E81] text-white rounded-[24px] p-5 sm:p-7 shadow-xl relative overflow-hidden border border-indigo-500/30">
-        <Trophy className="absolute -top-6 -right-6 w-36 h-36 text-white/5 pointer-events-none" />
-
-        <div className="flex items-center justify-between mb-4 relative z-10 gap-3">
-          <div className="flex items-center gap-3.5 sm:gap-4">
-            {/* Big 3D SVG Level Crest */}
-            <img
-              src={
-                levelInfo.currentRank === 'লিজেন্ড'
-                  ? '/leaderboard-levels/level_5_legend.svg'
-                  : levelInfo.currentRank === 'টাইটান'
-                  ? '/leaderboard-levels/level_4_titan.svg'
-                  : levelInfo.currentRank === 'ওয়ারিয়র'
-                  ? '/leaderboard-levels/level_3_warrior.svg'
-                  : levelInfo.currentRank === 'স্কাউট'
-                  ? '/leaderboard-levels/level_2_scout.svg'
-                  : '/leaderboard-levels/level_1_rookie.svg'
-              }
-              alt={levelInfo.currentRank}
-              className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-xl shrink-0 transition-transform hover:scale-105"
-            />
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-[10px] text-[#FDE047] text-xs sm:text-sm font-black mb-1.5 backdrop-blur-xs">
-                <span>{levelInfo.currentRank} স্তর</span>
-              </div>
-              <h3 className="text-sm sm:text-base font-bold text-white/80 leading-snug">
-                পরবর্তী স্তর: <strong className="text-white font-extrabold">{levelInfo.nextRank}</strong>
-              </h3>
-            </div>
-          </div>
-
-          <div className="text-right shrink-0">
-            <span className="text-2xl sm:text-4xl font-black text-white block tabular-nums leading-none">
-              {BanglaNameHelper.toBanglaNumeral(levelInfo.percent)}%
-            </span>
-            <span className="text-[11px] sm:text-xs font-bold text-[#FDE047] bg-black/30 px-2.5 py-0.5 rounded-[6px] border border-white/10 mt-1.5 inline-block">
-              {levelInfo.xpText}
-            </span>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/10 relative my-1">
-          <div
-            className="h-full bg-gradient-to-r from-[#38BDF8] via-[#818CF8] to-[#FDE047] transition-all duration-700 rounded-full shadow-[0_2px_8px_rgba(245,158,11,0.4)]"
-            style={{ width: `${levelInfo.progress * 100}%` }}
-          />
-        </div>
-
-        <div className="flex justify-between items-center text-xs font-bold text-white/60 mt-3">
-          <span>{levelInfo.currentRank}</span>
-          <span>{levelInfo.nextRank}</span>
-        </div>
-      </div>
-
-      {/* ── 3. Key Stats Grid ── */}
+      {/* ── 2. Key Stats Grid ── */}
       <StatsGrid
         examsTaken={evaluatedExams.length}
         avgScore={avgScore}
@@ -289,27 +231,29 @@ export default function MyProfileView({
         streak={user.streakCount || 0}
       />
 
-      {/* ── 4. Badges Showcase Section ── */}
+      {/* ── 3. XP Gain Line Chart (Above Badges Showcase) ── */}
+      <XpGainLineChartCard
+        data={xpChartData}
+        primaryTotal={primaryXpTotal}
+        isViewingSelf={true}
+      />
+
+      {/* ── 4. Streak Calendar (Directly below XP Graph Card) ── */}
+      <StreakCalendar
+        calendarData={calendarData}
+        streakCount={user.streakCount || 0}
+      />
+
+      {/* ── 5. Badges Showcase Section (অর্জন ও ব্যাজ) ── */}
       <BadgesShowcaseSection userId={user.id} />
 
-      {/* ── 5. Main Content Layout (Left Column & Right Column mimic from Flutter) ── */}
+      {/* ── 6. Subjects Progress & Recent Activity ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Left Column: Subjects Progress + Recent Activity */}
-        <div className="space-y-5">
-          <SubjectsProgressSection
-            subjectStats={subjectStats}
-            onSubjectClick={onSubjectClick}
-          />
-          <RecentActivitySection history={history} />
-        </div>
-
-        {/* Right Column: Streak Calendar */}
-        <div>
-          <StreakCalendar
-            calendarData={calendarData}
-            streakCount={user.streakCount || 0}
-          />
-        </div>
+        <SubjectsProgressSection
+          subjectStats={subjectStats}
+          onSubjectClick={onSubjectClick}
+        />
+        <RecentActivitySection history={history} />
       </div>
 
       {/* ── Avatar Picker Modal ── */}

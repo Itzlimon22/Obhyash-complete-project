@@ -115,13 +115,20 @@ class AppPopups {
       }
     }
 
+    // Enforce minimum 3.5 seconds stay time (4.0s for errors) so users always have plenty of time to read
+    final effectiveDuration = duration < const Duration(seconds: 3, milliseconds: 500)
+        ? (type == PopupType.error
+            ? const Duration(seconds: 4)
+            : const Duration(seconds: 3, milliseconds: 500))
+        : duration;
+
     overlayEntry = OverlayEntry(
       builder: (context) {
         return _TopAnimatedPopup(
           message: cleanMessage,
           title: title,
           type: type,
-          duration: duration,
+          duration: effectiveDuration,
           isDark: isDark,
           onDismiss: safeRemove,
         );

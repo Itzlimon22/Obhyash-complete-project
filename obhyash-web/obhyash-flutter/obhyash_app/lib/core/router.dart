@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'providers/auth_provider.dart';
 import '../features/dashboard/presentation/dashboard_view.dart';
 import '../features/auth/presentation/login_view.dart';
 import '../features/auth/presentation/update_password_view.dart';
@@ -120,7 +121,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         // If the cold-start launch animation has already run, do not stay on /splash
         if (AppLaunchTracker.hasCompletedColdLaunch) {
           final session = Supabase.instance.client.auth.currentSession;
-          return session != null ? '/' : '/welcome';
+          if (session != null) {
+            if (AuthNotifier.needsProfileCompletion) {
+              return '/complete-profile';
+            }
+            return '/';
+          }
+          return '/welcome';
         }
         return null; // let splash finish its launch animation
       }
@@ -145,6 +152,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (!isAuth && !isLoggingIn && !isUpdatingPassword) {
         return '/welcome';
       }
+
+      // If Google authentication or profile verification is actively resolving,
+      // DO NOT redirect to '/' yet; wait until the target route is determined.
+      if (AuthNotifier.isResolvingGoogleAuth) {
+        return null;
+      }
+
+      // If user is authenticated but needs profile completion, strictly guide to /complete-profile
+      if (isAuth && AuthNotifier.needsProfileCompletion) {
+        return '/complete-profile';
+      }
+
       if (isAuth && isLoggingIn) {
         return '/';
       }

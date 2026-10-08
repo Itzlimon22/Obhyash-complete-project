@@ -320,21 +320,19 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 {paymentMode === 'instant' ? (
                   <div className="space-y-4">
                     <div className="bg-neutral-50/80 dark:bg-[#2C2C2E]/40 border border-neutral-200/80 dark:border-white/[0.08] rounded-2xl p-5 text-center shadow-xs">
-                      <div className="w-12 h-12 rounded-2xl bg-[#12544F] text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-[#12544F]/20">
-                        <Zap className="w-6 h-6" />
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md shadow-black/10">
+                        <img src="/icons/automatic_payment.svg" alt="Automatic Payment" className="w-12 h-12 object-contain" />
                       </div>
                       <h4 className="text-base font-bold text-neutral-900 dark:text-white mb-1 font-['Anek_Bangla',sans-serif]">
                         সরাসরি অনলাইন পেমেন্ট
                       </h4>
                       <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-4 max-w-sm mx-auto font-['HindSiliguri',sans-serif] leading-relaxed">
-                        বিকাশ, নগদ, রকেট বা ভিসা/মাস্টারকার্ড দিয়ে নিরাপদে পেমেন্ট করুন। পেমেন্ট শেষে স্বয়ংক্রিয়ভাবে প্রো প্ল্যান চালু হবে।
+                        বিকাশ বা নগদ দিয়ে নিরাপদে পেমেন্ট করুন। পেমেন্ট শেষে স্বয়ংক্রিয়ভাবে প্রো প্ল্যান চালু হবে।
                       </p>
 
                       <div className="flex items-center justify-center gap-2 mb-5 flex-wrap">
                         <span className="px-2.5 py-1 rounded-lg bg-[#D11559]/10 text-[#D11559] border border-[#D11559]/20 font-mono text-xs font-bold">bKash</span>
                         <span className="px-2.5 py-1 rounded-lg bg-[#E11D48]/10 text-[#E11D48] border border-[#E11D48]/20 font-mono text-xs font-bold">Nagad</span>
-                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 font-mono text-xs font-bold">Rocket</span>
-                        <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-mono text-xs font-bold">Cards</span>
                       </div>
 
                       <button

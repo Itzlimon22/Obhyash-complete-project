@@ -625,7 +625,7 @@ function SignupForm() {
               <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
                   <label className="text-xs sm:text-sm font-normal text-slate-700 dark:text-slate-300 ml-0.5">
-                    শিক্ষা প্রতিষ্ঠান
+                    {formData.stream === 'SSC' ? 'স্কুল / শিক্ষা প্রতিষ্ঠান' : 'শিক্ষা প্রতিষ্ঠান'}
                   </label>
                   <div className="relative group">
                     <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#006A4E] transition-colors pointer-events-none" />
@@ -644,13 +644,12 @@ function SignupForm() {
                       onBlur={() =>
                         setTimeout(() => setShowCollegeSuggestions(false), 150)
                       }
-                      placeholder="কলেজ / স্কুলের নাম"
+                      placeholder={formData.stream === 'SSC' ? 'স্কুলের নাম লিখো' : 'কলেজ / স্কুলের নাম'}
                       autoComplete="off"
                       className="w-full pl-10 pr-3.5 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                     />
-                    {showCollegeSuggestions &&
-                      searchColleges(formData.institute).length > 0 && (
-                        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden">
+                    {showCollegeSuggestions && formData.institute.trim().length > 0 && (
+                        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden max-h-56 overflow-y-auto">
                           {searchColleges(formData.institute).map((name) => (
                             <button
                               key={name}
@@ -665,6 +664,18 @@ function SignupForm() {
                               {name}
                             </button>
                           ))}
+                          {!searchColleges(formData.institute).includes(formData.institute.trim()) && (
+                            <button
+                              type="button"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setShowCollegeSuggestions(false);
+                              }}
+                              className="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/70 dark:hover:bg-emerald-950/50 transition-colors flex items-center gap-2 border-t border-emerald-100 dark:border-emerald-900/50"
+                            >
+                              <span>➕ প্রতিষ্ঠান হিসেবে &quot;{formData.institute.trim()}&quot; ব্যবহার করো</span>
+                            </button>
+                          )}
                         </div>
                       )}
                   </div>

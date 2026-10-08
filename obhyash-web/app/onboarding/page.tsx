@@ -115,10 +115,10 @@ export default function OnboardingPage() {
   const handleInstituteChange = (val: string) => {
     setInstitute(val);
     setError(null);
-    if (val.trim().length >= 2) {
+    if (val.trim().length > 0) {
       const suggestions = searchColleges(val);
       setCollegeSuggestions(suggestions);
-      setShowSuggestions(suggestions.length > 0);
+      setShowSuggestions(true);
     } else {
       setShowSuggestions(false);
     }
@@ -134,6 +134,9 @@ export default function OnboardingPage() {
     setStream(newStream);
     const defaultBatch = newStream === 'HSC' ? 'HSC 2026' : 'SSC 2026';
     setBatch(defaultBatch);
+    if (newStream === 'HSC') {
+      setGroup('Science');
+    }
   };
 
   const validateStep1 = () => {
@@ -146,6 +149,9 @@ export default function OnboardingPage() {
     }
     if (!institute.trim()) {
       return 'তোমার কলেজ বা প্রতিষ্ঠানের নাম লেখো';
+    }
+    if (stream === 'HSC' && group !== 'Science') {
+      return 'এইচএসসি এর জন্য বর্তমানে শুধুমাত্র বিজ্ঞান বিভাগ চালু আছে';
     }
     return null;
   };
@@ -237,21 +243,21 @@ export default function OnboardingPage() {
   const stepLabels = ['প্রয়োজনীয় তথ্য', 'ঐচ্ছিক তথ্য'];
 
   const renderProgress = () => (
-    <div className="flex items-center justify-between max-w-xs mx-auto mb-6 px-4">
+    <div className="flex items-center justify-between max-w-[240px] mx-auto mb-1 px-2">
       {[1, 2].map((s, idx) => (
         <div key={s} className="flex items-center flex-1 last:flex-none">
           <div className="flex flex-col items-center">
             <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+              className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-200 ${
                 step >= s
-                  ? 'bg-[#006A4E] text-white shadow-sm'
+                  ? 'bg-[#066b4f] text-white shadow-xs'
                   : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'
               }`}
             >
               {s}
             </div>
             <span
-              className={`text-[11px] sm:text-xs mt-1.5 transition-colors whitespace-nowrap ${
+              className={`text-[10px] sm:text-[11px] mt-1 transition-colors whitespace-nowrap ${
                 step >= s
                   ? 'font-bold text-neutral-900 dark:text-white'
                   : 'font-medium text-neutral-400 dark:text-neutral-500'
@@ -262,8 +268,8 @@ export default function OnboardingPage() {
           </div>
           {s < 2 && (
             <div
-              className={`flex-1 h-0.5 mx-3 -mt-5 transition-colors ${
-                step > s ? 'bg-[#006A4E]' : 'bg-neutral-200 dark:bg-neutral-800'
+              className={`flex-1 h-0.5 mx-2 -mt-3.5 transition-colors ${
+                step > s ? 'bg-[#066b4f]' : 'bg-neutral-200 dark:bg-neutral-800'
               }`}
             />
           )}
@@ -273,38 +279,28 @@ export default function OnboardingPage() {
   );
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white dark:bg-[#07080a] md:bg-neutral-50 md:dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#066b4f]/20">
       {/* Top Header */}
-      <header className="w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
+      <header className="w-full max-w-md mx-auto px-4 pt-2.5 pb-1 flex items-center justify-between shrink-0">
         {step > 1 ? (
           <button
             type="button"
             onClick={handleBack}
-            className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1 cursor-pointer"
+            className="text-xs font-semibold text-[#6b7a74] hover:text-[#066b4f] dark:text-neutral-400 dark:hover:text-emerald-400 transition-colors flex items-center gap-1 cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>আগের ধাপ</span>
           </button>
         ) : (
-          <div className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/icon.svg"
-              alt="Obhyash Logo"
-              className="w-7 h-7 rounded-lg shadow-xs"
-            />
-            <span className="text-base font-black tracking-tight text-neutral-900 dark:text-white">
-              অভ্যাস
-            </span>
-          </div>
+          <div className="w-16" />
         )}
 
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-2.5 ml-auto">
           {mounted && (
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1 rounded-full text-[#6b7a74] hover:text-[#066b4f] dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
               title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
               aria-label="Toggle theme"
             >
@@ -314,7 +310,7 @@ export default function OnboardingPage() {
 
           <Link
             href="/support"
-            className="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+            className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/80 dark:bg-[#15201b]/80 backdrop-blur-md border border-[#d5e8e0] dark:border-[#203a30] text-[#066b4f] dark:text-[#34d399] text-[11px] font-semibold shadow-2xs hover:bg-white transition-all"
           >
             সাপোর্ট লাগবে?
           </Link>
@@ -322,23 +318,36 @@ export default function OnboardingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-5 sm:px-6 py-4 sm:py-8">
-        <div className="w-full max-w-sm sm:max-w-md md:bg-white md:dark:bg-[#111216] md:border md:border-neutral-200/90 md:dark:border-neutral-800/80 md:rounded-3xl sm:p-2 md:p-8 md:shadow-xl md:shadow-neutral-200/40 md:dark:shadow-none space-y-6 transition-colors">
-          {/* Welcome Header */}
-          <div className="text-center space-y-2 pt-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-              স্বাগতম, {googleUser?.name}! 🎉
-            </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium max-w-xs mx-auto">
-              তোমার অ্যাকাডেমিক তথ্য দিয়ে প্রোফাইলটি সম্পন্ন করো।
-            </p>
-          </div>
+      <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-1 sm:py-3">
+        {/* Brand Logo & Slogan Header */}
+        <div className="flex flex-col items-center justify-center text-center mb-2.5 sm:mb-3 px-4 shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/obhyash_full_logo.png"
+            alt="Obhyash Logo"
+            className="h-8 sm:h-9 w-auto object-contain dark:hidden drop-shadow-xs"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/obhyash_full_logo_dark.png"
+            alt="Obhyash Logo"
+            className="h-8 sm:h-9 w-auto object-contain hidden dark:block drop-shadow-xs"
+          />
+          <p className="mt-1 text-[11px] sm:text-xs font-medium text-[#52655d] dark:text-neutral-400 tracking-wide">
+            অভ্যাসে শুরু সাফল্যে শেষ
+          </p>
+        </div>
 
-          {/* Google Verified Banner */}
-          <div className="p-3.5 rounded-2xl bg-[#f3f4f6] dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
+        {/* Auth Sheet/Card */}
+        <div className="w-full max-w-[420px] bg-white dark:bg-[#121714] border-t sm:border border-[#e4ebe8] dark:border-[#1d2722] rounded-t-[28px] sm:rounded-b-[28px] px-4 py-3.5 sm:px-6 sm:py-5 shadow-[0_20px_45px_-15px_rgba(6,107,79,0.12)] dark:shadow-none space-y-3 transition-colors">
+          {/* Stepper Progress */}
+          {renderProgress()}
+
+          {/* Google Verified Banner (Only shown in Step 1) */}
+          {step === 1 && (
+            <div className="h-10 px-3 rounded-xl bg-[#f4f7f5] dark:bg-[#17201c] border border-[#dce9e2] dark:border-[#22352b] flex items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                     fill="#4285F4"
@@ -356,42 +365,34 @@ export default function OnboardingPage() {
                     fill="#EA4335"
                   />
                 </svg>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">
-                  {googleUser?.name}
-                </p>
-                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono truncate">
+                <span className="text-xs font-mono font-medium text-neutral-800 dark:text-neutral-200 truncate">
                   {googleUser?.email}
-                </p>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full shrink-0 border border-emerald-500/20">
+                <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
+                <span>ভেরিফাইড</span>
               </div>
             </div>
-
-            <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg shrink-0">
-              <CheckCircle2 size={13} />
-              <span>ভেরিফাইড</span>
-            </div>
-          </div>
-
-          {/* Stepper Progress */}
-          {renderProgress()}
+          )}
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 text-xs sm:text-sm font-medium animate-in slide-in-from-top-2">
+            <div className="p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 text-xs font-medium animate-in slide-in-from-top-1">
               ⚠️ {error}
             </div>
           )}
 
           {/* STEP 1: MANDATORY INFORMATION */}
           {step === 1 && (
-            <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
+            <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-200">
               {/* Mobile Number */}
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#2d3748] dark:text-neutral-300 block">
                   মোবাইল নম্বর <span className="text-red-500">*</span>
                 </label>
-                <div className="relative group">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-[#006A4E] transition-colors" />
+                <div className="relative flex items-center h-10 sm:h-11 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl px-3 shadow-2xs focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 transition-all">
+                  <Phone className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
                   <input
                     type="tel"
                     value={phone}
@@ -401,33 +402,33 @@ export default function OnboardingPage() {
                     }}
                     placeholder="01XXXXXXXXX"
                     required
-                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-mono font-medium"
+                    className="w-full h-full bg-transparent pl-2.5 pr-1 text-xs sm:text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-mono font-medium"
                   />
                 </div>
               </div>
 
               {/* College / Institution */}
-              <div className="space-y-1.5 relative">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
-                  কলেজ / প্রতিষ্ঠান <span className="text-red-500">*</span>
+              <div className="space-y-1 relative">
+                <label className="text-xs font-semibold text-[#2d3748] dark:text-neutral-300 block">
+                  {stream === 'SSC' ? 'স্কুল / প্রতিষ্ঠান' : 'কলেজ / প্রতিষ্ঠান'} <span className="text-red-500">*</span>
                 </label>
-                <div className="relative group">
-                  <School className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-[#006A4E] transition-colors" />
+                <div className="relative flex items-center h-10 sm:h-11 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl px-3 shadow-2xs focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 transition-all">
+                  <School className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
                   <input
                     type="text"
                     value={institute}
                     onChange={(e) => handleInstituteChange(e.target.value)}
                     onFocus={() => institute.trim().length >= 2 && setShowSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    placeholder="যেমন: নটর ডেম কলেজ, ঢাকা কলেজ..."
+                    placeholder={stream === 'SSC' ? 'স্কুল বা প্রতিষ্ঠানের নাম...' : 'কলেজ বা প্রতিষ্ঠানের নাম...'}
                     required
-                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                    className="w-full h-full bg-transparent pl-2.5 pr-1 text-xs sm:text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium"
                   />
                 </div>
 
                 {/* Suggestions Dropdown */}
-                {showSuggestions && collegeSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 z-30 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xl p-1.5 space-y-1">
+                {showSuggestions && institute.trim().length > 0 && (
+                  <div className="absolute top-full left-0 right-0 z-30 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl p-1 space-y-0.5">
                     {collegeSuggestions.map((col, idx) => (
                       <button
                         key={idx}
@@ -436,72 +437,109 @@ export default function OnboardingPage() {
                           e.preventDefault();
                           handleSelectCollege(col);
                         }}
-                        className="w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-medium text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors truncate"
+                        className="w-full text-left px-3 py-2 text-xs font-medium text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors truncate"
                       >
                         {col}
                       </button>
                     ))}
+                    {!collegeSuggestions.includes(institute.trim()) && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setShowSuggestions(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/70 dark:hover:bg-emerald-950/50 rounded-lg transition-colors flex items-center gap-1.5 border-t border-emerald-100 dark:border-emerald-900/50"
+                      >
+                        <span>➕ প্রতিষ্ঠান হিসেবে &quot;{institute.trim()}&quot; ব্যবহার করো</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* Stream & Division */}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="space-y-1.5">
-                  <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+              {/* Stream & Division (Both Dropdowns as requested) */}
+              <div className="grid grid-cols-2 gap-2.5">
+                {/* শ্রেণী Dropdown */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#2d3748] dark:text-neutral-300 block">
                     শ্রেণী
                   </label>
-                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#f3f4f6] dark:bg-[#16171d] rounded-2xl border border-neutral-200 dark:border-neutral-800">
-                    {(['HSC', 'SSC'] as const).map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => handleStreamChange(s)}
-                        className={`py-2 rounded-xl text-xs font-bold transition-all text-center ${
-                          stream === s
-                            ? 'bg-[#006A4E] text-white shadow-xs'
-                            : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
+                  <div className="relative">
+                    <select
+                      value={stream}
+                      onChange={(e) => handleStreamChange(e.target.value as 'HSC' | 'SSC')}
+                      className="w-full h-10 sm:h-11 px-3 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-[#066b4f] focus:ring-2 focus:ring-[#066b4f]/15 transition-all appearance-none pr-8 cursor-pointer"
+                    >
+                      <option value="HSC">এইচএসসি (HSC)</option>
+                      <option value="SSC">এসএসসি (SSC)</option>
+                    </select>
+                    <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500">
+                      <ChevronRight className="w-3.5 h-3.5 rotate-90" />
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+                {/* বিভাগ Dropdown */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#2d3748] dark:text-neutral-300 block">
                     বিভাগ
                   </label>
-                  <select
-                    value={group}
-                    onChange={(e) => setGroup(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-2xl bg-[#f3f4f6] dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20"
-                  >
-                    <option value="Science">বিজ্ঞান</option>
-                    <option value="Humanities">মানবিক</option>
-                    <option value="Commerce">ব্যবসায় শিক্ষা</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={group}
+                      onChange={(e) => setGroup(e.target.value)}
+                      className="w-full h-10 sm:h-11 px-3 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-[#066b4f] focus:ring-2 focus:ring-[#066b4f]/15 transition-all appearance-none pr-8 cursor-pointer"
+                    >
+                      <option value="Science">Science (বিজ্ঞান)</option>
+                      {stream === 'SSC' ? (
+                        <>
+                          <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
+                          <option value="Humanities">Humanities (মানবিক)</option>
+                        </>
+                      ) : (
+                        <>
+                          <option
+                            value="Business Studies"
+                            disabled
+                            className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800"
+                          >
+                            Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
+                          </option>
+                          <option
+                            value="Humanities"
+                            disabled
+                            className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800"
+                          >
+                            Humanities (মানবিক) - শীঘ্রই আসছে
+                          </option>
+                        </>
+                      )}
+                    </select>
+                    <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500">
+                      <ChevronRight className="w-3.5 h-3.5 rotate-90" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Batch Selector */}
-              <div className="space-y-1.5 pt-1">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#2d3748] dark:text-neutral-300 block">
                   {stream === 'HSC' ? 'এইচএসসি ব্যাচ' : 'এসএসসি ব্যাচ'}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {(stream === 'HSC'
-                    ? ['HSC 2026', 'HSC 2025', 'HSC 2027']
+                    ? ['HSC 2026', 'HSC 2027', 'HSC 2025']
                     : ['SSC 2026', 'SSC 2027', 'SSC 2028']
                   ).map((b) => (
                     <button
                       key={b}
                       type="button"
                       onClick={() => setBatch(b)}
-                      className={`py-2.5 px-2 rounded-2xl text-xs font-bold border transition-all text-center ${
+                      className={`h-9 px-1 rounded-xl text-xs font-bold border transition-all text-center ${
                         batch === b
-                          ? 'bg-[#006A4E]/10 border-[#006A4E] text-[#006A4E] dark:text-emerald-400 font-extrabold ring-1 ring-[#006A4E]/20'
+                          ? 'bg-[#066b4f]/10 border-[#066b4f] text-[#066b4f] dark:text-emerald-400 ring-1 ring-[#066b4f]/20 font-extrabold'
                           : 'bg-white dark:bg-[#16171d] border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300'
                       }`}
                     >
@@ -512,14 +550,14 @@ export default function OnboardingPage() {
               </div>
 
               {/* Next Step Button */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="w-full h-14 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer"
+                  className="w-full h-11 sm:h-12 bg-[#066b4f] hover:bg-[#055841] active:scale-[0.99] text-white font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
                 >
                   <span>পরবর্তী ধাপ</span>
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -528,99 +566,54 @@ export default function OnboardingPage() {
           {/* STEP 2: OPTIONAL INFORMATION */}
           {step === 2 && (
             <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
-              <div className="p-3 rounded-2xl bg-neutral-50 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400">
-                <Info className="w-4 h-4 text-[#006A4E] dark:text-emerald-400 shrink-0 mt-0.5" />
-                <span>
-                  এই তথ্যগুলো ঐচ্ছিক। তুমি চাইলে এগুলো এখনই নির্বাচন করতে পারো অথবা পরে প্রোফাইল থেকেও পরিবর্তন করতে পারবে।
-                </span>
-              </div>
-
-              {/* Admission Target Cards */}
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
-                  ভর্তি পরীক্ষার লক্ষ্য (ঐচ্ছিক)
+              {/* Optional Password Field (Clean login style) */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#2d3748] dark:text-neutral-300 block">
+                  পাসওয়ার্ড (ঐচ্ছিক)
                 </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {EXAM_TARGETS.map((t) => {
-                    const isSelected = examTarget === t.id;
-                    return (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => setExamTarget(t.id)}
-                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
-                          isSelected
-                            ? 'bg-[#006A4E]/10 border-[#006A4E] text-[#006A4E] dark:text-emerald-300 ring-1 ring-[#006A4E]/20'
-                            : 'bg-white dark:bg-[#16171d] border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300'
-                        }`}
-                      >
-                        <span className="text-xl">{t.emoji}</span>
-                        <p className="text-xs font-bold">{t.label}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Optional Password Field */}
-              <div className="space-y-1.5 pt-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
-                    পাসওয়ার্ড (ঐচ্ছিক)
-                  </label>
-                  <span className="text-[11px] text-neutral-400 font-medium">
-                    ঐচ্ছিক
-                  </span>
-                </div>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-[#006A4E] transition-colors" />
+                <div className="relative flex items-center h-10 sm:h-11 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl px-3 shadow-2xs focus-within:border-[#066b4f] focus-within:ring-2 focus-within:ring-[#066b4f]/15 transition-all">
+                  <Lock className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="ইমেইল দিয়ে লগইন করতে চাইলে (কমপক্ষে ৬ অক্ষর)"
-                    className="w-full pl-12 pr-11 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-xs sm:text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                    placeholder="পাসওয়ার্ড দাও (কমপক্ষে ৬ অক্ষর)"
+                    className="w-full h-full bg-transparent pl-2.5 pr-8 text-xs sm:text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none font-medium"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 p-1 cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 p-1 cursor-pointer"
                     aria-label="Toggle password visibility"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                <p className="text-[11px] text-neutral-400 leading-tight">
-                  💡 পাসওয়ার্ড না দিলেও তুমি সবসময় ১-ট্যাপে Google দিয়ে লগইন করতে পারবে।
-                </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 flex gap-3">
+              <div className="pt-1 flex gap-2.5">
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="w-14 h-14 items-center justify-center flex rounded-2xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#16171d] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                  className="w-11 h-11 sm:w-12 sm:h-12 items-center justify-center flex rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#16171d] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shrink-0"
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleSubmit()}
                   disabled={isSubmitting}
-                  className="flex-1 h-14 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="flex-1 h-11 sm:h-12 bg-[#066b4f] hover:bg-[#055841] active:scale-[0.99] text-white font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       <span>প্রোফাইল তৈরি হচ্ছে...</span>
                     </>
                   ) : (
-                    <>
-                      <span>পড়াশোনা শুরু করো</span>
-                      <span>🚀</span>
-                    </>
+                    <span>পড়াশোনা শুরু করো</span>
                   )}
                 </button>
               </div>

@@ -692,17 +692,17 @@ class _StatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF18181B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
         ),
         boxShadow: [
           BoxShadow(
             color: isDark ? Colors.black26 : const Color(0x06000000),
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -712,19 +712,19 @@ class _StatBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(7),
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 16, color: color),
+            child: Icon(icon, size: 14, color: color),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             value,
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
               color: isDark ? Colors.white : const Color(0xFF18181B),
             ),
           ),
@@ -732,8 +732,8 @@ class _StatBox extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
             ),
           ),
@@ -764,18 +764,18 @@ class _FilterPill extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected
                 ? (isDark ? const Color(0xFF27272A) : Colors.white)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: isSelected && !isDark
                 ? [
                     const BoxShadow(
                       color: Color(0x0F000000),
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
                     ),
                   ]
                 : [],
@@ -787,8 +787,8 @@ class _FilterPill extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                fontSize: 12.5,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected
                     ? (isDark ? Colors.white : const Color(0xFF18181B))
                     : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
@@ -923,25 +923,25 @@ class _ReportCard extends StatelessWidget {
                                       child: Text(
                                         subjKey.isNotEmpty ? _subjectName(subjKey) : 'Unknown Subject',
                                         style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w900,
-                                          color: isDark ? Colors.white : const Color(0xFF000000),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
                                         color: statusColor.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(100),
                                         border: Border.all(color: statusColor.withValues(alpha: 0.2)),
                                       ),
                                       child: Text(
                                         statusLabel,
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.bold,
                                           color: statusColor,
                                         ),
@@ -949,38 +949,39 @@ class _ReportCard extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const AppIcon(AppIcons.calendar, size: 12, color: Color(0xFFA3A3A3)),
-                                    const SizedBox(width: 6),
+                                    const AppIcon(AppIcons.calendar, size: 11, color: Color(0xFFA3A3A3)),
+                                    const SizedBox(width: 5),
                                     Text(
                                       dateStr,
                                       style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
                                         color: Color(0xFFA3A3A3),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 6),
                                 RichText(
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
                                         text: 'কারণ: ',
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          color: isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                                         ),
                                       ),
                                       TextSpan(
                                         text: report.reason,
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 13,
                                           fontWeight: FontWeight.w600,
-                                          color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+                                          color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
                                         ),
                                       ),
                                     ],
@@ -998,14 +999,14 @@ class _ReportCard extends StatelessWidget {
                             duration: const Duration(milliseconds: 200),
                             turns: isExpanded ? 0.5 : 0,
                             child: Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 LucideIcons.chevronDown,
-                                size: 18,
+                                size: 16,
                                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
                               ),
                             ),
@@ -1029,24 +1030,24 @@ class _ReportCard extends StatelessWidget {
                               ),
                               Container(
                                 color: isDark ? const Color(0x1A000000) : const Color(0xFFFAFAFA),
-                                padding: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.all(16),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     if (report.question != null)
                                       Container(
-                                        margin: const EdgeInsets.only(bottom: 16),
+                                        margin: const EdgeInsets.only(bottom: 12),
                                         decoration: BoxDecoration(
                                           color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F9FF),
-                                          borderRadius: BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.circular(12),
                                           border: Border.all(
                                             color: isDark ? const Color(0xFF334155) : const Color(0xFFBAE6FD),
                                           ),
                                           boxShadow: [
                                             BoxShadow(
                                               color: isDark ? Colors.black26 : const Color(0x0A000000),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 2),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 1),
                                             ),
                                           ],
                                         ),
@@ -1054,19 +1055,19 @@ class _ReportCard extends StatelessWidget {
                                           color: Colors.transparent,
                                           child: InkWell(
                                             onTap: onShowQuestion,
-                                            borderRadius: BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(12),
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  Icon(LucideIcons.fileSearch, size: 20, color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7)),
-                                                  const SizedBox(width: 10),
+                                                  Icon(LucideIcons.fileSearch, size: 16, color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7)),
+                                                  const SizedBox(width: 8),
                                                   Text(
                                                     'সম্পূর্ণ প্রশ্ন ও অপশন দেখো',
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.bold,
-                                                      fontSize: 16,
+                                                      fontSize: 13.5,
                                                       color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
                                                     ),
                                                   ),
@@ -1089,23 +1090,23 @@ class _ReportCard extends StatelessWidget {
 
                                     // Reference image
                                     if (report.imageUrl != null) ...[
-                                      const SizedBox(height: 16),
+                                      const SizedBox(height: 12),
                                       Align(
                                         alignment: Alignment.centerRight,
                                         child: Container(
-                                          width: 200,
-                                          height: 140,
+                                          width: 180,
+                                          height: 120,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(12),
                                             border: Border.all(
                                               color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
-                                              width: 2,
+                                              width: 1.5,
                                             ),
                                             boxShadow: const [
                                               BoxShadow(
                                                 color: Color(0x1A000000),
-                                                blurRadius: 8,
-                                                offset: Offset(0, 4),
+                                                blurRadius: 6,
+                                                offset: Offset(0, 2),
                                               ),
                                             ],
                                           ),
@@ -1120,20 +1121,20 @@ class _ReportCard extends StatelessWidget {
                                                     const Center(child: Icon(LucideIcons.imageOff)),
                                               ),
                                               Positioned(
-                                                bottom: 8,
-                                                right: 8,
+                                                bottom: 6,
+                                                right: 6,
                                                 child: Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                                   decoration: BoxDecoration(
                                                     color: Colors.black87,
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius: BorderRadius.circular(6),
                                                   ),
                                                   child: const Row(
                                                     mainAxisSize: MainAxisSize.min,
                                                     children: [
-                                                      Icon(LucideIcons.image, size: 10, color: Colors.white),
-                                                      SizedBox(width: 4),
-                                                      Text('Reference', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                                      Icon(LucideIcons.image, size: 9, color: Colors.white),
+                                                      SizedBox(width: 3),
+                                                      Text('Reference', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
                                                     ],
                                                   ),
                                                 ),
@@ -1146,7 +1147,7 @@ class _ReportCard extends StatelessWidget {
 
                                     // Admin feedback
                                     if (report.adminComment != null && report.adminComment!.trim().isNotEmpty) ...[
-                                      const SizedBox(height: 16),
+                                      const SizedBox(height: 12),
                                       _ChatBubble(
                                         role: 'অ্যাডমিন',
                                         message: report.adminComment!,
@@ -1154,7 +1155,7 @@ class _ReportCard extends StatelessWidget {
                                         isUser: false,
                                       ),
                                     ] else if (report.status != 'Resolved' && report.status != 'Ignored') ...[
-                                      const SizedBox(height: 16),
+                                      const SizedBox(height: 12),
                                       _ChatBubble(
                                         role: 'সিস্টেম',
                                         message: 'তোমার রিপোর্টটি টিমের কাছে পাঠানো হয়েছে। খুব শিগগিরই রিভিউ করা হবে।',
@@ -1205,37 +1206,37 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Column(
         crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (!isUser) ...[
-                  Icon(isSystem ? LucideIcons.bot : LucideIcons.shieldCheck, size: 12, color: const Color(0xFFA3A3A3)),
-                  const SizedBox(width: 4),
+                  Icon(isSystem ? LucideIcons.bot : LucideIcons.shieldCheck, size: 11, color: const Color(0xFFA3A3A3)),
+                  const SizedBox(width: 3),
                 ],
                 Text(
                   role,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFFA3A3A3),
-                    letterSpacing: 0.5,
+                    letterSpacing: 0.3,
                   ),
                 ),
                 if (isUser) ...[
-                  const SizedBox(width: 4),
-                  const Icon(LucideIcons.user, size: 12, color: Color(0xFFA3A3A3)),
+                  const SizedBox(width: 3),
+                  const Icon(LucideIcons.user, size: 11, color: Color(0xFFA3A3A3)),
                 ],
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: isUser
                   ? (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9))
@@ -1243,10 +1244,10 @@ class _ChatBubble extends StatelessWidget {
                       ? (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5))
                       : (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5)),
               borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(isUser ? 16 : 4),
-                bottomRight: Radius.circular(isUser ? 4 : 16),
+                topLeft: const Radius.circular(14),
+                topRight: const Radius.circular(14),
+                bottomLeft: Radius.circular(isUser ? 14 : 4),
+                bottomRight: Radius.circular(isUser ? 4 : 14),
               ),
               border: Border.all(
                 color: isUser
@@ -1259,13 +1260,13 @@ class _ChatBubble extends StatelessWidget {
             child: Text(
               message,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 13.5,
                 color: isUser
                     ? (isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155))
                     : isSystem
                         ? (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373))
                         : (isDark ? const Color(0xFFD1FAE5) : const Color(0xFF065F46)),
-                height: 1.5,
+                height: 1.45,
                 fontStyle: isSystem ? FontStyle.italic : FontStyle.normal,
               ),
             ),

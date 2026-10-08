@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:obhyash_app/features/subscription/presentation/payment_view.dart';
 import '../../../../core/providers/app_config_provider.dart';
@@ -127,7 +128,7 @@ class PaymentMethodSheet extends ConsumerWidget {
               _PaymentOptionCard(
                 isDark: isDark,
                 title: 'Automatic Payment',
-                subtitle: 'bKash, Nagad, Rocket, Cards (তাত্ক্ষণিক সক্রিয়)',
+                subtitle: 'bKash ও Nagad (তাত্ক্ষণিক সক্রিয়)',
                 badge: _buildAutoBadge(),
                 onTap: () {
                   final nav = Navigator.of(context, rootNavigator: true);
@@ -236,11 +237,11 @@ class PaymentMethodSheet extends ConsumerWidget {
           color: const Color(0xFFD11559).withValues(alpha: 0.25),
         ),
       ),
-      child: const Center(
-        child: Icon(
-          LucideIcons.zap,
-          color: Color(0xFFD11559),
-          size: 22,
+      padding: const EdgeInsets.all(6),
+      child: Center(
+        child: SvgPicture.asset(
+          'assets/icons/automatic_payment.svg',
+          fit: BoxFit.contain,
         ),
       ),
     );
@@ -257,11 +258,11 @@ class PaymentMethodSheet extends ConsumerWidget {
           color: const Color(0xFF059669).withValues(alpha: 0.25),
         ),
       ),
-      child: const Center(
-        child: Icon(
-          LucideIcons.fileCheck,
-          color: Color(0xFF059669),
-          size: 22,
+      padding: const EdgeInsets.all(6),
+      child: Center(
+        child: SvgPicture.asset(
+          'assets/icons/manual_payment.svg',
+          fit: BoxFit.contain,
         ),
       ),
     );

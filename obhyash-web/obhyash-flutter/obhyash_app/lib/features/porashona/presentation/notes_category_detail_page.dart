@@ -841,7 +841,7 @@ class _OfflineSaveButtonState extends State<_OfflineSaveButton> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('অফলাইন সংরক্ষণ থেকে মুছে ফেলা হয়েছে'),
-              duration: Duration(seconds: 2),
+              duration: Duration(seconds: 3),
             ),
           );
         }
@@ -866,7 +866,7 @@ class _OfflineSaveButtonState extends State<_OfflineSaveButton> {
                 Text('নোটটি অফলাইনে সফলভাবে সেভ হয়েছে!'),
               ],
             ),
-            duration: Duration(seconds: 2),
+            duration: Duration(seconds: 3),
           ),
         );
       }

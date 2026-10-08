@@ -270,5 +270,21 @@ void main() {
       final formattedTrail = QuestionFormatter.format(qTrail);
       expect(formattedTrail.contains(r'10^{-7}'), isTrue);
     });
+
+    test('Auto-heals aligned environment with single backslash line breaks and missing dollars', () {
+      const brokenAligned = r'''
+ত্বরণ হলো বেগের সময় অনুযায়ী পরিবর্তন:
+\begin{aligned} a &= \frac{dv}{dt} \ dv &= (2 + 6t)dt \end{aligned}
+v = $\int (2 + 6t)dt = 2t + 3t^2 + C$
+প্রাথমিক শর্ত: $t = 0$ তে
+v = 0
+C = 0
+''';
+      final healed = QuestionFormatter.format(brokenAligned);
+      expect(healed.contains(r'$$\begin{aligned}'), isTrue);
+      expect(healed.contains(r'\\ dv &='), isTrue);
+      expect(healed.contains(r'\end{aligned}$$'), isTrue);
+    });
   });
 }
+

@@ -657,19 +657,13 @@ export default function UserProfileView({
         </div>
       )}
 
-      {/* ── 5. বিষয়ভিত্তিক দক্ষতা (Subjects Progress) ─────────────────── */}
-      <SubjectsProgressSection
-        subjectStats={targetSubjects}
-        onSubjectClick={onSubjectClick}
-      />
-
-      {/* ── 6. স্ট্রিক ক্যালেন্ডার (Streak Calendar) ────────────────────── */}
+      {/* ── 5. স্ট্রিক ক্যালেন্ডার (Streak Calendar - directly below graph card) ── */}
       <StreakCalendar
         calendarData={calendarData}
         streakCount={targetStreak}
       />
 
-      {/* ── 7. অর্জন ও ব্যাজসমূহ (Badges Showcase) ────────────────────── */}
+      {/* ── 6. অর্জন ও ব্যাজসমূহ (Badges Showcase) ────────────────────── */}
       <BadgesShowcaseSection
         userId={user.id}
         userStats={{
@@ -677,6 +671,12 @@ export default function UserProfileView({
           examsTaken: targetExams,
           streakCount: targetStreak,
         }}
+      />
+
+      {/* ── 7. বিষয়ভিত্তিক দক্ষতা (Subjects Progress) ─────────────────── */}
+      <SubjectsProgressSection
+        subjectStats={targetSubjects}
+        onSubjectClick={onSubjectClick}
       />
     </div>
   );

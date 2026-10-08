@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const apiKey = process.env.UDDOKTAPAY_API_KEY || '9KrVMoMyjgX5e5itMtDIz2yvngV8Pzfey3d1qm2p';
+const apiKey = process.env.UDDOKTAPAY_API_KEY || '';
 const baseUrl = process.env.UDDOKTAPAY_BASE_URL || 'https://obhyash.paymently.io/api';
 
 export interface UddoktaPayVerificationResult {
@@ -196,12 +196,13 @@ export async function activateSubscriptionFromUddoktaPay(params: {
     };
   }
 
-  // 3. Determine Plan Duration and Display Name
+  // 3. Determine Plan Duration, Display Name, and Minimum Allowed Price Threshold
   const rawPlanId = (metadata.plan_id || metadata.planId || '').toString().toLowerCase();
   const rawPlanName = (metadata.plan_name || metadata.planName || metadata.plan_title || '').toString();
 
   let durationDays = 30;
   let planDisplayName = 'মাসিক প্ল্যান (১ মাস)';
+  let minAllowedPrice = 45; // Minimum allowable price for 1 month
 
   if (
     rawPlanId.includes('year') ||
@@ -211,6 +212,7 @@ export async function activateSubscriptionFromUddoktaPay(params: {
   ) {
     durationDays = 365;
     planDisplayName = 'বার্ষিক প্রো (১ বছর)';
+    minAllowedPrice = 350;
   } else if (
     rawPlanId.includes('6month') ||
     rawPlanId.includes('half') ||
@@ -221,6 +223,7 @@ export async function activateSubscriptionFromUddoktaPay(params: {
   ) {
     durationDays = 180;
     planDisplayName = 'ফুল সেশন প্যাক (৬ মাস)';
+    minAllowedPrice = 220;
   } else if (
     rawPlanId.includes('quarter') ||
     rawPlanId.includes('90') ||
@@ -231,8 +234,54 @@ export async function activateSubscriptionFromUddoktaPay(params: {
   ) {
     durationDays = 90;
     planDisplayName = 'এডমিশন প্যাক (৩ মাস)';
-  } else if (rawPlanName.trim()) {
-    planDisplayName = rawPlanName;
+    minAllowedPrice = 130;
+  } else {
+    durationDays = Number(metadata.duration_days) || 30;
+    planDisplayName = rawPlanName.trim() || 'মাসিক প্ল্যান (১ মাস)';
+    minAllowedPrice = 45;
+  }
+
+  // ── Price Spoofing Guard: Verify Paid Amount ────────────────────────────
+  const paidAmount = Number(amount) || 0;
+  const expectedAmount = Number(metadata.expected_amount || metadata.amount || 0);
+
+  // If expected_amount was locked by server at creation, verify paid matches expected (allowing 1 BDT tolerance for rounding)
+  const isBelowExpected = expectedAmount > 0 && paidAmount < (expectedAmount - 1);
+  const isBelowFloor = paidAmount < minAllowedPrice;
+
+  if (isBelowExpected || isBelowFloor) {
+    console.error(
+      `[Security Alert: Price Spoofing Blocked] User: ${userId}, Invoice: ${invoiceId}, Plan: ${planDisplayName}, Paid: ${paidAmount} BDT, Min Required: ${minAllowedPrice} BDT, Expected: ${expectedAmount} BDT`
+    );
+
+    // Record as Rejected in payment_requests for admin audit
+    try {
+      const nowTime = new Date().toISOString();
+      await supabaseAdmin.from('payment_requests').insert({
+        user_id: userId,
+        plan_name: planDisplayName,
+        amount: paidAmount,
+        currency: 'BDT',
+        payment_method: paymentMethod ? `UddoktaPay (${paymentMethod})` : 'UddoktaPay',
+        transaction_id: transactionId || invoiceId,
+        status: 'Rejected',
+        admin_notes: `SECURITY REJECTION: Paid amount (${paidAmount} ৳) is below required price for ${planDisplayName} (min floor: ${minAllowedPrice} ৳, expected: ${expectedAmount} ৳). Invoice: ${invoiceId}`,
+        requested_at: nowTime,
+        reviewed_at: nowTime,
+        reviewed_by: 'Security System (Anti-Spoofing)',
+        created_at: nowTime,
+        updated_at: nowTime,
+      });
+    } catch (_) {}
+
+    return {
+      success: false,
+      userId,
+      planName: planDisplayName,
+      expiresAt: '',
+      invoiceId,
+      error: `পরিশোধিত টাকার পরিমাণ (${paidAmount} ৳) নির্বাচিত প্ল্যানের (${planDisplayName}) জন্য অপর্যাপ্ত।`,
+    };
   }
 
   // 4. Calculate Expiry Date with Validity Stacking

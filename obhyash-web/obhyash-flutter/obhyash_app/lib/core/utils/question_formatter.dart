@@ -239,6 +239,10 @@ class QuestionFormatter {
           line.contains(r'\xrightleftharpoons') ||
           line.contains('@@CHEM_ARROW') ||
           line.startsWith(r'$$') ||
+          line.contains(r'\begin{') ||
+          line.contains(r'\end{') ||
+          line.contains(r'\int') ||
+          line.contains(r'\sum') ||
           line.contains('→') ||
           line.contains('⟶') ||
           line.contains('⇌') ||
@@ -424,11 +428,11 @@ class QuestionFormatter {
         .replaceAll(RegExp(r'[\u0008]oldsymbol\b'), r'\boldsymbol')
         .replaceAll(RegExp(r'[\u0008]'), '')
         // \v (vertical tab \u000b) -> \vec, \vmatrix, \vert
-        .replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec')
-        .replaceAll(RegExp(r'[\u000b\v]ec\{'), r'\vec{')
-        .replaceAll(RegExp(r'[\u000b\v]matrix\b'), r'\vmatrix')
-        .replaceAll(RegExp(r'[\u000b\v]ert\b'), r'\vert')
-        .replaceAll(RegExp(r'[\u000b\v]'), '')
+        .replaceAll(RegExp(r'\u000bec\b'), r'\vec')
+        .replaceAll(RegExp(r'\u000bec\{'), r'\vec{')
+        .replaceAll(RegExp(r'\u000bmatrix\b'), r'\vmatrix')
+        .replaceAll(RegExp(r'\u000bert\b'), r'\vert')
+        .replaceAll('\u000b', '')
         // \t (tab \u0009) -> \text, \times, \theta, \tan, \tau, \to, \tilde
         .replaceAll(RegExp(r'[\t\u0009]ext\{'), r'\text{')
         .replaceAll(RegExp(r'[\t\u0009]imes\b'), r'\times')
@@ -458,25 +462,28 @@ class QuestionFormatter {
     // Normalize multiple dollar delimiters ($$$, $$$$, etc.) down to $$
     res = res.replaceAll(RegExp(r'\${3,}'), r'$$');
 
-    // Matrix and tabular environment auto-healing:
-    // 1. Strip illegal internal dollar signs ($) inside matrix cells and normalize row breaks
+    // Matrix, aligned, and tabular environment auto-healing:
+    // Strip illegal internal dollar signs ($) inside matrix cells and normalize row breaks
     res = res.replaceAllMapped(
-      RegExp(r'(\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array|align\*?)\}[\s\S]*?\\end\{\2\})'),
+      RegExp(r'(\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array|align\*?|aligned)\}[\s\S]*?\\end\{\2\})'),
       (m) {
         final mat = m.group(1)!;
         var clean = mat.replaceAll(r'$', '');
+        // Replace single backslash followed by variable or symbol: ' \ dv' or ' \ 8' or ' \ &' -> ' \\ dv'
         clean = clean.replaceAllMapped(
-          RegExp(r'(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&\.\,\(\)\{\}\\])'),
+          RegExp(r'(?:(?<=[^\\])\\\s+|\s+\\\s+)(?=[0-9a-zA-Z\-\+\&\.\,\(\)\{\}\\])'),
           (rm) => r' \\ ',
         );
         return clean;
       },
     );
 
-    // 2. Ensure any bare matrix environment outside $$ is wrapped in clean $$...$$
+    // Auto-wrap bare matrix/aligned environments with $$ if not already delimited
     res = res.replaceAllMapped(
-      RegExp(r'(?<!\$)(?<!\\)(\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array)\}[\s\S]*?\\end\{\2\})(?!\$)'),
-      (m) => '\$\$${m.group(1)}\$\$',
+      RegExp(
+        r'(?<!\$)\s*(\\begin\{(?:aligned|align\*?|(?:v|p|b|B|V|small)?matrix|cases|array)\}[\s\S]*?\\end\{(?:aligned|align\*?|(?:v|p|b|B|V|small)?matrix|cases|array)\})\s*(?!\$)',
+      ),
+      (m) => '\n\n\$\$${m.group(1)!.trim()}\$\$\n\n',
     );
 
     // Auto-heal corrupted LaTeX commands where the backslash was stripped

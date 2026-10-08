@@ -46,6 +46,7 @@ import BlogQuickShareButton from '@/components/blog/BlogQuickShareButton';
 import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
 import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
 import ResultStepFlow from '@/components/blog/ResultStepFlow';
+import SscScholarshipConversionCard from '@/components/blog/SscScholarshipConversionCard';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -223,7 +224,7 @@ export default async function BlogPostPage({
       },
     },
     datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `https://obhyash.com/blog/${post.slug}`,
@@ -232,6 +233,37 @@ export default async function BlogPostPage({
     url: `https://obhyash.com/blog/${post.slug}`,
     inLanguage: 'bn-BD',
   };
+
+  // Extract FAQs for FAQPage Schema if article contains FAQ section
+  const faqItems: Array<{ question: string; answer: string }> = [];
+  const faqSectionMatch = post.content.match(/## সচরাচর জিজ্ঞাসা \(FAQ\)[\s\S]*?(?=\n## |\n---|$)/);
+  if (faqSectionMatch) {
+    const faqSection = faqSectionMatch[0];
+    const qMatches = [...faqSection.matchAll(/### ([^\n]+)\n+([\s\S]*?)(?=\n### |\n## |\n---|$)/g)];
+    for (const m of qMatches) {
+      const q = m[1].trim();
+      const a = m[2].trim().replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[#*`_]/g, '').replace(/\s+/g, ' ');
+      if (q && a) {
+        faqItems.push({ question: q, answer: a });
+      }
+    }
+  }
+
+  const faqJsonLd =
+    faqItems.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqItems.map((item) => ({
+            '@type': 'Question',
+            name: item.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: item.answer,
+            },
+          })),
+        }
+      : null;
 
   // Custom Markdown Callout components
   const MarkdownComponents = {
@@ -245,6 +277,12 @@ export default async function BlogPostPage({
       }
       if (widget === 'result-step-flow' || widget === 'hsc-result-steps') {
         return <ResultStepFlow />;
+      }
+      if (widget === 'ssc-scholarship-alert') {
+        return <SscScholarshipConversionCard variant="board-alert" />;
+      }
+      if (widget === 'ssc-college-prep') {
+        return <SscScholarshipConversionCard variant="college-prep" />;
       }
       if (widget === 'related-post') {
         const targetSlug = (props as Record<string, unknown>)['data-slug'] as string;
@@ -646,11 +684,18 @@ export default async function BlogPostPage({
   return (
     <div className="min-h-screen bg-white dark:bg-[#0A0A0A] text-slate-900 dark:text-slate-100 transition-colors">
       <ProgressBar />
-      {/* JSON-LD */}
+      {/* JSON-LD Article */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* JSON-LD FAQPage Schema */}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <ViewTracker slug={post.slug} />
 
       {/* ─── Post Hero (Prothom Alo / BigganChinta Editorial Style) ─── */}

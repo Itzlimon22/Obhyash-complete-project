@@ -128,7 +128,7 @@ export async function updateSession(request: NextRequest) {
 
   // SCENARIO B: Logged in — fetch profile once for all role/status checks
   if (user && (isProtectedRoute || isAuthRoute || isRootRoute)) {
-    let profile: { role?: string | null; status?: string | null } | null = null;
+    let profile: { role?: string | null; status?: string | null; stream?: string | null; batch?: string | null } | null = null;
 
     // Fast-path: Check if we have a recently cached profile to avoid DB connection exhaustion
     const cachedCookie = request.cookies.get('obhyash_role_cache');
@@ -156,7 +156,7 @@ export async function updateSession(request: NextRequest) {
         const { data } = await withTimeout(
           supabase
             .from('users')
-            .select('role, status')
+            .select('role, status, stream, batch')
             .eq('id', user.id)
             .single(),
           'Profile lookup timed out in middleware',
@@ -168,7 +168,9 @@ export async function updateSession(request: NextRequest) {
           supabaseResponse.cookies.set('obhyash_role_cache', JSON.stringify({
             userId: user.id,
             role: profile.role,
-            status: profile.status
+            status: profile.status,
+            stream: profile.stream,
+            batch: profile.batch,
           }), { maxAge: 180, path: '/' });
         }
       } catch (error) {
@@ -179,6 +181,8 @@ export async function updateSession(request: NextRequest) {
     const role = (profile?.role || (user as any)?.app_metadata?.role || (user as any)?.user_metadata?.role || '').toLowerCase();
     const status = profile?.status ?? 'Active';
     const isInactive = status === 'Inactive' || status === 'Suspended';
+    const isStaff = role === 'admin' || role === 'teacher';
+    const isProfileComplete = isStaff || (!!profile?.stream && !!profile?.batch);
 
     // Deactivated/suspended users get kicked out everywhere
     if (isInactive && pathname !== '/deactivated') {
@@ -191,7 +195,18 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    // Logged-in users visiting auth pages or the root get redirected to their dashboard
+    // Uncompleted students trying to access protected student routes go directly to /onboarding
+    if (isStudentRoute && !isStaff && !isProfileComplete && pathname !== '/onboarding') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/onboarding';
+      const response = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set({ ...cookie, path: cookie.path ?? '/' });
+      });
+      return response;
+    }
+
+    // Logged-in users visiting auth pages or the root get redirected to their dashboard or onboarding
     // Exception: If an error parameter is present on /login (e.g. unregistered_google), do NOT redirect
     if (isAuthRoute || isRootRoute) {
       if (isAuthRoute && (request.nextUrl.searchParams.has('error') || request.nextUrl.searchParams.has('logout'))) {
@@ -204,6 +219,8 @@ export async function updateSession(request: NextRequest) {
         url.pathname = '/admin/dashboard';
       } else if (role === 'teacher') {
         url.pathname = '/teacher/dashboard';
+      } else if (!isProfileComplete) {
+        url.pathname = '/onboarding';
       } else {
         url.pathname = '/dashboard';
       }

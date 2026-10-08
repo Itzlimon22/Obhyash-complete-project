@@ -109,11 +109,11 @@ class _SignupViewState extends ConsumerState<SignupView>
   }
 
   void _onInstituteChanged() {
-    final suggestions = searchColleges(_instituteController.text);
+    final text = _instituteController.text.trim();
+    final suggestions = searchColleges(text);
     setState(() {
       _collegeSuggestions = suggestions;
-      _showCollegeSuggestions =
-          _instituteController.text.isNotEmpty && suggestions.isNotEmpty;
+      _showCollegeSuggestions = text.isNotEmpty;
     });
   }
 
@@ -896,10 +896,10 @@ class _SignupViewState extends ConsumerState<SignupView>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildInputField(
-          label: 'শিক্ষা প্রতিষ্ঠান',
+          label: _stream == 'SSC' ? 'স্কুল / শিক্ষা প্রতিষ্ঠান' : 'শিক্ষা প্রতিষ্ঠান',
           icon: LucideIcons.school,
           controller: _instituteController,
-          hint: 'কলেজ / স্কুলের নাম',
+          hint: _stream == 'SSC' ? 'স্কুলের নাম লিখো' : 'কলেজ / স্কুলের নাম',
           isDark: isDark,
           tooltip: 'লিস্টে না থাকলে তোমার প্রতিষ্ঠানের পুরো নাম লিখে পরবর্তী ধাপে যাও।',
         ),
@@ -921,41 +921,88 @@ class _SignupViewState extends ConsumerState<SignupView>
               ],
             ),
             child: Column(
-              children: _collegeSuggestions.map((name) {
-                return InkWell(
-                  onTap: () {
-                    _instituteController.text = name;
-                    setState(() {
-                      _showCollegeSuggestions = false;
-                      _collegeSuggestions.clear();
-                    });
-                  },
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: isDark ? Colors.white10 : Colors.black12,
-                          width: name == _collegeSuggestions.last ? 0 : 1,
+              children: [
+                ..._collegeSuggestions.map((name) {
+                  return InkWell(
+                    onTap: () {
+                      _instituteController.text = name;
+                      setState(() {
+                        _showCollegeSuggestions = false;
+                        _collegeSuggestions.clear();
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: isDark ? Colors.white10 : Colors.black12,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.normal,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                     ),
-                    child: Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.normal,
-                        color: isDark ? Colors.white : Colors.black87,
+                  );
+                }),
+                if (_instituteController.text.trim().isNotEmpty &&
+                    !_collegeSuggestions.contains(_instituteController.text.trim()))
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _showCollegeSuggestions = false;
+                        _collegeSuggestions.clear();
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF0F291E)
+                            : const Color(0xFFECFDF5),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.add_circle_outline,
+                            size: 15,
+                            color: Color(0xFF059669),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'প্রতিষ্ঠান হিসেবে "${_instituteController.text.trim()}" ব্যবহার করো',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF059669),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              }).toList(),
+              ],
             ),
           ),
         ] else if (_instituteController.text.isNotEmpty) ...[

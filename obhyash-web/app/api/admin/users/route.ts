@@ -45,9 +45,7 @@ async function verifyAdminCaller(request: NextRequest, supabaseAdmin: any): Prom
         role === 'super admin' ||
         role === 'superadmin' ||
         role === 'moderator' ||
-        email === 'admin@obhyash.com' ||
-        sessionUser.user.user_metadata?.role === 'Admin' ||
-        sessionUser.user.user_metadata?.role === 'admin'
+        email === 'admin@obhyash.com'
       ) {
         return true;
       }
@@ -74,9 +72,7 @@ async function verifyAdminCaller(request: NextRequest, supabaseAdmin: any): Prom
           role === 'super admin' ||
           role === 'superadmin' ||
           role === 'moderator' ||
-          email === 'admin@obhyash.com' ||
-          authData.user.user_metadata?.role === 'Admin' ||
-          authData.user.user_metadata?.role === 'admin'
+          email === 'admin@obhyash.com'
         ) {
           return true;
         }

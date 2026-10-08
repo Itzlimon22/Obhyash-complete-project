@@ -79,7 +79,7 @@ export default function PersonalDetailsPanel({
     setFormData((prev) => ({ ...prev, institute: val }));
     const suggestions = searchColleges(val);
     setCollegeSuggestions(suggestions);
-    setShowCollegeSuggestions(val.trim().length > 0 && suggestions.length > 0);
+    setShowCollegeSuggestions(val.trim().length > 0);
   };
 
   const handleChange = (
@@ -358,8 +358,8 @@ export default function PersonalDetailsPanel({
               autoComplete="off"
               className={inputClass}
             />
-            {showCollegeSuggestions && (
-              <div className="absolute z-30 w-full mt-1 bg-white dark:bg-[#1A1A1A] border border-[#E5E7EB] dark:border-[#2D2D2D] rounded-[12px] shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+            {showCollegeSuggestions && formData.institute.trim().length > 0 && (
+              <div className="absolute z-30 w-full mt-1 bg-white dark:bg-[#1A1A1A] border border-[#E5E7EB] dark:border-[#2D2D2D] rounded-[12px] shadow-lg overflow-hidden max-h-56 overflow-y-auto">
                 {collegeSuggestions.map((name) => (
                   <div
                     key={name}
@@ -368,11 +368,22 @@ export default function PersonalDetailsPanel({
                       setFormData((prev) => ({ ...prev, institute: name }));
                       setShowCollegeSuggestions(false);
                     }}
-                    className="px-4 py-2.5 text-sm text-[#1F2937] dark:text-[#E5E5E5] hover:bg-emerald-50 dark:hover:bg-emerald-950/20 cursor-pointer"
+                    className="px-4 py-2.5 text-sm text-[#1F2937] dark:text-[#E5E5E5] hover:bg-emerald-50 dark:hover:bg-emerald-950/20 cursor-pointer border-b border-neutral-100 dark:border-neutral-800 last:border-0"
                   >
                     {name}
                   </div>
                 ))}
+                {!collegeSuggestions.includes(formData.institute.trim()) && (
+                  <div
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setShowCollegeSuggestions(false);
+                    }}
+                    className="px-4 py-2.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/70 dark:hover:bg-emerald-950/50 cursor-pointer border-t border-emerald-100 dark:border-emerald-900/50 flex items-center gap-2"
+                  >
+                    <span>➕ তোমার প্রতিষ্ঠান হিসেবে &quot;{formData.institute.trim()}&quot; ব্যবহার করো</span>
+                  </div>
+                )}
               </div>
             )}
           </div>

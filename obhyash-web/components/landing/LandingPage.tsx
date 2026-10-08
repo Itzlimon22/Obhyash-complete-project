@@ -451,7 +451,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       q: 'পেমেন্ট সম্পন্ন করার পর প্রো অ্যাক্সেস কতক্ষণে চালু হয়?',
-      a: 'বিকাশ, নগদ বা রকেটের মাধ্যমে ডিজিটাল পেমেন্ট সম্পন্ন করার সাথে সাথেই কোনো প্রকার অপেক্ষা ছাড়া ইনস্ট্যান্টলি (তাৎক্ষণিক) তোমার একাউন্টে প্রো সাবস্ক্রিপশন অ্যাক্টিভ হয়ে যাবে।',
+      a: 'বিকাশ বা নগদের মাধ্যমে ডিজিটাল পেমেন্ট সম্পন্ন করার সাথে সাথেই কোনো প্রকার অপেক্ষা ছাড়া ইনস্ট্যান্টলি (তাৎক্ষণিক) তোমার একাউন্টে প্রো সাবস্ক্রিপশন অ্যাক্টিভ হয়ে যাবে।',
     },
   ];
 
@@ -1640,12 +1640,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </span>
                   <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#F7941D] text-white shadow-2xs">
                     Nagad
-                  </span>
-                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#8B2D88] text-white shadow-2xs">
-                    Rocket
-                  </span>
-                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#005CA9] text-white shadow-2xs">
-                    Upay
                   </span>
                 </div>
               </div>

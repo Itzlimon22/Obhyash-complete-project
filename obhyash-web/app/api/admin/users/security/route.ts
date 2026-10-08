@@ -44,9 +44,7 @@ export async function POST(request: NextRequest) {
           role === 'super admin' ||
           role === 'superadmin' ||
           role === 'moderator' ||
-          email === 'admin@obhyash.com' ||
-          sessionUser.user.user_metadata?.role === 'Admin' ||
-          sessionUser.user.user_metadata?.role === 'admin'
+          email === 'admin@obhyash.com'
         ) {
           adminUserId = sessionUser.user.id;
           adminEmail = userRow?.email || sessionUser.user.email || null;
@@ -74,9 +72,7 @@ export async function POST(request: NextRequest) {
             role === 'super admin' ||
             role === 'superadmin' ||
             role === 'moderator' ||
-            email === 'admin@obhyash.com' ||
-            authData.user.user_metadata?.role === 'Admin' ||
-            authData.user.user_metadata?.role === 'admin'
+            email === 'admin@obhyash.com'
           ) {
             adminUserId = authData.user.id;
             adminEmail = userRow?.email || authData.user.email || null;

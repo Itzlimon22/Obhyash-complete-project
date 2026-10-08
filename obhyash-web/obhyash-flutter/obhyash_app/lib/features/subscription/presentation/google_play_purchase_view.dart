@@ -102,7 +102,7 @@ class _GooglePlayPurchaseViewState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('গুগল প্লে পেমেন্ট প্রক্রিয়াধীন রয়েছে...'),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 3),
         ),
       );
     } else if (result.state == PurchaseState.success) {

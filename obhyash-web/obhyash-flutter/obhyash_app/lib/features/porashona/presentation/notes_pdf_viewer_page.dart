@@ -306,7 +306,7 @@ class _NotesPdfViewerPageState extends State<NotesPdfViewerPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('অফলাইন সংরক্ষণ থেকে মুছে ফেলা হয়েছে'),
-              duration: Duration(seconds: 2),
+              duration: Duration(seconds: 3),
             ),
           );
         }
@@ -332,7 +332,7 @@ class _NotesPdfViewerPageState extends State<NotesPdfViewerPage> {
                 Text('নোটটি অফলাইনে সফলভাবে সেভ হয়েছে!'),
               ],
             ),
-            duration: Duration(seconds: 2),
+            duration: Duration(seconds: 3),
           ),
         );
       }

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <!-- Background Card Frame -->
+    <linearGradient id="cardBg" x1="16" y1="14" x2="112" y2="114" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="50%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+
+    <!-- Subtle Brand Glows behind logos -->
+    <radialGradient id="bkashGlow" cx="34" cy="46" r="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E2136E" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#E2136E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nagadGlow" cx="94" cy="46" r="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F7941D" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#F7941D" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Instant Zap Badge -->
+    <linearGradient id="zapGrad" x1="56" y1="80" x2="72" y2="106" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <filter id="zapShadow" x="48" y="74" width="32" height="42" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- Card Base Frame -->
+  <rect x="14" y="14" width="100" height="100" rx="24" fill="url(#cardBg)"/>
+  <rect x="15" y="15" width="98" height="98" rx="23" stroke="#27272A" stroke-width="1.5"/>
+
+  <!-- Brand Ambient Glows -->
+  <circle cx="34" cy="46" r="28" fill="url(#bkashGlow)"/>
+  <circle cx="94" cy="46" r="28" fill="url(#nagadGlow)"/>
+
+  <!-- Divider Line -->
+  <path d="M64 22V70" stroke="#27272A" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>
+
+  <!-- 1. OFFICIAL BKASH ORIGAMI BIRD -->
+  <g transform="translate(11.00, 24.26) scale(0.38333)">
+    <path fill="#D12053" d="M96.58 62.45l-53.03-8.31 7.03 31.6z"/>
+    <path fill="#E2136E" d="M96.58 62.45L56.62 6.93 43.56 54.15z"/>
+    <path fill="#D12053" d="M42.32 53.51L.45 0l54.83 6.55z"/>
+    <path fill="#9E1638" d="M23.25 31.15L0 9.24h6.12z"/>
+    <path fill="#D12053" d="M107.89 35.46l-9.84 26.69L82.1 40.09z"/>
+    <path fill="#E2136E" d="M56.77 84.14l38.61-15.51L97 63.7z"/>
+    <path fill="#9E1638" d="M25.89 113.41l16.54-58.02 8.39 37.75z"/>
+    <path fill="#E2136E" d="M109.43 35.67l-4.06 11.02 14.64-.24z"/>
+  </g>
+
+  <!-- 2. OFFICIAL NAGAD DYNAMIC SWIRL EMBLEM -->
+  <g transform="translate(63.90, 19.56) scale(1.01695)">
+    <path d="M53.2 28.1c0 .7 0 1.3-.1 1.9-.2 2.8-.9 5.4-2 7.8-.4 1-.9 1.9-1.5 2.8-4.2 6.6-11.6 11-20 11-3.6 0-7-.8-10-2.2C11.6 45.7 6 37.5 6 28.1 6 18.8 11.4 10.8 19.1 7c-.6.8-1.2 1.6-1.7 2.5 0 .1-.1.1-.1.2-.3.3-.6.5-.9.8-.4.3-.7.7-1.1 1l-.2.2-.2.2c-.1.1-.2.3-.4.4-.2.3-.5.6-.7.9-1 1.3-1.8 2.7-2.4 4.2-.1.1-.1.3-.2.4-.1.2-.1.4-.2.5 0 .1-.1.2-.1.3-.1.3-.2.5-.3.8-.1.2-.1.4-.2.5 0 .1-.1.2-.1.3 0 .2-.1.4-.1.6l-.3 1.8c0 .2 0 .3-.1.5v2.4c0 6.4 2.9 12.2 7.6 15.9 3.6 2.9 8.1 4.7 13 4.7 4.5 0 8.6-1.4 12-3.9 2.5-1.8 4.5-4.1 6-6.8.2-.4.4-.7.6-1.1 1.2-2.5 1.9-5.2 1.9-8.1v-.7c0-.7 0-1.3-.1-2l.1.1c.3.3.6.5.9.8.3-.5.6-.9.9-1.4.2.9.3 1.8.4 2.8.1.9.1 1.6.1 2.3z" fill="#ed1c24"/>
+    <path d="M32.4 9.2L28 1.1c-7.3 3.3-12.3 10.6-12.3 19.1 0 4.3 1.3 8.3 3.5 11.6-.2-1.1-.2-2.2-.2-3.4.1-8.7 5.6-16.1 13.4-19.2z" fill="#f7941d"/>
+    <path d="M35.9 13.2c1.8-.5 3.8-.7 5.7-.7 1.2 0 2.5.1 3.6.3l-.1-3.6-.2-7.2c-.8-.1-1.7-.2-2.6-.2-4 0-7.7 1.3-10.7 3.4L34 9.6c-4.3 1.5-7.8 4.5-10 8.4-1.1 1.9-1.9 4.1-2.2 6.4.6-1.2 1.3-2.3 2.1-3.3 2.9-3.8 7.1-6.7 12-7.9z" fill="#ed1c24"/>
+    <path d="M46.4 9.1l.2 5.1c-1.7-.5-3.4-.8-5.3-.8-3.5 0-6.8 1-9.7 2.7-3.6 2.2-6.4 5.7-7.8 9.8 1.4-1.9 3.1-3.6 5.1-4.9 2.9-1.9 6.4-3 10.1-3 2.8 0 5.4.6 7.8 1.7 1.8.8 3.4 1.9 4.8 3.3l2.8-4.2 3.6-5.5c-3.2-2.6-7.2-4.2-11.6-4.2z" fill="#f7941d"/>
+    <path d="M50.9 25.7v.7c0 4.2-1.7 7.7-1.9 8.1-.2.4-.4.7-.6 1.1-1.5 2.7-3.5 5-6 6.8-3.4 2.4-7.5 3.9-12 3.9-4.9 0-9.5-1.7-13-4.7-4.6-3.8-7.6-9.5-7.6-15.9v-2.4c0-.2 0-.3.1-.5l.3-1.8c0-.2.1-.4.1-.6 0-.1.1-.2.1-.3.1-.2.1-.4.2-.5.1-.3.2-.6.3-.8 0-.1.1-.2.1-.3.1-.2.1-.4.2-.5.1-.1.1-.3.2-.4.6-1.5 1.5-2.9 2.4-4.2.2-.3.5-.6.7-.9.1-.1.2-.3.4-.4.1-.1.1-.2.2-.2.1-.1.1-.2.2-.2.3-.4.7-.7 1.1-1 .3-.3.6-.5.9-.8 0 .1-.1.1-.1.2s-.1.2-.1.2c-1.2 2.4-2 5.3-2.3 8.3-.1.8-.1 1.6-.1 2.5 0 10.8 6.3 19.5 14.1 19.5h.8c1.1 0 2.2-.2 3.3-.4 5.3-1.4 9.2-6.3 9.2-12v-.3c-.1-3.4-1.5-6.5-3.8-8.6 1.6 0 3.2.3 4.7.7 2.9.7 5.5 2.1 7.8 3.9l.1.1c-.1.4 0 1.1 0 1.7z" fill="#f7941d"/>
+    <path d="M50.9 25.7v.7c0 4.4-2 8.2-2 8.2-.2.4-.4.7-.6 1.1-1.5 2.7-3.6 5-6.1 6.8-3.5 2.6-7.7 3.9-12.1 3.9-4.8 0-9.4-1.7-13.1-4.7-4.8-3.9-7.6-9.8-7.6-16 0-6.2 2.8-12.1 7.6-16l.2-.2c0 .1-.1.1-.1.2s-.1.1-.1.2c-4.7 3.9-7.4 9.6-7.4 15.8 0 6.2 2.7 11.9 7.5 15.9 3.6 3 8.3 4.6 13 4.6 4.3 0 8.5-1.3 12-3.9 2.5-1.8 4.5-4.1 6-6.8.2-.4.4-.7.5-1.1 0 0 2-3.7 2-8.1v-.7c0-.7 0-1.3-.1-2v-.1l.1.1.1.1c.2.8.2 1.4.2 2z" fill="#f7941d"/>
+  </g>
+
+  <!-- 3. AUTOMATIC INSTANT ZAP BADGE -->
+  <g filter="url(#zapShadow)">
+    <circle cx="64" cy="93" r="15" fill="#18181B" stroke="#F59E0B" stroke-width="1.5"/>
+    <circle cx="64" cy="93" r="11.5" fill="#09090B"/>
+    <path d="M65.5 84.5L58.5 93.5H63.5L62.5 101.5L69.5 92.5H64.5L65.5 84.5Z" fill="url(#zapGrad)"/>
+  </g>
+</svg>

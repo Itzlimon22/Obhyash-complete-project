@@ -32,21 +32,15 @@ export async function GET(request: NextRequest) {
       const serverSupabase = await (await import('@/utils/supabase/server')).createClient();
       const { data: sessionUser } = await serverSupabase.auth.getUser();
       if (sessionUser?.user) {
-        const metaRole = (
-          sessionUser.user.app_metadata?.role ||
-          sessionUser.user.user_metadata?.role ||
-          ''
-        ).toLowerCase();
-
+        const appMetaRole = (sessionUser.user.app_metadata?.role || '').toLowerCase();
         const userEmail = (sessionUser.user.email || '').toLowerCase();
 
         if (
-          metaRole === 'admin' ||
-          metaRole === 'super admin' ||
-          metaRole === 'superadmin' ||
-          metaRole === 'moderator' ||
-          userEmail === 'admin@obhyash.com' ||
-          userEmail.includes('admin@')
+          appMetaRole === 'admin' ||
+          appMetaRole === 'super admin' ||
+          appMetaRole === 'superadmin' ||
+          appMetaRole === 'moderator' ||
+          userEmail === 'admin@obhyash.com'
         ) {
           isAdmin = true;
         }
@@ -73,42 +67,21 @@ export async function GET(request: NextRequest) {
       }
     } catch (_) {}
 
-    // 2. Try Cookie role cache (set by middleware)
-    if (!isAdmin) {
-      try {
-        const cookieStore = await (await import('next/headers')).cookies();
-        const roleCache = cookieStore.get('obhyash_role_cache')?.value;
-        if (roleCache) {
-          const parsed = JSON.parse(roleCache);
-          if (parsed?.role && typeof parsed.role === 'string') {
-            const r = parsed.role.toLowerCase();
-            if (r === 'admin' || r === 'super admin' || r === 'superadmin' || r === 'moderator') {
-              isAdmin = true;
-            }
-          }
-        }
-      } catch (_) {}
-    }
-
-    // 3. Fallback to Bearer Token
+    // 2. Fallback to Bearer Token
     if (!isAdmin) {
       const authHeader = request.headers.get('authorization');
       if (authHeader?.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
         const { data: authData } = await supabaseAdmin.auth.getUser(token);
         if (authData?.user) {
-          const metaRole = (
-            authData.user.app_metadata?.role ||
-            authData.user.user_metadata?.role ||
-            ''
-          ).toLowerCase();
+          const appMetaRole = (authData.user.app_metadata?.role || '').toLowerCase();
           const email = (authData.user.email || '').toLowerCase();
 
           if (
-            metaRole === 'admin' ||
-            metaRole === 'super admin' ||
-            metaRole === 'superadmin' ||
-            metaRole === 'moderator' ||
+            appMetaRole === 'admin' ||
+            appMetaRole === 'super admin' ||
+            appMetaRole === 'superadmin' ||
+            appMetaRole === 'moderator' ||
             email === 'admin@obhyash.com'
           ) {
             isAdmin = true;

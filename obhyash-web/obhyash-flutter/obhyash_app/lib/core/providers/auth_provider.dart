@@ -18,6 +18,13 @@ final authProvider = NotifierProvider<AuthNotifier, User?>(
 );
 
 class AuthNotifier extends Notifier<User?> {
+  /// When true, native Google authentication or profile lookup is actively resolving.
+  /// Router MUST NOT navigate to '/' during this window.
+  static bool isResolvingGoogleAuth = false;
+
+  /// Tracks whether the active user has incomplete registration/profile (needs /complete-profile).
+  static bool needsProfileCompletion = false;
+
   @override
   User? build() {
     // 1. Serve the currently-known user synchronously (fastest path).
@@ -46,6 +53,8 @@ class AuthNotifier extends Notifier<User?> {
           break;
 
         case AuthChangeEvent.signedOut:
+          needsProfileCompletion = false;
+          isResolvingGoogleAuth = false;
           state = null;
           break;
 
@@ -66,51 +75,47 @@ class AuthNotifier extends Notifier<User?> {
     final email = user.email?.trim();
     final supabase = Supabase.instance.client;
 
-    // 1. Check if user is registered in public.users
-    bool isRegistered = true;
+    // 1. Check if user has complete profile (stream + batch) in public.users
+    bool isComplete = true;
     try {
-      final rpcRes = await supabase.rpc('check_user_registered', params: {
-        'p_user_id': user.id,
-        'p_email': email,
-      });
+      final res = await supabase
+          .from('users')
+          .select('id, stream, batch, role')
+          .or('id.eq.${user.id},email.ilike.${email ?? ''}')
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
 
-      if (rpcRes is bool) {
-        isRegistered = rpcRes;
+      if (res == null) {
+        isComplete = false;
       } else {
-        // Fallback: direct table check
-        final res = await supabase
-            .from('users')
-            .select('id')
-            .or('id.eq.${user.id},email.ilike.${email ?? ''}')
-            .maybeSingle();
-        isRegistered = res != null;
+        final role = (res['role'] as String? ?? '').toLowerCase();
+        final isStaff = role == 'admin' || role == 'teacher';
+        final stream = res['stream'] as String?;
+        final batch = res['batch'] as String?;
+        isComplete = isStaff ||
+            (stream != null &&
+                stream.isNotEmpty &&
+                batch != null &&
+                batch.isNotEmpty);
       }
     } catch (e) {
       debugPrint('[AuthNotifier] Registration check error: $e');
-      // Direct table check fallback
-      try {
-        final res = await supabase
-            .from('users')
-            .select('id')
-            .or('id.eq.${user.id},email.ilike.${email ?? ''}')
-            .maybeSingle();
-        isRegistered = res != null;
-      } catch (_) {
-        // In case of offline cache or RLS, preserve session
-        isRegistered = true;
-      }
+      isComplete = true;
     }
 
-    // 2. Unregistered Google account check (Only applies to Google OAuth logins)
+    // 2. Unregistered / Incomplete Google account check
     final provider = user.appMetadata['provider'] as String? ?? '';
     final isGoogleUser = provider == 'google' ||
         (user.identities?.any((i) => i.provider == 'google') ?? false);
 
-    if (isGoogleUser && !isRegistered) {
-      debugPrint('[AuthNotifier] ℹ️ New Google account ($email). Navigating to /complete-profile.');
+    if (isGoogleUser && !isComplete) {
+      debugPrint(
+        '[AuthNotifier] ℹ️ Incomplete Google account ($email). Navigating to /complete-profile.',
+      );
+      needsProfileCompletion = true;
       final ctx = rootNavigatorKey.currentContext;
       if (ctx != null && ctx.mounted) {
-        // Small delay to ensure router is ready
         Future.microtask(() {
           if (ctx.mounted) {
             GoRouter.of(ctx).go('/complete-profile');
@@ -118,6 +123,8 @@ class AuthNotifier extends Notifier<User?> {
         });
       }
       return;
+    } else {
+      needsProfileCompletion = false;
     }
 
     // 3. User is registered! Sync Google OAuth user profile if needed
@@ -169,6 +176,8 @@ class AuthNotifier extends Notifier<User?> {
 
   /// Convenience sign-out that cleans up and delegates to Supabase.
   Future<void> signOut() async {
+    needsProfileCompletion = false;
+    isResolvingGoogleAuth = false;
     final uid = state?.id ?? Supabase.instance.client.auth.currentUser?.id;
     if (uid != null) {
       unawaited(SessionMonitorService.stop(userId: uid));

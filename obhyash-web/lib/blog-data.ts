@@ -18,6 +18,7 @@ export interface BlogPost {
     initials: string;
   };
   publishedAt: string;
+  updatedAt?: string;
   readTime: number;
   featured: boolean;
   coverColor: string; // tailwind gradient classes — used as fallback when no image
@@ -257,6 +258,7 @@ const getLocalPosts = async (): Promise<BlogPost[]> => {
       },
       publishedAt:
         data.publishedAt || new Date(fs.statSync(filePath).mtime).toISOString(),
+      updatedAt: data.updatedAt || undefined,
       readTime: data.readTime || 5,
       featured: data.featured || false,
       coverColor: data.coverColor || 'from-neutral-500 to-neutral-600',

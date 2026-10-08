@@ -87,34 +87,30 @@ export async function GET(request: Request) {
       let redirectPath = nextParam || '/dashboard';
 
       if (user) {
-        // Verify if user is registered in public.users
-        let isRegistered = false;
+        // Look up profile to check role, stream, and batch
+        let profile: { id?: string; role?: string | null; stream?: string | null; batch?: string | null } | null = null;
         try {
-          const { data: rpcRes, error: rpcErr } = await supabase.rpc('check_user_registered', {
-            p_user_id: user.id,
-            p_email: user.email || null,
-          });
-          if (!rpcErr && typeof rpcRes === 'boolean') {
-            isRegistered = rpcRes;
-          } else {
-            const { data: directProfile } = await supabase
+          const { data } = await withTimeout(
+            supabase
               .from('users')
-              .select('id, role')
+              .select('id, role, stream, batch')
               .or(`id.eq.${user.id},email.ilike.${user.email || ''}`)
-              .maybeSingle();
-            isRegistered = !!directProfile;
-          }
-        } catch {
-          const { data: directProfile } = await supabase
-            .from('users')
-            .select('id, role')
-            .or(`id.eq.${user.id},email.ilike.${user.email || ''}`)
-            .maybeSingle();
-          isRegistered = !!directProfile;
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle(),
+            'Auth profile lookup timed out',
+          );
+          profile = data;
+        } catch (lookupErr) {
+          console.error('[Auth Callback] Profile lookup error:', lookupErr);
         }
 
-        // If user is not yet registered in public.users, guide them to complete onboarding profile
-        if (!isRegistered) {
+        const role = profile?.role?.toLowerCase() || 'student';
+        const isStaff = role === 'admin' || role === 'teacher';
+        const isComplete = isStaff || (!!profile && !!profile.stream && !!profile.batch);
+
+        // If user is not yet registered or profile is incomplete, guide them directly to /onboarding
+        if (!isComplete) {
           // If request was initiated from Flutter mobile app, redirect back to mobile app with onboarding flag
           if (isMobileApp) {
             return NextResponse.redirect(
@@ -153,19 +149,9 @@ export async function GET(request: Request) {
           }
         }
 
-        const { data: profile } = await withTimeout(
-          supabase
-            .from('users')
-            .select('role')
-            .or(`id.eq.${user.id},email.ilike.${user.email || ''}`)
-            .maybeSingle(),
-          'Auth profile lookup timed out',
-        );
-
-        const role = profile?.role?.toLowerCase() || 'student';
         if (role === 'admin') redirectPath = '/admin/dashboard';
         else if (role === 'teacher') redirectPath = '/teacher/dashboard';
-        else redirectPath = '/dashboard';
+        else redirectPath = nextParam || '/dashboard';
       }
 
       const forwardedHost = request.headers.get('x-forwarded-host');

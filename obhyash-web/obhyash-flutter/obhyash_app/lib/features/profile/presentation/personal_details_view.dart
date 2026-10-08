@@ -117,11 +117,11 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
   }
 
   void _onInstituteChanged() {
-    final suggestions = searchColleges(_instituteController.text);
+    final text = _instituteController.text.trim();
+    final suggestions = searchColleges(text);
     setState(() {
       _collegeSuggestions = suggestions;
-      _showCollegeSuggestions =
-          _instituteController.text.isNotEmpty && suggestions.isNotEmpty;
+      _showCollegeSuggestions = text.isNotEmpty;
     });
   }
 
@@ -728,45 +728,82 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                       ],
                                     ),
                                     child: Column(
-                                      children: _collegeSuggestions
-                                          .map(
-                                            (name) => InkWell(
-                                              onTap: () {
-                                                _instituteController.text =
-                                                    name;
-                                                setState(
-                                                  () =>
-                                                      _showCollegeSuggestions =
-                                                          false,
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 12,
-                                                    ),
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    name,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: isDark
-                                                          ? const Color(
-                                                              0xFFE5E5E5,
-                                                            )
-                                                          : const Color(
-                                                              0xFF1F2937,
-                                                            ),
-                                                    ),
+                                      children: [
+                                        ..._collegeSuggestions.map(
+                                          (name) => InkWell(
+                                            onTap: () {
+                                              _instituteController.text = name;
+                                              setState(() => _showCollegeSuggestions = false);
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
+                                              ),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  name,
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: isDark
+                                                        ? const Color(0xFFE5E5E5)
+                                                        : const Color(0xFF1F2937),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          )
-                                          .toList(),
+                                          ),
+                                        ),
+                                        if (_instituteController.text.trim().isNotEmpty &&
+                                            !_collegeSuggestions.contains(_instituteController.text.trim()))
+                                          InkWell(
+                                            onTap: () {
+                                              setState(() => _showCollegeSuggestions = false);
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: isDark
+                                                    ? const Color(0xFF0F291E)
+                                                    : const Color(0xFFECFDF5),
+                                                border: Border(
+                                                  top: BorderSide(
+                                                    color: isDark
+                                                        ? const Color(0xFF1B4D3E)
+                                                        : const Color(0xFFA7F3D0),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.add_circle_outline,
+                                                    size: 16,
+                                                    color: Color(0xFF059669),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Text(
+                                                      'তোমার প্রতিষ্ঠান হিসেবে "${_instituteController.text.trim()}" ব্যবহার করো',
+                                                      style: const TextStyle(
+                                                        fontSize: 13.5,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: Color(0xFF059669),
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
                                     ),
                                   ),
                               ],

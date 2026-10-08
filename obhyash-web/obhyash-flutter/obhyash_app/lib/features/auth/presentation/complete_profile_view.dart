@@ -31,7 +31,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
   String _stream = 'HSC';
   String _group = 'Science';
   String _batch = 'HSC 2026';
-  String _examTarget = 'Engineering';
+  final String _examTarget = 'Engineering';
   bool _showPassword = false;
   bool _isSubmitting = false;
 
@@ -82,23 +82,20 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
 
   void _onInstituteChanged() {
     final text = _instituteController.text.trim();
-    if (text.length >= 2) {
-      final suggestions = searchColleges(text);
-      setState(() {
-        _collegeSuggestions = suggestions;
-        _showSuggestions = suggestions.isNotEmpty;
-      });
-    } else {
-      if (_showSuggestions) {
-        setState(() => _showSuggestions = false);
-      }
-    }
+    final suggestions = searchColleges(text);
+    setState(() {
+      _collegeSuggestions = suggestions;
+      _showSuggestions = text.isNotEmpty;
+    });
   }
 
   void _handleStreamChange(String s) {
     setState(() {
       _stream = s;
       _batch = s == 'HSC' ? 'HSC 2026' : 'SSC 2026';
+      if (_stream == 'HSC') {
+        _group = 'Science';
+      }
     });
   }
 
@@ -122,6 +119,10 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
     final institute = _instituteController.text.trim();
     if (institute.isEmpty) {
       return 'তোমার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
+    }
+
+    if (_stream == 'HSC' && _group != 'Science') {
+      return 'এইচএসসি এর জন্য বর্তমানে শুধুমাত্র বিজ্ঞান বিভাগ চালু আছে';
     }
 
     return null;
@@ -222,7 +223,8 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
         }
       }
 
-      // 3. Refresh global Auth state
+      // 3. Reset profile completion requirement and refresh global Auth state
+      AuthNotifier.needsProfileCompletion = false;
       ref.read(authProvider.notifier).refreshUser();
 
       if (!mounted) return;
@@ -270,7 +272,11 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
           return PopScope(
             canPop: _step == 1,
             onPopInvokedWithResult: (didPop, result) {
-              if (didPop) return;
+              if (didPop) {
+                AuthNotifier.needsProfileCompletion = false;
+                ref.read(authProvider.notifier).signOut();
+                return;
+              }
               if (_step == 2) {
                 setState(() => _step = 1);
               }
@@ -394,7 +400,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                                           // Top Support Button (Top Right)
                                           Padding(
                                             padding: const EdgeInsets.fromLTRB(
-                                                20, 14, 20, 0),
+                                                16, 6, 16, 0),
                                             child: Align(
                                               alignment: Alignment.topRight,
                                               child: _buildSupportButton(
@@ -405,21 +411,21 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                                           // Hero: Logo + Slogan (Exact match with signup_view)
                                           Padding(
                                             padding: const EdgeInsets.fromLTRB(
-                                                24, 16, 24, 30),
+                                                20, 2, 20, 8),
                                             child: Column(
                                               children: [
                                                 Image.asset(
                                                   'assets/images/obhyash_full_logo.png',
-                                                  height: 44,
+                                                  height: 36,
                                                   fit: BoxFit.contain,
                                                 ),
-                                                const SizedBox(height: 10),
+                                                const SizedBox(height: 4),
                                                 const Text(
                                                   'অভ্যাসে শুরু সাফল্যে শেষ',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     fontFamily: 'HindSiliguri',
-                                                    fontSize: 15,
+                                                    fontSize: 13,
                                                     fontWeight: FontWeight.w500,
                                                     color: Color(0xFF6B7A74),
                                                   ),
@@ -458,31 +464,33 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                                                 ),
                                               ),
                                               padding: EdgeInsets.fromLTRB(
-                                                  24, 24, 24, 32 + bottomPad),
+                                                  20, 16, 20, 16 + bottomPad),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
                                                 children: [
                                                   // 2-Step Progress Stepper
                                                   _buildProgressBar(isDark),
-                                                  const SizedBox(height: 20),
+                                                  const SizedBox(height: 10),
 
-                                                  // Google User Greeting & Verified Badge
-                                                  _buildGoogleVerifiedBanner(
-                                                    displayName: displayName,
-                                                    email: email,
-                                                    isDark: isDark,
-                                                    textPrimary: textPrimary,
-                                                    textMuted: textMuted,
-                                                  ),
-                                                  const SizedBox(height: 20),
+                                                  // Google User Verified Badge (Only in Step 1)
+                                                  if (_step == 1) ...[
+                                                    _buildGoogleVerifiedBanner(
+                                                      displayName: displayName,
+                                                      email: email,
+                                                      isDark: isDark,
+                                                      textPrimary: textPrimary,
+                                                      textMuted: textMuted,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                  ],
 
                                                   // Step Content
                                                   _step == 1
                                                       ? _buildStep1(isDark)
                                                       : _buildStep2(isDark),
 
-                                                  const SizedBox(height: 24),
+                                                  const SizedBox(height: 14),
 
                                                   // Action Buttons Row (Matching signup_view)
                                                   _buildActionButtons(
@@ -603,7 +611,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
     );
   }
 
-  // Google Verified Info Card
+  // Google Verified Info Card (Ultra Compact: Google Icon + Email + Verified Badge)
   Widget _buildGoogleVerifiedBanner({
     required String displayName,
     required String email,
@@ -616,69 +624,49 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
         isDark ? const Color(0xFF22332A) : const Color(0xFFD6EAE1);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: cardBorder, width: 1.2),
       ),
       child: Row(
         children: [
-          // Google Multi-Color Icon in Rounded Box
+          // Google Multi-Color Icon
           Container(
-            width: 40,
-            height: 40,
+            width: 28,
+            height: 28,
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF111513) : Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: isDark
                     ? const Color(0xFF2E2E36)
                     : const Color(0xFFE4EBE8),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
-            padding: const EdgeInsets.all(9),
+            padding: const EdgeInsets.all(5),
             child: SvgPicture.string(_googleSvgString),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'স্বাগতম, $displayName! 🎉',
-                  style: TextStyle(
-                    fontFamily: 'HindSiliguri',
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
-                    color: textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  email.isNotEmpty ? email : 'Google Account',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: textMuted,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+            child: Text(
+              email.isNotEmpty
+                  ? email
+                  : (displayName.isNotEmpty ? displayName : 'Google Account'),
+              style: TextStyle(
+                fontFamily: 'HindSiliguri',
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
             decoration: BoxDecoration(
               color: const Color(0xFF0A8A66).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(99),
@@ -691,15 +679,15 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
               children: [
                 Icon(
                   LucideIcons.checkCircle2,
-                  size: 13,
+                  size: 12,
                   color: Color(0xFF0A8A66),
                 ),
-                SizedBox(width: 4),
+                SizedBox(width: 3.5),
                 Text(
                   'ভেরিফাইড',
                   style: TextStyle(
                     fontFamily: 'HindSiliguri',
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF0A8A66),
                   ),
@@ -732,19 +720,21 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
           keyboardType: TextInputType.phone,
           isDark: isDark,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
 
-        // College / Institute
+        // College / School / Institute
         _buildInputField(
-          label: 'কলেজ / প্রতিষ্ঠান *',
+          label: _stream == 'SSC' ? 'স্কুল / প্রতিষ্ঠান *' : 'কলেজ / প্রতিষ্ঠান *',
           icon: LucideIcons.graduationCap,
           controller: _instituteController,
-          hint: 'যেমন: নটর ডেম কলেজ, ঢাকা কলেজ...',
+          hint: _stream == 'SSC'
+              ? 'যেমন: আইডিয়াল স্কুল, মতিঝিল সরকারি বালক...'
+              : 'যেমন: নটর ডেম কলেজ, ঢাকা কলেজ...',
           isDark: isDark,
         ),
 
         // Auto-complete suggestions dropdown
-        if (_showSuggestions && _collegeSuggestions.isNotEmpty) ...[
+        if (_showSuggestions) ...[
           const SizedBox(height: 4),
           Container(
             constraints: const BoxConstraints(maxHeight: 180),
@@ -760,117 +750,150 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                 ),
               ],
             ),
-            child: ListView.separated(
+            child: ListView(
               shrinkWrap: true,
               padding: EdgeInsets.zero,
-              itemCount: _collegeSuggestions.length,
-              separatorBuilder: (context, index) => Divider(
-                height: 1,
-                color: fieldBorder.withValues(alpha: 0.6),
-              ),
-              itemBuilder: (context, idx) {
-                final col = _collegeSuggestions[idx];
-                return InkWell(
-                  onTap: () {
-                    _instituteController.text = col;
-                    setState(() => _showSuggestions = false);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+              children: [
+                ..._collegeSuggestions.map((col) {
+                  return InkWell(
+                    onTap: () {
+                      _instituteController.text = col;
+                      setState(() => _showSuggestions = false);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: Text(
+                        col,
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      col,
-                      style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
+                  );
+                }),
+                if (_instituteController.text.trim().isNotEmpty &&
+                    !_collegeSuggestions.contains(_instituteController.text.trim()))
+                  InkWell(
+                    onTap: () {
+                      setState(() => _showSuggestions = false);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 11,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF0F291E)
+                            : const Color(0xFFECFDF5),
+                        border: Border(
+                          top: BorderSide(
+                            color: isDark
+                                ? const Color(0xFF1B4D3E)
+                                : const Color(0xFFA7F3D0),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.add_circle_outline,
+                            size: 15,
+                            color: Color(0xFF059669),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'প্রতিষ্ঠান হিসেবে "${_instituteController.text.trim()}" ব্যবহার করো',
+                              style: const TextStyle(
+                                fontFamily: 'HindSiliguri',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF059669),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
+              ],
             ),
           ),
         ],
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
 
-        // Stream (Class) & Division (Group) Row
+        // Stream (Class) & Division (Group) Row - Both Dropdowns as requested
         Row(
           children: [
-            // Stream (HSC / SSC)
+            // Stream (HSC / SSC) Dropdown
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildLabel('শ্রেণী', isDark),
-                  const SizedBox(height: 7),
-                  Row(
-                    children: ['HSC', 'SSC'].map((s) {
-                      final isSel = _stream == s;
-                      return Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(right: s == 'HSC' ? 6 : 0),
-                          child: InkWell(
-                            onTap: () => _handleStreamChange(s),
-                            borderRadius: BorderRadius.circular(16),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              decoration: BoxDecoration(
-                                color: isSel
-                                    ? const Color(0xFF0A8A66)
-                                    : (isDark
-                                        ? const Color(0xFF141417)
-                                        : const Color(0xFFF6F9F8)),
-                                border: Border.all(
-                                  color: isSel
-                                      ? const Color(0xFF0A8A66)
-                                      : fieldBorder,
-                                  width: 1.2,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                s,
-                                style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSel ? Colors.white : textMuted,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  const SizedBox(height: 5),
+                  AppDropdown<String>(
+                    value: _stream,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10.5),
+                    options: const [
+                      AppDropdownOption(value: 'HSC', label: 'এইচএসসি (HSC)'),
+                      AppDropdownOption(value: 'SSC', label: 'এসএসসি (SSC)'),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) _handleStreamChange(val);
+                    },
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
 
-            // Division / Group Dropdown
+            // Division / Group Dropdown (Science active, Others blurred/disabled)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildLabel('বিভাগ', isDark),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 5),
                   AppDropdown<String>(
                     value: _group,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                    options: const [
-                      AppDropdownOption(value: 'Science', label: 'বিজ্ঞান'),
-                      AppDropdownOption(value: 'Humanities', label: 'মানবিক'),
-                      AppDropdownOption(
-                          value: 'Commerce', label: 'ব্যবসায় শিক্ষা'),
-                    ],
+                        horizontal: 12, vertical: 10.5),
+                    options: _stream == 'SSC'
+                        ? const [
+                            AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                            AppDropdownOption(
+                                value: 'Business Studies',
+                                label: 'Business Studies (ব্যবসায় শিক্ষা)'),
+                            AppDropdownOption(
+                                value: 'Humanities', label: 'Humanities (মানবিক)'),
+                          ]
+                        : const [
+                            AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                            AppDropdownOption(
+                              value: 'Business Studies',
+                              label: 'Business Studies (ব্যবসায় শিক্ষা)',
+                              isEnabled: false,
+                              disabledBadge: 'শীঘ্রই আসছে',
+                            ),
+                            AppDropdownOption(
+                              value: 'Humanities',
+                              label: 'Humanities (মানবিক)',
+                              isEnabled: false,
+                              disabledBadge: 'শীঘ্রই আসছে',
+                            ),
+                          ],
                     onChanged: (val) {
                       if (val != null) setState(() => _group = val);
                     },
@@ -880,14 +903,14 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
 
         // Batch Chips
         _buildLabel(
           _stream == 'HSC' ? 'এইচএসসি ব্যাচ' : 'এসএসসি ব্যাচ',
           isDark,
         ),
-        const SizedBox(height: 7),
+        const SizedBox(height: 5),
         Row(
           children: (_stream == 'HSC'
                   ? ['HSC 2026', 'HSC 2025', 'HSC 2027']
@@ -900,17 +923,17 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                     right: (b != 'HSC 2027' && b != 'SSC 2028') ? 6 : 0),
                 child: InkWell(
                   onTap: () => setState(() => _batch = b),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    padding: const EdgeInsets.symmetric(vertical: 8.5),
                     decoration: BoxDecoration(
                       color: isSel
                           ? const Color(0xFF0A8A66).withValues(alpha: 0.14)
                           : (isDark
                               ? const Color(0xFF141417)
                               : const Color(0xFFF6F9F8)),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSel
                             ? const Color(0xFF0A8A66)
@@ -923,7 +946,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                       b,
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
-                        fontSize: 12.5,
+                        fontSize: 12,
                         fontWeight:
                             isSel ? FontWeight.w700 : FontWeight.w500,
                         color: isSel
@@ -956,146 +979,64 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Helper Note Card
+        _buildLabel('পাসওয়ার্ড (ঐচ্ছিক)', isDark),
+        const SizedBox(height: 6),
         Container(
-          padding: const EdgeInsets.all(14),
+          height: 50,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF18201C) : const Color(0xFFF0F7F4),
-            borderRadius: BorderRadius.circular(16),
+            color: fieldBg,
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isDark
-                  ? const Color(0xFF22352B)
-                  : const Color(0xFFD4EAE0),
+              color: fieldBorder,
+              width: 1.2,
             ),
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                LucideIcons.info,
-                size: 17,
-                color: Color(0xFF0A8A66),
+              Icon(
+                LucideIcons.lock,
+                size: 19,
+                color: textMuted,
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  'এই তথ্যগুলো ঐচ্ছিক। তুমি চাইলে এগুলো এখনই নির্বাচন করতে পারো অথবা পরে প্রোফাইল থেকেও পরিবর্তন করতে পারবে।',
+                child: TextFormField(
+                  controller: _passwordController,
+                  obscureText: !_showPassword,
                   style: TextStyle(
                     fontFamily: 'HindSiliguri',
-                    fontSize: 12.5,
-                    color: isDark
-                        ? const Color(0xFFD1D5DB)
-                        : const Color(0xFF374151),
-                    height: 1.45,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                    color: textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'পাসওয়ার্ড দাও (কমপক্ষে ৬ অক্ষর)',
+                    hintStyle: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      color: textMuted.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.w400,
+                      fontSize: 13.5,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
               ),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(
+                  _showPassword ? LucideIcons.eyeOff : LucideIcons.eye,
+                  size: 19,
+                  color: textMuted,
+                ),
+                onPressed: () => setState(() => _showPassword = !_showPassword),
+              ),
             ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Exam Target
-        _buildLabel('ভর্তি পরীক্ষার লক্ষ্য (ঐচ্ছিক)', isDark),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            _buildTargetCard(
-              id: 'Engineering',
-              emoji: '⚙️',
-              title: 'ইঞ্জিনিয়ারিং',
-              isDark: isDark,
-              fieldBorder: fieldBorder,
-            ),
-            const SizedBox(width: 8),
-            _buildTargetCard(
-              id: 'Medical',
-              emoji: '🩺',
-              title: 'মেডিকেল',
-              isDark: isDark,
-              fieldBorder: fieldBorder,
-            ),
-            const SizedBox(width: 8),
-            _buildTargetCard(
-              id: 'University',
-              emoji: '🏛️',
-              title: 'ভার্সিটি',
-              isDark: isDark,
-              fieldBorder: fieldBorder,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        // Optional Password
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildLabel('পাসওয়ার্ড (ঐচ্ছিক)', isDark),
-            Text(
-              'ঐচ্ছিক',
-              style: TextStyle(
-                fontFamily: 'HindSiliguri',
-                fontSize: 11.5,
-                color: textMuted,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 7),
-        TextFormField(
-          controller: _passwordController,
-          obscureText: !_showPassword,
-          style: TextStyle(
-            fontSize: 14.5,
-            fontWeight: FontWeight.w500,
-            color: textPrimary,
-          ),
-          decoration: InputDecoration(
-            hintText: 'ইমেইল দিয়ে লগইন করতে চাইলে (কমপক্ষে ৬ অক্ষর)',
-            hintStyle: TextStyle(
-              fontFamily: 'HindSiliguri',
-              fontSize: 13.5,
-              color: textMuted.withValues(alpha: 0.7),
-            ),
-            prefixIcon: Icon(
-              LucideIcons.lock,
-              size: 18,
-              color: textMuted,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _showPassword ? LucideIcons.eyeOff : LucideIcons.eye,
-                size: 18,
-                color: textMuted,
-              ),
-              onPressed: () => setState(() => _showPassword = !_showPassword),
-            ),
-            filled: true,
-            fillColor: fieldBg,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: fieldBorder),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: fieldBorder),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-              borderSide: BorderSide(color: Color(0xFF0A8A66), width: 1.5),
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          '💡 পাসওয়ার্ড না দিলেও তুমি সবসময় ১-ট্যাপে Google দিয়ে লগইন করতে পারবে।',
-          style: TextStyle(
-            fontFamily: 'HindSiliguri',
-            fontSize: 11.5,
-            color: textMuted,
           ),
         ),
       ],
@@ -1109,19 +1050,19 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
 
     if (_step == 1) {
       return Container(
-        height: 54,
+        height: 48,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF0A8A66), Color(0xFF066B4F)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF066B4F).withValues(alpha: 0.35),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -1129,7 +1070,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
           color: Colors.transparent,
           child: InkWell(
             onTap: _handleNext,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             child: const Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1138,7 +1079,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
                     'পরবর্তী ধাপ',
                     style: TextStyle(
                       fontFamily: 'HindSiliguri',
-                      fontSize: 16.5,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -1190,7 +1131,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
             // Submit Button (3D Deepest Green)
             Expanded(
               child: AppButton3D(
-                text: 'পড়াশোনা শুরু করো 🚀',
+                text: 'পড়াশোনা শুরু করো',
                 onPressed: _isSubmitting ? null : () => _handleSubmit(),
                 isLoading: _isSubmitting,
                 baseColor: AppColors.viridianForest,
@@ -1237,12 +1178,12 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
     final textMuted =
         isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
     return Padding(
-      padding: const EdgeInsets.only(left: 4),
+      padding: const EdgeInsets.only(left: 2),
       child: Text(
         text,
         style: TextStyle(
           fontFamily: 'HindSiliguri',
-          fontSize: 13,
+          fontSize: 12.5,
           fontWeight: FontWeight.w600,
           color: textMuted,
         ),
@@ -1271,12 +1212,12 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel(label, isDark),
-        const SizedBox(height: 7),
+        const SizedBox(height: 5),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 14.5,
             fontWeight: FontWeight.w500,
             color: textPrimary,
           ),
@@ -1284,7 +1225,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
             hintText: hint,
             hintStyle: TextStyle(
               fontFamily: 'HindSiliguri',
-              fontSize: 14,
+              fontSize: 13.5,
               fontWeight: FontWeight.normal,
               color: textMuted.withValues(alpha: 0.7),
             ),
@@ -1296,19 +1237,19 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
             filled: true,
             fillColor: fieldBg,
             contentPadding: const EdgeInsets.symmetric(
-              vertical: 15,
-              horizontal: 16,
+              vertical: 11,
+              horizontal: 14,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(color: fieldBorder),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(color: fieldBorder),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
+              borderRadius: BorderRadius.all(Radius.circular(14)),
               borderSide: BorderSide(color: Color(0xFF0A8A66), width: 1.5),
             ),
           ),
@@ -1317,59 +1258,7 @@ class _CompleteProfileViewState extends ConsumerState<CompleteProfileView>
     );
   }
 
-  // Exam Target Selection Card
-  Widget _buildTargetCard({
-    required String id,
-    required String emoji,
-    required String title,
-    required bool isDark,
-    required Color fieldBorder,
-  }) {
-    final isSelected = _examTarget == id;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _examTarget = isSelected ? '' : id),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? const Color(0xFF0A8A66).withValues(alpha: 0.12)
-                : (isDark
-                    ? const Color(0xFF141417)
-                    : const Color(0xFFFFFFFF)),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected ? const Color(0xFF0A8A66) : fieldBorder,
-              width: isSelected ? 1.5 : 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 22)),
-              const SizedBox(height: 6),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 12.5,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: isSelected
-                      ? (isDark
-                          ? const Color(0xFF34D399)
-                          : const Color(0xFF0A8A66))
-                      : (isDark
-                          ? Colors.white70
-                          : const Color(0xFF374151)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+
 
   // Top Support Button (Matching signup_view)
   Widget _buildSupportButton(BuildContext context, bool isDark) {

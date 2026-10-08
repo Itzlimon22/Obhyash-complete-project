@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../router.dart';
+import '../providers/auth_provider.dart';
 import '../utils/app_popups.dart';
 
 class DeepLinkService {
@@ -46,6 +47,8 @@ class DeepLinkService {
     // 1. Handle Onboarding deep link returning from Google OAuth
     if (uri.queryParameters['onboarding'] == 'true' ||
         uri.fragment.contains('onboarding=true')) {
+      AuthNotifier.isResolvingGoogleAuth = false;
+      AuthNotifier.needsProfileCompletion = true;
       router.go('/complete-profile');
       return;
     }

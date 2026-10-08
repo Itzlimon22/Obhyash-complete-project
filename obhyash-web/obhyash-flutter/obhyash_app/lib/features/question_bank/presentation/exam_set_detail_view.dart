@@ -780,7 +780,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   'কমপক্ষে একটি বিষয় নির্বাচন করতে হবে',
                   style: TextStyle(),
                 ),
-                duration: Duration(seconds: 2),
+                duration: Duration(seconds: 3),
                 behavior: SnackBarBehavior.floating,
               ),
             );

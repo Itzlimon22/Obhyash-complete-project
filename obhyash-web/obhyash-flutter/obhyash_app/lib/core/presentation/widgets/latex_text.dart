@@ -212,6 +212,10 @@ String _cleanIntraSentenceNewlines(String text) {
         line.contains(r'\xrightleftharpoons') ||
         line.contains(_kChemArrowPrefix) ||
         line.startsWith(r'$$') ||
+        line.contains(r'\begin{') ||
+        line.contains(r'\end{') ||
+        line.contains(r'\int') ||
+        line.contains(r'\sum') ||
         line.contains('→') ||
         line.contains('⟶') ||
         line.contains('⇌') ||
@@ -536,6 +540,14 @@ String _preprocess(String text) {
     }
   }
 
+  // 4c. Ensure any bare aligned, align, or matrix environments outside $$ are cleanly wrapped in display math $$...$$
+  processedText = processedText.replaceAllMapped(
+    RegExp(
+      r'(?<!\$)\s*(\\begin\{(?:aligned|align\*?|(?:v|p|b|B|V|small)?matrix|cases|array)\}[\s\S]*?\\end\{(?:aligned|align\*?|(?:v|p|b|B|V|small)?matrix|cases|array)\})\s*(?!\$)',
+    ),
+    (m) => '\n\n\$\$${m.group(1)!.trim()}\$\$\n\n',
+  );
+
   // 5. Split into math blocks ($$...$$ or $...$) and non-math segments
   final mathPattern = RegExp(r'(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)');
   final parts = <String>[];
@@ -606,6 +618,26 @@ String _preprocess(String text) {
       RegExp(r'\b([a-zA-Z0-9]+)\^\{(-?[0-9a-zA-Z]+)\}\b'),
       (m) => '\$${m.group(1)}^{${m.group(2)}}\$',
     );
+
+    // Auto-wrap bare math equation lines e.g. "s = \int_{0}^{10} (2t + 3t^2)dt" or "= [t^2 + t^3]_{0}^{10}"
+    final tLines = t.split('\n');
+    final processedTLines = tLines.map((line) {
+      final trimmedLine = line.trim();
+      if (trimmedLine.isEmpty || trimmedLine.contains(r'$') || RegExp(r'[\u0980-\u09FF]').hasMatch(trimmedLine)) {
+        return line;
+      }
+      // If line contains LaTeX commands (like \int, \frac, \sqrt) or starts with '=' or is pure algebraic equation
+      final hasMathSymbols = trimmedLine.contains(r'\') ||
+          trimmedLine.startsWith('=') ||
+          RegExp(r'^[a-zA-Z]\([a-zA-Z0-9]+\)\s*=').hasMatch(trimmedLine) ||
+          RegExp(r'^[a-zA-Z]\s*=\s*[0-9]').hasMatch(trimmedLine);
+      final hasWords = RegExp(r'[a-zA-Z]{3,}\s+[a-zA-Z]{3,}').hasMatch(trimmedLine);
+      if (hasMathSymbols && !hasWords) {
+        return '\$$trimmedLine\$';
+      }
+      return line;
+    }).toList();
+    t = processedTLines.join('\n');
 
     return t;
   }).toList();
@@ -741,7 +773,8 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
       );
     }
 
-    final cleanLatex = QuestionFormatter.autoHealRawLatex(latex.trim());
+    var cleanLatex = QuestionFormatter.autoHealRawLatex(latex.trim());
+    cleanLatex = cleanLatex.replaceAll(RegExp(r'^\$+|\$+$'), '').trim();
     final mathWidget = Math.tex(
       cleanLatex,
       mathStyle: MathStyle.text,
@@ -780,7 +813,8 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
       );
     }
 
-    final cleanLatex = QuestionFormatter.autoHealRawLatex(latex.trim());
+    var cleanLatex = QuestionFormatter.autoHealRawLatex(latex.trim());
+    cleanLatex = cleanLatex.replaceAll(RegExp(r'^\$+|\$+$'), '').trim();
     return Align(
       alignment: Alignment.center,
       child: SingleChildScrollView(

@@ -848,7 +848,7 @@ class _PaymentViewState extends ConsumerState<PaymentView>
                               ),
                             ),
                             Text(
-                              'বিকাশ, নগদ, রকেট ও কার্ডে ১-ক্লিকে সরাসরি পেমেন্ট',
+                              'বিকাশ ও নগদে ১-ক্লিকে সরাসরি পেমেন্ট',
                               style: TextStyle(
                                 fontSize: 12.5,
                                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
@@ -874,12 +874,11 @@ class _PaymentViewState extends ConsumerState<PaymentView>
                       ),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _paymentMethodBadge('bKash', const Color(0xFFD11559)),
+                        const SizedBox(width: 16),
                         _paymentMethodBadge('Nagad', const Color(0xFFE11D48)),
-                        _paymentMethodBadge('Rocket', const Color(0xFF6B21A8)),
-                        _paymentMethodBadge('Cards', const Color(0xFF0284C7)),
                       ],
                     ),
                   ),
@@ -2657,7 +2656,7 @@ class _FaqTileState extends State<_FaqTile> {
   }
 }
 
-/// Dedicated Page for Automatic / Instant Payment (UddoktaPay: bKash, Nagad, Cards)
+/// Dedicated Page for Automatic / Instant Payment (UddoktaPay: bKash, Nagad)
 class AutoPaymentView extends StatelessWidget {
   final SubscriptionPlan plan;
   final String? appliedCouponCode;
