@@ -490,6 +490,30 @@
       "subjectId": "ssc_math",
       "name": "সেট ও ফাংশন",
       "questionCount": 20
+    },
+    {
+      "id": "ssc_p_c4",
+      "subjectId": "ssc_physics",
+      "name": "কাজ, ক্ষমতা ও শক্তি",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_c_c4",
+      "subjectId": "ssc_chemistry",
+      "name": "পর্যায় সারণি",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_m_c3",
+      "subjectId": "ssc_math",
+      "name": "বীজগাণিতিক রাশি",
+      "questionCount": 20
+    },
+    {
+      "id": "ssc_b_c2",
+      "subjectId": "ssc_biology",
+      "name": "জীব কোষ ও টিস্যু",
+      "questionCount": 20
     }
   ]
 }

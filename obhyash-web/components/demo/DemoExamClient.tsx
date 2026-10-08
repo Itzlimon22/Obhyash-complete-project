@@ -24,28 +24,41 @@ function shuffleArray<T>(array: T[]): T[] {
 // Pick questions matching subject and chapters, fall back to pool if not enough
 function getQuestionsForConfig(
   pool: Question[],
-  subject: string,
+  config: ExamConfig,
   chapterNames: string[],
   count: number = 25
 ): Question[] {
-  // 1. Try to find questions strictly matching subject
-  let matching = pool.filter(
-    (q) =>
-      (q.subject || '').toLowerCase() === subject.toLowerCase() ||
-      (q.subjectLabel || '').toLowerCase().includes(subject.toLowerCase())
-  );
+  const subjectKey = (config.subject || '').toLowerCase();
+  const subjectLabel = (config.subjectLabel || '').toLowerCase();
+
+  // 1. Match questions by subject id, subject name, or label
+  let matching = pool.filter((q) => {
+    const qSubId = ((q as any).subjectId || '').toLowerCase();
+    const qSubName = (q.subject || '').toLowerCase();
+    const qSubLabel = (q.subjectLabel || '').toLowerCase();
+
+    return (
+      (qSubId && (qSubId === subjectKey || qSubId.includes(subjectKey))) ||
+      (qSubName && (qSubName === subjectKey || qSubName.includes(subjectKey))) ||
+      (qSubLabel && (qSubLabel.includes(subjectLabel) || subjectLabel.includes(qSubLabel)))
+    );
+  });
 
   // If chapter filter specified and not 'All'
   if (chapterNames.length > 0 && !chapterNames.includes('All')) {
     const chapterFiltered = matching.filter((q) =>
-      chapterNames.some((c) => q.chapter.toLowerCase().includes(c.toLowerCase()))
+      chapterNames.some(
+        (c) =>
+          q.chapter.toLowerCase().includes(c.toLowerCase()) ||
+          c.toLowerCase().includes(q.chapter.toLowerCase())
+      )
     );
-    if (chapterFiltered.length >= 5) {
+    if (chapterFiltered.length > 0) {
       matching = chapterFiltered;
     }
   }
 
-  // 2. If matching count is less than requested, backfill from general pool
+  // 2. If matching count is less than requested, backfill from matching subject or pool
   if (matching.length < count) {
     const remaining = pool.filter((q) => !matching.some((m) => m.id === q.id));
     matching = [...matching, ...shuffleArray(remaining)];
@@ -109,7 +122,7 @@ export default function DemoExamClient() {
 
     const picked = getQuestionsForConfig(
       PUBLIC_QUESTIONS,
-      currentConfig.subject,
+      currentConfig,
       chapterList,
       currentConfig.questionCount || 25
     );
