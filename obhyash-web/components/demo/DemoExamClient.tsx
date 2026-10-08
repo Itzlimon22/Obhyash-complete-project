@@ -9,6 +9,7 @@ import { ExamInstructionsView } from '@/components/student/features/exam/ExamIns
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 import ResultView from '@/components/student/ui/ResultView';
 import AppInstallPromptModal from '@/components/demo/AppInstallPromptModal';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { cn } from '@/lib/utils';
 
 // Fisher-Yates shuffle
@@ -69,54 +70,13 @@ function getQuestionsForConfig(
 
 export default function DemoExamClient() {
   const router = useRouter();
+  const { isDark, toggleTheme } = useTheme();
 
   // 4-Stage Flow: setup -> instructions -> exam -> result
   const [stage, setStage] = useState<'setup' | 'instructions' | 'exam' | 'result'>('setup');
 
   // Track if user completed an exam in this session or prior
   const [hasCompletedExam, setHasCompletedExam] = useState<boolean>(false);
-
-  // Dedicated Theme state for Exam Runner and Result View (Default: dark)
-  const [examTheme, setExamTheme] = useState<'light' | 'dark'>('dark');
-
-  const handleToggleExamTheme = useCallback(() => {
-    setExamTheme((prev) => {
-      const next = prev === 'dark' ? 'light' : 'dark';
-      if (next === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      return next;
-    });
-  }, []);
-
-  // Force light theme on setup & instructions; apply examTheme on exam & result
-  useEffect(() => {
-    if (stage === 'setup' || stage === 'instructions') {
-      document.documentElement.classList.remove('dark');
-    } else if (stage === 'exam' || stage === 'result') {
-      if (examTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }, [stage, examTheme]);
-
-  // Cleanup on unmount: restore theme from localStorage if user leaves /demo
-  useEffect(() => {
-    return () => {
-      try {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else if (stored === 'light') {
-          document.documentElement.classList.remove('dark');
-        }
-      } catch {}
-    };
-  }, []);
 
   const [currentConfig, setCurrentConfig] = useState<ExamConfig>({
     subject: 'physics',
@@ -241,22 +201,15 @@ export default function DemoExamClient() {
   );
 
   return (
-    <div
-      className={cn(
-        "min-h-screen font-['HindSiliguri',sans-serif]",
-        stage === 'setup' || stage === 'instructions'
-          ? 'bg-[#FAFAF9] text-neutral-900'
-          : 'bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100'
-      )}
-    >
-      {/* ── 1. Setup Stage (Always Light Theme) ── */}
+    <div className="min-h-screen font-['HindSiliguri',sans-serif] bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100 transition-colors duration-200">
+      {/* ── 1. Setup Stage ── */}
       {stage === 'setup' && (
         <div className="py-6 sm:py-10 px-3 sm:px-6">
           <div className="max-w-xl mx-auto mb-4 text-center">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-['Anek_Bangla',sans-serif]">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
               ফ্রি ডেমো মডেল টেস্ট
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-['Anek_Bangla',sans-serif]">
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-['Anek_Bangla',sans-serif]">
               লগইন ছাড়াই সরাসরি বোর্ডের মানসম্মত মডেল টেস্ট দিয়ে নিজের প্রস্তুতি যাচাই করো
             </p>
           </div>
@@ -265,7 +218,7 @@ export default function DemoExamClient() {
         </div>
       )}
 
-      {/* ── 2. Instructions Stage (Always Light Theme) ── */}
+      {/* ── 2. Instructions Stage ── */}
       {stage === 'instructions' && (
         <ExamInstructionsView
           config={currentConfig}
@@ -274,7 +227,7 @@ export default function DemoExamClient() {
         />
       )}
 
-      {/* ── 3. Exam Runner Stage (With Theme Toggle Button in Header) ── */}
+      {/* ── 3. Exam Runner Stage ── */}
       {stage === 'exam' && (
         <ExamRunner
           appState={appState}
@@ -288,12 +241,12 @@ export default function DemoExamClient() {
           onSubmit={handleExamSubmit}
           onExit={() => setStage('setup')}
           setAppState={setAppState}
-          toggleTheme={handleToggleExamTheme}
-          isDarkMode={examTheme === 'dark'}
+          toggleTheme={toggleTheme}
+          isDarkMode={isDark}
         />
       )}
 
-      {/* ── 4. Result Stage (Header Cross navigates to Setup; Theme Toggle in Header) ── */}
+      {/* ── 4. Result Stage ── */}
       {stage === 'result' && (
         <div className="flex flex-col min-h-screen">
           <ResultView
@@ -301,8 +254,8 @@ export default function DemoExamClient() {
             userAnswers={userAnswers}
             timeTaken={timeTaken}
             onRestart={() => setStage('setup')}
-            isDarkMode={examTheme === 'dark'}
-            onToggleTheme={handleToggleExamTheme}
+            isDarkMode={isDark}
+            onToggleTheme={toggleTheme}
             negativeMarking={currentConfig.negativeMarking || 0.25}
             examDetails={examDetails}
             onReexam={() => setShowSecondExamGate(true)}

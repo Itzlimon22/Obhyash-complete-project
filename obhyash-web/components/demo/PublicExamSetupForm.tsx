@@ -69,6 +69,40 @@ export default function PublicExamSetupForm({
     return availableSubjects.find((s) => s.id === selectedSubjectId) || availableSubjects[0];
   }, [availableSubjects, selectedSubjectId]);
 
+  // Dynamic exam types based on selected level and subject
+  const availableExamTypes = useMemo(() => {
+    if (selectedLevel === 'SSC') {
+      return ['Board', 'Academic'];
+    }
+
+    const subId = (selectedSubjectId || '').toLowerCase();
+    const subName = (selectedSubData?.name || '').toLowerCase();
+    const subLabel = (selectedSubData?.label || '').toLowerCase();
+    const isBiology =
+      subId.includes('biology') || subName.includes('biology') || subLabel.includes('জীববিজ্ঞান');
+    const isICT =
+      subId.includes('ict') || subName.includes('ict') || subLabel.includes('তথ্য');
+
+    if (isBiology) {
+      return ['Medical', 'Varsity', 'Board', 'Academic'];
+    }
+    if (isICT) {
+      return ['Board', 'Academic'];
+    }
+    return ['Engineering', 'Varsity', 'Board', 'Academic'];
+  }, [selectedLevel, selectedSubjectId, selectedSubData]);
+
+  // Sync selected examTypes when level or subject changes
+  React.useEffect(() => {
+    setExamTypes((prev) => {
+      const valid = new Set(Array.from(prev).filter((t) => availableExamTypes.includes(t)));
+      if (valid.size === 0) {
+        return new Set(availableExamTypes.slice(-2));
+      }
+      return valid;
+    });
+  }, [availableExamTypes]);
+
   // Handle level change
   const handleLevelChange = (newLevel: 'HSC' | 'SSC') => {
     setSelectedLevel(newLevel);
@@ -136,14 +170,14 @@ export default function PublicExamSetupForm({
           <button
             type="button"
             onClick={() => setShowSubjectModal(true)}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-amber-500/5 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 shadow-xs"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-white/[0.16] shadow-xs"
           >
             <span className="text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-neutral-100">
               {selectedSubData ? selectedSubData.label : 'বিষয় নির্বাচন করো...'}
             </span>
             <ChevronDown
               size={18}
-              className="text-neutral-500 dark:text-neutral-400 shrink-0 ml-2"
+              className="text-neutral-400 dark:text-neutral-500 shrink-0 ml-2"
             />
           </button>
         </CardContainer>
@@ -203,11 +237,17 @@ export default function PublicExamSetupForm({
           title="পরীক্ষার ধরন"
           tooltip="বোর্ড ও অ্যাকাডেমিক মান অনুযায়ী পরীক্ষার প্রশ্ন প্রস্তুত করা হবে।"
         >
-          <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-neutral-50/80 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
-            {['Engineering', 'Varsity', 'Board', 'Academic'].map((t) => {
+          <div
+            className={cn(
+              "grid gap-1.5 p-1 rounded-xl bg-neutral-50/80 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]",
+              availableExamTypes.length === 2 ? 'grid-cols-2' : 'grid-cols-4'
+            )}
+          >
+            {availableExamTypes.map((t) => {
               const isSelected = examTypes.has(t);
               const labelMap: Record<string, string> = {
                 Engineering: 'ইঞ্জিনিয়ারিং',
+                Medical: 'মেডিকেল',
                 Varsity: 'ভার্সিটি',
                 Board: 'বোর্ড',
                 Academic: 'একাডেমিক',
