@@ -406,10 +406,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     <div className="w-full max-w-xl mx-auto px-0 sm:px-4 py-2 sm:py-5 select-none font-['HindSiliguri']">
       <div className="flex flex-col gap-2.5 sm:gap-3">
         {/* 1. Subject Selector Card */}
-        <CardContainer
-          title="বিষয় নির্বাচন"
-          icon={BookOpen}
-        >
+        <CardContainer title="বিষয় নির্বাচন">
           {isLoadingData ? (
             <div className="h-11 w-full bg-neutral-100 dark:bg-neutral-800/60 animate-pulse rounded-xl" />
           ) : (
@@ -417,25 +414,16 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               type="button"
               onClick={() => setShowSubjectModal(true)}
               className={cn(
-                "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer",
-                selectedSubject
-                  ? "bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
-                  : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-neutral-700"
+                "w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer",
+                "bg-amber-500/5 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 shadow-xs"
               )}
             >
-              <span
-                className={cn(
-                  "text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif]",
-                  selectedSubject
-                    ? "text-[#12544F] dark:text-[#34D399]"
-                    : "text-neutral-400 dark:text-neutral-500 font-normal"
-                )}
-              >
+              <span className="text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-neutral-100">
                 {selectedSubData ? selectedSubData.label : "বিষয় নির্বাচন করো..."}
               </span>
               <ChevronDown
                 size={18}
-                className="text-neutral-400 dark:text-neutral-500 shrink-0 ml-2"
+                className="text-neutral-500 dark:text-neutral-400 shrink-0 ml-2"
               />
             </button>
           )}
@@ -450,34 +438,21 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         >
           <CardContainer
             title="অধ্যায় ও টপিক"
-            icon={List}
             tooltip="যে বিষয় ও অধ্যায়গুলোর ওপর পরীক্ষা দিতে চাও সেগুলো বেছে নাও"
           >
             <div className="flex flex-col gap-3">
               {/* Chapter Dropdown Trigger */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
+                <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-['Anek_Bangla',sans-serif]">
                   অধ্যায়
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowChapterModal(true)}
                   disabled={chapters.length === 0 && selectedSubject !== null}
-                  className={cn(
-                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer",
-                    selectedChapters.size > 0
-                      ? "bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
-                      : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08]"
-                  )}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08]"
                 >
-                  <span
-                    className={cn(
-                      "text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif]",
-                      selectedChapters.size > 0
-                        ? "text-[#12544F] dark:text-[#34D399] font-bold"
-                        : "text-neutral-400 dark:text-neutral-500 font-normal"
-                    )}
-                  >
+                  <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400 font-normal">
                     {selectedChapters.size === 0
                       ? "সব অধ্যায়"
                       : selectedChapters.size === chapters.length
@@ -493,28 +468,16 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
               {/* Topic Dropdown Trigger */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
+                <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-['Anek_Bangla',sans-serif]">
                   টপিক
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowTopicModal(true)}
                   disabled={selectedChapters.size === 0 || topics.length === 0}
-                  className={cn(
-                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left disabled:opacity-50 cursor-pointer",
-                    selectedTopics.size > 0
-                      ? "bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
-                      : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08]"
-                  )}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left disabled:opacity-50 cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08]"
                 >
-                  <span
-                    className={cn(
-                      "text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif]",
-                      selectedTopics.size > 0
-                        ? "text-[#12544F] dark:text-[#34D399] font-bold"
-                        : "text-neutral-400 dark:text-neutral-500 font-normal"
-                    )}
-                  >
+                  <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-400 dark:text-neutral-500 font-normal">
                     {selectedTopics.size === 0
                       ? "সব টপিক"
                       : selectedTopics.size === topics.length
@@ -534,82 +497,137 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* 3. Exam Type Card */}
         <CardContainer
           title="পরীক্ষার ধরন"
-          icon={Settings}
-          tooltip="তোমার প্রোফাইলের লক্ষ্য অনুযায়ী পরীক্ষার ধরন ফিল্টার করা হয়েছে। এটি প্রোফাইল থেকে যেকোনো সময় পরিবর্তন করা যাবে।"
+          tooltip="তোমার প্রোফাইলের লক্ষ্য অনুযায়ী পরীক্ষার ধরন ফিল্টার করা হয়েছে।"
         >
-          <SegmentedGroup
-            items={allowedExamTypes}
-            selectedItems={examTypes}
-            onToggle={(t) => {
-              setExamTypes((prev) => {
-                const next = new Set(prev);
-                if (next.has(t) && next.size > 1) {
-                  next.delete(t);
-                } else if (!next.has(t)) {
-                  next.add(t);
-                }
-                return next;
-              });
-            }}
-          />
+          <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-neutral-50/80 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
+            {allowedExamTypes.map((t) => {
+              const isSelected = examTypes.has(t);
+              const labelMap: Record<string, string> = {
+                Engineering: "ইঞ্জিনিয়ারিং",
+                Varsity: "ভার্সিটি",
+                Board: "বোর্ড",
+                Academic: "একাডেমিক",
+              };
+              const displayLabel = labelMap[t] || t;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    setExamTypes((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(t) && next.size > 1) {
+                        next.delete(t);
+                      } else if (!next.has(t)) {
+                        next.add(t);
+                      }
+                      return next;
+                    });
+                  }}
+                  className={cn(
+                    "py-2 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    isSelected
+                      ? "bg-[#0b4d44] text-white shadow-xs"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  {displayLabel}
+                </button>
+              );
+            })}
+          </div>
         </CardContainer>
 
         {/* 4. Difficulty Card */}
         <CardContainer
           title="কঠিনতা"
-          icon={Activity}
-          tooltip={"Easy: বেসিক ধারণা\nMedium: স্ট্যান্ডার্ড মান\nHard: চ্যালেঞ্জিং ও উচ্চতর দক্ষতা"}
+          tooltip={"সহজ: বেসিক ধারণা\nমধ্যম: স্ট্যান্ডার্ড মান\nকঠিন: চ্যালেঞ্জিং ও উচ্চতর দক্ষতা"}
         >
-          <SegmentedGroup
-            items={["Easy", "Medium", "Hard"]}
-            selectedItems={difficulties}
-            onToggle={(d) => {
-              setDifficulties((prev) => {
-                const next = new Set(prev);
-                if (next.has(d) && next.size > 1) {
-                  next.delete(d);
-                } else if (!next.has(d)) {
-                  next.add(d);
-                }
-                return next;
-              });
-            }}
-          />
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/70 dark:border-white/[0.08]">
+            {[
+              { val: "Easy", label: "সহজ" },
+              { val: "Medium", label: "মধ্যম" },
+              { val: "Hard", label: "কঠিন" },
+            ].map(({ val, label }) => {
+              const isSelected = difficulties.has(val);
+              return (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => {
+                    setDifficulties((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(val) && next.size > 1) {
+                        next.delete(val);
+                      } else if (!next.has(val)) {
+                        next.add(val);
+                      }
+                      return next;
+                    });
+                  }}
+                  className={cn(
+                    "py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    isSelected
+                      ? "bg-[#0b4d44] text-white shadow-xs"
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </CardContainer>
 
         {/* 5. Question Count Card */}
         <CardContainer
           title="প্রশ্নের সংখ্যা"
-          icon={HelpCircle}
           tooltip="পরীক্ষায় মোট কতটি প্রশ্ন থাকবে তা নির্ধারণ করো"
         >
-          <div className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
                 মোট প্রশ্ন:
               </span>
-              <StepperControl
-                value={questionCount}
-                unit="টি"
-                min={5}
-                max={100}
-                step={5}
-                onChanged={(val) => {
-                  if (val > 50 && !isPro) {
-                    setProModalConfig({
-                      isOpen: true,
-                      title: "৫০+ প্রশ্ন আনলক করো ⚡",
-                      message:
-                        "ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়। ৭৫ বা ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট দিতে প্রো সাবস্ক্রিপশন নাও।",
-                      featurePill: "প্রো ফিচার",
-                      icon: Crown,
-                    });
-                    return;
-                  }
-                  setQuestionCount(val);
-                  setDurationMinutes(val);
-                }}
-              />
+              <div className="flex items-center justify-between w-40 px-3 py-1.5 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
+                <button
+                  type="button"
+                  disabled={questionCount <= 5}
+                  onClick={() => {
+                    const next = Math.max(5, questionCount - 5);
+                    setQuestionCount(next);
+                    setDurationMinutes(next);
+                  }}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  −
+                </button>
+                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
+                  {questionCount} টি
+                </span>
+                <button
+                  type="button"
+                  disabled={questionCount >= 100}
+                  onClick={() => {
+                    const next = Math.min(100, questionCount + 5);
+                    if (next > 50 && !isPro) {
+                      setProModalConfig({
+                        isOpen: true,
+                        title: "৫০+ প্রশ্ন আনলক করো ⚡",
+                        message: "ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়।",
+                        featurePill: "প্রো ফিচার",
+                        icon: Crown,
+                      });
+                      return;
+                    }
+                    setQuestionCount(next);
+                    setDurationMinutes(next);
+                  }}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  +
+                </button>
+              </div>
             </div>
 
             {/* Quick Preset Pills */}
@@ -617,17 +635,15 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               {[10, 20, 25, 50, 100].map((count) => {
                 const isSelected = questionCount === count;
                 return (
-                  <PresetPill
+                  <button
                     key={count}
-                    label={`${count}টি`}
-                    isSelected={isSelected}
+                    type="button"
                     onClick={() => {
                       if (count > 50 && !isPro) {
                         setProModalConfig({
                           isOpen: true,
                           title: "৫০+ প্রশ্ন আনলক করো ⚡",
-                          message:
-                            "ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়। ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট দিতে প্রো সাবস্ক্রিপশন নাও।",
+                          message: "ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়।",
                           featurePill: "প্রো ফিচার",
                           icon: Crown,
                         });
@@ -636,7 +652,15 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                       setQuestionCount(count);
                       setDurationMinutes(count);
                     }}
-                  />
+                    className={cn(
+                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-['Anek_Bangla',sans-serif] cursor-pointer",
+                      isSelected
+                        ? "bg-[#0b4d44] text-white shadow-xs"
+                        : "bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400"
+                    )}
+                  >
+                    {count}টি
+                  </button>
                 );
               })}
             </div>
@@ -646,22 +670,34 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* 6. Time Duration Card */}
         <CardContainer
           title="পরীক্ষার সময়"
-          icon={Clock}
           tooltip="পরীক্ষার মোট সময় (মিনিট)"
         >
-          <div className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
                 মোট সময়:
               </span>
-              <StepperControl
-                value={durationMinutes}
-                unit="মি."
-                min={5}
-                max={180}
-                step={5}
-                onChanged={(val) => setDurationMinutes(val)}
-              />
+              <div className="flex items-center justify-between w-40 px-3 py-1.5 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
+                <button
+                  type="button"
+                  disabled={durationMinutes <= 5}
+                  onClick={() => setDurationMinutes(Math.max(5, durationMinutes - 5))}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  −
+                </button>
+                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
+                  {durationMinutes} মি.
+                </span>
+                <button
+                  type="button"
+                  disabled={durationMinutes >= 180}
+                  onClick={() => setDurationMinutes(Math.min(180, durationMinutes + 5))}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  +
+                </button>
+              </div>
             </div>
 
             {/* Quick Preset Pills */}
@@ -669,12 +705,19 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               {[10, 20, 30, 60, 90].map((mins) => {
                 const isSelected = durationMinutes === mins;
                 return (
-                  <PresetPill
+                  <button
                     key={mins}
-                    label={`${mins} মি.`}
-                    isSelected={isSelected}
+                    type="button"
                     onClick={() => setDurationMinutes(mins)}
-                  />
+                    className={cn(
+                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-['Anek_Bangla',sans-serif] cursor-pointer",
+                      isSelected
+                        ? "bg-[#0b4d44] text-white shadow-xs"
+                        : "bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400"
+                    )}
+                  >
+                    {mins} মি.
+                  </button>
                 );
               })}
             </div>
@@ -684,10 +727,9 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* 7. Negative Marking Card */}
         <CardContainer
           title="নেগেটিভ মার্কিং"
-          icon={MinusCircle}
           tooltip={"-০.২৫: প্রতি ৪টি ভুল উত্তরের জন্য ১ নম্বর কাটা\n-০.৫০: প্রতি ২টি ভুল উত্তরের জন্য ১ নম্বর কাটা"}
         >
-          <div className="p-1 rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/70 dark:border-white/[0.08]">
             {[
               { val: 0.0, label: "০ (নেই)" },
               { val: 0.25, label: "-০.২৫ মার্ক" },
@@ -700,10 +742,10 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   type="button"
                   onClick={() => setNegativeMarking(val)}
                   className={cn(
-                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
                     isSelected
-                      ? "bg-[#12544F] text-white border border-[#12544F] shadow-xs active:scale-95"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-[#0b4d44] text-white shadow-xs"
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   )}
                 >
                   {label}
@@ -714,53 +756,53 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </CardContainer>
 
         {/* 8. Live Blueprint Capsule Summary */}
-        <div className="my-1.5 px-3 py-3 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex items-center justify-around text-center">
+        <div className="my-1 px-4 py-2.5 rounded-full bg-[#f2fbf7] dark:bg-[#121f1c] border border-emerald-200/80 dark:border-emerald-800/40 shadow-xs flex items-center justify-around text-center">
           <div className="flex items-center gap-1.5">
-            <HelpCircle size={15} className="text-sky-500 shrink-0" />
+            <span className="text-xs text-sky-500 font-bold">?</span>
             <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               {questionCount}টি প্রশ্ন
             </span>
           </div>
 
-          <div className="w-[1px] h-4 bg-neutral-200 dark:bg-white/[0.08]" />
+          <div className="w-[1px] h-3.5 bg-emerald-200 dark:bg-emerald-800/50" />
 
           <div className="flex items-center gap-1.5">
-            <Clock size={15} className="text-amber-500 shrink-0" />
+            <span className="text-xs text-amber-500 font-bold">⏱</span>
             <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               {durationMinutes} মিনিট
             </span>
           </div>
 
-          <div className="w-[1px] h-4 bg-neutral-200 dark:bg-white/[0.08]" />
+          <div className="w-[1px] h-3.5 bg-emerald-200 dark:bg-emerald-800/50" />
 
           <div className="flex items-center gap-1.5">
-            <MinusCircle size={15} className="text-rose-500 shrink-0" />
+            <span className="text-xs text-rose-500 font-bold">⊖</span>
             <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
-              {negativeMarking === 0 ? "০ মার্ক" : `-${negativeMarking}`}
+              {negativeMarking === 0 ? "০" : `-${negativeMarking}`}
             </span>
           </div>
 
-          <div className="w-[1px] h-4 bg-neutral-200 dark:bg-white/[0.08]" />
+          <div className="w-[1px] h-3.5 bg-emerald-200 dark:bg-emerald-800/50" />
 
           <div className="flex items-center gap-1.5">
-            <Zap size={15} className="text-purple-500 shrink-0" />
+            <span className="text-xs text-purple-500 font-bold">⚡</span>
             <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               +{questionCount * 2} XP
             </span>
           </div>
         </div>
 
-        {/* 9. Start Button - Flutter 1:1 Elevated Primary 3D CTA */}
+        {/* 9. Start Button - Match Image Flat Deep Green Rounded-2xl Button */}
         <button
           type="button"
           onClick={handleStartExam}
           disabled={isStarting || isExternalLoading}
-          className="w-full h-[50px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328,0_6px_20px_rgba(18,84,79,0.25)] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] disabled:opacity-60 disabled:pointer-events-none font-bold text-[16px] transition-all flex items-center justify-center gap-2 mt-2 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif]"
+          className="w-full py-3.5 rounded-2xl bg-[#0b4d44] hover:bg-[#093e37] active:scale-[0.99] text-white font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 mt-1 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif] shadow-sm"
         >
           {isStarting || isExternalLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <span>পরীক্ষা শুরু করো</span>
+            <span>শুরু করো</span>
           )}
         </button>
       </div>
@@ -856,9 +898,9 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 onClick={() => setShowTooltip(!showTooltip)}
-                className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-white p-0.5"
+                className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 p-0.5 cursor-pointer"
               >
-                <Info size={14} />
+                <HelpCircle size={15} className="stroke-[2.2]" />
               </button>
               {showTooltip && (
                 <div className="absolute left-0 top-6 z-50 w-56 p-2.5 rounded-xl bg-neutral-900 dark:bg-neutral-800 text-white text-xs whitespace-pre-line shadow-xl border border-neutral-700 animate-in fade-in duration-150">

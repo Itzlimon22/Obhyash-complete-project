@@ -132,18 +132,18 @@ export default function PublicExamSetupForm({
         </div>
 
         {/* ─── 1. Subject Selector Card ─── */}
-        <CardContainer title="বিষয় নির্বাচন" icon={BookOpen}>
+        <CardContainer title="বিষয় নির্বাচন">
           <button
             type="button"
             onClick={() => setShowSubjectModal(true)}
-            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-amber-500/5 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 shadow-xs"
           >
-            <span className="text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif] text-[#12544F] dark:text-[#34D399]">
+            <span className="text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-neutral-100">
               {selectedSubData ? selectedSubData.label : 'বিষয় নির্বাচন করো...'}
             </span>
             <ChevronDown
               size={18}
-              className="text-neutral-400 dark:text-neutral-500 shrink-0 ml-2"
+              className="text-neutral-500 dark:text-neutral-400 shrink-0 ml-2"
             />
           </button>
         </CardContainer>
@@ -151,21 +151,20 @@ export default function PublicExamSetupForm({
         {/* ─── 2. Chapters & Topics Card ─── */}
         <CardContainer
           title="অধ্যায় ও টপিক"
-          icon={List}
           tooltip="যে বিষয় ও অধ্যায়গুলোর ওপর পরীক্ষা দিতে চাও সেগুলো বেছে নাও"
         >
           <div className="flex flex-col gap-3">
             {/* Chapter Dropdown Trigger */}
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
+              <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-['Anek_Bangla',sans-serif]">
                 অধ্যায়
               </label>
               <button
                 type="button"
                 onClick={() => setShowChapterModal(true)}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08]"
               >
-                <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-[#12544F] dark:text-[#34D399] font-bold">
+                <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400 font-normal">
                   {selectedChapters.size === 0 || selectedChapters.size === availableChapters.length
                     ? 'সব অধ্যায়'
                     : `${selectedChapters.size}টি অধ্যায় নির্বাচিত`}
@@ -179,16 +178,16 @@ export default function PublicExamSetupForm({
 
             {/* Topic Dropdown Trigger (App Install Trigger) */}
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
+              <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-['Anek_Bangla',sans-serif]">
                 টপিক
               </label>
               <button
                 type="button"
                 onClick={() => setShowTopicLockModal(true)}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-neutral-700"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08]"
               >
-                <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400">
-                  সব টপিক (টপিক সিলেক্ট করতে ক্লিক করো)
+                <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-400 dark:text-neutral-500 font-normal">
+                  সব টপিক
                 </span>
                 <ChevronDown
                   size={18}
@@ -202,146 +201,297 @@ export default function PublicExamSetupForm({
         {/* ─── 3. Exam Type Card ─── */}
         <CardContainer
           title="পরীক্ষার ধরন"
-          icon={Settings}
           tooltip="বোর্ড ও অ্যাকাডেমিক মান অনুযায়ী পরীক্ষার প্রশ্ন প্রস্তুত করা হবে।"
         >
-          <SegmentedGroup
-            items={['Academic', 'Board']}
-            selectedItems={examTypes}
-            onToggle={(t) => {
-              setExamTypes((prev) => {
-                const next = new Set(prev);
-                if (next.has(t) && next.size > 1) {
-                  next.delete(t);
-                } else if (!next.has(t)) {
-                  next.add(t);
-                }
-                return next;
-              });
-            }}
-          />
+          <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-neutral-50/80 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
+            {['Engineering', 'Varsity', 'Board', 'Academic'].map((t) => {
+              const isSelected = examTypes.has(t);
+              const labelMap: Record<string, string> = {
+                Engineering: 'ইঞ্জিনিয়ারিং',
+                Varsity: 'ভার্সিটি',
+                Board: 'বোর্ড',
+                Academic: 'একাডেমিক',
+              };
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    setExamTypes((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(t) && next.size > 1) {
+                        next.delete(t);
+                      } else if (!next.has(t)) {
+                        next.add(t);
+                      }
+                      return next;
+                    });
+                  }}
+                  className={cn(
+                    "py-2 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    isSelected
+                      ? 'bg-[#0b4d44] text-white shadow-xs'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  )}
+                >
+                  {labelMap[t] || t}
+                </button>
+              );
+            })}
+          </div>
         </CardContainer>
 
         {/* ─── 4. Difficulty Card ─── */}
         <CardContainer
           title="কঠিনতা"
-          icon={Activity}
-          tooltip={'Easy: বেসিক ধারণা\nMedium: স্ট্যান্ডার্ড মান\nHard: চ্যালেঞ্জিং ও উচ্চতর দক্ষতা'}
+          tooltip={'সহজ: বেসিক ধারণা\nমধ্যম: স্ট্যান্ডার্ড মান\nকঠিন: চ্যালেঞ্জিং ও উচ্চতর দক্ষতা'}
         >
-          <SegmentedGroup
-            items={['Easy', 'Medium', 'Hard']}
-            selectedItems={difficulties}
-            onToggle={(d) => {
-              setDifficulties((prev) => {
-                const next = new Set(prev);
-                if (next.has(d) && next.size > 1) {
-                  next.delete(d);
-                } else if (!next.has(d)) {
-                  next.add(d);
-                }
-                return next;
-              });
-            }}
-          />
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/70 dark:border-white/[0.08]">
+            {[
+              { val: 'Easy', label: 'সহজ' },
+              { val: 'Medium', label: 'মধ্যম' },
+              { val: 'Hard', label: 'কঠিন' },
+            ].map(({ val, label }) => {
+              const isSelected = difficulties.has(val);
+              return (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => {
+                    setDifficulties((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(val) && next.size > 1) {
+                        next.delete(val);
+                      } else if (!next.has(val)) {
+                        next.add(val);
+                      }
+                      return next;
+                    });
+                  }}
+                  className={cn(
+                    "py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    isSelected
+                      ? 'bg-[#0b4d44] text-white shadow-xs'
+                      : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </CardContainer>
 
         {/* ─── 5. Question Count Card (Max 25 for Free Demo) ─── */}
         <CardContainer
           title="প্রশ্নের সংখ্যা"
-          icon={HelpCircle}
           tooltip="পরীক্ষায় মোট কতটি প্রশ্ন থাকবে তা নির্ধারণ করো"
         >
-          <div className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
                 মোট প্রশ্ন:
               </span>
-              <StepperControl
-                value={questionCount}
-                unit="টি"
-                min={5}
-                max={100}
-                step={5}
-                onChanged={(val) => {
-                  if (val > 25) {
-                    setShowQuestionLimitModal(true);
-                  } else {
-                    setQuestionCount(val);
-                    setDurationMinutes(val); // 1 min per question default
-                  }
-                }}
-              />
+              <div className="flex items-center justify-between w-40 px-3 py-1.5 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
+                <button
+                  type="button"
+                  disabled={questionCount <= 5}
+                  onClick={() => {
+                    const next = Math.max(5, questionCount - 5);
+                    setQuestionCount(next);
+                    setDurationMinutes(next);
+                  }}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  −
+                </button>
+                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
+                  {questionCount} টি
+                </span>
+                <button
+                  type="button"
+                  disabled={questionCount >= 100}
+                  onClick={() => {
+                    if (questionCount >= 25) {
+                      setShowQuestionLimitModal(true);
+                      return;
+                    }
+                    const next = Math.min(25, questionCount + 5);
+                    setQuestionCount(next);
+                    setDurationMinutes(next);
+                  }}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  +
+                </button>
+              </div>
             </div>
 
-            {/* Presets */}
-            <div className="grid grid-cols-4 gap-1.5">
-              {[10, 15, 20, 25].map((cnt) => (
-                <button
-                  key={cnt}
-                  type="button"
-                  onClick={() => {
-                    setQuestionCount(cnt);
-                    setDurationMinutes(cnt);
-                  }}
-                  className={cn(
-                    "py-1.5 px-1 rounded-lg text-xs sm:text-sm font-bold text-center transition-all duration-150 font-['Anek_Bangla',sans-serif] cursor-pointer",
-                    questionCount === cnt
-                      ? 'bg-[#12544F] text-white border border-[#12544F] shadow-xs active:scale-95'
-                      : 'bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700'
-                  )}
-                >
-                  {cnt} টি
-                </button>
-              ))}
+            {/* Quick Preset Pills matching reference image */}
+            <div className="grid grid-cols-5 gap-1.5">
+              {[10, 20, 25, 50, 100].map((cnt) => {
+                const isSelected = questionCount === cnt;
+                return (
+                  <button
+                    key={cnt}
+                    type="button"
+                    onClick={() => {
+                      if (cnt > 25) {
+                        setShowQuestionLimitModal(true);
+                        return;
+                      }
+                      setQuestionCount(cnt);
+                      setDurationMinutes(cnt);
+                    }}
+                    className={cn(
+                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-['Anek_Bangla',sans-serif] cursor-pointer",
+                      isSelected
+                        ? 'bg-[#0b4d44] text-white shadow-xs'
+                        : 'bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400'
+                    )}
+                  >
+                    {cnt}টি
+                  </button>
+                );
+              })}
             </div>
           </div>
         </CardContainer>
 
         {/* ─── 6. Duration Card ─── */}
-        <CardContainer title="সময়" icon={HelpCircle} tooltip="পরীক্ষার মোট সময়সীমা">
-          <div className="flex items-center justify-between">
-            <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
-              মোট সময়:
-            </span>
-            <StepperControl
-              value={durationMinutes}
-              unit="মিনিট"
-              min={5}
-              max={30}
-              step={5}
-              onChanged={(val) => setDurationMinutes(val)}
-            />
+        <CardContainer
+          title="পরীক্ষার সময়"
+          tooltip="পরীক্ষার মোট সময় (মিনিট)"
+        >
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+                মোট সময়:
+              </span>
+              <div className="flex items-center justify-between w-40 px-3 py-1.5 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
+                <button
+                  type="button"
+                  disabled={durationMinutes <= 5}
+                  onClick={() => setDurationMinutes(Math.max(5, durationMinutes - 5))}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  −
+                </button>
+                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
+                  {durationMinutes} মি.
+                </span>
+                <button
+                  type="button"
+                  disabled={durationMinutes >= 180}
+                  onClick={() => setDurationMinutes(Math.min(180, durationMinutes + 5))}
+                  className="w-7 h-7 flex items-center justify-center text-xl font-bold text-neutral-700 dark:text-neutral-300 disabled:opacity-30 cursor-pointer"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Preset Pills */}
+            <div className="grid grid-cols-5 gap-1.5">
+              {[10, 20, 30, 60, 90].map((mins) => {
+                const isSelected = durationMinutes === mins;
+                return (
+                  <button
+                    key={mins}
+                    type="button"
+                    onClick={() => setDurationMinutes(mins)}
+                    className={cn(
+                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-['Anek_Bangla',sans-serif] cursor-pointer",
+                      isSelected
+                        ? 'bg-[#0b4d44] text-white shadow-xs'
+                        : 'bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400'
+                    )}
+                  >
+                    {mins} মি.
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </CardContainer>
 
         {/* ─── 7. Negative Marking Card ─── */}
         <CardContainer
           title="নেগেটিভ মার্কিং"
-          icon={HelpCircle}
-          tooltip="প্রতিটি ভুল উত্তরের জন্য কর্তনকৃত নম্বর"
+          tooltip={"-০.২৫: প্রতি ৪টি ভুল উত্তরের জন্য ১ নম্বর কাটা\n-০.৫০: প্রতি ২টি ভুল উত্তরের জন্য ১ নম্বর কাটা"}
         >
-          <div className="flex items-center justify-between">
-            <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
-              প্রতি ভুলের জন্য কর্তন:
-            </span>
-            <span className="px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-[#18181B] text-sm font-bold text-[#12544F] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
-              ০.২৫ মার্ক
-            </span>
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/70 dark:border-white/[0.08]">
+            {[
+              { val: 0.0, label: '০ (নেই)' },
+              { val: 0.25, label: '-০.২৫ মার্ক' },
+              { val: 0.5, label: '-০.৫ মার্ক' },
+            ].map(({ val, label }) => {
+              const isSelected = negativeMarking === val;
+              return (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => {}}
+                  className={cn(
+                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    isSelected
+                      ? 'bg-[#0b4d44] text-white shadow-xs'
+                      : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </CardContainer>
 
-        {/* ─── Primary Start Button ─── */}
-        <div className="pt-2">
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={handleStart}
-            className="w-full py-3.5 px-4 rounded-[16px] bg-[#12544F] hover:bg-[#0e433f] text-white shadow-md active:scale-[0.99] font-bold text-base sm:text-lg font-['Anek_Bangla',sans-serif] transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <span>পরীক্ষা শুরু করো</span>
-            <span className="text-amber-300">⚡</span>
-          </button>
+        {/* ─── 8. Live Blueprint Capsule Summary ─── */}
+        <div className="my-1 px-4 py-2.5 rounded-full bg-[#f2fbf7] dark:bg-[#121f1c] border border-emerald-200/80 dark:border-emerald-800/40 shadow-xs flex items-center justify-around text-center">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-sky-500 font-bold">?</span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+              {questionCount}টি প্রশ্ন
+            </span>
+          </div>
+
+          <div className="w-[1px] h-3.5 bg-emerald-200 dark:bg-emerald-800/50" />
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-amber-500 font-bold">⏱</span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+              {durationMinutes} মিনিট
+            </span>
+          </div>
+
+          <div className="w-[1px] h-3.5 bg-emerald-200 dark:bg-emerald-800/50" />
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-rose-500 font-bold">⊖</span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+              -0.25
+            </span>
+          </div>
+
+          <div className="w-[1px] h-3.5 bg-emerald-200 dark:bg-emerald-800/50" />
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-purple-500 font-bold">⚡</span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+              +50 XP
+            </span>
+          </div>
         </div>
+
+        {/* ─── 9. Primary Start Button ─── */}
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={handleStart}
+          className="w-full py-3.5 rounded-2xl bg-[#0b4d44] hover:bg-[#093e37] active:scale-[0.99] text-white font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 mt-1 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif] shadow-sm disabled:opacity-50"
+        >
+          <span>শুরু করো</span>
+        </button>
       </div>
 
       {/* ─── Modals ─── */}
@@ -379,9 +529,7 @@ export default function PublicExamSetupForm({
       <AppInstallPromptModal
         isOpen={showTopicLockModal}
         onClose={() => setShowTopicLockModal(false)}
-        title="টপিকভিত্তিক নির্দিষ্ট অনুশীলন চাও?"
-        message="নির্দিষ্ট টপিক ধরে গভীর অনুশীলনের বিশেষ সুবিধাটি অভ্যাসের অফিসিয়াল অ্যান্ড্রয়েড অ্যাপে উপলব্ধ। এখনই প্লে স্টোর থেকে অ্যাপ নামিয়ে প্র্যাকটিস শুরু করো।"
-        featureBadge="টপিক স্পেশাল"
+        title="টপিক ধরে ধরে এক্সাম দিতে চাও?"
         utmContent="setup_topic_click"
       />
 
@@ -389,9 +537,7 @@ export default function PublicExamSetupForm({
       <AppInstallPromptModal
         isOpen={showQuestionLimitModal}
         onClose={() => setShowQuestionLimitModal(false)}
-        title="৫০ ও ১০০ প্রশ্নের ফুল মডেল টেস্ট"
-        message="বোর্ড স্ট্যান্ডার্ড ৫০ ও ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট, দেশজুড়ে লাইভ পরীক্ষা ও মেধা তালিকায় অংশ নিতে ডাউনলোড করো অভ্যাস অ্যাপ।"
-        featureBadge="ফুল মডেল টেস্ট"
+        title="যেকোনো সংখ্যক প্রশ্নে এক্সাম দিতে চাও?"
         utmContent="setup_question_limit"
       />
     </div>
@@ -423,9 +569,9 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 onClick={() => setShowTooltip(!showTooltip)}
-                className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-white p-0.5"
+                className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 p-0.5 cursor-pointer"
               >
-                <Info size={14} />
+                <HelpCircle size={15} className="stroke-[2.2]" />
               </button>
               {showTooltip && (
                 <div className="absolute left-0 top-6 z-50 w-56 p-2.5 rounded-xl bg-neutral-900 dark:bg-neutral-800 text-white text-xs whitespace-pre-line shadow-xl border border-neutral-700 animate-in fade-in duration-150">

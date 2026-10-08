@@ -8,8 +8,8 @@ import PublicExamSetupForm from '@/components/demo/PublicExamSetupForm';
 import { ExamInstructionsView } from '@/components/student/features/exam/ExamInstructionsView';
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 import ResultView from '@/components/student/ui/ResultView';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import AppInstallPromptModal from '@/components/demo/AppInstallPromptModal';
+import { cn } from '@/lib/utils';
 
 // Fisher-Yates shuffle
 function shuffleArray<T>(array: T[]): T[] {
@@ -69,10 +69,54 @@ function getQuestionsForConfig(
 
 export default function DemoExamClient() {
   const router = useRouter();
-  const { isDark, toggleTheme } = useTheme();
 
   // 4-Stage Flow: setup -> instructions -> exam -> result
   const [stage, setStage] = useState<'setup' | 'instructions' | 'exam' | 'result'>('setup');
+
+  // Track if user completed an exam in this session or prior
+  const [hasCompletedExam, setHasCompletedExam] = useState<boolean>(false);
+
+  // Dedicated Theme state for Exam Runner and Result View (Default: dark)
+  const [examTheme, setExamTheme] = useState<'light' | 'dark'>('dark');
+
+  const handleToggleExamTheme = useCallback(() => {
+    setExamTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      if (next === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  }, []);
+
+  // Force light theme on setup & instructions; apply examTheme on exam & result
+  useEffect(() => {
+    if (stage === 'setup' || stage === 'instructions') {
+      document.documentElement.classList.remove('dark');
+    } else if (stage === 'exam' || stage === 'result') {
+      if (examTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [stage, examTheme]);
+
+  // Cleanup on unmount: restore theme from localStorage if user leaves /demo
+  useEffect(() => {
+    return () => {
+      try {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else if (stored === 'light') {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch {}
+    };
+  }, []);
 
   const [currentConfig, setCurrentConfig] = useState<ExamConfig>({
     subject: 'physics',
@@ -99,15 +143,17 @@ export default function DemoExamClient() {
   // Handle Setup Form "Start Exam" Click -> Moves to Instructions
   const handleSetupComplete = (config: ExamConfig) => {
     // Check if user already took their 1 free demo exam
+    let completedCount = 0;
     if (typeof window !== 'undefined') {
-      const completedCount = parseInt(
+      completedCount = parseInt(
         localStorage.getItem('obhyash_demo_exams_completed') || '0',
         10
       );
-      if (completedCount >= 1) {
-        setShowSecondExamGate(true);
-        return;
-      }
+    }
+
+    if (hasCompletedExam || completedCount >= 1) {
+      setShowSecondExamGate(true);
+      return;
     }
 
     setCurrentConfig(config);
@@ -147,7 +193,7 @@ export default function DemoExamClient() {
       return currentLeft;
     });
 
-    // Record completion in localStorage
+    // Record completion in localStorage & React state
     if (typeof window !== 'undefined') {
       const prev = parseInt(
         localStorage.getItem('obhyash_demo_exams_completed') || '0',
@@ -155,6 +201,7 @@ export default function DemoExamClient() {
       );
       localStorage.setItem('obhyash_demo_exams_completed', String(prev + 1));
     }
+    setHasCompletedExam(true);
 
     setStage('result');
     setAppState(AppState.COMPLETED);
@@ -178,21 +225,6 @@ export default function DemoExamClient() {
     return () => clearInterval(timer);
   }, [stage, handleExamSubmit]);
 
-  // Handle "Take Another Exam" from Result View -> Triggers Gate Modal
-  const handleAttemptAnotherExam = () => {
-    if (typeof window !== 'undefined') {
-      const completedCount = parseInt(
-        localStorage.getItem('obhyash_demo_exams_completed') || '0',
-        10
-      );
-      if (completedCount >= 1) {
-        setShowSecondExamGate(true);
-        return;
-      }
-    }
-    setStage('setup');
-  };
-
   const examDetails: ExamDetails = useMemo(
     () => ({
       subject: currentConfig.subject,
@@ -209,15 +241,22 @@ export default function DemoExamClient() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif]">
-      {/* ── 1. Setup Stage (Identical to ExamSetupForm with Class Dropdown) ── */}
+    <div
+      className={cn(
+        "min-h-screen font-['HindSiliguri',sans-serif]",
+        stage === 'setup' || stage === 'instructions'
+          ? 'bg-[#FAFAF9] text-neutral-900'
+          : 'bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100'
+      )}
+    >
+      {/* ── 1. Setup Stage (Always Light Theme) ── */}
       {stage === 'setup' && (
         <div className="py-6 sm:py-10 px-3 sm:px-6">
           <div className="max-w-xl mx-auto mb-4 text-center">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-['Anek_Bangla',sans-serif]">
               ফ্রি ডেমো মডেল টেস্ট
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-['Anek_Bangla',sans-serif]">
+            <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-['Anek_Bangla',sans-serif]">
               লগইন ছাড়াই সরাসরি বোর্ডের মানসম্মত মডেল টেস্ট দিয়ে নিজের প্রস্তুতি যাচাই করো
             </p>
           </div>
@@ -226,7 +265,7 @@ export default function DemoExamClient() {
         </div>
       )}
 
-      {/* ── 2. Instructions Stage (Exact ExamInstructionsView) ── */}
+      {/* ── 2. Instructions Stage (Always Light Theme) ── */}
       {stage === 'instructions' && (
         <ExamInstructionsView
           config={currentConfig}
@@ -235,7 +274,7 @@ export default function DemoExamClient() {
         />
       )}
 
-      {/* ── 3. Exam Runner Stage (Exact ExamRunner like Flutter App) ── */}
+      {/* ── 3. Exam Runner Stage (With Theme Toggle Button in Header) ── */}
       {stage === 'exam' && (
         <ExamRunner
           appState={appState}
@@ -249,22 +288,24 @@ export default function DemoExamClient() {
           onSubmit={handleExamSubmit}
           onExit={() => setStage('setup')}
           setAppState={setAppState}
+          toggleTheme={handleToggleExamTheme}
+          isDarkMode={examTheme === 'dark'}
         />
       )}
 
-      {/* ── 4. Result Stage (Exact ResultView with Explanations & 2nd Exam Gate) ── */}
+      {/* ── 4. Result Stage (Header Cross navigates to Setup; Theme Toggle in Header) ── */}
       {stage === 'result' && (
         <div className="flex flex-col min-h-screen">
           <ResultView
             questions={questions}
             userAnswers={userAnswers}
             timeTaken={timeTaken}
-            onRestart={handleAttemptAnotherExam}
-            isDarkMode={isDark}
-            onToggleTheme={toggleTheme}
+            onRestart={() => setStage('setup')}
+            isDarkMode={examTheme === 'dark'}
+            onToggleTheme={handleToggleExamTheme}
             negativeMarking={currentConfig.negativeMarking || 0.25}
             examDetails={examDetails}
-            onReexam={handleAttemptAnotherExam}
+            onReexam={() => setShowSecondExamGate(true)}
           />
         </div>
       )}
@@ -273,11 +314,10 @@ export default function DemoExamClient() {
       <AppInstallPromptModal
         isOpen={showSecondExamGate}
         onClose={() => setShowSecondExamGate(false)}
-        title="১ম ফ্রি ডেমো টেস্ট সম্পন্ন হয়েছে! 🏆"
-        message="তুমি সফলভাবে তোমার ১ম ফ্রি টেস্ট শেষ করেছ! পরবর্তী আনলিমিটেড মডেল টেস্ট দিতে, মেধা তালিকায় নিজের বোর্ড র‍্যাঙ্ক দেখতে এবং ভুল উত্তরের অধ্যায়ভিত্তিক প্রস্তুতি নিতে এখনই প্লে স্টোর থেকে Obhyash অ্যাপ ইনস্টল করো।"
-        featureBadge="আনলিমিটেড মডেল টেস্ট"
+        title="আনলিমিটেড এক্সাম দিতে চাও?"
         utmContent="second_exam_gate"
       />
     </div>
   );
 }
+
