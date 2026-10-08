@@ -28,6 +28,7 @@ import {
   BookOpen,
   PanelBottom,
   Layers,
+  Globe,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/admin/questions/pagination';
@@ -60,6 +61,7 @@ export interface ButtonBreakdownItem {
   totalClicks: number;
   appDownloads: number;
   signups: number;
+  practiceClicks?: number;
   percentage: number;
 }
 
@@ -461,14 +463,14 @@ export default function BlogManagementClient() {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                  বাটন ও প্লেসমেন্ট ট্র্যাকিং
+                  বাটন ও প্লেসমেন্ট ট্র্যাকিং (Play Store vs Website)
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 dark:bg-teal-950/70 text-teal-800 dark:text-teal-300 font-mono">
                   Live
                 </span>
               </div>
               <p className="text-xs text-slate-400 dark:text-zinc-400 mt-0.5">
-                কোন বাটনে মোট কতটি ক্লিক হয়েছে এবং কতটি অ্যাপ ডাউনলোড ও রেজিস্ট্রেশন এসেছে
+                কোন বাটন থেকে প্লে-স্টোর অ্যাপ ইনস্টল এবং কোনটি থেকে ওয়েবসাইট রেজিস্ট্রেশন হচ্ছে তা নিখুঁত মনিটরিং
               </p>
             </div>
           </div>
@@ -484,6 +486,54 @@ export default function BlogManagementClient() {
           </div>
         </div>
 
+        {/* Legend / Clarification Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 sm:p-5 bg-slate-50/70 dark:bg-zinc-900/40 border-b border-slate-100 dark:border-zinc-800/80 text-xs font-sans">
+          {/* Card 1: Play Store App */}
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-emerald-500/20 shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Smartphone className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-900 dark:text-white text-xs">
+                Google Play Store অ্যাপ
+              </p>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300/80">
+                Android অ্যাপ ইনস্টল/ডাউনলোড ক্লিক
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: Website Register */}
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-cyan-500/20 shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+              <Globe className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-900 dark:text-white text-xs">
+                Website রেজিস্ট্রেশন
+              </p>
+              <p className="text-[11px] text-cyan-700 dark:text-cyan-300/80">
+                obhyash.com ব্রাউজারে সাইন-আপ ক্লিক
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3: Website Free Practice */}
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-amber-500/20 shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-900 dark:text-white text-xs">
+                Website ফ্রি এক্সাম
+              </p>
+              <p className="text-[11px] text-amber-700 dark:text-amber-300/80">
+                ওয়েবসাইটে ডেমো বা ফ্রি টেস্ট ক্লিক
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Content Table & Cards */}
         <div className="p-5 sm:p-6">
           {metrics?.buttonBreakdown && metrics.buttonBreakdown.length > 0 ? (
@@ -493,8 +543,24 @@ export default function BlogManagementClient() {
                   <tr className="border-b border-slate-100 dark:border-zinc-800 text-slate-400 dark:text-zinc-500 font-semibold font-sans uppercase tracking-wider text-[11px]">
                     <th className="pb-3 pl-2">বাটনের নাম ও অবস্থান</th>
                     <th className="pb-3 text-center">মোট ক্লিক</th>
-                    <th className="pb-3 text-center">📱 অ্যাপ ডাউনলোড</th>
-                    <th className="pb-3 text-center">🎓 রেজিস্ট্রেশন ক্লিক</th>
+                    <th className="pb-3 text-center">
+                      <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold">
+                        <Smartphone className="w-3.5 h-3.5" />
+                        Play Store অ্যাপ
+                      </span>
+                    </th>
+                    <th className="pb-3 text-center">
+                      <span className="inline-flex items-center gap-1.5 text-cyan-700 dark:text-cyan-400 font-bold">
+                        <Globe className="w-3.5 h-3.5" />
+                        Website রেজিস্ট্রেশন
+                      </span>
+                    </th>
+                    <th className="pb-3 text-center">
+                      <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Web ফ্রি এক্সাম
+                      </span>
+                    </th>
                     <th className="pb-3 text-right pr-2">শেয়ার (%)</th>
                   </tr>
                 </thead>
@@ -520,6 +586,8 @@ export default function BlogManagementClient() {
                       }
                     };
 
+                    const practiceCount = item.practiceClicks || 0;
+
                     return (
                       <tr
                         key={item.location}
@@ -535,8 +603,8 @@ export default function BlogManagementClient() {
                               <p className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                                 {item.nameBn}
                               </p>
-                              <span className="font-mono text-[10px] text-slate-400 uppercase tracking-wider">
-                                {item.nameEn} ({item.location})
+                              <span className="font-mono text-[10px] text-slate-400">
+                                {item.nameEn}
                               </span>
                             </div>
                           </div>
@@ -544,25 +612,45 @@ export default function BlogManagementClient() {
 
                         {/* Total Clicks */}
                         <td className="py-4 text-center">
-                          <span className="font-mono font-bold text-sm text-slate-900 dark:text-white px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800">
+                          <span className="font-mono font-bold text-sm text-slate-900 dark:text-white px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200/50 dark:border-zinc-700/50">
                             {item.totalClicks.toLocaleString('bn-BD')}
                           </span>
                         </td>
 
-                        {/* App Downloads */}
+                        {/* Play Store App Downloads */}
                         <td className="py-4 text-center">
-                          <span className="inline-flex items-center gap-1 font-mono font-bold text-xs px-2.5 py-1 rounded-full bg-[#c2f2d0] dark:bg-[#1a3828] text-emerald-950 dark:text-emerald-200">
-                            <Smartphone className="w-3 h-3 text-emerald-700 dark:text-emerald-300" />
-                            {item.appDownloads.toLocaleString('bn-BD')} টি
-                          </span>
+                          {item.appDownloads > 0 ? (
+                            <span className="inline-flex items-center gap-1.5 font-mono font-bold text-xs px-2.5 py-1 rounded-full bg-[#c2f2d0] dark:bg-[#1a3828] text-emerald-950 dark:text-emerald-200 border border-emerald-500/20 shadow-xs">
+                              <Smartphone className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
+                              {item.appDownloads.toLocaleString('bn-BD')} টি Play Store
+                            </span>
+                          ) : (
+                            <span className="font-mono text-slate-400 dark:text-zinc-600">০</span>
+                          )}
                         </td>
 
-                        {/* Signups */}
+                        {/* Website Signups */}
                         <td className="py-4 text-center">
-                          <span className="inline-flex items-center gap-1 font-mono font-bold text-xs px-2.5 py-1 rounded-full bg-[#d0e2ff] dark:bg-[#1e2f4a] text-blue-950 dark:text-blue-200">
-                            <UserCheck className="w-3 h-3 text-blue-700 dark:text-blue-300" />
-                            {item.signups.toLocaleString('bn-BD')} টি
-                          </span>
+                          {item.signups > 0 ? (
+                            <span className="inline-flex items-center gap-1.5 font-mono font-bold text-xs px-2.5 py-1 rounded-full bg-[#d0e2ff] dark:bg-[#1e2f4a] text-blue-950 dark:text-blue-200 border border-blue-500/20 shadow-xs">
+                              <Globe className="w-3 h-3 text-blue-700 dark:text-blue-400" />
+                              {item.signups.toLocaleString('bn-BD')} টি Website
+                            </span>
+                          ) : (
+                            <span className="font-mono text-slate-400 dark:text-zinc-600">০</span>
+                          )}
+                        </td>
+
+                        {/* Website Free Practice Exam */}
+                        <td className="py-4 text-center">
+                          {practiceCount > 0 ? (
+                            <span className="inline-flex items-center gap-1.5 font-mono font-bold text-xs px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-950 dark:text-amber-200 border border-amber-500/20 shadow-xs">
+                              <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                              {practiceCount.toLocaleString('bn-BD')} টি Web Exam
+                            </span>
+                          ) : (
+                            <span className="font-mono text-slate-400 dark:text-zinc-600">০</span>
+                          )}
                         </td>
 
                         {/* Share (%) */}
@@ -571,9 +659,9 @@ export default function BlogManagementClient() {
                             <span className="font-mono font-bold text-xs text-slate-700 dark:text-zinc-300">
                               {item.percentage}%
                             </span>
-                            <div className="w-24 sm:w-32 h-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
+                            <div className="w-24 sm:w-28 h-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all duration-500"
+                                className="h-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-teal-500 rounded-full transition-all duration-500"
                                 style={{ width: `${Math.min(100, item.percentage)}%` }}
                               />
                             </div>

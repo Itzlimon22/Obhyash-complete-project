@@ -38,6 +38,7 @@ export async function GET() {
       totalClicks: number;
       appDownloads: number;
       signups: number;
+      practiceClicks: number;
       percentage: number;
     }[] = [];
     let tableExists = true;
@@ -110,16 +111,40 @@ export async function GET() {
           .sort((a, b) => b.total - a.total)
           .slice(0, 5);
 
-        // Aggregate Button Breakdown
+        // Aggregate Button Breakdown with crystal clear separation of Play Store vs Website
         const LOCATION_CONFIG: Record<string, { nameBn: string; nameEn: string }> = {
-          mobile_sticky: { nameBn: 'মোবাইল স্টিকি বার', nameEn: 'Mobile Sticky Bar' },
-          quick_action: { nameBn: 'মোবাইল স্টিকি বার', nameEn: 'Mobile Sticky Bar' },
-          header: { nameBn: 'হেডার ন্যাভ বার', nameEn: 'Header Navbar' },
-          drawer: { nameBn: 'মোবাইল স্লাইড ড্রয়ার', nameEn: 'Mobile Drawer' },
-          in_article: { nameBn: 'আর্টিকেলের ভেতরে', nameEn: 'In-Article CTA' },
-          sidebar: { nameBn: 'ব্লগ সাইডবার', nameEn: 'Sidebar Widget' },
-          footer: { nameBn: 'ফুটার সেকশন', nameEn: 'Footer' },
-          floating_next: { nameBn: 'ফ্লোটিং নেক্সট বক্স', nameEn: 'Floating Next Box' },
+          mobile_sticky: {
+            nameBn: 'মোবাইল স্টিকি বটম বার',
+            nameEn: 'Mobile Sticky Bar (Play Store App + Website Register)',
+          },
+          quick_action: {
+            nameBn: 'মোবাইল স্টিকি বটম বার',
+            nameEn: 'Mobile Sticky Bar (Play Store App + Website Register)',
+          },
+          header: {
+            nameBn: 'হেডার ন্যাভ বার',
+            nameEn: 'Website Header Navbar (Free Exam / Website Links)',
+          },
+          drawer: {
+            nameBn: 'মোবাইল স্লাইড ড্রয়ার',
+            nameEn: 'Mobile Side Drawer (Play Store App + Dashboard)',
+          },
+          in_article: {
+            nameBn: 'আর্টিকেলের ভেতরে CTA',
+            nameEn: 'In-Article Content Links (App & Website)',
+          },
+          sidebar: {
+            nameBn: 'ব্লগ সাইডবার',
+            nameEn: 'Blog Sidebar Widget (Website & App)',
+          },
+          footer: {
+            nameBn: 'ফুটার সেকশন',
+            nameEn: 'Website Footer (Play Store + Website Links)',
+          },
+          floating_next: {
+            nameBn: 'ফ্লোটিং নেক্সট বক্স',
+            nameEn: 'Floating Next Article Box',
+          },
         };
 
         const bMap: Record<string, {
@@ -129,10 +154,11 @@ export async function GET() {
           totalClicks: number;
           appDownloads: number;
           signups: number;
+          practiceClicks: number;
         }> = {};
 
         // Pre-populate core locations so admin can monitor all active buttons
-        const coreKeys = ['mobile_sticky', 'header', 'in_article', 'drawer', 'footer'];
+        const coreKeys = ['mobile_sticky', 'header', 'drawer', 'in_article', 'footer'];
         coreKeys.forEach((k) => {
           bMap[k] = {
             location: k,
@@ -141,6 +167,7 @@ export async function GET() {
             totalClicks: 0,
             appDownloads: 0,
             signups: 0,
+            practiceClicks: 0,
           };
         });
 
@@ -161,12 +188,14 @@ export async function GET() {
               totalClicks: 0,
               appDownloads: 0,
               signups: 0,
+              practiceClicks: 0,
             };
           }
 
           bMap[loc].totalClicks++;
           if (row.event_type === 'app_download') bMap[loc].appDownloads++;
-          if (row.event_type === 'signup_click') bMap[loc].signups++;
+          else if (row.event_type === 'signup_click') bMap[loc].signups++;
+          else if (row.event_type === 'practice_click') bMap[loc].practiceClicks++;
         });
 
         buttonBreakdown = Object.values(bMap)
