@@ -5,9 +5,9 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'Blog Subscribers | Obhyash Admin',
+  title: 'Conversion Monitor Hub | Obhyash Admin',
   description:
-    'Manage blog newsletter subscribers and export subscriber lists.',
+    'Real-time conversion tracking for App Downloads, Signups, SSC/HSC Demo Exams, and Button Analytics.',
 };
 
 export default async function BlogManagementPage() {

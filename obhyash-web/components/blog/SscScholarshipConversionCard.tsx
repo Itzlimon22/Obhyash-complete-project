@@ -45,8 +45,8 @@ export default function SscScholarshipConversionCard({
     trackBlogConversion({
       eventType: 'app_download',
       sourceSlug: 'ssc-scholarship-britti-result-2026-check',
-      sourceCategory: 'নোটিশ ও শিক্ষা আপডেট',
-      buttonLocation: 'in_article',
+      sourceCategory: 'SSC',
+      buttonLocation: 'scholarship_card',
     });
   };
 

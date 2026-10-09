@@ -15,6 +15,7 @@ export interface AppInstallPromptModalProps {
   message?: string;
   featureBadge?: string;
   utmContent?: string;
+  level?: 'HSC' | 'SSC' | string;
 }
 
 export default function AppInstallPromptModal({
@@ -22,6 +23,7 @@ export default function AppInstallPromptModal({
   onClose,
   title,
   utmContent = 'demo_modal',
+  level = 'General',
 }: AppInstallPromptModalProps) {
   if (!isOpen) return null;
 
@@ -34,7 +36,8 @@ export default function AppInstallPromptModal({
     trackBlogConversion({
       eventType: 'app_download',
       sourceSlug: 'demo_exam',
-      buttonLocation: 'quick_action',
+      sourceCategory: level,
+      buttonLocation: 'demo_gate_modal',
     });
   };
 
@@ -42,7 +45,8 @@ export default function AppInstallPromptModal({
     trackBlogConversion({
       eventType: 'signup_click',
       sourceSlug: 'demo_exam',
-      buttonLocation: 'quick_action',
+      sourceCategory: level,
+      buttonLocation: 'demo_gate_modal',
     });
     onClose();
   };

@@ -11,6 +11,7 @@ import ResultView from '@/components/student/ui/ResultView';
 import AppInstallPromptModal from '@/components/demo/AppInstallPromptModal';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { cn } from '@/lib/utils';
+import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 // Fisher-Yates shuffle
 function shuffleArray<T>(array: T[]): T[] {
@@ -99,9 +100,12 @@ export default function DemoExamClient() {
 
   // Freemium Gate State (Limit to 1 Free Exam)
   const [showSecondExamGate, setShowSecondExamGate] = useState<boolean>(false);
+  const [selectedLevelState, setSelectedLevelState] = useState<'HSC' | 'SSC'>('HSC');
 
   // Handle Setup Form "Start Exam" Click -> Moves to Instructions
-  const handleSetupComplete = (config: ExamConfig) => {
+  const handleSetupComplete = (config: ExamConfig, selectedLevel: 'HSC' | 'SSC' = 'HSC') => {
+    setSelectedLevelState(selectedLevel);
+
     // Check if user already took their 1 free demo exam
     let completedCount = 0;
     if (typeof window !== 'undefined') {
@@ -112,9 +116,23 @@ export default function DemoExamClient() {
     }
 
     if (hasCompletedExam || completedCount >= 1) {
+      trackBlogConversion({
+        eventType: 'practice_click',
+        sourceSlug: `demo_${(config.subject || 'exam').toLowerCase()}`,
+        sourceCategory: selectedLevel,
+        buttonLocation: 'demo_gate_modal',
+      });
       setShowSecondExamGate(true);
       return;
     }
+
+    // Track active demo exam start segmented by SSC vs HSC
+    trackBlogConversion({
+      eventType: 'demo_exam_start',
+      sourceSlug: `demo_${(config.subject || 'exam').toLowerCase()}`,
+      sourceCategory: selectedLevel,
+      buttonLocation: selectedLevel === 'SSC' ? 'demo_ssc_start' : 'demo_hsc_start',
+    });
 
     setCurrentConfig(config);
     setStage('instructions');
@@ -163,9 +181,16 @@ export default function DemoExamClient() {
     }
     setHasCompletedExam(true);
 
+    trackBlogConversion({
+      eventType: 'demo_exam_complete',
+      sourceSlug: `demo_${(currentConfig.subject || 'exam').toLowerCase()}`,
+      sourceCategory: selectedLevelState,
+      buttonLocation: 'demo_exam_completed',
+    });
+
     setStage('result');
     setAppState(AppState.COMPLETED);
-  }, [currentConfig.durationMinutes]);
+  }, [currentConfig.durationMinutes, currentConfig.subject, selectedLevelState]);
 
   // Active Countdown Timer for Exam Runner
   useEffect(() => {
@@ -269,6 +294,7 @@ export default function DemoExamClient() {
         onClose={() => setShowSecondExamGate(false)}
         title="আনলিমিটেড এক্সাম দিতে চাও?"
         utmContent="second_exam_gate"
+        level={selectedLevelState}
       />
     </div>
   );

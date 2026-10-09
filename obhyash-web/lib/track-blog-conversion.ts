@@ -4,7 +4,9 @@ export type BlogConversionEventType =
   | 'app_download'
   | 'signup_click'
   | 'login_click'
-  | 'practice_click';
+  | 'practice_click'
+  | 'demo_exam_start'
+  | 'demo_exam_complete';
 
 export interface TrackConversionOptions {
   eventType: BlogConversionEventType;
@@ -18,7 +20,13 @@ export interface TrackConversionOptions {
     | 'in_article'
     | 'floating_next'
     | 'quick_action'
-    | 'mobile_sticky';
+    | 'mobile_sticky'
+    | 'demo_ssc_start'
+    | 'demo_hsc_start'
+    | 'demo_exam_completed'
+    | 'demo_gate_modal'
+    | 'scholarship_card'
+    | (string & {});
 }
 
 /**

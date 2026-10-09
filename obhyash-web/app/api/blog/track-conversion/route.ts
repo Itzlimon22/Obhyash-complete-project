@@ -9,6 +9,8 @@ const VALID_EVENT_TYPES = new Set([
   'signup_click',
   'login_click',
   'practice_click',
+  'demo_exam_start',
+  'demo_exam_complete',
 ]);
 
 export async function POST(req: Request) {

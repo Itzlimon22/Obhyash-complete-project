@@ -27,6 +27,7 @@ import {
   FileText,
   ExternalLink,
   Newspaper,
+  Activity,
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
@@ -149,8 +150,8 @@ const ADMIN_NAVIGATION: NavSection[] = [
       },
       {
         id: 'blog-management',
-        label: 'ব্লগ কনভার্শন',
-        icon: Newspaper,
+        label: 'কনভার্শন মনিটর',
+        icon: Activity,
         href: '/admin/blog-management',
       },
       {

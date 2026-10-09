@@ -40,10 +40,18 @@ export default function BlogMobileStickyBar() {
     ? pathname.replace('/blog/', '')
     : 'blog_page';
 
+  // Determine cohort category (SSC / HSC / General)
+  const cohortCategory = currentSlug.toLowerCase().includes('ssc')
+    ? 'SSC'
+    : currentSlug.toLowerCase().includes('hsc')
+    ? 'HSC'
+    : 'General';
+
   const handleAppDownloadClick = () => {
     trackBlogConversion({
       eventType: 'app_download',
       sourceSlug: currentSlug,
+      sourceCategory: cohortCategory,
       buttonLocation: 'mobile_sticky',
     });
   };
@@ -52,6 +60,7 @@ export default function BlogMobileStickyBar() {
     trackBlogConversion({
       eventType: 'signup_click',
       sourceSlug: currentSlug,
+      sourceCategory: cohortCategory,
       buttonLocation: 'mobile_sticky',
     });
   };
