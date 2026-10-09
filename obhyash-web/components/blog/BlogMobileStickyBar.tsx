@@ -71,7 +71,17 @@ export default function BlogMobileStickyBar() {
       className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-white/10 shadow-[0_-6px_24px_rgba(0,0,0,0.12)] px-3 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] transition-all duration-200"
     >
       <div className="max-w-md mx-auto grid grid-cols-2 gap-2.5">
-        {/* Deep Green: App Download Button */}
+        {/* Left: Deep Cyan: Register Button */}
+        <Link
+          href="/signup"
+          onClick={handleRegisterClick}
+          className="group relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-anek font-bold text-[14px] sm:text-[15px] shadow-sm hover:shadow-md transition-all duration-150 text-center"
+        >
+          <UserPlus className="w-4 h-4 flex-shrink-0 text-cyan-200" />
+          <span className="truncate tracking-wide">Register</span>
+        </Link>
+
+        {/* Right: Deep Green: App Download Button */}
         <a
           href={PLAY_STORE_URL}
           target="_blank"
@@ -82,16 +92,6 @@ export default function BlogMobileStickyBar() {
           <GooglePlayStoreIcon className="w-4 h-4 flex-shrink-0" />
           <span className="truncate tracking-wide">App Download</span>
         </a>
-
-        {/* Deep Cyan: Register Button */}
-        <Link
-          href="/signup"
-          onClick={handleRegisterClick}
-          className="group relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-anek font-bold text-[14px] sm:text-[15px] shadow-sm hover:shadow-md transition-all duration-150 text-center"
-        >
-          <UserPlus className="w-4 h-4 flex-shrink-0 text-cyan-200" />
-          <span className="truncate tracking-wide">Register</span>
-        </Link>
       </div>
     </aside>
   );

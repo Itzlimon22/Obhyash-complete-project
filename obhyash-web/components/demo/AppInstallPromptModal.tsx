@@ -22,6 +22,7 @@ export default function AppInstallPromptModal({
   isOpen,
   onClose,
   title,
+  message,
   utmContent = 'demo_modal',
   level = 'General',
 }: AppInstallPromptModalProps) {
@@ -65,9 +66,15 @@ export default function AppInstallPromptModal({
         </button>
 
         {/* Center Aligned Clean Heading */}
-        <h3 className="text-xl sm:text-2xl font-black text-center text-slate-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-snug mt-3 mb-6 px-4">
+        <h3 className="text-xl sm:text-2xl font-black text-center text-slate-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-snug mt-2 mb-2 px-3">
           {title}
         </h3>
+
+        {message && (
+          <p className="text-xs sm:text-sm text-center text-slate-500 dark:text-zinc-400 font-['Anek_Bangla',sans-serif] leading-relaxed mb-5 px-2">
+            {message}
+          </p>
+        )}
 
         {/* Action Buttons: Left (Red: রেজিস্টার করো) & Right (Deep Cyan: অ্যাপ ইনস্টল করো) */}
         <div className="grid grid-cols-2 gap-3 pt-1">

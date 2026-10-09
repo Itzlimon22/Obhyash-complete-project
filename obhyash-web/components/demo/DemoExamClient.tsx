@@ -40,9 +40,9 @@ function getQuestionsForConfig(
     const qSubLabel = (q.subjectLabel || '').toLowerCase();
 
     return (
-      (qSubId && (qSubId === subjectKey || qSubId.includes(subjectKey))) ||
-      (qSubName && (qSubName === subjectKey || qSubName.includes(subjectKey))) ||
-      (qSubLabel && (qSubLabel.includes(subjectLabel) || subjectLabel.includes(qSubLabel)))
+      (qSubId && (qSubId === subjectKey || subjectKey.includes(qSubId))) ||
+      (qSubName && (qSubName === subjectKey || qSubName === subjectLabel)) ||
+      (qSubLabel && (qSubLabel === subjectKey || qSubLabel === subjectLabel))
     );
   });
 
@@ -98,15 +98,27 @@ export default function DemoExamClient() {
   const [timeTaken, setTimeTaken] = useState<number>(0);
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
 
-  // Freemium Gate State (Limit to 1 Free Exam)
+  // Freemium Gate State (2-Exam Free Trial)
   const [showSecondExamGate, setShowSecondExamGate] = useState<boolean>(false);
   const [selectedLevelState, setSelectedLevelState] = useState<'HSC' | 'SSC'>('HSC');
+  const [completedExamsCount, setCompletedExamsCount] = useState<number>(0);
+
+  // Sync completed exams count from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const count = parseInt(
+        localStorage.getItem('obhyash_demo_exams_completed') || '0',
+        10
+      );
+      setCompletedExamsCount(count);
+    }
+  }, [stage]);
 
   // Handle Setup Form "Start Exam" Click -> Moves to Instructions
   const handleSetupComplete = (config: ExamConfig, selectedLevel: 'HSC' | 'SSC' = 'HSC') => {
     setSelectedLevelState(selectedLevel);
 
-    // Check if user already took their 1 free demo exam
+    // Check if user already took their 2 free demo exams (2-Exam Trial)
     let completedCount = 0;
     if (typeof window !== 'undefined') {
       completedCount = parseInt(
@@ -115,7 +127,7 @@ export default function DemoExamClient() {
       );
     }
 
-    if (hasCompletedExam || completedCount >= 1) {
+    if (completedCount >= 2) {
       trackBlogConversion({
         eventType: 'practice_click',
         sourceSlug: `demo_${(config.subject || 'exam').toLowerCase()}`,
@@ -231,6 +243,21 @@ export default function DemoExamClient() {
       {stage === 'setup' && (
         <div className="py-6 sm:py-10 px-3 sm:px-6">
           <div className="max-w-xl mx-auto mb-4 text-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 font-['Anek_Bangla',sans-serif]">
+              {completedExamsCount === 0 ? (
+                <span className="bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20 px-2.5 py-0.5 rounded-full">
+                  ✨ ২টি ফ্রি ডেমো টেস্ট ট্রায়াল
+                </span>
+              ) : completedExamsCount === 1 ? (
+                <span className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
+                  🎯 ১ম টেস্ট সম্পন্ন • শেষ ১টি ফ্রি টেস্ট বাকি
+                </span>
+              ) : (
+                <span className="bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 px-2.5 py-0.5 rounded-full">
+                  🔒 ২টি ফ্রি ট্রায়াল শেষ
+                </span>
+              )}
+            </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
               ফ্রি ডেমো মডেল টেস্ট
             </h1>
@@ -278,22 +305,49 @@ export default function DemoExamClient() {
             questions={questions}
             userAnswers={userAnswers}
             timeTaken={timeTaken}
-            onRestart={() => setStage('setup')}
+            onRestart={() => {
+              let count = 0;
+              if (typeof window !== 'undefined') {
+                count = parseInt(
+                  localStorage.getItem('obhyash_demo_exams_completed') || '0',
+                  10
+                );
+              }
+              if (count >= 2) {
+                setShowSecondExamGate(true);
+              } else {
+                setStage('setup');
+              }
+            }}
             isDarkMode={isDark}
             onToggleTheme={toggleTheme}
             negativeMarking={currentConfig.negativeMarking || 0.25}
             examDetails={examDetails}
-            onReexam={() => setShowSecondExamGate(true)}
+            onReexam={() => {
+              let count = 0;
+              if (typeof window !== 'undefined') {
+                count = parseInt(
+                  localStorage.getItem('obhyash_demo_exams_completed') || '0',
+                  10
+                );
+              }
+              if (count >= 2) {
+                setShowSecondExamGate(true);
+              } else {
+                setStage('setup');
+              }
+            }}
           />
         </div>
       )}
 
-      {/* ── Freemium Gate: 2nd Exam App Install Prompt ── */}
+      {/* ── Freemium Gate: 2-Exam Trial App Install Prompt ── */}
       <AppInstallPromptModal
         isOpen={showSecondExamGate}
         onClose={() => setShowSecondExamGate(false)}
-        title="আনলিমিটেড এক্সাম দিতে চাও?"
-        utmContent="second_exam_gate"
+        title="২টি ফ্রি টেস্ট ট্রায়াল শেষ!"
+        message="সম্পূর্ণ বিষয়ভিত্তিক প্রশ্নব্যাংক, লাইভ টেস্ট এবং প্রতিটি প্রশ্নের উত্তরের ব্যাখ্যার জন্য অ্যাপ ইনস্টল করো বা ফ্রি একাউন্ট তৈরি করো।"
+        utmContent="two_exam_trial_gate"
         level={selectedLevelState}
       />
     </div>

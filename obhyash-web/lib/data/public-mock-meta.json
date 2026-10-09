@@ -514,6 +514,78 @@
       "subjectId": "ssc_biology",
       "name": "জীব কোষ ও টিস্যু",
       "questionCount": 20
+    },
+    {
+      "id": "bio1_ch01",
+      "subjectId": "hsc_biology_1",
+      "name": "কোষ ও এর গঠন",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch02",
+      "subjectId": "hsc_biology_1",
+      "name": "কোষ বিভাজন",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch03",
+      "subjectId": "hsc_biology_1",
+      "name": "কোষ রসায়ন",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch04",
+      "subjectId": "hsc_biology_1",
+      "name": "অণুজীব",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch05",
+      "subjectId": "hsc_biology_1",
+      "name": "শৈবাল ও ছত্রাক",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch06",
+      "subjectId": "hsc_biology_1",
+      "name": "ব্রায়োফাইটা ও টেরিডোফাইটা",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch07",
+      "subjectId": "hsc_biology_1",
+      "name": "নগ্নবীজী ও আবৃতবীজী উদ্ভিদ",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch08",
+      "subjectId": "hsc_biology_1",
+      "name": "টিস্যু ও টিস্যুতন্ত্র",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch09",
+      "subjectId": "hsc_biology_1",
+      "name": "উদ্ভিদ শারীরতত্ত্ব",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch10",
+      "subjectId": "hsc_biology_1",
+      "name": "উদ্ভিদের প্রজনন",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch11",
+      "subjectId": "hsc_biology_1",
+      "name": "জীব প্রযুক্তি",
+      "questionCount": 20
+    },
+    {
+      "id": "bio1_ch12",
+      "subjectId": "hsc_biology_1",
+      "name": "জীবের পরিবেশ, বিস্তার ও সংরক্ষণ",
+      "questionCount": 20
     }
   ]
 }

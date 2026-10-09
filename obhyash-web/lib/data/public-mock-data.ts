@@ -42,13 +42,17 @@ function getSubjectNormalizedCode(subId: string): string {
   return 'general';
 }
 
-// Map from meta.subjects to PublicSubject[]
-export const PUBLIC_SUBJECTS: PublicSubject[] = (publicMockMeta.subjects as Array<{ id: string; name: string; level: 'HSC' | 'SSC' }>).map((s) => ({
-  id: s.id,
-  level: s.level,
-  name: getSubjectNormalizedCode(s.id),
-  label: s.name.replace(/^SSC\s+/, ''), // Clean clean display label
-}));
+// Map from meta.subjects to PublicSubject[] (only subjects with valid chapters)
+export const PUBLIC_SUBJECTS: PublicSubject[] = (
+  publicMockMeta.subjects as Array<{ id: string; name: string; level: 'HSC' | 'SSC' }>
+)
+  .filter((s) => publicMockMeta.chapters.some((c) => c.subjectId === s.id))
+  .map((s) => ({
+    id: s.id,
+    level: s.level,
+    name: getSubjectNormalizedCode(s.id),
+    label: s.name.replace(/^SSC\s+/, ''), // Clean display label
+  }));
 
 // Map from meta.chapters to PublicChapter[]
 export const PUBLIC_CHAPTERS: PublicChapter[] = (publicMockMeta.chapters as Array<{ id: string; subjectId: string; name: string }>).map((c) => ({

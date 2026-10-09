@@ -120,7 +120,7 @@ export default function PublicExamSetupForm({
       .map((c) => c.name);
 
     const config: ExamConfig = {
-      subject: selectedSubData?.name || 'physics',
+      subject: selectedSubData?.id || selectedSubData?.name || 'physics',
       subjectLabel: selectedSubData?.label || 'পদার্থবিজ্ঞান',
       examType: Array.from(examTypes).join('+'),
       chapters: chapterNames.length > 0 ? chapterNames.join(',') : 'All',
@@ -834,41 +834,47 @@ const ChapterMultiSelectModal: React.FC<ChapterMultiSelectModalProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-          {items.map((item) => {
-            const id = getId(item);
-            const name = getName(item);
-            const isSelected = currentSelected.has(id);
+          {items.length === 0 ? (
+            <div className="py-10 text-center text-neutral-400 dark:text-neutral-500 font-['Anek_Bangla',sans-serif] text-sm">
+              এই বিষয়ের সকল অধ্যায় সমন্বিত পূর্ণাঙ্গ মডেল টেস্ট অনুষ্ঠিত হবে।
+            </div>
+          ) : (
+            items.map((item) => {
+              const id = getId(item);
+              const name = getName(item);
+              const isSelected = currentSelected.has(id);
 
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => toggleSelection(id)}
-                className={cn(
-                  "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
-                  isSelected
-                    ? 'bg-[#12544F]/10 dark:bg-[#12544F]/20 border-[#12544F] dark:border-[#34D399]/60 text-[#12544F] dark:text-[#34D399]'
-                    : 'bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700'
-                )}
-              >
-                <div
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => toggleSelection(id)}
                   className={cn(
-                    'w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition',
+                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
                     isSelected
-                      ? 'bg-[#12544F] dark:bg-[#34D399] border-[#12544F] dark:border-[#34D399]'
-                      : 'border-neutral-300 dark:border-neutral-600 bg-transparent'
+                      ? 'bg-[#12544F]/10 dark:bg-[#12544F]/20 border-[#12544F] dark:border-[#34D399]/60 text-[#12544F] dark:text-[#34D399]'
+                      : 'bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700'
                   )}
                 >
-                  {isSelected && (
-                    <Check size={13} className="text-white dark:text-black stroke-[3]" />
-                  )}
-                </div>
-                <div className="flex-1 text-base font-semibold truncate">
-                  <MathRenderer text={name} />
-                </div>
-              </button>
-            );
-          })}
+                  <div
+                    className={cn(
+                      'w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition',
+                      isSelected
+                        ? 'bg-[#12544F] dark:bg-[#34D399] border-[#12544F] dark:border-[#34D399]'
+                        : 'border-neutral-300 dark:border-neutral-600 bg-transparent'
+                    )}
+                  >
+                    {isSelected && (
+                      <Check size={13} className="text-white dark:text-black stroke-[3]" />
+                    )}
+                  </div>
+                  <div className="flex-1 text-base font-semibold truncate">
+                    <MathRenderer text={name} />
+                  </div>
+                </button>
+              );
+            })
+          )}
         </div>
 
         <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-white/[0.08]">
