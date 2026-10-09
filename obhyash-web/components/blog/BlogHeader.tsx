@@ -193,7 +193,7 @@ function NavLinks() {
   ];
 
   return (
-    <nav className="hidden lg:flex items-center gap-1.5 font-anek text-[15px]">
+    <nav className="hidden lg:flex items-center gap-1.5 font-noto text-[15px]">
       {navItems.map((item) => (
         <Link
           key={item.label}
@@ -315,7 +315,7 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
                   buttonLocation: 'header',
                 })
               }
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs sm:text-sm font-bold font-anek shadow-xs transition-all shrink-0"
+              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs sm:text-sm font-bold font-noto shadow-xs transition-all shrink-0"
             >
               <WritingOnPaperIcon className="w-3.5 h-3.5 text-cyan-200" />
               <span>এক্সাম দাও</span>
@@ -358,7 +358,7 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
       )}
 
       <div
-        className={`fixed top-0 right-0 bottom-0 z-[101] w-80 sm:w-96 bg-white dark:bg-[#161616] border-l border-slate-200 dark:border-white/10 p-6 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-out font-anek overflow-y-auto no-scrollbar ${
+        className={`fixed top-0 right-0 bottom-0 z-[101] w-80 sm:w-96 bg-white dark:bg-[#161616] border-l border-slate-200 dark:border-white/10 p-6 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-out font-noto overflow-y-auto no-scrollbar ${
           isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

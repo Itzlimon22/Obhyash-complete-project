@@ -79,7 +79,7 @@ export default function BlogBookmarkButton({
       disabled={pending}
       aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
       title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
-      className={`inline-flex items-center gap-2 rounded-full border transition-all font-anek
+      className={`inline-flex items-center gap-2 rounded-full border transition-all font-noto
         ${iconOnly ? 'w-9 h-9 justify-center' : 'px-4 py-2 text-sm font-semibold'}
         ${
           isBookmarked

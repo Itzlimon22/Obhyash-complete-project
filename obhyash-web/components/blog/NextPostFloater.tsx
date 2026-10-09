@@ -86,10 +86,10 @@ export default function NextPostFloater({
 
         {/* Header Tag */}
         <div className="flex items-center gap-1.5 mb-1.5">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-anek">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-noto">
             <Sparkles className="w-3 h-3" /> পরবর্তী আর্টিকেল
           </span>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-anek flex items-center gap-1">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-noto flex items-center gap-1">
             <Clock className="w-3 h-3" /> {nextPost.readTime} মিনিট
           </span>
         </div>
@@ -97,7 +97,7 @@ export default function NextPostFloater({
         {/* Title */}
         <Link
           href={`/blog/${nextPost.slug}`}
-          className="group block font-anek"
+          className="group block font-noto"
         >
           <h4 className="text-[14px] sm:text-[15px] font-bold text-slate-900 dark:text-slate-100 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-2 leading-snug">
             {nextPost.title}

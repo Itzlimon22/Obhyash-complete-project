@@ -61,7 +61,7 @@ export default function BlogCard({
       <div
         role="article"
         onClick={() => router.push(`/blog/${post.slug}`)}
-        className="group relative cursor-pointer font-anek w-full rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300"
+        className="group relative cursor-pointer font-noto w-full rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300"
       >
         <div className="relative w-full h-[400px] sm:h-[460px] md:h-[520px] overflow-hidden bg-slate-900">
           <Image
@@ -171,7 +171,7 @@ export default function BlogCard({
       <div
         role="article"
         onClick={() => router.push(`/blog/${post.slug}`)}
-        className="group flex items-center gap-3.5 cursor-pointer font-anek py-3 border-b border-slate-100 dark:border-white/5 last:border-0"
+        className="group flex items-center gap-3.5 cursor-pointer font-noto py-3 border-b border-slate-100 dark:border-white/5 last:border-0"
       >
         <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm border border-slate-200/60 dark:border-white/10">
           <Image
@@ -204,7 +204,7 @@ export default function BlogCard({
       <div
         role="article"
         onClick={() => router.push(`/blog/${post.slug}`)}
-        className="group flex flex-col h-full cursor-pointer font-anek bg-white dark:bg-[#161616] rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 shadow-sm"
+        className="group flex flex-col h-full cursor-pointer font-noto bg-white dark:bg-[#161616] rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 shadow-sm"
       >
         {/* Thumbnail with floating category pill */}
         <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
@@ -281,7 +281,7 @@ export default function BlogCard({
     <div
       role="article"
       onClick={() => router.push(`/blog/${post.slug}`)}
-      className="group flex flex-col sm:flex-row gap-5 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer font-anek shadow-sm"
+      className="group flex flex-col sm:flex-row gap-5 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer font-noto shadow-sm"
     >
       {/* Thumbnail Left (Katen List Format) */}
       <div className="relative w-full sm:w-60 md:w-64 h-48 sm:h-auto shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">

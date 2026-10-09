@@ -182,6 +182,29 @@ body::after {
   font-family: var(--font-hind), 'Hind Siliguri', 'HindSiliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
+/* --- Blog & Noto Sans Bengali Typography --- */
+.blog-root,
+.font-blog,
+.font-noto,
+.font-noto-bengali,
+[class*="font-['Noto"],
+[class*="font-[Noto"] {
+  font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Ensure blog content uses Noto Sans Bengali + Inter while preserving KaTeX math and code blocks */
+.blog-root :is(h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, label, blockquote, li, td, th):not(.katex *):not(.katex):not(pre *):not(code):not(.font-mono) {
+  font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Override legacy font classes inside blog tree */
+.blog-root .font-hind,
+.blog-root .font-anek,
+.blog-root [class*="font-['Hind"],
+.blog-root [class*="font-['Anek"] {
+  font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
 /* --- Chorcha & Flutter Benchmark Typography Utilities --- */
 .tabular-nums, .font-tabular {
   font-variant-numeric: tabular-nums;

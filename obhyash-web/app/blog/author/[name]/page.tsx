@@ -58,7 +58,7 @@ export default async function AuthorProfilePage({
   const authorInfo = authorPosts[0].author;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-black font-anek">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-black font-noto">
       {/* ─── Hero Section ─── */}
       <section className="bg-white dark:bg-[#121212] border-b border-slate-200 dark:border-[#2b2b2b] pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">

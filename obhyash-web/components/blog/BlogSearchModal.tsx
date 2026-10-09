@@ -142,7 +142,7 @@ export default function BlogSearchModal({
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            className="w-full bg-transparent text-[16px] sm:text-[17px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none font-anek"
+            className="w-full bg-transparent text-[16px] sm:text-[17px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none font-noto"
           />
           {query && (
             <button
@@ -162,7 +162,7 @@ export default function BlogSearchModal({
 
         {/* Quick Search Tag Pills */}
         <div className="px-4 sm:px-6 py-2.5 bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0 font-anek">
+          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0 font-noto">
             জনপ্রিয়:
           </span>
           {POPULAR_SEARCH_TAGS.map((tag) => (
@@ -172,7 +172,7 @@ export default function BlogSearchModal({
                 setQuery(tag);
                 setSelectedIndex(0);
               }}
-              className="px-2.5 py-1 text-[12px] font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800/90 rounded-full border border-slate-200 dark:border-slate-700/80 hover:border-rose-300 dark:hover:border-rose-500/50 hover:text-rose-600 dark:hover:text-rose-400 transition-colors shrink-0 font-anek"
+              className="px-2.5 py-1 text-[12px] font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800/90 rounded-full border border-slate-200 dark:border-slate-700/80 hover:border-rose-300 dark:hover:border-rose-500/50 hover:text-rose-600 dark:hover:text-rose-400 transition-colors shrink-0 font-noto"
             >
               {tag}
             </button>
@@ -202,16 +202,16 @@ export default function BlogSearchModal({
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-anek">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-noto">
                           <BookOpen className="w-2.5 h-2.5 text-rose-500" />
                           {post.category}
                         </span>
-                        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-anek flex items-center gap-1">
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-noto flex items-center gap-1">
                           <Clock className="w-2.5 h-2.5" /> {post.readTime} মিনিট
                         </span>
                       </div>
                       <h4
-                        className={`text-[15px] sm:text-[16px] font-bold line-clamp-1 font-anek leading-snug ${
+                        className={`text-[15px] sm:text-[16px] font-bold line-clamp-1 font-noto leading-snug ${
                           isSelected
                             ? 'text-rose-600 dark:text-rose-400'
                             : 'text-slate-900 dark:text-slate-100'
@@ -219,7 +219,7 @@ export default function BlogSearchModal({
                       >
                         {post.title}
                       </h4>
-                      <p className="text-[13px] text-slate-500 dark:text-slate-400 line-clamp-1 font-anek font-light">
+                      <p className="text-[13px] text-slate-500 dark:text-slate-400 line-clamp-1 font-noto font-light">
                         {post.excerpt}
                       </p>
                     </div>
@@ -233,7 +233,7 @@ export default function BlogSearchModal({
               );
             })
           ) : (
-            <div className="py-12 text-center space-y-2 font-anek">
+            <div className="py-12 text-center space-y-2 font-noto">
               <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
                 🔍 &ldquo;{query}&rdquo; দিয়ে কোনো আর্টিকেল পাওয়া যায়নি!
               </p>
@@ -245,7 +245,7 @@ export default function BlogSearchModal({
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="px-4 sm:px-6 py-3 bg-slate-50 dark:bg-[#161616] border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 font-anek">
+        <div className="px-4 sm:px-6 py-3 bg-slate-50 dark:bg-[#161616] border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 font-noto">
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border rounded">↑</kbd>

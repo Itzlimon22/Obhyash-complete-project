@@ -43,7 +43,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] font-anek overflow-hidden">
+    <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] font-noto overflow-hidden">
       {/* Header / Toggle */}
       <button
         onClick={() => setIsOpen((v) => !v)}

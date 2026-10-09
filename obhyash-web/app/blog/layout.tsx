@@ -46,7 +46,7 @@ export default function BlogLayout({
 }) {
   return (
     <BlogThemeProvider>
-      <div className="min-h-screen w-full min-w-0 overflow-x-clip flex flex-col bg-white dark:bg-[#0e0e0e] text-slate-900 dark:text-slate-100 font-sans tracking-tight transition-colors duration-200">
+      <div className="blog-root min-h-screen w-full min-w-0 overflow-x-clip flex flex-col bg-white dark:bg-[#0e0e0e] text-slate-900 dark:text-slate-100 font-noto tracking-tight transition-colors duration-200">
         <BlogHeader />
         <main className="flex-1 pb-16 md:pb-0">{children}</main>
         <BlogFooter />

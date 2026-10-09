@@ -75,7 +75,7 @@ export default function BlogMobileStickyBar() {
         <Link
           href="/signup"
           onClick={handleRegisterClick}
-          className="group relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-anek font-bold text-[14px] sm:text-[15px] shadow-sm hover:shadow-md transition-all duration-150 text-center"
+          className="group relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-noto font-bold text-[14px] sm:text-[15px] shadow-sm hover:shadow-md transition-all duration-150 text-center"
         >
           <UserPlus className="w-4 h-4 flex-shrink-0 text-cyan-200" />
           <span className="truncate tracking-wide">Register</span>
@@ -87,7 +87,7 @@ export default function BlogMobileStickyBar() {
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleAppDownloadClick}
-          className="group relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#065f46] hover:bg-[#047857] active:bg-[#022c22] text-white font-anek font-bold text-[14px] sm:text-[15px] shadow-sm hover:shadow-md transition-all duration-150 text-center"
+          className="group relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#065f46] hover:bg-[#047857] active:bg-[#022c22] text-white font-noto font-bold text-[14px] sm:text-[15px] shadow-sm hover:shadow-md transition-all duration-150 text-center"
         >
           <GooglePlayStoreIcon className="w-4 h-4 flex-shrink-0" />
           <span className="truncate tracking-wide">App Download</span>

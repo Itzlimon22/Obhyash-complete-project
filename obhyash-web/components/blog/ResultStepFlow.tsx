@@ -78,14 +78,14 @@ export default function ResultStepFlow() {
               )}
 
               {/* Number circle */}
-              <div className="relative z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-[#181818] text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-bold shrink-0 border border-slate-200 dark:border-white/15 shadow-xs font-anek">
+              <div className="relative z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-[#181818] text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-bold shrink-0 border border-slate-200 dark:border-white/15 shadow-xs font-noto">
                 {step.num}
               </div>
 
               {/* Step content */}
               <div className="flex-1 min-w-0 pb-3">
                 <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
-                  <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 font-anek">
+                  <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 font-noto">
                     {step.title}
                   </span>
 
@@ -118,7 +118,7 @@ export default function ResultStepFlow() {
                 </div>
 
                 {step.description && (
-                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-normal font-anek">
+                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-normal font-noto">
                     {step.description}
                   </p>
                 )}

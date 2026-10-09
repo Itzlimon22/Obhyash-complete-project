@@ -97,7 +97,7 @@ export default function SocialShare({ url, title, compact }: SocialShareProps) {
 
   return (
     <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
-      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 font-anek">
+      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 font-noto">
         শেয়ার করো
       </p>
       {icons}

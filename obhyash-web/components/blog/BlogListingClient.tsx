@@ -406,7 +406,7 @@ export default function BlogListingClient({
   const hasMore = visibleCount < filteredPosts.length;
 
   return (
-    <div className="bg-slate-50/60 dark:bg-[#0c0c0c] text-slate-800 dark:text-slate-100 min-h-screen py-8 sm:py-12 transition-colors font-anek">
+    <div className="bg-slate-50/60 dark:bg-[#0c0c0c] text-slate-800 dark:text-slate-100 min-h-screen py-8 sm:py-12 transition-colors font-noto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12">
         {/* ══════════════════════════════════════════════════════════════════
             HERO SHOWCASE (Shown in default / unfiltered mode)
@@ -446,7 +446,7 @@ export default function BlogListingClient({
                   {heroMainPost.title}
                 </h1>
 
-                <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-2xl mb-4 leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-2xl mb-4 leading-relaxed font-noto">
                   {heroMainPost.excerpt}
                 </p>
 
@@ -552,7 +552,7 @@ export default function BlogListingClient({
                     updateUrl(activeCategory, activeTag, q);
                   }}
                   placeholder="যেকোনো বিষয়, অধ্যায় বা আর্টিকেল খুঁজুন..."
-                  className="w-full pl-10 pr-9 py-2.5 rounded-full border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-black/30 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition-all font-anek"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-full border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-black/30 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition-all font-noto"
                 />
                 {searchQuery && (
                   <button
@@ -878,7 +878,7 @@ export default function BlogListingClient({
               <h3 className="text-xl font-bold leading-snug mb-3">
                 বোর্ড ও ভর্তি পরীক্ষার প্রশ্ন ব্যাংক
               </h3>
-              <p className="text-xs text-slate-300 dark:text-slate-400 leading-relaxed mb-6 font-sans">
+              <p className="text-xs text-slate-300 dark:text-slate-400 leading-relaxed mb-6 font-noto">
                 হাজারো নির্ভুল MCQ প্র্যাকটিস করো, পূর্ণাঙ্গ ব্যাখ্যা দেখো এবং নিজের ভুলগুলো স্বয়ংক্রিয় মিস্টেক নোটবুকে সংরক্ষণ করে প্রস্তুতি মজবুত করো।
               </p>
               <Link
@@ -967,7 +967,7 @@ export default function BlogListingClient({
             </div>
 
             {/* Widget 4: Obhyash Mobile App Download Card */}
-            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#141414] p-6 shadow-xs text-center font-anek">
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#141414] p-6 shadow-xs text-center font-noto">
               <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 flex items-center justify-center mx-auto mb-3 shadow-xs">
                 <GooglePlayIcon className="w-7 h-7" />
               </div>

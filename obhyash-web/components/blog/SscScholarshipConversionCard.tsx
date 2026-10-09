@@ -51,16 +51,16 @@ export default function SscScholarshipConversionCard({
   };
 
   return (
-    <div className="my-8 sm:my-10 not-prose rounded-3xl bg-[#111417] text-white p-6 sm:p-10 shadow-xl border border-white/5 font-sans transition-all duration-300">
+    <div className="my-8 sm:my-10 not-prose rounded-3xl bg-[#111417] text-white p-6 sm:p-10 shadow-xl border border-white/5 font-noto transition-all duration-300">
       {/* 1. Main Title */}
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-['Anek_Bangla',sans-serif] leading-[1.25] tracking-tight mb-3">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-noto leading-[1.25] tracking-tight mb-3">
         {isAlert
           ? 'বৃত্তির তালিকা এলেই সরাসরি ফোনে নোটিফিকেশন পাবে।'
           : 'কলেজের প্রথম দিন থেকেই এগিয়ে থাকো।'}
       </h2>
 
       {/* 2. Subtitle / Description */}
-      <p className="text-sm sm:text-base md:text-lg text-slate-300 font-['Hind_Siliguri',sans-serif] leading-relaxed mb-8 max-w-2xl">
+      <p className="text-sm sm:text-base md:text-lg text-slate-300 font-noto leading-relaxed mb-8 max-w-2xl">
         {isAlert
           ? 'তোমার শিক্ষা বোর্ডের মেধা ও সাধারণ বৃত্তির গেজেট প্রকাশমাত্রই মোবাইলে অ্যালার্ট পেতে যুক্ত হও অভ্যাস অ্যাপে।'
           : 'অধ্যায়ভিত্তিক ফ্রি টেস্ট দাও, আর প্রতিটি ভুলের ব্যাখ্যাসহ সমাধান দেখে নাও।'}
@@ -77,7 +77,7 @@ export default function SscScholarshipConversionCard({
         >
           <GooglePlayColorIcon className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
           <div className="flex flex-col items-start leading-tight">
-            <span className="text-[11px] sm:text-xs text-slate-600 font-medium font-['Hind_Siliguri',sans-serif] -mb-0.5">
+            <span className="text-[11px] sm:text-xs text-slate-600 font-medium font-noto -mb-0.5">
               বিনামূল্যে ডাউনলোড
             </span>
             <span className="text-xl sm:text-2xl font-black text-slate-900 font-sans tracking-tight">
@@ -90,14 +90,14 @@ export default function SscScholarshipConversionCard({
         <div className="mt-5 text-center">
           <Link
             href="/demo"
-            className="text-sm sm:text-base text-slate-200 hover:text-white underline underline-offset-4 decoration-slate-400 hover:decoration-white font-['Hind_Siliguri',sans-serif] font-medium transition-colors"
+            className="text-sm sm:text-base text-slate-200 hover:text-white underline underline-offset-4 decoration-slate-400 hover:decoration-white font-noto font-medium transition-colors"
           >
             ডেমো টেস্ট দিয়ে দেখো
           </Link>
         </div>
 
         {/* 5. Google Play Verified App Badge */}
-        <div className="mt-4 flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-400 font-['Hind_Siliguri',sans-serif]">
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-400 font-noto">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>Google Play ভেরিফাইড অ্যাপ</span>
         </div>

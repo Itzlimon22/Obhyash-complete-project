@@ -225,7 +225,7 @@ export const HscGpaCalculator: React.FC = () => {
   };
 
   return (
-    <div className="not-prose my-8 rounded-2xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#121214] p-4 sm:p-5 shadow-xs font-hind">
+    <div className="not-prose my-8 rounded-2xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#121214] p-4 sm:p-5 shadow-xs font-noto">
       {/* ── Compact Header ── */}
       <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100 dark:border-neutral-800">
         <div>

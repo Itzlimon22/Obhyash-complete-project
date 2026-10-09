@@ -108,13 +108,13 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
           {/* Back link */}
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors mb-6 font-anek"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors mb-6 font-noto"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             ব্লগে ফিরে যাও
           </Link>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-anek mb-5">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-noto mb-5">
             আর্টিকেল খুঁজুন
           </h1>
 
@@ -127,7 +127,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
               placeholder="শিরোনাম, বিষয়, ট্যাগ বা লেখক..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 rounded-2xl border border-black/8 dark:border-white/8 bg-white dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-rose-400/20 shadow-sm text-[16px] font-anek transition-all"
+              className="w-full pl-12 pr-12 py-4 rounded-2xl border border-black/8 dark:border-white/8 bg-white dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-rose-400/20 shadow-sm text-[16px] font-noto transition-all"
             />
             {query && (
               <button
@@ -142,7 +142,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
 
           {/* Result count */}
           {hasQuery && !isLoading && (
-            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 font-anek">
+            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 font-noto">
               <span className="font-semibold text-slate-700 dark:text-slate-200">
                 {total}
               </span>{' '}
@@ -163,7 +163,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
           <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <button
             onClick={() => setActiveCategory(ALL_CATEGORIES)}
-            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors border font-anek ${
+            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors border font-noto ${
               activeCategory === ALL_CATEGORIES
                 ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm border-transparent'
                 : 'bg-transparent text-slate-600 dark:text-slate-400 border-black/8 dark:border-white/8 hover:bg-black/5 dark:hover:bg-white/5'
@@ -177,7 +177,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
               onClick={() =>
                 setActiveCategory(cat === activeCategory ? ALL_CATEGORIES : cat)
               }
-              className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors border font-anek ${
+              className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors border font-noto ${
                 activeCategory === cat
                   ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm border-transparent'
                   : 'bg-transparent text-slate-600 dark:text-slate-400 border-black/8 dark:border-white/8 hover:bg-black/5 dark:hover:bg-white/5'
@@ -245,13 +245,13 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
               <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-slate-100 dark:bg-[#1e1e1e] flex items-center justify-center">
                 <Search className="w-7 h-7 text-slate-300 dark:text-slate-600" />
               </div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2 font-anek">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2 font-noto">
                 কোনো ফলাফল পাওয়া যায়নি
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-anek">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-noto">
                 &ldquo;{debouncedQuery}&rdquo; অনুসন্ধানে কোনো আর্টিকেল মেলেনি।
               </p>
-              <div className="flex flex-wrap gap-2 justify-center text-sm text-slate-500 dark:text-slate-400 font-anek">
+              <div className="flex flex-wrap gap-2 justify-center text-sm text-slate-500 dark:text-slate-400 font-noto">
                 <span>পরামর্শ:</span>
                 <span>ভিন্ন বানান বা ছোট শব্দ ব্যবহার করো</span>
               </div>
@@ -260,7 +260,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
                   setQuery('');
                   setActiveCategory(ALL_CATEGORIES);
                 }}
-                className="mt-6 px-4 py-2 text-sm font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors font-anek"
+                className="mt-6 px-4 py-2 text-sm font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors font-noto"
               >
                 অনুসন্ধান মুছুন →
               </button>
@@ -268,7 +268,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
           ) : (
             /* Empty state — no query yet */
             <div className="text-center py-20">
-              <p className="text-slate-400 dark:text-slate-500 font-anek text-[15px]">
+              <p className="text-slate-400 dark:text-slate-500 font-noto text-[15px]">
                 উপরের বাক্সে কিছু টাইপ করো এবং সব আর্টিকেল থেকে ফলাফল দেখো।
               </p>
             </div>

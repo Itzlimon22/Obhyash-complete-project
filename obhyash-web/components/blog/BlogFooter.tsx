@@ -15,7 +15,7 @@ export default function BlogFooter() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-200 dark:border-[#2b2b2b] bg-white dark:bg-[#121212] mt-20 font-anek">
+    <footer className="border-t border-slate-200 dark:border-[#2b2b2b] bg-white dark:bg-[#121212] mt-20 font-noto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
           {/* Brand & About */}

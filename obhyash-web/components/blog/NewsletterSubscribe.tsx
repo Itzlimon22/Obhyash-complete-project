@@ -40,7 +40,7 @@ export default function NewsletterSubscribe() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-3xl bg-slate-50/80 dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 px-5 py-5 sm:px-8 sm:py-6 font-anek shadow-sm">
+    <div className="w-full max-w-2xl mx-auto rounded-3xl bg-slate-50/80 dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 px-5 py-5 sm:px-8 sm:py-6 font-noto shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="w-10 h-10 shrink-0 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-900/40 flex items-center justify-center text-[#059669] dark:text-[#34d399]">

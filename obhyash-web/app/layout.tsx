@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { Inter, Hind_Siliguri, Anek_Bangla } from "next/font/google";
+import { Inter, Hind_Siliguri, Anek_Bangla, Noto_Sans_Bengali } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import AuthProvider from "@/components/auth/AuthProvider";
@@ -30,6 +30,14 @@ const hindSiliguri = Hind_Siliguri({
 // ✅ Configure Anek Bangla (Variable font - single request)
 const anekBangla = Anek_Bangla({
   variable: "--font-anek",
+  subsets: ["bengali"],
+  display: "swap",
+  preload: true,
+});
+
+// ✅ Configure Noto Sans Bengali (Variable font - single request)
+const notoSansBengali = Noto_Sans_Bengali({
+  variable: "--font-noto-sans-bengali",
   subsets: ["bengali"],
   display: "swap",
   preload: true,
@@ -138,7 +146,7 @@ export default function RootLayout({
   return (
     <html
       lang="bn"
-      className={`${inter.variable} ${hindSiliguri.variable} ${anekBangla.variable}`}
+      className={`${inter.variable} ${hindSiliguri.variable} ${anekBangla.variable} ${notoSansBengali.variable}`}
       suppressHydrationWarning
     >
       <head>
