@@ -43,6 +43,9 @@ scratch/
 
 supabase/.temp/
 
-# generated downloads
+# generated downloads and pdfs
 /public/downloads/*
 !/public/downloads/.gitkeep
+output_pdfs/
+*.aab
+*.apk

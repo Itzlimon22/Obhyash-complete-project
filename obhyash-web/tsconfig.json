@@ -32,6 +32,14 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "supabase"]
+  "exclude": [
+    "node_modules",
+    "supabase",
+    "scripts",
+    "scratch",
+    "backups",
+    "obhyash-flutter",
+    "output_pdfs"
+  ]
 }
 

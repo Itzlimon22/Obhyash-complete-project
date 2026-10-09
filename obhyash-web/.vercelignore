@@ -1,20 +1,32 @@
-# Ignore mobile app flutter project
+# Ignore mobile app flutter project & binary releases
 obhyash-flutter/
+*.aab
+*.apk
+*.zip
+*.tar.gz
+
+# Local PDF generations & references
+output_pdfs/
+*.pdf
+lib/pdf-generator/reference/
+public/downloads/
 
 # Local database migrations & SQL scripts
 sql/
 *.sql
+supabase/
 
 # Local scratch directories & backups
 backups/
 scratch/
 .agents/
 
-# Internal documentation & root blueprint files (specifically anchored to root so content/blog is untouched)
+# Internal documentation & root blueprint files
 docs/
 /CLAUDE_SEO_BLOG_PROMPT.md
 /LEGENDS_LEAGUE_BLUEPRINT.md
 /TRACKING.md
+/MEMORY.md
 /blog-seo-guide.txt
 /json-generator-prompt.txt
 
@@ -57,6 +69,7 @@ test_search.js
 
 # Logs and temporary build dumps
 *.log
+*.tsbuildinfo
 tsc_output.txt
 temp_input.txt
 .DS_Store

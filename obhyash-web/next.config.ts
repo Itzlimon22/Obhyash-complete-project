@@ -9,6 +9,20 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   reactStrictMode: true,
+  turbopack: {
+    root: __dirname,
+  },
+  outputFileTracingExcludes: {
+    '*': [
+      './obhyash-flutter/**',
+      './output_pdfs/**',
+      './docs/**',
+      './scripts/**',
+      './sql/**',
+      './backups/**',
+      './scratch/**',
+    ],
+  },
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
