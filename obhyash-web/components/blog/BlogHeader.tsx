@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Search,
   X,
   Facebook,
   Menu,
@@ -16,10 +15,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
-import BlogThemeToggle from './BlogThemeToggle';
 import ProgressBar from './ProgressBar';
-import BlogSearchModal from './BlogSearchModal';
-import { BlogPost } from '@/lib/blog-data';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 // Authentic Google Play Store Icon
@@ -211,14 +207,9 @@ function NavLinks() {
   );
 }
 
-interface BlogHeaderProps {
-  posts?: BlogPost[];
-}
-
-export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
+export default function BlogHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -321,19 +312,6 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               <span>এক্সাম দাও</span>
             </Link>
 
-            {/* Dark / Light Mode Toggle */}
-            <BlogThemeToggle />
-
-            {/* Search Button (Neutral Slate Circular) */}
-            <button
-              type="button"
-              onClick={() => setIsSearchOpen(true)}
-              aria-label="Search"
-              title="সার্চ করুন (Ctrl+K)"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 border border-slate-200/80 dark:border-white/10 transition-colors shrink-0"
-            >
-              <Search className="w-4 h-4 stroke-[2.2]" />
-            </button>
 
             {/* Burger Menu Button (Neutral Slate Circular) */}
             <button
@@ -565,12 +543,6 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
         </div>
       </div>
 
-      {/* Live Search Modal */}
-      <BlogSearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        posts={posts}
-      />
     </>
   );
 }

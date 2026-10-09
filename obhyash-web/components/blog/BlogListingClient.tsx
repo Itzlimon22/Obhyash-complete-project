@@ -28,6 +28,7 @@ import {
 import { toast } from 'sonner';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import BlogSearchModal from '@/components/blog/BlogSearchModal';
+import BlogThemeToggle from '@/components/blog/BlogThemeToggle';
 import { getPostCover } from '@/lib/blog-images';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
@@ -870,6 +871,21 @@ export default function BlogListingClient({
 
           {/* Right Sidebar Column (4 Cols) */}
           <aside className="lg:col-span-4 space-y-6">
+            {/* Widget 0: Search + Theme Toggle */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#141414] p-4 shadow-xs flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsSearchModalOpen(true)}
+                aria-label="সার্চ করুন"
+                title="সার্চ করুন"
+                className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-500 hover:border-slate-400 dark:hover:border-slate-600 hover:text-slate-600 dark:hover:text-slate-300 transition-all text-sm font-noto"
+              >
+                <Search className="w-4 h-4 shrink-0" />
+                <span>সার্চ করুন…</span>
+              </button>
+              <BlogThemeToggle />
+            </div>
+
             {/* Widget 1: Obhyash Platform / Exam Cell Card */}
             <div className="rounded-3xl bg-slate-900 dark:bg-[#161616] border border-slate-800 dark:border-white/10 text-white p-7 shadow-xs relative overflow-hidden">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">

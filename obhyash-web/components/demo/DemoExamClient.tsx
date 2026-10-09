@@ -112,6 +112,44 @@ export default function DemoExamClient() {
       );
       setCompletedExamsCount(count);
     }
+    // Restore saved theme when component unmounts (user navigates away)
+    return () => {
+      if (typeof window === 'undefined') return;
+      try {
+        const saved = localStorage.getItem('theme');
+        const root = document.documentElement;
+        if (saved === 'dark') {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      } catch {}
+    };
+  }, [stage]);
+
+  // Force light theme on setup/instructions; restore saved theme on exam/result
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+    if (stage === 'setup' || stage === 'instructions') {
+      // Always light for setup & instructions
+      root.classList.remove('dark');
+    } else {
+      // exam / result — restore user's saved theme preference
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+          root.classList.add('dark');
+        } else if (saved === 'light') {
+          root.classList.remove('dark');
+        } else {
+          // Default to dark (app default) if no preference saved
+          root.classList.add('dark');
+        }
+      } catch {
+        root.classList.add('dark');
+      }
+    }
   }, [stage]);
 
   // Handle Setup Form "Start Exam" Click -> Moves to Instructions
