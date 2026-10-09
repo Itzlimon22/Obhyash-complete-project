@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   reactStrictMode: true,
-  turbopack: {
-    root: __dirname,
-  },
   outputFileTracingExcludes: {
     '*': [
       './obhyash-flutter/**',

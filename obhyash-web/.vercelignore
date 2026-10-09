@@ -14,7 +14,8 @@ public/downloads/
 # Local database migrations & SQL scripts
 sql/
 *.sql
-supabase/
+!utils/
+!utils/**
 
 # Local scratch directories & backups
 backups/
