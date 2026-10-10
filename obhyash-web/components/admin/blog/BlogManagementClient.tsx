@@ -97,6 +97,8 @@ export interface BlogMetrics {
   todaySignups: number;
   totalPracticeClicks: number;
   todayPracticeClicks: number;
+  totalPdfDownloads?: number;
+  todayPdfDownloads?: number;
   sscStats?: CohortStats;
   hscStats?: CohortStats;
   generalStats?: CohortStats;
@@ -154,7 +156,7 @@ export default function BlogManagementClient() {
 
   // Live feed filter chips
   const [feedFilter, setFeedFilter] = useState<
-    'all' | 'app' | 'signup' | 'ssc' | 'hsc' | 'practice'
+    'all' | 'app' | 'signup' | 'ssc' | 'hsc' | 'practice' | 'pdf'
   >('all');
   const [feedSearch, setFeedSearch] = useState('');
 
@@ -218,6 +220,12 @@ export default function BlogManagementClient() {
         item.event_type !== 'practice_click' &&
         item.event_type !== 'demo_exam_start' &&
         item.event_type !== 'demo_exam_complete'
+      )
+        return false;
+      if (
+        feedFilter === 'pdf' &&
+        item.button_location !== 'physics_pdf_card' &&
+        item.button_location !== 'physics_ka_kha_pdf_card'
       )
         return false;
 
@@ -366,9 +374,13 @@ export default function BlogManagementClient() {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 লাইভ ফিড
               </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/10 text-cyan-800 dark:text-cyan-300 border border-cyan-500/20 font-mono">
+                ফিজিক্স PDF: {(metrics?.totalPdfDownloads ?? 0).toLocaleString('bn-BD')} টি
+                {metrics?.todayPdfDownloads ? ` (+${metrics.todayPdfDownloads} আজ)` : ''}
+              </span>
             </div>
             <p className="text-[11px] text-slate-400 dark:text-zinc-400">
-              অ্যাপ ডাউনলোড, রেজিস্ট্রেশন ও এসএসসি/এইচএসসি এক্সাম অ্যাক্টিভিটি ট্র্যাকার
+              অ্যাপ ডাউনলোড, রেজিস্ট্রেশন, ফিজিক্স PDF ও এসএসসি/এইচএসসি এক্সাম অ্যাক্টিভিটি ট্র্যাকার
             </p>
           </div>
         </div>
@@ -563,6 +575,15 @@ export default function BlogManagementClient() {
               {(metrics?.subscribers ?? 0).toLocaleString('bn-BD')}
             </span>
           </div>
+          <div className="flex items-center justify-between text-[10px] pt-1 mt-1 border-t border-cyan-500/10">
+            <span className="text-cyan-800/80 dark:text-cyan-300/80 font-medium">
+              ফিজিক্স PDF:
+            </span>
+            <span className="font-mono font-bold text-cyan-700 dark:text-cyan-300">
+              {(metrics?.totalPdfDownloads ?? 0).toLocaleString('bn-BD')}
+              {metrics?.todayPdfDownloads ? ` (+${metrics.todayPdfDownloads})` : ''}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -701,6 +722,7 @@ export default function BlogManagementClient() {
               </span>
               {[
                 { id: 'all', label: 'সব অ্যাকশন' },
+                { id: 'pdf', label: '📄 ফিজিক্স PDF' },
                 { id: 'app', label: '📱 Play Store' },
                 { id: 'signup', label: '👤 সাইনআপ' },
                 { id: 'ssc', label: '📘 SSC টেস্ট' },

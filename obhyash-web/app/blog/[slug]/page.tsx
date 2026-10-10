@@ -47,6 +47,7 @@ import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
 import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
 import ResultStepFlow from '@/components/blog/ResultStepFlow';
 import SscScholarshipConversionCard from '@/components/blog/SscScholarshipConversionCard';
+import HscPhysicsPdfDownloadCard from '@/components/blog/HscPhysicsPdfDownloadCard';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -283,6 +284,9 @@ export default async function BlogPostPage({
       }
       if (widget === 'ssc-college-prep') {
         return <SscScholarshipConversionCard variant="college-prep" />;
+      }
+      if (widget === 'hsc-physics-pdf-download') {
+        return <HscPhysicsPdfDownloadCard />;
       }
       if (widget === 'related-post') {
         const targetSlug = (props as Record<string, unknown>)['data-slug'] as string;

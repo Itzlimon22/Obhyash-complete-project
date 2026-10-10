@@ -39,6 +39,16 @@ const BUTTON_CONFIG: Record<
     nameEn: 'SSC Scholarship Alert Card',
     category: 'In-Article',
   },
+  physics_pdf_card: {
+    nameBn: 'এইচএসসি ফিজিক্স ক/খ PDF ডাউনলোড',
+    nameEn: 'HSC Physics Ka/Kha PDF Download',
+    category: 'Lead Magnet',
+  },
+  physics_ka_kha_pdf_card: {
+    nameBn: 'এইচএসসি ফিজিক্স ক/খ PDF ডাউনলোড',
+    nameEn: 'HSC Physics Ka/Kha PDF Download',
+    category: 'Lead Magnet',
+  },
   demo_ssc_start: {
     nameBn: 'এসএসসি ডেমো এক্সাম স্টার্ট',
     nameEn: 'SSC Demo Exam Start Action',
@@ -119,6 +129,8 @@ export async function GET() {
     let todaySignups = 0;
     let totalPracticeClicks = 0;
     let todayPracticeClicks = 0;
+    let totalPdfDownloads = 0;
+    let todayPdfDownloads = 0;
     let totalConversions = 0;
     let todayConversions = 0;
 
@@ -277,6 +289,7 @@ export async function GET() {
 
         // Pre-populate prominent buttons so monitor hub always tracks them cleanly
         const coreKeys = [
+          'physics_pdf_card',
           'mobile_sticky',
           'header',
           'drawer',
@@ -353,6 +366,12 @@ export async function GET() {
           // Button aggregation
           let loc = row.button_location || 'other';
           if (loc === 'quick_action') loc = 'mobile_sticky';
+          if (loc === 'physics_ka_kha_pdf_card') loc = 'physics_pdf_card';
+
+          if (loc === 'physics_pdf_card') {
+            totalPdfDownloads++;
+            if (isToday) todayPdfDownloads++;
+          }
 
           if (!buttonMap[loc]) {
             const cfg = BUTTON_CONFIG[loc] || {
@@ -435,6 +454,7 @@ export async function GET() {
         recentConversions = rows.slice(0, 200).map((r) => {
           let loc = r.button_location || 'other';
           if (loc === 'quick_action') loc = 'mobile_sticky';
+          if (loc === 'physics_ka_kha_pdf_card') loc = 'physics_pdf_card';
           return {
             id: r.id,
             event_type: r.event_type,
@@ -469,6 +489,8 @@ export async function GET() {
       todaySignups,
       totalPracticeClicks,
       todayPracticeClicks,
+      totalPdfDownloads,
+      todayPdfDownloads,
       sscStats,
       hscStats,
       generalStats,
