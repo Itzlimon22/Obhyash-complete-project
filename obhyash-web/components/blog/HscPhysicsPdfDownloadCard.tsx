@@ -5,7 +5,7 @@ import { Download } from 'lucide-react';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 const GOOGLE_DRIVE_PDF_URL =
-  'https://drive.google.com/file/d/1Z5PaFhbEgMseDTRnLj48XaLiyAODyl6L/view?usp=drive_link';
+  'https://drive.google.com/file/d/1jSV3eCfYdVjGmnYkgqEkM52W8vIziOnB/view?usp=sharing';
 
 export default function HscPhysicsPdfDownloadCard() {
   const handleDownloadClick = () => {

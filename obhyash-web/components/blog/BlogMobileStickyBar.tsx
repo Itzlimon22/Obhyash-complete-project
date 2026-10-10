@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
 const PLAY_STORE_URL =
@@ -62,7 +61,7 @@ export default function BlogMobileStickyBar() {
       className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-white/10 shadow-[0_-6px_24px_rgba(0,0,0,0.12)] px-3.5 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] transition-all duration-200"
     >
       <div className="max-w-md mx-auto flex items-center justify-between gap-3">
-        {/* Left: Text "Unlimited exam dao." */}
+        {/* Left: Text "আনলিমিটেড এক্সাম দাও" */}
         <Link
           href="/demo"
           onClick={() =>
@@ -73,11 +72,8 @@ export default function BlogMobileStickyBar() {
               buttonLocation: 'mobile_sticky_left_text',
             })
           }
-          className="flex items-center gap-2 min-w-0 flex-1 py-1 group"
+          className="flex items-center min-w-0 flex-1 py-1 group"
         >
-          <div className="w-7 h-7 rounded-lg bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200/60 dark:border-cyan-800/40 flex items-center justify-center shrink-0 text-[#0e7490] dark:text-cyan-400 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-3.5 h-3.5" />
-          </div>
           <span className="text-[13px] sm:text-[14px] font-bold text-slate-800 dark:text-slate-100 font-noto truncate tracking-tight group-hover:text-[#0e7490] dark:group-hover:text-cyan-400 transition-colors">
             আনলিমিটেড এক্সাম দাও
           </span>
