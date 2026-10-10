@@ -193,9 +193,14 @@ export default async function BlogPostPage({
     .filter((p) => p.category === post.category || p.tags.some((t) => post.tags.includes(t)))
     .concat(otherPosts)
     .filter((p, index, self) => self.findIndex((item) => item.slug === p.slug) === index)
-    .slice(0, 4);
+  // Britti / scholarship page should not have in-article related card
+  const isBrittiPost =
+    post.slug === 'ssc-scholarship-britti-result-2026-check' ||
+    post.slug.includes('britti');
 
-  const processedContent = injectInArticleRelated(post.content, relatedPosts[0]?.slug);
+  const processedContent = isBrittiPost
+    ? post.content
+    : injectInArticleRelated(post.content, relatedPosts[0]?.slug);
 
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
@@ -289,6 +294,7 @@ export default async function BlogPostPage({
         return <HscPhysicsPdfDownloadCard />;
       }
       if (widget === 'related-post') {
+        if (isBrittiPost) return null;
         const targetSlug = (props as Record<string, unknown>)['data-slug'] as string;
         const targetPost = postsBySlug.get(targetSlug) || relatedPosts[0];
         if (targetPost) {
