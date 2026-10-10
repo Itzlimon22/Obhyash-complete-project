@@ -76,14 +76,14 @@ export default function AppInstallPromptModal({
           </p>
         )}
 
-        {/* Action Buttons: Left (Red: রেজিস্টার করো) & Right (Deep Cyan: অ্যাপ ইনস্টল করো) */}
+        {/* Action Buttons: Left (Red: লগইন / রেজিস্টার) & Right (Deep Cyan: অ্যাপ ইনস্টল করো) */}
         <div className="grid grid-cols-2 gap-3 pt-1">
           <Link
-            href="/signup"
+            href="/login"
             onClick={handleRegisterClick}
-            className="flex items-center justify-center py-3 px-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-sm sm:text-base font-['Anek_Bangla',sans-serif] shadow-md hover:shadow-lg transition-all text-center cursor-pointer"
+            className="flex items-center justify-center py-3 px-2 sm:px-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm font-['Anek_Bangla',sans-serif] shadow-md hover:shadow-lg transition-all text-center cursor-pointer whitespace-nowrap"
           >
-            রেজিস্টার করো
+            লগইন / রেজিস্টার
           </Link>
 
           <a
@@ -91,7 +91,7 @@ export default function AppInstallPromptModal({
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleInstallClick}
-            className="flex items-center justify-center py-3 px-3 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-bold text-sm sm:text-base font-['Anek_Bangla',sans-serif] shadow-md hover:shadow-lg transition-all text-center cursor-pointer"
+            className="flex items-center justify-center py-3 px-2 sm:px-3 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-bold text-xs sm:text-sm font-['Anek_Bangla',sans-serif] shadow-md hover:shadow-lg transition-all text-center cursor-pointer whitespace-nowrap"
           >
             অ্যাপ ইনস্টল করো
           </a>
