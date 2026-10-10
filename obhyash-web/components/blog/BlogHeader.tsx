@@ -242,7 +242,7 @@ export default function BlogHeader() {
             : 'bg-white dark:bg-[#121212] border-b border-slate-100 dark:border-white/5'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
           {/* ─── 1. LEFT: LOGO ─── */}
           <Link href="/blog" className="flex items-center group shrink-0" aria-label="অভ্যাস ব্লগ হোমপেজ">
             {/* Light mode logo */}
@@ -265,12 +265,29 @@ export default function BlogHeader() {
             />
           </Link>
 
-          {/* ─── 2. CENTER: BENGALI NAVIGATION MENU (Neutral Gray/Dark Accent) ─── */}
+          {/* ─── 2. MOBILE ONLY: FREE EXAM BUTTON IN EXACT CENTER ─── */}
+          <div className="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-auto">
+            <Link
+              href="/demo"
+              onClick={() =>
+                trackBlogConversion({
+                  eventType: 'practice_click',
+                  buttonLocation: 'header_mobile_center',
+                })
+              }
+              className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs font-bold font-noto shadow-xs transition-all shrink-0"
+            >
+              <WritingOnPaperIcon className="w-3.5 h-3.5 text-cyan-200" />
+              <span>এক্সাম দাও</span>
+            </Link>
+          </div>
+
+          {/* ─── 3. CENTER: BENGALI NAVIGATION MENU (Desktop only) ─── */}
           <Suspense fallback={<div className="hidden lg:block w-96 h-8" />}>
             <NavLinks />
           </Suspense>
 
-          {/* ─── 3. RIGHT: SOCIAL ICONS + FREE EXAM + ACTIONS ─── */}
+          {/* ─── 4. RIGHT: SOCIAL ICONS + FREE EXAM (DESKTOP) + ACTIONS ─── */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             {/* Social Icons (Facebook & YouTube) */}
             <div className="hidden lg:flex items-center gap-1 text-slate-500 dark:text-slate-400">
@@ -297,7 +314,7 @@ export default function BlogHeader() {
             {/* Subtle Divider (Desktop only) */}
             <div className="hidden lg:block w-px h-5 bg-slate-200 dark:bg-white/10 mx-0.5" />
 
-            {/* Exam Button (Deep Cyan) */}
+            {/* Exam Button (Desktop only: Deep Cyan) */}
             <Link
               href="/demo"
               onClick={() =>
@@ -306,7 +323,7 @@ export default function BlogHeader() {
                   buttonLocation: 'header',
                 })
               }
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs sm:text-sm font-bold font-noto shadow-xs transition-all shrink-0"
+              className="hidden lg:flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs sm:text-sm font-bold font-noto shadow-xs transition-all shrink-0"
             >
               <WritingOnPaperIcon className="w-3.5 h-3.5 text-cyan-200" />
               <span>এক্সাম দাও</span>
