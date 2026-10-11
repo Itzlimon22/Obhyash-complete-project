@@ -32,54 +32,10 @@ export interface TrackConversionOptions {
 const recentEvents = new Map<string, number>();
 
 /**
- * Lightweight, non-blocking beacon to track blog reader conversions
- * (e.g. clicking Play Store download, registration, or login)
+ * Button click conversion tracking — completely disabled to stop Vercel Serverless Function invocations
+ * and keep CPU usage strictly within the Hobby tier.
  */
-export function trackBlogConversion({
-  eventType,
-  sourceSlug = 'blog_home',
-  sourceCategory = 'General',
-  buttonLocation,
-}: TrackConversionOptions) {
-  if (typeof window === 'undefined') return;
-
-  // Deduplicate identical events within 4 seconds (prevents accidental double taps & rapid clicks)
-  const dedupKey = `${eventType}:${sourceSlug}:${buttonLocation}`;
-  const now = Date.now();
-  const lastTime = recentEvents.get(dedupKey);
-  if (lastTime && now - lastTime < 4000) {
-    return;
-  }
-  recentEvents.set(dedupKey, now);
-
-  // Prune map if large
-  if (recentEvents.size > 50) {
-    for (const [k, t] of recentEvents.entries()) {
-      if (now - t > 10000) recentEvents.delete(k);
-    }
-  }
-
-  try {
-    const payload = JSON.stringify({
-      event_type: eventType,
-      source_slug: sourceSlug,
-      source_category: sourceCategory,
-      button_location: buttonLocation,
-    });
-
-    // Use navigator.sendBeacon for fast, reliable, non-blocking delivery even during page navigation
-    if (navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: 'application/json' });
-      navigator.sendBeacon('/api/blog/track-conversion', blob);
-    } else {
-      fetch('/api/blog/track-conversion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true,
-      }).catch(() => {});
-    }
-  } catch (error) {
-    // Non-blocking fail-safe
-  }
+export function trackBlogConversion(_options: TrackConversionOptions) {
+  // Disabled: no-op to eliminate serverless function CPU time
+  return;
 }
