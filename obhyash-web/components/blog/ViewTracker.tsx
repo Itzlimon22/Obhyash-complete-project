@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { trackUserView } from '@/lib/blog-recommendations';
 import { markPostAsRead } from '@/hooks/use-read-history';
 
 export default function ViewTracker({ slug }: { slug: string }) {
@@ -10,7 +9,6 @@ export default function ViewTracker({ slug }: { slug: string }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!tracked.current) {
-        trackUserView(slug);
         markPostAsRead(slug); // persist to localStorage for read-history indicator
         tracked.current = true;
       }

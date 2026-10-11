@@ -72,32 +72,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
   const postCounts = searchData?.postCounts ?? {};
   const total = searchData?.total ?? 0;
 
-  // Bookmarks (shared SWR key)
-  const { data: bookmarkData, mutate: mutateBookmarks } = useSWR<{
-    slugs: string[];
-  }>('/api/blog/bookmarks', fetcher);
-  const bookmarkedSlugs = useMemo(
-    () => new Set(bookmarkData?.slugs ?? []),
-    [bookmarkData],
-  );
-
   const readSlugs = useReadHistory();
-
-  const toggleBookmark = async (slug: string) => {
-    if (!bookmarkData) return;
-    const already = bookmarkedSlugs.has(slug);
-    const next = already
-      ? bookmarkData.slugs.filter((s) => s !== slug)
-      : [...bookmarkData.slugs, slug];
-    mutateBookmarks({ slugs: next }, false);
-    await fetch('/api/blog/bookmarks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug }),
-    });
-    mutateBookmarks();
-  };
-
   const hasQuery = debouncedQuery.length > 0;
 
   return (
@@ -233,8 +208,6 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
                   key={post.slug}
                   post={post}
                   stats={postCounts[post.slug]}
-                  isBookmarked={bookmarkedSlugs.has(post.slug)}
-                  onToggleBookmark={toggleBookmark}
                   isRead={readSlugs.has(post.slug)}
                 />
               ))}

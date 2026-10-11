@@ -4,14 +4,12 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import useSWR from 'swr';
 import { BlogPost } from '@/lib/blog-data';
 import { useReadHistory } from '@/hooks/use-read-history';
 import {
   ChevronRight,
   Clock,
   Search,
-  Bookmark,
   Share2,
   Facebook,
   ArrowRight,
@@ -31,8 +29,6 @@ import BlogSearchModal from '@/components/blog/BlogSearchModal';
 import BlogThemeToggle from '@/components/blog/BlogThemeToggle';
 import { getPostCover } from '@/lib/blog-images';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 // Authentic Google Play Store Icon
 const GooglePlayIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
@@ -225,12 +221,10 @@ export default function BlogListingClient({
   const initialTag = searchParams.get('tag') ?? '';
   const initialCategory = searchParams.get('category') ?? '';
   const initialQuery = searchParams.get('q') ?? '';
-  const initialFilter = searchParams.get('filter') ?? '';
 
   const [activeCategory, setActiveCategory] = useState<string>(() => initialCategory || 'All');
   const [activeTag, setActiveTag] = useState<string>(() => initialTag);
   const [searchQuery, setSearchQuery] = useState<string>(() => initialQuery);
-  const [isBookmarksOnly, setIsBookmarksOnly] = useState<boolean>(() => initialFilter === 'bookmarks');
   const [visibleCount, setVisibleCount] = useState<number>(8);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
 
@@ -242,17 +236,15 @@ export default function BlogListingClient({
     const currentTag = searchParams.get('tag') ?? '';
     const currentCategory = searchParams.get('category') ?? '';
     const currentQ = searchParams.get('q') ?? '';
-    const currentFilter = searchParams.get('filter') ?? '';
 
     setActiveTag(currentTag);
     setActiveCategory(currentCategory || 'All');
     setSearchQuery(currentQ);
-    setIsBookmarksOnly(currentFilter === 'bookmarks');
   }, [searchParams]);
 
   // Update URL parameters smoothly without full reload
   const updateUrl = useCallback(
-    (newCat: string, newTag: string, newQ: string, bookmarksOnly?: boolean) => {
+    (newCat: string, newTag: string, newQ: string) => {
       const params = new URLSearchParams();
       if (newCat && newCat !== 'All' && newCat !== 'সকল বিষয়') {
         params.set('category', newCat);
@@ -262,9 +254,6 @@ export default function BlogListingClient({
       }
       if (newQ && newQ.trim()) {
         params.set('q', newQ.trim());
-      }
-      if (bookmarksOnly) {
-        params.set('filter', 'bookmarks');
       }
 
       const queryString = params.toString();
@@ -278,26 +267,16 @@ export default function BlogListingClient({
   const handleSelectCategory = (catId: string) => {
     const nextCat = catId === activeCategory && catId !== 'All' ? 'All' : catId;
     setActiveCategory(nextCat);
-    setIsBookmarksOnly(false);
     setVisibleCount(8);
-    updateUrl(nextCat, activeTag, searchQuery, false);
+    updateUrl(nextCat, activeTag, searchQuery);
   };
 
   // Handle Tag click
   const handleSelectTag = (tag: string) => {
     const nextTag = tag === activeTag ? '' : tag;
     setActiveTag(nextTag);
-    setIsBookmarksOnly(false);
     setVisibleCount(8);
-    updateUrl(activeCategory, nextTag, searchQuery, false);
-  };
-
-  // Toggle bookmarks only filter
-  const handleToggleBookmarksFilter = () => {
-    const next = !isBookmarksOnly;
-    setIsBookmarksOnly(next);
-    setVisibleCount(8);
-    updateUrl(activeCategory, activeTag, searchQuery, next);
+    updateUrl(activeCategory, nextTag, searchQuery);
   };
 
   // Reset all filters
@@ -305,49 +284,8 @@ export default function BlogListingClient({
     setActiveCategory('All');
     setActiveTag('');
     setSearchQuery('');
-    setIsBookmarksOnly(false);
     setVisibleCount(8);
     router.push('/blog', { scroll: false });
-  };
-
-  // Bookmarks SWR
-  const { data: bookmarkData, mutate: mutateBookmarks } = useSWR<{ slugs: string[] }>(
-    '/api/blog/bookmarks',
-    fetcher,
-  );
-  const bookmarkedSlugs = useMemo(
-    () => new Set(bookmarkData?.slugs ?? []),
-    [bookmarkData],
-  );
-
-  const toggleBookmark = async (slug: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!bookmarkData) {
-      toast.error('বুকমার্ক করতে লগইন করুন');
-      return;
-    }
-    const already = bookmarkedSlugs.has(slug);
-    const next = already
-      ? bookmarkData.slugs.filter((s) => s !== slug)
-      : [...bookmarkData.slugs, slug];
-    mutateBookmarks({ slugs: next }, false);
-
-    try {
-      const res = await fetch('/api/blog/bookmarks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug }),
-      });
-      if (res.status === 401) {
-        mutateBookmarks();
-        toast.error('বুকমার্ক করতে লগইন করুন');
-        return;
-      }
-      toast(already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে সংরক্ষণ করা হয়েছে');
-    } catch {
-      mutateBookmarks();
-      toast.error('বুকমার্ক ব্যর্থ হয়েছে');
-    }
   };
 
   const handleShare = (post: BlogPost, e: React.MouseEvent) => {
@@ -368,22 +306,17 @@ export default function BlogListingClient({
 
   // All filtered posts
   const filteredPosts = useMemo(() => {
-    let result = posts;
-    if (isBookmarksOnly) {
-      result = result.filter((post) => bookmarkedSlugs.has(post.slug));
-    }
-    return result.filter((post) => matchPost(post, activeCategory, activeTag, searchQuery));
-  }, [posts, isBookmarksOnly, bookmarkedSlugs, activeCategory, activeTag, searchQuery]);
+    return posts.filter((post) => matchPost(post, activeCategory, activeTag, searchQuery));
+  }, [posts, activeCategory, activeTag, searchQuery]);
 
   // Is any filter currently active?
   const isFiltered = useMemo(() => {
     return (
-      isBookmarksOnly ||
       (activeCategory !== 'All' && activeCategory !== 'সকল বিষয়' && Boolean(activeCategory)) ||
       Boolean(activeTag) ||
       Boolean(searchQuery.trim())
     );
-  }, [isBookmarksOnly, activeCategory, activeTag, searchQuery]);
+  }, [activeCategory, activeTag, searchQuery]);
 
   // Dynamic count map for the filter tabs
   const tabCounts = useMemo(() => {
@@ -568,30 +501,6 @@ export default function BlogListingClient({
                 )}
               </div>
 
-              {/* Quick Bookmarks Toggle Button */}
-              <button
-                type="button"
-                onClick={handleToggleBookmarksFilter}
-                className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 ${
-                  isBookmarksOnly
-                    ? 'bg-rose-600 text-white shadow-xs'
-                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-300'
-                }`}
-                title="বুকমার্ক করা আর্টিকেল দেখুন"
-              >
-                <Bookmark className={`w-3.5 h-3.5 ${isBookmarksOnly ? 'fill-current' : ''}`} />
-                <span>বুকমার্কসমূহ</span>
-                <span
-                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
-                    isBookmarksOnly
-                      ? 'bg-white/20 text-white'
-                      : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300'
-                  }`}
-                >
-                  {BanglaNameHelper.toBanglaNumeral(bookmarkedSlugs.size)}
-                </span>
-              </button>
-
               {/* Reset All Filters Button (Visible when filtered) */}
               {isFiltered && (
                 <button
@@ -643,20 +552,6 @@ export default function BlogListingClient({
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-[#141414] border border-slate-200/80 dark:border-white/10 shadow-xs text-xs sm:text-sm">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-bold text-slate-500 dark:text-slate-400">সক্রিয় ফিল্টার:</span>
-
-                {isBookmarksOnly && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-bold border border-rose-200 dark:border-rose-900/50">
-                    <Bookmark className="w-3.5 h-3.5 fill-current" />
-                    <span>সংরক্ষিত বুকমার্কসমূহ</span>
-                    <button
-                      onClick={handleToggleBookmarksFilter}
-                      className="hover:text-rose-950 dark:hover:text-white"
-                      title="বুকমার্ক ফিল্টার সরান"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                )}
 
                 {activeCategory && activeCategory !== 'All' && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-slate-200 text-xs font-bold">
@@ -821,30 +716,14 @@ export default function BlogListingClient({
                       )}
                     </div>
 
-                    {/* Footer Actions: Share + Bookmark */}
-                    <div className="flex items-center justify-between pt-3.5 mt-3 border-t border-slate-100 dark:border-white/5 text-slate-400 text-xs">
+                    {/* Footer Actions: Share */}
+                    <div className="flex items-center justify-end pt-3.5 mt-3 border-t border-slate-100 dark:border-white/5 text-slate-400 text-xs">
                       <button
                         onClick={(e) => handleShare(post, e)}
                         className="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1.5"
                       >
                         <Share2 className="w-3.5 h-3.5" />
                         <span>শেয়ার</span>
-                      </button>
-
-                      <button
-                        onClick={(e) => toggleBookmark(post.slug, e)}
-                        className={`hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center gap-1.5 ${
-                          bookmarkedSlugs.has(post.slug)
-                            ? 'text-rose-600 dark:text-rose-400 font-bold'
-                            : ''
-                        }`}
-                      >
-                        <Bookmark
-                          className={`w-3.5 h-3.5 ${
-                            bookmarkedSlugs.has(post.slug) ? 'fill-current' : ''
-                          }`}
-                        />
-                        <span>{bookmarkedSlugs.has(post.slug) ? 'সংরক্ষিত' : 'বুকমার্ক'}</span>
                       </button>
                     </div>
                   </div>

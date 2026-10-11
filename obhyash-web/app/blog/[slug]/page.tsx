@@ -41,7 +41,6 @@ import 'katex/dist/katex.min.css';
 import ProgressBar from '@/components/blog/ProgressBar';
 import MermaidRenderer from '@/components/blog/MermaidRenderer';
 import BackToTop from '@/components/blog/BackToTop';
-import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
 import BlogQuickShareButton from '@/components/blog/BlogQuickShareButton';
 import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
 import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
@@ -740,10 +739,9 @@ export default async function BlogPostPage({
               প্রকাশ: {formatBanglaDate(post.publishedAt)}
             </p>
 
-            {/* Right: Only Share and Bookmark Buttons */}
+            {/* Right: Only Share Button */}
             <div className="flex items-center gap-2">
               <BlogQuickShareButton title={post.title} url={jsonLd.url} />
-              <BlogBookmarkButton slug={post.slug} iconOnly />
             </div>
           </div>
 

@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Sparkles,
   LayoutDashboard,
-  Bookmark,
   Download,
   BookOpen,
 } from 'lucide-react';
@@ -409,19 +408,6 @@ export default function BlogHeader() {
                 <span>অভ্যাস ড্যাশবোর্ড</span>
               </span>
               <ArrowRight className="w-4 h-4 opacity-80" />
-            </Link>
-
-            {/* Bookmarks Option */}
-            <Link
-              href="/blog?filter=bookmarks"
-              onClick={() => setIsDrawerOpen(false)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-sm transition-all"
-            >
-              <span className="flex items-center gap-2.5">
-                <Bookmark className="w-4 h-4 text-rose-500 fill-rose-500/20" />
-                <span>সংরক্ষিত বুকমার্কসমূহ</span>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
 
             {/* Exam Demo Link */}

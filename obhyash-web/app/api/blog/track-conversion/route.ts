@@ -13,6 +13,16 @@ const VALID_EVENT_TYPES = new Set([
   'demo_exam_complete',
 ]);
 
+let supabaseAdmin: ReturnType<typeof createSupabaseClient> | null = null;
+function getSupabaseAdmin() {
+  if (!supabaseAdmin && supabaseUrl && supabaseServiceKey) {
+    supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+  }
+  return supabaseAdmin;
+}
+
 export async function POST(req: Request) {
   try {
     let body: any;
@@ -30,13 +40,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid event type' }, { status: 400 });
     }
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    const admin = getSupabaseAdmin();
+    if (!admin) {
       return NextResponse.json({ error: 'Database unconfigured' }, { status: 500 });
     }
 
-    const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
-
-    const { error } = await supabaseAdmin.from('blog_conversions').insert({
+    const { error } = await (admin as any).from('blog_conversions').insert({
       event_type,
       source_slug: String(source_slug || 'blog_home').slice(0, 200),
       source_category: source_category ? String(source_category).slice(0, 100) : null,

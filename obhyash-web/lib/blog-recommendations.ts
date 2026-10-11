@@ -134,7 +134,7 @@ export async function getAdvancedRecommendations(
   )();
 }
 
-export async function getMostViewedPosts(): Promise<BlogPost[]> {
+async function _getMostViewedPostsImpl(): Promise<BlogPost[]> {
   const allPosts = await getAllPosts();
   try {
     const supabase = await createClient();
@@ -179,7 +179,15 @@ export async function getMostViewedPosts(): Promise<BlogPost[]> {
   return allPosts.slice(0, 3);
 }
 
-export async function getBlogPostCounts(
+export async function getMostViewedPosts(): Promise<BlogPost[]> {
+  return unstable_cache(
+    _getMostViewedPostsImpl,
+    ['blog-most-viewed-posts'],
+    { revalidate: 3600, tags: ['blog-views'] },
+  )();
+}
+
+async function _getBlogPostCountsImpl(
   slugs: string[],
 ): Promise<Record<string, { likes: number; views: number }>> {
   if (!slugs.length) return {};
@@ -210,4 +218,14 @@ export async function getBlogPostCounts(
   }
 
   return result;
+}
+
+export async function getBlogPostCounts(
+  slugs: string[],
+): Promise<Record<string, { likes: number; views: number }>> {
+  return unstable_cache(
+    () => _getBlogPostCountsImpl(slugs),
+    ['blog-post-counts'],
+    { revalidate: 3600, tags: ['blog-counts'] },
+  )();
 }

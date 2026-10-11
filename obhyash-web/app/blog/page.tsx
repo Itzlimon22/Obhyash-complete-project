@@ -5,18 +5,15 @@ import {
   getAllPosts,
   getFeaturedPost,
   BLOG_CATEGORIES,
-  BlogPost,
 } from '@/lib/blog-data';
 import BlogListingClient from '@/components/blog/BlogListingClient';
-import { createClient } from '@/utils/supabase/server';
 import {
-  getAdvancedRecommendations,
   getMostViewedPosts,
   getBlogPostCounts,
 } from '@/lib/blog-recommendations';
 
-// Personalised per user (recommendations differ for known vs. guest users)
-export const dynamic = 'force-dynamic';
+// Fully public, statically generated with ISR (revalidates once per hour in background)
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Obhyash Blog — Study Tips, Exam Strategies & More for Students',
@@ -41,27 +38,22 @@ export default async function BlogPage() {
   const featured = await getFeaturedPost();
   const allPosts = await getAllPosts();
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let recommendedPosts: BlogPost[] = [];
-  let isGuest = true;
-
+  // Public recommendations based on trending/most viewed posts (no auth check needed)
+  let recommendedPosts = [];
   try {
-    if (user) {
-      isGuest = false;
-      recommendedPosts = await getAdvancedRecommendations(null, user.id);
-    } else {
-      recommendedPosts = await getMostViewedPosts();
-    }
+    recommendedPosts = await getMostViewedPosts();
   } catch (error) {
     console.error('Failed to load recommended posts:', error);
+    recommendedPosts = allPosts.slice(0, 3);
   }
 
   const allSlugs = allPosts.map((p) => p.slug);
-  const postCounts = await getBlogPostCounts(allSlugs);
+  let postCounts = {};
+  try {
+    postCounts = await getBlogPostCounts(allSlugs);
+  } catch {
+    // Graceful fallback
+  }
 
   return (
     <Suspense>
@@ -70,7 +62,7 @@ export default async function BlogPage() {
         featuredPost={featured}
         categories={BLOG_CATEGORIES}
         recommendedPosts={recommendedPosts}
-        isGuest={isGuest}
+        isGuest={true}
         postCounts={postCounts}
       />
     </Suspense>

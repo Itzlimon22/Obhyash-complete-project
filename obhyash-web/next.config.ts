@@ -232,10 +232,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Blog listing — personalised recommendations differ per user; must NOT be CDN-cached
+      // Blog listing — public static page cached on CDN
       {
         source: '/blog',
-        headers: [{ key: 'Cache-Control', value: 'private, no-store' }],
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        ],
       },
       // Authenticated student routes — all contain user-specific content
       {

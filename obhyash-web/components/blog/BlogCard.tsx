@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Heart,
   Eye,
-  Bookmark,
   CheckCheck,
 } from 'lucide-react';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
@@ -36,8 +35,6 @@ interface BlogCardProps {
   featured?: boolean;
   layout?: 'list' | 'grid' | 'featured' | 'compact';
   stats?: { likes: number; views: number };
-  isBookmarked?: boolean;
-  onToggleBookmark?: (slug: string) => void;
   isRead?: boolean;
 }
 
@@ -46,8 +43,6 @@ export default function BlogCard({
   featured = false,
   layout = 'list',
   stats,
-  isBookmarked,
-  onToggleBookmark,
   isRead,
 }: BlogCardProps) {
   const router = useRouter();
@@ -75,24 +70,6 @@ export default function BlogCard({
 
           {/* Dark Gradient Overlay (Katen Signature) */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-
-          {/* Bookmark Button (Top Right) */}
-          {onToggleBookmark && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleBookmark(post.slug);
-              }}
-              aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
-              className={`absolute top-5 right-5 z-20 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-md ${
-                isBookmarked
-                  ? 'bg-rose-500 text-white'
-                  : 'bg-white/20 text-white hover:bg-white/40'
-              }`}
-            >
-              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-white' : ''}`} />
-            </button>
-          )}
 
           {/* Bottom Content Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 md:p-12 z-10 flex flex-col justify-end">
@@ -220,24 +197,6 @@ export default function BlogCard({
           <span className="absolute top-3 left-3 z-10 px-3 py-1 text-xs font-bold text-white rounded-full bg-gradient-to-r from-[#10b981] to-[#047857] shadow-md">
             {post.category}
           </span>
-
-          {/* Bookmark Button */}
-          {onToggleBookmark && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleBookmark(post.slug);
-              }}
-              aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
-              className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-sm ${
-                isBookmarked
-                  ? 'bg-rose-500 text-white'
-                  : 'bg-white/80 dark:bg-black/60 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-black'
-              }`}
-            >
-              <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-white' : ''}`} />
-            </button>
-          )}
         </div>
 
         {/* Content */}
@@ -297,24 +256,6 @@ export default function BlogCard({
         <span className="absolute top-3 left-3 z-10 px-3 py-1 text-xs font-bold text-white rounded-full bg-gradient-to-r from-[#10b981] to-[#047857] shadow-md">
           {post.category}
         </span>
-
-        {/* Bookmark Overlay Button */}
-        {onToggleBookmark && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleBookmark(post.slug);
-            }}
-            aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
-            className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-sm ${
-              isBookmarked
-                ? 'bg-rose-500 text-white'
-                : 'bg-white/80 dark:bg-black/60 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-black'
-            }`}
-          >
-            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-white' : ''}`} />
-          </button>
-        )}
       </div>
 
       {/* Content Right */}

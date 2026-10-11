@@ -29,6 +29,8 @@ export interface TrackConversionOptions {
     | (string & {});
 }
 
+const recentEvents = new Map<string, number>();
+
 /**
  * Lightweight, non-blocking beacon to track blog reader conversions
  * (e.g. clicking Play Store download, registration, or login)
@@ -40,6 +42,22 @@ export function trackBlogConversion({
   buttonLocation,
 }: TrackConversionOptions) {
   if (typeof window === 'undefined') return;
+
+  // Deduplicate identical events within 4 seconds (prevents accidental double taps & rapid clicks)
+  const dedupKey = `${eventType}:${sourceSlug}:${buttonLocation}`;
+  const now = Date.now();
+  const lastTime = recentEvents.get(dedupKey);
+  if (lastTime && now - lastTime < 4000) {
+    return;
+  }
+  recentEvents.set(dedupKey, now);
+
+  // Prune map if large
+  if (recentEvents.size > 50) {
+    for (const [k, t] of recentEvents.entries()) {
+      if (now - t > 10000) recentEvents.delete(k);
+    }
+  }
 
   try {
     const payload = JSON.stringify({
