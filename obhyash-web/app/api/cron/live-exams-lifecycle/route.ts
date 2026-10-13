@@ -12,27 +12,13 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
  * 3. 15 minutes after end_time, marks is_leaderboard_published = true.
  * 4. Dispatches push notifications to all participants for published leaderboards.
  */
-export async function GET(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-
-    // Optional authorization check if CRON_SECRET is configured
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    const result = await runLiveExamLifecycleAutomation(supabaseAdmin);
-
-    return NextResponse.json(result, { status: result.success ? 200 : 500 });
-  } catch (error: any) {
-    console.error('Error in /api/cron/live-exams-lifecycle:', error);
-    return NextResponse.json(
-      { success: false, error: error.message || 'Internal cron error' },
-      { status: 500 }
-    );
-  }
+export async function GET(_request: NextRequest) {
+  // Cron execution temporarily paused to protect Vercel Serverless CPU time limits
+  return NextResponse.json({
+    success: true,
+    paused: true,
+    message: 'Live exam lifecycle cron is temporarily disabled to prevent CPU exhaustion.',
+  });
 }
 
 export async function POST(request: NextRequest) {

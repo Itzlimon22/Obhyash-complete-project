@@ -22,6 +22,74 @@ async function withTimeout<T>(
 }
 
 export async function updateSession(request: NextRequest) {
+  // If explicitly logging out via query parameter, bypass session check and clear cookies immediately
+  if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.has('logout')) {
+    const logoutResponse = NextResponse.next({ request });
+    request.cookies.getAll().forEach((cookie) => {
+      if (
+        cookie.name.startsWith('sb-') ||
+        cookie.name.startsWith('sb:') ||
+        cookie.name.includes('supabase') ||
+        cookie.name.includes('auth') ||
+        cookie.name.startsWith('obhyash')
+      ) {
+        logoutResponse.cookies.delete(cookie.name);
+        logoutResponse.cookies.set(cookie.name, '', {
+          path: '/',
+          maxAge: 0,
+          expires: new Date(0),
+        });
+      }
+    });
+    return logoutResponse;
+  }
+
+  // Define route types
+  const { pathname } = request.nextUrl;
+  const isRootRoute = pathname === '/';
+  const isAdminRoute = pathname.startsWith('/admin');
+  const isTeacherRoute = pathname.startsWith('/teacher');
+  const isAuthRoute = pathname === '/login' || pathname === '/signup';
+
+  // All student tab paths that map into the SPA (including deep-link sub-paths)
+  const STUDENT_TAB_PATHS = [
+    '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
+    '/analysis', '/notifications', '/subscription', '/upgrade', '/profile', '/settings',
+    '/referral', '/complaint', '/feature-requests', '/bookmarks',
+    '/account-info', '/account-linking', '/info',
+    '/legends-league', '/legends_league', '/live_exam',
+    // Deep links — dynamic sub-paths
+    '/leaderboard/user', // /leaderboard/user/[userId]
+    '/leaderboard/user-profile', // /leaderboard/user-profile/[userId]
+    '/history/',
+    '/exam/',
+  ];
+  const isStudentRoute = STUDENT_TAB_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
+  const isProtectedRoute = isStudentRoute || isTeacherRoute || isAdminRoute;
+
+  // FAST-PATH: Instant check for Supabase auth cookie presence (Zero Serverless CPU time)
+  const allCookies = request.cookies.getAll();
+  const hasAuthCookie = allCookies.some(
+    (cookie) =>
+      cookie.name.startsWith('sb-') ||
+      cookie.name.startsWith('sb:') ||
+      cookie.name.includes('supabase') ||
+      cookie.name.includes('auth') ||
+      cookie.name.startsWith('obhyash')
+  );
+
+  // If user does not even have an auth cookie:
+  if (!hasAuthCookie) {
+    // 1. Trying to access protected route -> instant redirect to /login without calling Supabase
+    if (isProtectedRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+    // 2. Unauthenticated visitor accessing public/auth routes (/, /login, /signup) -> instant allow without calling Supabase
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -50,28 +118,6 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // If explicitly logging out via query parameter, bypass session check and clear cookies immediately
-  if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.has('logout')) {
-    const logoutResponse = NextResponse.next({ request });
-    request.cookies.getAll().forEach((cookie) => {
-      if (
-        cookie.name.startsWith('sb-') ||
-        cookie.name.startsWith('sb:') ||
-        cookie.name.includes('supabase') ||
-        cookie.name.includes('auth') ||
-        cookie.name.startsWith('obhyash')
-      ) {
-        logoutResponse.cookies.delete(cookie.name);
-        logoutResponse.cookies.set(cookie.name, '', {
-          path: '/',
-          maxAge: 0,
-          expires: new Date(0),
-        });
-      }
-    });
-    return logoutResponse;
-  }
-
   // We use getSession() instead of getUser() because Next.js prefetches can trigger
   // this middleware 20+ times concurrently on the Admin dashboard.
   // getUser() makes an API call every time, leading to rate limits and 429 errors.
@@ -89,30 +135,6 @@ export async function updateSession(request: NextRequest) {
   } catch (error) {
     console.error('Middleware auth refresh error:', error);
   }
-
-  // Define route types
-  const { pathname } = request.nextUrl;
-  const isRootRoute = pathname === '/';
-  const isAdminRoute = pathname.startsWith('/admin');
-  const isTeacherRoute = pathname.startsWith('/teacher');
-  const isAuthRoute = pathname === '/login' || pathname === '/signup';
-
-  // All student tab paths that map into the SPA (including deep-link sub-paths)
-  const STUDENT_TAB_PATHS = [
-    '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
-    '/analysis', '/notifications', '/subscription', '/upgrade', '/profile', '/settings',
-    '/referral', '/complaint', '/feature-requests', '/bookmarks',
-    '/account-info', '/account-linking', '/info',
-    '/legends-league', '/legends_league', '/live_exam',
-    // Deep links — dynamic sub-paths
-    '/leaderboard/user', // /leaderboard/user/[userId]
-    '/leaderboard/user-profile', // /leaderboard/user-profile/[userId]
-    '/history/',
-    '/exam/',
-  ];
-  const isStudentRoute = STUDENT_TAB_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
-  const isProtectedRoute = isStudentRoute || isTeacherRoute || isAdminRoute;
-
 
   // SCENARIO A: Not logged in and trying to access a protected route
   if (!user && isProtectedRoute) {
