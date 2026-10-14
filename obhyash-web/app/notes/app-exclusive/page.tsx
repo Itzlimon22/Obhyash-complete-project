@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { AppExclusiveHeader } from '@/components/notes/AppExclusiveHeader';
-import { AppMockupGrid } from '@/components/notes/AppMockupGrid';
 import { PlayStoreCtaBanner } from '@/components/notes/PlayStoreCtaBanner';
 import { PLAY_STORE_URL } from '@/data/hsc-ka-kha-notes';
 import {
@@ -185,8 +185,54 @@ export default function AppExclusiveNotesPage() {
           </p>
         </div>
 
-        {/* 2-Per-Row S25 Mockup Grid */}
-        <AppMockupGrid />
+        {/* Featured 2-Phone App Mockup Showcase (Side-by-side 2 Per Row) */}
+        <div className="relative my-8 sm:my-10 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-[#080d1a] shadow-2xl">
+          {/* Ambient Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative p-4 sm:p-8 flex flex-col items-center">
+            {/* Tag / Badge */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/15 shadow-xs flex items-center gap-2">
+                <span>📱</span>
+                <span>অ্যাপের ভেতরের ২টি মূল ফিচার প্রিভিউ</span>
+              </span>
+            </div>
+
+            {/* The 2-Phone Mockup Image */}
+            <div className="relative w-full max-w-4xl aspect-[1024/648] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-slate-950/60">
+              <Image
+                src="/mockups/obhyash-app-showcase.png"
+                alt="অভ্যাস অ্যাপ স্ক্রিনশট - মাস্টার ফর্মুলা ব্যাংক ও বিষয়ভিত্তিক ক ও খ হ্যান্ডনোট"
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 1024px) 100vw, 896px"
+              />
+            </div>
+
+            {/* Two captions below the 2 phones */}
+            <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 text-center">
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-200">
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                  বাম স্ক্রিন: মাস্টার ফর্মুলা ব্যাংক (Σ)
+                </span>
+                <p className="text-xs sm:text-sm text-slate-300">
+                  পদার্থ, রসায়ন, গণিত ও বায়োলজির সকল পেপারের অধ্যায়ভিত্তিক সূত্র ও শর্টকাট।
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-200">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1">
+                  ডান স্ক্রিন: বিষয়ভিত্তিক অধ্যায় মডিউল
+                </span>
+                <p className="text-xs sm:text-sm text-slate-300">
+                  বোর্ড পরীক্ষার বিগত বছরের নির্ভুল জ্ঞান ও অনুধাবন (ক ও খ) হ্যান্ডনোটস।
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Bottom Play Store CTA Banner */}
         <PlayStoreCtaBanner
