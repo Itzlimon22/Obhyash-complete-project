@@ -1,18 +1,24 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Download } from 'lucide-react';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
 
-const GOOGLE_DRIVE_PDF_URL =
-  'https://drive.google.com/file/d/1jSV3eCfYdVjGmnYkgqEkM52W8vIziOnB/view?usp=sharing';
+interface HscPhysicsPdfDownloadCardProps {
+  sourceSlug?: string;
+  sourceCategory?: string;
+}
 
-export default function HscPhysicsPdfDownloadCard() {
+export default function HscPhysicsPdfDownloadCard({
+  sourceSlug = 'ssc-scholarship-britti-result-2026-check',
+  sourceCategory = 'HSC',
+}: HscPhysicsPdfDownloadCardProps) {
   const handleDownloadClick = () => {
     trackBlogConversion({
       eventType: 'app_download',
-      sourceSlug: 'ssc-scholarship-britti-result-2026-check',
-      sourceCategory: 'HSC',
+      sourceSlug,
+      sourceCategory,
       buttonLocation: 'physics_pdf_card',
     });
   };
@@ -29,16 +35,14 @@ export default function HscPhysicsPdfDownloadCard() {
           </p>
         </div>
 
-        <a
-          href={GOOGLE_DRIVE_PDF_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/notes/hsc-science-ka-kha"
           onClick={handleDownloadClick}
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#991b1b] hover:bg-[#7f1d1d] active:bg-[#6b1414] text-white text-sm font-semibold transition-colors shrink-0 cursor-pointer shadow-sm"
         >
           <Download className="w-4 h-4 text-white" />
           <span>PDF ডাউনলোড করো</span>
-        </a>
+        </Link>
       </div>
     </div>
   );

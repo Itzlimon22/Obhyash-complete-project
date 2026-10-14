@@ -113,6 +113,81 @@ function formatBanglaDate(dateStr: string) {
   }
 }
 
+// Helper to inject HSC Science Ka-Kha PDF download card across all blog posts (like on the britti page)
+function injectHscNotesCard(content: string): string {
+  // If the article already contains the widget (e.g. manually placed or britti page), do not duplicate
+  if (content.includes('data-widget="hsc-physics-pdf-download"')) {
+    return content;
+  }
+
+  // Inject after the 2nd regular paragraph (same position as the britti post)
+  const blocks = content.split(/\n{2,}/);
+  if (blocks.length < 3) {
+    return `${content}\n\n<div data-widget="hsc-physics-pdf-download"></div>\n\n`;
+  }
+
+  let paragraphCount = 0;
+  let insertIndex = -1;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i].trim();
+    // Skip headings, tables, blockquotes, code fences, html tags, lists
+    if (
+      !block ||
+      block.startsWith('#') ||
+      block.startsWith('```') ||
+      block.startsWith('<') ||
+      block.startsWith('|') ||
+      block.startsWith('>') ||
+      block.startsWith('- ') ||
+      block.startsWith('* ') ||
+      /^\d+\.\s/.test(block)
+    ) {
+      continue;
+    }
+
+    paragraphCount++;
+    if (paragraphCount === 2) {
+      insertIndex = i + 1;
+      break;
+    }
+  }
+
+  // Fallback: if 2 paragraphs couldn't be counted, insert after the 1st paragraph
+  if (insertIndex === -1) {
+    paragraphCount = 0;
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i].trim();
+      if (
+        !block ||
+        block.startsWith('#') ||
+        block.startsWith('```') ||
+        block.startsWith('<') ||
+        block.startsWith('|') ||
+        block.startsWith('>') ||
+        block.startsWith('- ') ||
+        block.startsWith('* ') ||
+        /^\d+\.\s/.test(block)
+      ) {
+        continue;
+      }
+      paragraphCount++;
+      if (paragraphCount === 1) {
+        insertIndex = i + 1;
+        break;
+      }
+    }
+  }
+
+  if (insertIndex !== -1 && insertIndex <= blocks.length) {
+    const widgetHtml = '<div data-widget="hsc-physics-pdf-download"></div>';
+    blocks.splice(insertIndex, 0, widgetHtml);
+    return blocks.join('\n\n');
+  }
+
+  return `${content}\n\n<div data-widget="hsc-physics-pdf-download"></div>\n\n`;
+}
+
 // Helper to inject in-article "আরও পড়ুন" card
 function injectInArticleRelated(content: string, relatedSlug?: string): string {
   // If author explicitly used [related:slug], replace with widget div
@@ -127,7 +202,7 @@ function injectInArticleRelated(content: string, relatedSlug?: string): string {
     return processed;
   }
 
-  // Auto-inject after the 3rd regular paragraph
+  // Auto-inject after the 4th regular paragraph (providing breathing room after the notes card)
   const blocks = processed.split(/\n{2,}/);
   if (blocks.length < 5) {
     return processed;
@@ -154,7 +229,7 @@ function injectInArticleRelated(content: string, relatedSlug?: string): string {
     }
 
     paragraphCount++;
-    if (paragraphCount === 3) {
+    if (paragraphCount === 4) {
       insertIndex = i + 1;
       break;
     }
@@ -197,9 +272,13 @@ export default async function BlogPostPage({
     post.slug === 'ssc-scholarship-britti-result-2026-check' ||
     post.slug.includes('britti');
 
+  // 1. Ensure HSC Science Ka-Kha PDF card is injected across all posts (like on the britti page)
+  const withHscCard = injectHscNotesCard(post.content);
+
+  // 2. Inject related posts card for non-britti articles
   const processedContent = isBrittiPost
-    ? post.content
-    : injectInArticleRelated(post.content, relatedPosts[0]?.slug);
+    ? withHscCard
+    : injectInArticleRelated(withHscCard, relatedPosts[0]?.slug);
 
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
@@ -290,7 +369,12 @@ export default async function BlogPostPage({
         return <SscScholarshipConversionCard variant="college-prep" />;
       }
       if (widget === 'hsc-physics-pdf-download') {
-        return <HscPhysicsPdfDownloadCard />;
+        return (
+          <HscPhysicsPdfDownloadCard
+            sourceSlug={post.slug}
+            sourceCategory={post.category}
+          />
+        );
       }
       if (widget === 'related-post') {
         if (isBrittiPost) return null;

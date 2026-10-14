@@ -9,9 +9,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Completely bypass auth checks & serverless session logic for public blog routes and static info
+  // 2. Completely bypass auth checks & serverless session logic for public pages and static info
   if (
     pathname.startsWith('/blog') ||
+    pathname.startsWith('/notes') ||
     pathname.startsWith('/demo') ||
     pathname === '/faq' ||
     pathname === '/privacy' ||
@@ -36,11 +37,12 @@ export const config = {
      * - favicon.ico (favicon file)
      * - api (ALL api routes - API routes handle their own auth)
      * - blog (all blog pages and subpaths)
+     * - notes (all public science notes pages)
      * - demo (public demo exam platform)
      * - public info: faq, privacy, terms, refund, about-us
      * - public assets (svg, png, jpg, webp, etc.)
      */
-    '/((?!_next/static|_next/image|favicon\\.ico|api(?:/.*)?$|blog(?:/.*)?$|demo(?:/.*)?$|faq$|privacy$|terms$|refund$|about-us$|sitemap.*|robots\\.txt$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|manifest\\.json)$).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|api(?:/.*)?$|blog(?:/.*)?$|notes(?:/.*)?$|demo(?:/.*)?$|faq$|privacy$|terms$|refund$|about-us$|sitemap.*|robots\\.txt$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|manifest\\.json)$).*)',
   ],
 };
 
