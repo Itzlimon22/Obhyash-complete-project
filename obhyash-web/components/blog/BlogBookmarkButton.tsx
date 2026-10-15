@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { Bookmark } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -14,7 +15,9 @@ export default function BlogBookmarkButton({
   slug: string;
   iconOnly?: boolean;
 }) {
-  const { data, mutate } = useSWR('/api/blog/bookmarks', fetcher);
+  const { user } = useAuth();
+  // Only query bookmarks if the user is authenticated (prevents serverless CPU usage for public readers)
+  const { data, mutate } = useSWR(user ? '/api/blog/bookmarks' : null, fetcher);
   const [pending, setPending] = useState(false);
 
   const isBookmarked: boolean = data?.slugs?.includes(slug) ?? false;

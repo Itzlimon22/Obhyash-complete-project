@@ -78,10 +78,17 @@ export async function GET(request: NextRequest) {
       if (userLike) hasLiked = true;
     }
 
-    return NextResponse.json({
-      likes: count || 0,
-      hasLiked,
-    });
+    return NextResponse.json(
+      {
+        likes: count || 0,
+        hasLiked,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=86400',
+        },
+      },
+    );
   } catch (error: any) {
     console.error('Error fetching likes:', error);
     return NextResponse.json(

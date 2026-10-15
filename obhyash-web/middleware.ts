@@ -31,18 +31,41 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api (ALL api routes - API routes handle their own auth)
-     * - blog (all blog pages and subpaths)
-     * - notes (all public science notes pages)
-     * - demo (public demo exam platform)
-     * - public info: faq, privacy, terms, refund, about-us
-     * - public assets (svg, png, jpg, webp, etc.)
+     * Only run middleware on protected app routes and auth flows.
+     * All public traffic (home, blog, notes, static info, assets, api)
+     * completely bypasses middleware execution, ensuring 0ms CPU time.
      */
-    '/((?!_next/static|_next/image|favicon\\.ico|api(?:/.*)?$|blog(?:/.*)?$|notes(?:/.*)?$|demo(?:/.*)?$|faq$|privacy$|terms$|refund$|about-us$|sitemap.*|robots\\.txt$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|manifest\\.json)$).*)',
+    '/admin/:path*',
+    '/teacher/:path*',
+    '/dashboard/:path*',
+    '/setup/:path*',
+    '/history/:path*',
+    '/practice/:path*',
+    '/leaderboard/:path*',
+    '/analysis/:path*',
+    '/notifications/:path*',
+    '/subscription/:path*',
+    '/upgrade/:path*',
+    '/profile/:path*',
+    '/settings/:path*',
+    '/referral/:path*',
+    '/complaint/:path*',
+    '/feature-requests/:path*',
+    '/bookmarks/:path*',
+    '/account-info/:path*',
+    '/account-linking/:path*',
+    '/info/:path*',
+    '/legends-league/:path*',
+    '/legends_league/:path*',
+    '/live_exam/:path*',
+    '/live-exam/:path*',
+    '/exam/:path*',
+    '/question-bank/:path*',
+    '/personal/:path*',
+    '/login',
+    '/signup',
+    '/onboarding',
+    '/deactivated',
   ],
 };
 
