@@ -380,10 +380,10 @@ const nextConfig: NextConfig = {
       },
       // Default API routes — no-store for dynamic/authenticated APIs
       {
-        source: '/api/((?!blog/latest|blog/search).*)',
+        source: '/api/((?!blog/latest|blog/search|referral/leaderboard).*)',
         headers: [{ key: 'Cache-Control', value: 'no-store' }],
       },
-      // High-traffic public blog APIs cached aggressively on Vercel Edge CDN (0ms compute)
+      // High-traffic public blog & referral APIs cached aggressively on Vercel Edge CDN (0ms compute)
       {
         source: '/api/blog/latest',
         headers: [
@@ -415,6 +415,23 @@ const nextConfig: NextConfig = {
           {
             key: 'Vercel-CDN-Cache-Control',
             value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/api/referral/leaderboard',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
           },
         ],
       },
