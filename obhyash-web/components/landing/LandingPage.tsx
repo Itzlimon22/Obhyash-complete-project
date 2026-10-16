@@ -1,12 +1,9 @@
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GooglePlayButton } from './GooglePlayButton';
-import { AppShowcaseSection } from './AppShowcaseSection';
 import { MobileAppInstallBanner } from './MobileAppInstallBanner';
 import {
   BookOpen,
-  Clock,
   User,
   ArrowRight,
   Sun,
@@ -14,7 +11,6 @@ import {
   Sparkles,
   FileText,
   ScanLine,
-  BarChart3,
   History,
   Trophy,
   Zap,
@@ -28,19 +24,12 @@ import {
   CheckCircle,
   CheckCircle2,
   Check,
-  Crown,
-  Bookmark,
-  Flag,
-  Lock,
-  ChevronDown,
-  ChevronUp,
   Download,
   Printer,
   CheckCheck,
   Smartphone,
   Laptop,
   RefreshCw,
-  ShieldCheck,
   Menu,
   X,
   Flame,
@@ -52,18 +41,6 @@ import {
   XCircle,
   Award,
 } from 'lucide-react';
-
-// Next.js dynamic import lazy-loads heavy components (like LaTeX/ReactMarkdown)
-// This strictly separates the heavy math syntax parsing JS from the main page bundle.
-const LatexText = dynamic(
-  () => import('@/components/student/ui/common/LatexText'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-4 w-3/4 animate-pulse bg-neutral-200 dark:bg-neutral-800 rounded"></div>
-    ),
-  },
-);
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -83,108 +60,13 @@ interface PricingPlan {
   highlight?: boolean;
 }
 
-const DEMO_QUESTIONS = [
-  {
-    number: '০১',
-    text: 'একটি কণা $v = u + at$ সূত্র মেনে চলে। যদি $u = 0$ এবং $a = 5 \\text{ ms}^{-2}$ হয়, তবে $t = 4\\text{ s}$ এ কণাটির বেগ কত হবে?',
-    options: ['10 ms⁻¹', '20 ms⁻¹', '15 ms⁻¹', '25 ms⁻¹'],
-    correct: 1,
-    subject: 'পদার্থবিজ্ঞান ১ম পত্র',
-    chapter: 'গতিবিদ্যা',
-    source: 'CU-18',
-    explanation: 'আমরা জানি, $v = u + at$\nযেহেতু $u = 0, a = 5 \\text{ ms}^{-2}, t = 4\\text{ s}$\nসুতরাং, $v = 0 + (5 \\times 4) = 20\\text{ ms}^{-1}$।\n(রেফারেন্স: ড. শাহজাহান তপন স্যার - গতিবিদ্যা)',
-  },
-  {
-    number: '০২',
-    text: 'নিচের কোন অরবিটালটির শক্তি সবচেয়ে কম?',
-    options: ['4s', '3d', '4p', '4f'],
-    correct: 0,
-    subject: 'রসায়ন ১ম পত্র',
-    chapter: 'গুণগত রসায়ন',
-    source: 'DU-A-21',
-    explanation: 'আউফবাউ নীতি অনুযায়ী $(n+l)$ এর মান যার কম তার শক্তি কম। 4s এর জন্য $n+l = 4+0 = 4$, যা 3d (৫) অপেক্ষা কম।\n(রেফারেন্স: হাজারী ও নাগ স্যার - গুণগত রসায়ন)',
-  },
-  {
-    number: '০৩',
-    text: '$\\lim_{x \\to 0} \\frac{\\sin 5x}{x}$ এর মান কত?',
-    options: ['0', '1', '5', 'অসংজ্ঞায়িত'],
-    correct: 2,
-    subject: 'উচ্চতর গণিত ১ম পত্র',
-    chapter: 'অন্তরীকরণ',
-    source: 'BUET-19',
-    explanation: 'মৌলিক সূত্রানুযায়ী $\\lim_{x \\to 0} \\frac{\\sin ax}{x} = a$। এখানে $a = 5$, অতএব মান 5।\n(রেফারেন্স: এস ইউ আহাম্মদ স্যার - অন্তরীকরণ)',
-  },
-];
-
 const LandingPage: React.FC<LandingPageProps> = ({
   onGetStarted,
   onLogin, // ✅ Log in
   isDarkMode,
   toggleTheme,
 }) => {
-  const [activeDemoTab, setActiveDemoTab] = useState<
-    'generate' | 'analytics'
-  >('generate');
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-
-  // --- Interactive Demo Logic ---
-  const [demoQIndex, setDemoQIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(592);
-  const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState<boolean>(false);
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
-
-  // Auto-play demo cycle (Question -> Option Lock -> Warm Book Explanation -> Next Question)
-  useEffect(() => {
-    if (activeDemoTab !== 'generate') return;
-
-    let timer1: NodeJS.Timeout;
-    let timer2: NodeJS.Timeout;
-    let timer3: NodeJS.Timeout;
-
-    // Step 1: Select/Lock option after 1.5s
-    timer1 = setTimeout(() => {
-      setSelectedOpt(DEMO_QUESTIONS[demoQIndex].correct);
-
-      // Step 2: Reveal warm book explanation after 1s of locking
-      timer2 = setTimeout(() => {
-        setShowExplanation(true);
-
-        // Step 3: Transition to next question after 3.5s
-        timer3 = setTimeout(() => {
-          setDemoQIndex((prev) => (prev + 1) % DEMO_QUESTIONS.length);
-          setSelectedOpt(null);
-          setShowExplanation(false);
-          setIsBookmarked(false);
-        }, 3500);
-      }, 1000);
-    }, 1500);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, [activeDemoTab, demoQIndex]);
-
   const marqueeRef = useRef<HTMLDivElement>(null);
-
-  // Timer countdown
-  useEffect(() => {
-    const timer = setInterval(
-      () => setTimeLeft((t) => (t > 0 ? t - 1 : 1200)),
-      1000,
-    );
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60)
-      .toString()
-      .padStart(2, '0');
-    const sc = (s % 60).toString().padStart(2, '0');
-    return `${m}:${sc}`;
-  };
 
   // --- Data Arrays ---
 
@@ -432,29 +314,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
     },
   ];
 
-  const faqs = [
-    {
-      q: 'সাবস্ক্রিপশন নিলে কি সব সাবজেক্ট ও প্রশ্নব্যাংক একসাথে আনলক হবে?',
-      a: 'হ্যাঁ! প্রো প্ল্যান নেওয়ার সাথে সাথেই পদার্থ, রসায়ন, গণিত, জীববিজ্ঞান ও আইসিটি সহ সকল বিষয়ের বিগত ২০ বছরের বোর্ড প্রশ্ন, শীর্ষ কলেজের টেস্ট পেপার এবং বিশ্ববিদ্যালয় ও মেডিকেল ভর্তি পরীক্ষার সম্পূর্ণ প্রশ্নব্যাংক আনলক হয়ে যাবে।',
-    },
-    {
-      q: 'ফ্রি-তে কি প্র্যাকটিস বা ডেমো এক্সাম দিয়ে দেখার সুযোগ আছে?',
-      a: 'অবশ্যই! কোনো প্রকার পেমেন্ট ছাড়াই একাউন্ট খুলে তুমি ফ্রি ডেমো এক্সাম ও নির্দিষ্ট প্রশ্নব্যাংক প্র্যাকটিস করে আমাদের নির্ভুল ব্যাখ্যা, স্মার্ট টাইমার ও দ্রুতগতির প্ল্যাটফর্ম যাচাই করে নিতে পারবে।',
-    },
-    {
-      q: 'ভুল হওয়া প্রশ্ন ও দুর্বল বিষয়গুলো কি আলাদাভাবে রিভিশন দেওয়া যায়?',
-      a: 'হ্যাঁ! প্রতিটি পরীক্ষার পর তোমার ভুল হওয়া প্রশ্নগুলো স্বয়ংক্রিয়ভাবে তোমার পার্সোনাল "মিস্টেক নোটবুক"-এ সংরক্ষিত হয়ে থাকে, যাতে পরীক্ষার ঠিক আগে শুধু নিজের দুর্বল জায়গাগুলোতে ফোকাস করে রিভিশন দিতে পারো।',
-    },
-    {
-      q: 'প্রশ্ন ও সমাধানের নির্ভুলতা কতটা নির্ভরযোগ্য?',
-      a: 'আমাদের প্রতিটি প্রশ্ন ও সমাধান বুয়েট, ঢাবি ও শীর্ষ মেডিকেল কলেজের অভিজ্ঞ মেন্টরদের দ্বারা এনসিটিবি (NCTB) অনুমোদিত টেক্সটবুকের রেফারেন্স ও নিখুঁত ব্যাখ্যা সহ ভেরিফাই করা। কোনো গাইড বইয়ের মতো টাইপো বা ভুল উত্তরের ঝামেলা নেই।',
-    },
-    {
-      q: 'পেমেন্ট সম্পন্ন করার পর প্রো অ্যাক্সেস কতক্ষণে চালু হয়?',
-      a: 'বিকাশ বা নগদের মাধ্যমে ডিজিটাল পেমেন্ট সম্পন্ন করার সাথে সাথেই কোনো প্রকার অপেক্ষা ছাড়া ইনস্ট্যান্টলি (তাৎক্ষণিক) তোমার একাউন্টে প্রো সাবস্ক্রিপশন অ্যাক্টিভ হয়ে যাবে।',
-    },
-  ];
-
   return (
     <div className="dark min-h-screen w-full min-w-0 overflow-x-hidden bg-black text-neutral-100 font-sans selection:bg-red-500/20">
       {/* Navigation */}
@@ -525,35 +384,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-20 lg:pb-24 z-10">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row lg:items-start items-center gap-8 sm:gap-12 lg:gap-16">
-          {/* Left Content */}
-          <div className="lg:w-1/2 text-center lg:text-left space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in-up">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+      <section className="relative pt-8 pb-14 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28 z-10">
+        <div className="max-w-4xl mx-auto px-4 lg:px-6 flex flex-col items-center text-center">
+          <div className="space-y-5 sm:space-y-6 lg:space-y-8 animate-fade-in-up flex flex-col items-center">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
               ভুল থেকেই শুরু হোক <br />
               <span className="text-red-500">
                 নিখুঁত প্রস্তুতি
               </span>
             </h1>
 
-            <p className="text-xs sm:text-sm md:text-base text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+            <p className="text-sm sm:text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed font-medium">
               ২,০০,০০০+ অধ্যায়ভিত্তিক ও বিগত বছরের প্রশ্নব্যাংক, রিয়েল টাইমার এক্সাম, একবার ক্লিকেই অপশন লকিং, মূল পাঠ্যবইয়ের প্রমাণসহ নিখুঁত সমাধান এবং অফলাইন PDF ডাউনলোড—সবকিছু এক প্ল্যাটফর্মে।
             </p>
 
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 justify-center lg:justify-start pt-1 sm:pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 justify-center pt-2">
               <button
                 onClick={onGetStarted}
-                className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer"
+                className="flex-1 sm:flex-initial px-5 sm:px-7 py-3 sm:py-3.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-sm sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
               >
                 <span>শুরু করো</span>
-                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <ArrowRight className="w-4 h-4" />
               </button>
 
               <Link
                 href="/demo"
-                className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#262626] hover:bg-[#323232] border border-white/[0.12] text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer select-none"
+                className="flex-1 sm:flex-initial px-5 sm:px-7 py-3 sm:py-3.5 bg-[#262626] hover:bg-[#323232] border border-white/[0.12] text-white rounded-[14px] font-bold text-sm sm:text-base shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer select-none"
               >
-                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-300" />
+                <Flame className="w-4 h-4 text-neutral-300" />
                 <span>ডেমো পরীক্ষা দাও</span>
               </Link>
 
@@ -561,8 +419,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Play Store Live Trust Indicator */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-1 text-xs text-neutral-400">
-              <div className="flex items-center gap-1 text-amber-400 text-xs">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 pt-2 text-xs sm:text-sm text-neutral-400">
+              <div className="flex items-center gap-1 text-amber-400 text-xs sm:text-sm">
                 <span>★★★★★</span>
                 <span className="font-black text-white">৪.৯</span>
               </div>
@@ -570,266 +428,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-neutral-300 font-medium">Google Play Store App</span>
               <span className="text-neutral-600 dark:text-neutral-500 hidden sm:inline">•</span>
               <span className="text-emerald-400 font-semibold hidden sm:inline">১০০% ফ্রি প্র্যাকটিস</span>
-            </div>
-          </div>
-
-          {/* Right Interactive Demo */}
-          <div className="lg:w-1/2 w-full perspective-1000 lg:min-h-[580px]">
-            <div className="w-full relative bg-[#0c0c0e] rounded-2xl border border-neutral-800 shadow-2xl shadow-black/70 overflow-hidden transform rotate-y-2 hover:rotate-y-0 transition-all duration-300">
-              {/* Fake Browser Header */}
-              <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5 sm:py-3 border-b border-neutral-800 bg-neutral-900/80">
-                <div className="flex gap-1.5 sm:gap-2">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400"></div>
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400"></div>
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400"></div>
-                </div>
-                <div className="flex bg-neutral-800 rounded-lg p-1 text-[10px] font-bold">
-                  <button
-                    onClick={() => setActiveDemoTab('generate')}
-                    aria-label="কাস্টম প্রশ্ন ডেমো"
-                    className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded transition-all ${activeDemoTab === 'generate' ? 'bg-neutral-700 shadow text-emerald-400' : 'text-neutral-400'}`}
-                  >
-                    <FileText className="w-3 h-3" /> কাস্টম
-                  </button>
-                  <button
-                    onClick={() => setActiveDemoTab('analytics')}
-                    aria-label="পারফরম্যান্স এনালাইসিস ডেমো"
-                    className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded transition-all ${activeDemoTab === 'analytics' ? 'bg-neutral-700 shadow text-emerald-400' : 'text-neutral-400'}`}
-                  >
-                    <BarChart3 className="w-3 h-3" /> এনালাইসিস
-                  </button>
-                </div>
-              </div>
-
-              {/* Demo Content Area */}
-              <div className="p-3.5 sm:p-5 md:p-6 min-h-[340px] sm:min-h-[380px] flex flex-col relative">
-                {/* 1. Generate Question Demo (Realistic QuestionCard with Lock & Explanation) */}
-                {activeDemoTab === 'generate' && (
-                  <div className="animate-in fade-in zoom-in duration-300 space-y-4">
-                    {/* Question Header Bar */}
-                    <div className="flex justify-between items-center border-b pb-2.5 border-neutral-100 dark:border-neutral-800">
-                      <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>প্রশ্ন {DEMO_QUESTIONS[demoQIndex].number}</span>
-                        <span className="text-neutral-300 dark:text-neutral-700">•</span>
-                        <span className="text-neutral-500 dark:text-neutral-400 font-medium">
-                          {DEMO_QUESTIONS[demoQIndex].subject}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/60">
-                        <Clock className="w-3 h-3 text-emerald-600" />
-                        <span>{formatTime(timeLeft)}</span>
-                      </div>
-                    </div>
-
-                    {/* Question Statement */}
-                    <div className="text-sm sm:text-base text-neutral-900 dark:text-neutral-100 font-semibold leading-relaxed">
-                      <LatexText text={DEMO_QUESTIONS[demoQIndex].text} />
-                    </div>
-
-                    {/* Source Pill & Action Buttons */}
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 text-[11px] font-bold tracking-wide shadow-2xs">
-                        <span>🏛️</span>
-                        <span>{DEMO_QUESTIONS[demoQIndex].source}</span>
-                      </span>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setIsBookmarked(!isBookmarked)}
-                          aria-label={isBookmarked ? "বুকমার্ক রিমুভ করুন" : "প্রশ্ন বুকমার্ক করুন"}
-                          className={`p-1.5 rounded-lg border transition-colors ${
-                            isBookmarked
-                              ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-600'
-                              : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-600'
-                          }`}
-                        >
-                          <Bookmark className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          aria-label="ভুল প্রশ্ন রিপোর্ট করুন"
-                          className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-red-500 transition-colors"
-                        >
-                          <Flag className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Options Grid (2x2 on desktop, 1-col on mobile) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                      {DEMO_QUESTIONS[demoQIndex].options.map((opt, i) => {
-                        const bengaliLetters = ['ক', 'খ', 'গ', 'ঘ'];
-                        const isSelected = selectedOpt === i;
-                        const isCorrect = DEMO_QUESTIONS[demoQIndex].correct === i;
-
-                        return (
-                          <button
-                            type="button"
-                            key={i}
-                            onClick={() => {
-                              if (selectedOpt === i) {
-                                setShowExplanation((prev) => !prev);
-                              } else {
-                                setSelectedOpt(i);
-                                setShowExplanation(true);
-                              }
-                            }}
-                            className={`w-full text-left px-3.5 py-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 text-xs sm:text-sm cursor-pointer select-none ${
-                              isSelected
-                                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-600 text-emerald-900 dark:text-emerald-200 shadow-sm ring-1 ring-emerald-500/30 font-bold scale-[1.01]'
-                                : 'bg-neutral-50 dark:bg-neutral-800/60 border-neutral-200 dark:border-neutral-700/80 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600'
-                            }`}
-                          >
-                            <span
-                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
-                                isSelected
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
-                              }`}
-                            >
-                              {bengaliLetters[i]}
-                            </span>
-                            <span className="flex-1 truncate">
-                              <LatexText text={opt} />
-                            </span>
-                            {isSelected && (
-                              <span className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold shrink-0 bg-emerald-100/80 dark:bg-emerald-900/50 px-1.5 py-0.5 rounded">
-                                <Lock className="w-2.5 h-2.5" /> লক
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Warm Book Style Explanation Preview - Smooth Independent Expand/Collapse */}
-                    <div
-                      className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                        showExplanation
-                          ? 'max-h-[500px] opacity-100 mt-3'
-                          : 'max-h-0 opacity-0 mt-0 pointer-events-none'
-                      }`}
-                    >
-                      <div className="rounded-xl overflow-hidden border border-[#E6DCBF] dark:border-neutral-800 shadow-sm">
-                        <button
-                          type="button"
-                          onClick={() => setShowExplanation(false)}
-                          aria-label="ব্যাখ্যা বন্ধ করুন"
-                          className="w-full text-left flex items-center justify-between px-3.5 py-2 bg-[#F3ECE4] dark:bg-[#1A1816] border-b border-[#E6DCBF]/70 dark:border-neutral-800 cursor-pointer select-none group/exp"
-                        >
-                          <div className="flex items-center gap-2 text-xs font-bold text-[#5C4D3C] dark:text-[#E0D5C1]">
-                            <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                            <span>ব্যাখ্যা ও পাঠ্যবই রেফারেন্স</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold">
-                              সঠিক উত্তর
-                            </span>
-                            <ChevronDown className="w-3.5 h-3.5 text-neutral-500 rotate-180 transition-transform duration-200" />
-                          </div>
-                        </button>
-                        <div className="p-3 bg-[#FAF7F2] dark:bg-[#121110] text-xs text-[#42372A] dark:text-neutral-300 leading-relaxed space-y-1.5">
-                          <LatexText text={DEMO_QUESTIONS[demoQIndex].explanation} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/*
-                {false && (
-                  <div className="animate-in fade-in zoom-in duration-300 flex flex-col items-center justify-center h-full pt-4">
-                    <div className="relative w-48 h-64 bg-white border border-neutral-300 rounded shadow-md p-4 flex flex-col gap-3">
-                      {[1, 2, 3, 4, 5, 6].map((row) => (
-                        <div
-                          key={row}
-                          className="flex justify-between items-center opacity-60"
-                        >
-                          <div className="w-4 h-4 bg-neutral-200 rounded-full"></div>
-                          <div className="w-4 h-4 bg-neutral-800 rounded-full"></div>
-                          <div className="w-4 h-4 bg-neutral-200 rounded-full"></div>
-                          <div className="w-4 h-4 bg-neutral-200 rounded-full"></div>
-                        </div>
-                      ))}
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-red-500 shadow-[0_0_15px_rgba(200,16,46,0.8)] animate-[scan_2s_ease-in-out_infinite]"></div>
-                    </div>
-                    <div className="mt-6 flex items-center gap-2 text-red-600 dark:text-red-400 font-bold">
-                      <Zap className="w-4 h-4 animate-pulse" />
-                      উত্তরপত্র যাচাই চলছে...
-                    </div>
-                  </div>
-                )}
-                */}
-
-                {/* 3. Analytics Demo */}
-                {activeDemoTab === 'analytics' && (
-                  <div className="animate-in fade-in zoom-in duration-300 pt-2 w-full space-y-3">
-                    <div className="flex gap-2">
-                      <div className="flex-1 bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide">
-                          গড় স্কোর
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-                          ৭৮%
-                        </div>
-                      </div>
-                      <div className="flex-1 bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
-                        <div className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-wide">
-                          পরীক্ষা
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-                          ২৪
-                        </div>
-                      </div>
-                      <div className="flex-1 bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-700">
-                        <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wide">
-                          XP
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-                          ১২৪০
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-2.5 pt-1">
-                      {[
-                        { name: 'পদার্থবিজ্ঞান', pct: 85, good: true },
-                        { name: 'রসায়ন', pct: 52, good: false },
-                        { name: 'জীববিজ্ঞান', pct: 74, good: true },
-                        { name: 'গণিত', pct: 91, good: true },
-                      ].map((s) => (
-                        <div key={s.name}>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                              {s.name}
-                            </span>
-                            <span
-                              className={`text-xs font-bold ${s.good ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
-                            >
-                              {s.pct}%
-                            </span>
-                          </div>
-                          <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-700 ${s.good ? 'bg-emerald-500' : 'bg-red-500'}`}
-                              style={{ width: `${s.pct}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-2 pt-1 flex-wrap">
-                      <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-[10px] font-bold rounded-full border border-red-200 dark:border-red-800">
-                        ⚠ দুর্বল: রসায়ন
-                      </span>
-                      <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800">
-                        ★ সেরা: গণিত
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
@@ -1260,29 +858,26 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-10 sm:py-16 md:py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16 space-y-2 sm:space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-amber-950/40 border border-amber-800/60 text-amber-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-2xs">
-              <div className="flex items-center gap-0.5 text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <span className="font-sans font-black">৪.৯/৫ রেটিং</span>
-              <span className="opacity-40">•</span>
-              <span>৫০০+ শিক্ষার্থীর আস্থা</span>
-            </div>
+      <section className="py-10 sm:py-16 md:py-24 bg-black overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 mb-8 sm:mb-12">
+          <div className="text-center space-y-2 sm:space-y-3">
             <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-white">
               শিক্ষার্থীদের সাফল্যের অভিজ্ঞতা
             </h2>
           </div>
+        </div>
 
-          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-none snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
-            {testimonials.map((item, idx) => (
+        {/* 1 Row Auto Sliding Marquee */}
+        <div className="relative w-full overflow-hidden">
+          {/* Edge Fade Gradients */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 sm:w-32 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 sm:w-32 bg-gradient-to-l from-black via-black/80 to-transparent z-10" />
+
+          <div className="flex w-max gap-4 sm:gap-6 animate-marquee-horizontal hover:[animation-play-state:paused] py-2">
+            {[...testimonials, ...testimonials].map((item, idx) => (
               <div
                 key={idx}
-                className="w-[82vw] max-w-[320px] md:w-auto md:max-w-none snap-center shrink-0 md:shrink bg-[#111216] p-4 sm:p-6 md:p-7 rounded-xl sm:rounded-2xl border border-neutral-800 shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
+                className="w-[300px] sm:w-[380px] shrink-0 bg-[#111216] p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-neutral-800 shadow-sm hover:shadow-xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group select-none"
               >
                 <div>
                   {/* Top Bar: Stars + Verified Badge */}
@@ -1336,16 +931,16 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             ))}
           </div>
+        </div>
 
-          {/* Bottom Social Proof Highlight */}
-          <div className="mt-8 sm:mt-12 text-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl bg-neutral-900/60 border border-neutral-800 text-[11px] sm:text-xs text-neutral-400">
-              <span className="flex items-center gap-1.5 font-bold text-white">
-                <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
-                ৯৮% শিক্ষার্থী
-              </span>
-              <span>জানিয়েছেন অভ্যাসের মাধ্যমে নিয়মিত প্র্যাকটিস তাদের পরীক্ষায় সিলি মিসটেক ও ভুল দাগানোর প্রবণতা কমিয়েছে</span>
-            </div>
+        {/* Bottom Social Proof Highlight */}
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 mt-8 sm:mt-12 text-center">
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl bg-neutral-900/60 border border-neutral-800 text-[11px] sm:text-xs text-neutral-400">
+            <span className="flex items-center gap-1.5 font-bold text-white">
+              <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+              ৯৮% শিক্ষার্থী
+            </span>
+            <span>জানিয়েছেন অভ্যাসের মাধ্যমে নিয়মিত প্র্যাকটিস তাদের পরীক্ষায় সিলি মিসটেক ও ভুল দাগানোর প্রবণতা কমিয়েছে</span>
           </div>
         </div>
       </section>
@@ -1359,10 +954,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-8 sm:mb-12 md:mb-16 space-y-2 sm:space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-emerald-950/50 border border-emerald-700/50 text-emerald-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-2xs">
-              <Crown className="w-3.5 h-3.5 text-emerald-400" />
-              <span>সাশ্রয়ী ও ট্রান্সপারেন্ট প্রাইসিং</span>
-            </div>
             <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
               তোমার প্রস্তুতির সেরা প্ল্যানটি{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
@@ -1453,273 +1044,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
               );
             })}
           </div>
-
-          {/* Free vs Pro Detailed Comparison Table */}
-          <div className="rounded-2xl sm:rounded-3xl bg-[#0e0f13] border border-neutral-800 shadow-xl overflow-hidden">
-            <div className="p-4 sm:p-6 md:p-8 border-b border-neutral-800 bg-[#131419]">
-              <h3 className="text-sm sm:text-base md:text-lg font-bold text-white text-center sm:text-left">
-                ফ্রি বনাম প্রো প্যাকেজের স্পষ্ট তুলনা
-              </h3>
-            </div>
-
-            {/* Mobile Responsive Cards (visible on mobile only) */}
-            <div className="block sm:hidden divide-y divide-neutral-800/80 p-3 space-y-2.5">
-              {[
-                {
-                  feature: 'দৈনিক পরীক্ষা কোটা',
-                  free: '২টি মক + ১টি QB / দিন',
-                  pro: 'সীমাহীন আনলিমিটেড',
-                },
-                {
-                  feature: 'প্রতি পরীক্ষায় প্রশ্ন সংখ্যা',
-                  free: 'সর্বোচ্চ ৫০টি',
-                  pro: 'সীমাহীন',
-                },
-                {
-                  feature: 'প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স',
-                  free: '❌ সীমিত (QB বন্ধ)',
-                  pro: '✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ',
-                },
-                {
-                  feature: '২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট',
-                  free: 'প্রশ্নপত্র ৩টি/সপ্তাহ (উত্তরপত্র Pro)',
-                  pro: '✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট',
-                },
-                {
-                  feature: '৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব',
-                  free: 'বেসিক স্কোর',
-                  pro: '✓ সঠিকতা %, ব্যয়িত সময় ও নেগেটিভ টেবিল',
-                },
-                {
-                  feature: 'বুকমার্ক ও ভুল প্রশ্নের রিভিশন শিট',
-                  free: 'সর্বোচ্চ ২৫টি',
-                  pro: '✓ সীমাহীন সেভ ও রিভিশন',
-                },
-                {
-                  feature: 'ডেইলি স্ট্রিক ও লিডারবোর্ড',
-                  free: '✓ সাধারণ',
-                  pro: '✓ প্রো ব্যাজ ও লিডারবোর্ড অগ্রাধিকার',
-                },
-                {
-                  feature: 'বিজ্ঞাপনমুক্ত নিরবচ্ছিন্ন পরিবেশ',
-                  free: 'স্ট্যান্ডার্ড',
-                  pro: '✓ ১০০% বিজ্ঞাপনমুক্ত',
-                },
-              ].map((row, idx) => (
-                <div key={idx} className={idx > 0 ? "pt-2.5" : ""}>
-                  <p className="font-bold text-xs sm:text-sm text-white mb-1.5">
-                    {row.feature}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-2 rounded-lg bg-[#14151a] border border-neutral-800 flex flex-col justify-between">
-                      <span className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider mb-0.5">
-                        ফ্রি (Free)
-                      </span>
-                      <span className="text-neutral-300 font-medium text-[11px] sm:text-xs">
-                        {row.free}
-                      </span>
-                    </div>
-                    <div className="p-2 rounded-lg bg-emerald-950/30 border border-emerald-800/50 flex flex-col justify-between">
-                      <span className="block text-[9px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">
-                        প্রো (Pro)
-                      </span>
-                      <span className="text-emerald-300 font-bold text-[11px] sm:text-xs">
-                        {row.pro}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop & Tablet Table */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-neutral-200/80 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 dark:bg-neutral-950/40">
-                    <th className="py-4 px-6">ফিচার সমূহ</th>
-                    <th className="py-4 px-6 text-center">ফ্রি প্ল্যান (Free)</th>
-                    <th className="py-4 px-6 text-center text-emerald-600 dark:text-emerald-400 font-extrabold bg-emerald-50/50 dark:bg-emerald-950/20">
-                      প্রো প্যাকেজ (Pro)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 font-medium text-neutral-700 dark:text-neutral-300">
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      দৈনিক পরীক্ষা কোটা
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">২টি মক + ১টি QB / দিন</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      সীমাহীন আনলিমিটেড
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      প্রতি পরীক্ষায় প্রশ্ন সংখ্যা
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">সর্বোচ্চ ৫০টি</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      সীমাহীন
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">❌ সীমিত (QB বন্ধ)</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      ✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      ২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">প্রশ্নপত্র ৩টি/সপ্তাহ (উত্তরপত্র Pro)</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      ✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      ৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">বেসিক স্কোর</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      ✓ সঠিকতা %, ব্যয়িত সময় ও নেগেটিভ টেবিল
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      বুকমার্ক ও ভুল প্রশ্নের রিভিশন শিট
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">সর্বোচ্চ ২৫টি</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      ✓ সীমাহীন সেভ ও রিভিশন
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      ডেইলি স্ট্রিক ও লিডারবোর্ড
-                    </td>
-                    <td className="py-4 px-6 text-center text-emerald-600 dark:text-emerald-400">✓ সাধারণ</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      ✓ প্রো ব্যাজ ও লিডারবোর্ড অগ্রাধিকার
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      বিজ্ঞাপনমুক্ত নিরবচ্ছিন্ন পরিবেশ
-                    </td>
-                    <td className="py-4 px-6 text-center text-neutral-500">স্ট্যান্ডার্ড</td>
-                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
-                      ✓ ১০০% বিজ্ঞাপনমুক্ত
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className="p-3.5 sm:p-6 bg-[#131419] flex flex-col md:flex-row items-center justify-between gap-3.5 sm:gap-6 border-t border-neutral-800">
-              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-300">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>নিরাপদ পেমেন্ট গেটওয়ে:</span>
-                </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
-                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#E2136E] text-white shadow-2xs">
-                    bKash
-                  </span>
-                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#F7941D] text-white shadow-2xs">
-                    Nagad
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={onGetStarted}
-                className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-[#12544F] hover:brightness-105 text-white rounded-xl sm:rounded-[14px] font-bold text-xs shadow-[0_3.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
-              >
-                <span>প্রো প্ল্যানে আপগ্রেড করো</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-10 sm:py-16 md:py-20 max-w-4xl mx-auto px-4 lg:px-6 relative">
-        <div className="text-center mb-6 sm:mb-10 md:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white">
-            সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)
-          </h2>
-        </div>
-        <div className="space-y-2.5 sm:space-y-4">
-          {faqs.map((faq, idx) => {
-            const isOpen = openFaq === idx;
-            return (
-              <div
-                key={idx}
-                className={`bg-[#0e0f13] rounded-xl sm:rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-lg ${isOpen ? 'border-emerald-500/80 shadow-lg ring-1 ring-emerald-500/20' : 'border-neutral-800/90 hover:border-neutral-700'}`}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  aria-expanded={isOpen}
-                  aria-label={faq.q}
-                  className="w-full text-left p-3.5 sm:p-5 md:p-6 flex items-start justify-between gap-3 sm:gap-4 group"
-                >
-                  <h3 className="font-bold text-xs sm:text-sm md:text-base text-white flex items-start gap-2 sm:gap-2.5">
-                    <span
-                      className={`text-emerald-400 text-base sm:text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
-                    >
-                      Q.
-                    </span>
-                    {faq.q}
-                  </h3>
-                  <div
-                    className={`mt-0.5 sm:mt-1 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-emerald-500 border-emerald-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-emerald-400 group-hover:border-emerald-400'}`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
-                      stroke="currentColor"
-                      className="w-3 h-3 sm:w-3.5 sm:h-3.5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                      />
-                    </svg>
-                  </div>
-                </button>
-                <div
-                  className={`transition-all duration-300 ease-in-out px-3.5 sm:px-6 ${isOpen ? 'max-h-[500px] pb-4 sm:pb-6 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
-                >
-                  <div className="pl-5 sm:pl-7 text-neutral-400 text-xs sm:text-sm leading-relaxed border-t border-neutral-800/60 pt-2.5 sm:pt-3">
-                    {faq.a}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── OBHYASH MOBILE APP SHOWCASE SECTION (Play Store) ── */}
-      <AppShowcaseSection />
 
       {/* Footer */}
       <footer className="bg-black pt-10 sm:pt-14 md:pt-20 pb-8 sm:pb-10 font-sans border-t border-neutral-900">
