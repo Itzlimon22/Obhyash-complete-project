@@ -87,18 +87,18 @@ export default function StepByStepRegistration({
     }
   };
 
-  // Step 3: Stream Options - Pure Bangla in UI
+  // Step 3: Stream Options - Pure Bangla in UI with 3D Icons
   const streamOptions = [
-    { id: 'HSC', title: 'এইচএসসি', badge: 'জনপ্রিয়', icon: '🎓' },
-    { id: 'SSC', title: 'এসএসসি', icon: '🎒' },
+    { id: 'HSC', title: 'এইচএসসি', badge: 'জনপ্রিয়', icon: '🎓', image: '/images/auth-icons/hsc.png' },
+    { id: 'SSC', title: 'এসএসসি', icon: '🎒', image: '/images/auth-icons/ssc.png' },
   ];
 
-  // Step 4: Group Options - Pure Bangla in UI
+  // Step 4: Group Options - Pure Bangla in UI with 3D Icons
   const getGroupOptions = () => {
     return [
-      { id: 'Science', title: 'বিজ্ঞান', icon: '🧪' },
-      { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼' },
-      { id: 'Humanities', title: 'মানবিক', icon: '🌍' },
+      { id: 'Science', title: 'বিজ্ঞান', icon: '🧪', image: '/images/auth-icons/science.png' },
+      { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼', image: '/images/auth-icons/business.png' },
+      { id: 'Humanities', title: 'মানবিক', icon: '🌍', image: '/images/auth-icons/humanities.png' },
     ];
   };
 
@@ -331,7 +331,13 @@ export default function StepByStepRegistration({
   };
 
   return (
-    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-2.5 sm:py-8 overflow-hidden relative selection:bg-emerald-500/20 font-sans">
+    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#0a0c12] text-white px-4 py-2.5 sm:py-8 overflow-hidden relative selection:bg-emerald-500/20 font-sans">
+      {/* Background Soft Ambient Glow */}
+      <div
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(16,185,129,0.10),transparent_60%)]"
+        aria-hidden="true"
+      />
+
       {/* Top Left: Back Navigation Arrow */}
       <button
         type="button"
@@ -441,13 +447,17 @@ export default function StepByStepRegistration({
                   setGender('Male');
                   setStep(3);
                 }}
-                className={`w-full py-3 sm:py-4 px-4 sm:px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
+                className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-center gap-3.5 transition-all duration-200 cursor-pointer ${
                   gender === 'Male'
                     ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                     : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                 }`}
               >
-                <span className="text-xl sm:text-2xl">👦</span>
+                <img
+                  src="/images/auth-icons/boy.png"
+                  alt="ছেলে"
+                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+                />
                 <span className="font-bold text-sm sm:text-base">ছেলে</span>
               </button>
 
@@ -457,13 +467,17 @@ export default function StepByStepRegistration({
                   setGender('Female');
                   setStep(3);
                 }}
-                className={`w-full py-3 sm:py-4 px-4 sm:px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
+                className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-center gap-3.5 transition-all duration-200 cursor-pointer ${
                   gender === 'Female'
                     ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                     : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                 }`}
               >
-                <span className="text-xl sm:text-2xl">👧</span>
+                <img
+                  src="/images/auth-icons/girl.png"
+                  alt="মেয়ে"
+                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+                />
                 <span className="font-bold text-sm sm:text-base">মেয়ে</span>
               </button>
             </div>
@@ -493,14 +507,20 @@ export default function StepByStepRegistration({
                       setGroup('Science');
                       setStep(4);
                     }}
-                    className={`w-full py-3 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
+                    className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                         : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
-                      <span className="text-xl">{opt.icon}</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center">
+                        <img
+                          src={opt.image}
+                          alt={opt.title}
+                          className="w-full h-full object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)]"
+                        />
+                      </div>
                       <span className="font-bold text-sm sm:text-base">{opt.title}</span>
                     </div>
                     {isSelected && <Check className="w-5 h-5 text-emerald-400" />}
@@ -543,7 +563,13 @@ export default function StepByStepRegistration({
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
-                      <span className="text-xl">{opt.icon}</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center">
+                        <img
+                          src={opt.image}
+                          alt={opt.title}
+                          className="w-full h-full object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)]"
+                        />
+                      </div>
                       <span className="font-bold text-sm sm:text-base">{opt.title}</span>
                       {(opt as any).badge && (
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 border border-neutral-700 font-medium">
@@ -579,13 +605,23 @@ export default function StepByStepRegistration({
                       setBatch(opt.id);
                       setStep(6);
                     }}
-                    className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                    className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                         : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                     }`}
                   >
-                    <span className="font-bold text-sm sm:text-base">{opt.title}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 flex items-center justify-center">
+                        <img
+                          src="/images/auth-icons/batch.png"
+                          alt="ব্যাচ"
+                          className="w-full h-full object-contain drop-shadow-[0_2px_5px_rgba(0,0,0,0.4)]"
+                        />
+                      </div>
+                      <span className="font-bold text-sm sm:text-base">{opt.title}</span>
+                    </div>
+                    {isSelected && <Check className="w-5 h-5 text-emerald-400" />}
                   </button>
                 );
               })}
