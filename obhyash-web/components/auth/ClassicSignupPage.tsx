@@ -713,21 +713,8 @@ function SignupForm() {
                         className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-[#16171d] border border-transparent rounded-xl shadow-xs shadow-black/[0.05] dark:shadow-black/25 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-sm text-neutral-900 dark:text-white appearance-none cursor-pointer"
                       >
                         <option value="Science">Science (বিজ্ঞান)</option>
-                        {formData.stream === 'SSC' ? (
-                          <>
-                            <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
-                            <option value="Humanities">Humanities (মানবিক)</option>
-                          </>
-                        ) : (
-                          <>
-                            <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                              Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
-                            </option>
-                            <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                              Humanities (মানবিক) - শীঘ্রই আসছে
-                            </option>
-                          </>
-                        )}
+                        <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
+                        <option value="Humanities">Humanities (মানবিক)</option>
                       </select>
                     </div>
                   </div>

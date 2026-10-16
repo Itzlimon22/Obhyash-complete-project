@@ -870,27 +870,11 @@ class _SignupViewState extends ConsumerState<SignupView>
       _batch = batchOptions.first;
     }
 
-    final groupOptions = _stream == 'SSC'
-        ? const [
-            AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
-            AppDropdownOption(value: 'Business Studies', label: 'Business Studies (ব্যবসায় শিক্ষা)'),
-            AppDropdownOption(value: 'Humanities', label: 'Humanities (মানবিক)'),
-          ]
-        : const [
-            AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
-            AppDropdownOption(
-              value: 'Business Studies',
-              label: 'Business Studies (ব্যবসায় শিক্ষা)',
-              isEnabled: false,
-              disabledBadge: 'শীঘ্রই আসছে',
-            ),
-            AppDropdownOption(
-              value: 'Humanities',
-              label: 'Humanities (মানবিক)',
-              isEnabled: false,
-              disabledBadge: 'শীঘ্রই আসছে',
-            ),
-          ];
+    final groupOptions = const [
+      AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+      AppDropdownOption(value: 'Business Studies', label: 'Business Studies (ব্যবসায় শিক্ষা)'),
+      AppDropdownOption(value: 'Humanities', label: 'Humanities (মানবিক)'),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

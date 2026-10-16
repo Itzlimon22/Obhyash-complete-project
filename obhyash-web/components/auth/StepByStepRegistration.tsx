@@ -95,17 +95,10 @@ export default function StepByStepRegistration({
 
   // Step 4: Group Options - Pure Bangla in UI
   const getGroupOptions = () => {
-    if (stream === 'SSC') {
-      return [
-        { id: 'Science', title: 'বিজ্ঞান', icon: '🧪' },
-        { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼' },
-        { id: 'Humanities', title: 'মানবিক', icon: '🌍' },
-      ];
-    }
     return [
       { id: 'Science', title: 'বিজ্ঞান', icon: '🧪' },
-      { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼', badge: 'শীঘ্রই আসছে', disabled: true },
-      { id: 'Humanities', title: 'মানবিক', icon: '🌍', badge: 'শীঘ্রই আসছে', disabled: true },
+      { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼' },
+      { id: 'Humanities', title: 'মানবিক', icon: '🌍' },
     ];
   };
 
@@ -338,18 +331,18 @@ export default function StepByStepRegistration({
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-8 relative selection:bg-emerald-500/20 font-sans">
+    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-2.5 sm:py-8 overflow-hidden relative selection:bg-emerald-500/20 font-sans">
       {/* Top Left: Back Navigation Arrow */}
       <button
         type="button"
         onClick={handleBack}
-        className="absolute top-6 left-5 sm:left-8 p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800/60 transition-colors z-20 cursor-pointer"
+        className="absolute top-4 left-4 sm:top-6 sm:left-8 p-1.5 sm:p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800/60 transition-colors z-20 cursor-pointer"
         aria-label="Back"
       >
         <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
-      <div className="relative z-10 w-full max-w-[380px] sm:max-w-[420px] flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-[360px] sm:max-w-[420px] flex flex-col items-center">
         {/* Error Alert */}
         {error && (
           <div className="w-full mb-4 px-4 py-2.5 rounded-xl bg-red-950/70 border border-red-800/80 text-red-200 text-xs sm:text-sm text-center animate-in fade-in">
@@ -360,15 +353,15 @@ export default function StepByStepRegistration({
         {/* ── STEP 1: Name & Institute (Formerly Step 5) ───────────── */}
         {step === 1 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+            <div className="text-center mb-5 sm:mb-14">
+              <h2 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তোমার নাম ও প্রতিষ্ঠান?
               </h2>
             </div>
 
-            <div className="w-full space-y-4">
+            <div className="w-full space-y-3 sm:space-y-4">
               {/* Name Field */}
-              <div className="space-y-1.5 text-left">
+              <div className="space-y-1 sm:space-y-1.5 text-left">
                 <label className="block text-xs sm:text-sm font-semibold text-neutral-300">
                   তোমার নাম
                 </label>
@@ -381,12 +374,12 @@ export default function StepByStepRegistration({
                   }}
                   placeholder="তোমার নাম লিখো"
                   autoFocus
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
+                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                 />
               </div>
 
               {/* Institute Field (Right Below Name) */}
-              <div className="space-y-1.5 text-left relative">
+              <div className="space-y-1 sm:space-y-1.5 text-left relative">
                 <label className="block text-xs sm:text-sm font-semibold text-neutral-300">
                   শিক্ষা প্রতিষ্ঠান / কলেজ
                 </label>
@@ -398,7 +391,7 @@ export default function StepByStepRegistration({
                     if (institute.trim().length >= 2) setShowSuggestions(true);
                   }}
                   placeholder="কলেজ বা প্রতিষ্ঠানের নাম লিখো"
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
+                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                 />
 
                 {/* College Autocomplete Dropdown */}
@@ -409,7 +402,7 @@ export default function StepByStepRegistration({
                         key={idx}
                         type="button"
                         onClick={() => handleSelectCollege(colName)}
-                        className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-neutral-200 hover:bg-emerald-950/40 hover:text-emerald-300 transition-colors"
+                        className="w-full text-left px-4 py-2 text-xs sm:text-sm text-neutral-200 hover:bg-emerald-950/40 hover:text-emerald-300 transition-colors"
                       >
                         {colName}
                       </button>
@@ -419,11 +412,11 @@ export default function StepByStepRegistration({
               </div>
 
               {/* Next Button */}
-              <div className="pt-2">
+              <div className="pt-1 sm:pt-2">
                 <button
                   type="button"
                   onClick={handleNextFromName}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none transition-all cursor-pointer"
+                  className="w-full py-3 sm:py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none transition-all cursor-pointer"
                 >
                   এগিয়ে যাও
                 </button>
@@ -435,27 +428,27 @@ export default function StepByStepRegistration({
         {/* ── STEP 2: Gender Selection (Formerly Step 4) ───────────── */}
         {step === 2 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+            <div className="text-center mb-5 sm:mb-14">
+              <h2 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তুমি একজন
               </h2>
             </div>
 
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2.5 sm:space-y-3">
               <button
                 type="button"
                 onClick={() => {
                   setGender('Male');
                   setStep(3);
                 }}
-                className={`w-full py-4 px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
+                className={`w-full py-3 sm:py-4 px-4 sm:px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
                   gender === 'Male'
                     ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                     : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                 }`}
               >
-                <span className="text-2xl">👦</span>
-                <span className="font-bold text-base">ছেলে</span>
+                <span className="text-xl sm:text-2xl">👦</span>
+                <span className="font-bold text-sm sm:text-base">ছেলে</span>
               </button>
 
               <button
@@ -464,14 +457,14 @@ export default function StepByStepRegistration({
                   setGender('Female');
                   setStep(3);
                 }}
-                className={`w-full py-4 px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
+                className={`w-full py-3 sm:py-4 px-4 sm:px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
                   gender === 'Female'
                     ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                     : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                 }`}
               >
-                <span className="text-2xl">👧</span>
-                <span className="font-bold text-base">মেয়ে</span>
+                <span className="text-xl sm:text-2xl">👧</span>
+                <span className="font-bold text-sm sm:text-base">মেয়ে</span>
               </button>
             </div>
           </div>
@@ -480,13 +473,13 @@ export default function StepByStepRegistration({
         {/* ── STEP 3: Stream Selection (Formerly Step 1) ───────────── */}
         {step === 3 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+            <div className="text-center mb-5 sm:mb-14">
+              <h2 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তুমি কি বিষয়ে অভ্যাস করতে চাও?
               </h2>
             </div>
 
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2.5 sm:space-y-3">
               {streamOptions.map((opt) => {
                 const isSelected = stream === opt.id;
                 return (
@@ -500,7 +493,7 @@ export default function StepByStepRegistration({
                       setGroup('Science');
                       setStep(4);
                     }}
-                    className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
+                    className={`w-full py-3 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                         : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
@@ -521,13 +514,13 @@ export default function StepByStepRegistration({
         {/* ── STEP 4: Group Selection ─────────────────────────────────── */}
         {step === 4 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+            <div className="text-center mb-4 sm:mb-12">
+              <h2 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তুমি কোন বিভাগে?
               </h2>
             </div>
 
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2 sm:space-y-3">
               {getGroupOptions().map((opt) => {
                 const isSelected = group === opt.id;
                 const isDisabled = (opt as any).disabled;
@@ -541,7 +534,7 @@ export default function StepByStepRegistration({
                       setGroup(opt.id);
                       setStep(5);
                     }}
-                    className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 ${
+                    className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-between transition-all duration-200 ${
                       isDisabled
                         ? 'opacity-40 cursor-not-allowed border border-white/[0.04] bg-[#12141c]/50 text-neutral-500'
                         : isSelected
@@ -569,13 +562,13 @@ export default function StepByStepRegistration({
         {/* ── STEP 5: Batch Selection (Formerly Step 3) ────────────── */}
         {step === 5 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+            <div className="text-center mb-4 sm:mb-12">
+              <h2 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তোমার ব্যাচ?
               </h2>
             </div>
 
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2 sm:space-y-3">
               {getBatchOptions().map((opt) => {
                 const isSelected = batch === opt.id;
                 return (
@@ -586,7 +579,7 @@ export default function StepByStepRegistration({
                       setBatch(opt.id);
                       setStep(6);
                     }}
-                    className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                    className={`w-full py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
                         : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
@@ -603,19 +596,19 @@ export default function StepByStepRegistration({
         {/* ── STEP 6: Password Setup ─────────────────────────────────── */}
         {step === 6 && (
           <form onSubmit={handleFinalSubmit} className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+            <div className="text-center mb-3 sm:mb-10">
+              <h2 className="text-base sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 একটি পাসওয়ার্ড সেট করো
               </h2>
             </div>
 
-            <div className="w-full space-y-4">
+            <div className="w-full space-y-2 sm:space-y-3.5">
               {/* Confirmed Mobile/Email Display */}
               {phoneOrEmail && (
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] text-xs sm:text-sm">
+                <div className="flex items-center justify-between px-3 py-1.5 sm:py-2.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] text-xs sm:text-sm">
                   <div className="flex items-center gap-2 text-neutral-300 truncate mr-2">
                     <span className="text-neutral-500 font-medium shrink-0">
-                      {isInitialPhone ? 'মোবাইল নম্বর:' : 'ইমেইল অ্যাড্রেস:'}
+                      {isInitialPhone ? 'মোবাইল:' : 'ইমেইল:'}
                     </span>
                     <span className="font-bold text-white tracking-wide truncate font-mono">{phoneOrEmail}</span>
                   </div>
@@ -630,10 +623,10 @@ export default function StepByStepRegistration({
               )}
 
               {/* Dynamic Secondary Identifier Input (Mandatory) */}
-              <div className="space-y-1.5 text-left">
+              <div className="space-y-1 sm:space-y-1.5 text-left">
                 <label className="block text-xs sm:text-sm font-semibold text-neutral-300 flex items-center justify-between">
                   <span>{isInitialPhone ? 'ইমেইল অ্যাড্রেস (Gmail)' : 'মোবাইল নম্বর'}</span>
-                  <span className="text-[11px] text-emerald-400 font-normal">বাধ্যতামূলক</span>
+                  <span className="text-[10px] sm:text-[11px] text-emerald-400 font-normal">বাধ্যতামূলক</span>
                 </label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400">
@@ -649,16 +642,16 @@ export default function StepByStepRegistration({
                     }}
                     placeholder={
                       isInitialPhone
-                        ? 'তোমার জিমেইল লিখো (যেমন: student@gmail.com)'
-                        : '১১ ডিজিটের মোবাইল নম্বর (যেমন: 017XXXXXXXX)'
+                        ? 'student@gmail.com'
+                        : '১১ ডিজিটের নম্বর (যেমন: 017XXXXXXXX)'
                     }
-                    className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all font-mono"
+                    className="w-full pl-10 sm:pl-11 pr-4 py-2 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all font-mono"
                   />
                 </div>
               </div>
 
               {/* Password */}
-              <div className="space-y-1.5 text-left">
+              <div className="space-y-1 sm:space-y-1.5 text-left">
                 <label className="block text-xs sm:text-sm font-semibold text-neutral-300">
                   পাসওয়ার্ড
                 </label>
@@ -671,7 +664,7 @@ export default function StepByStepRegistration({
                       setError(null);
                     }}
                     placeholder="পাসওয়ার্ড লিখো (কমপক্ষে ৬ অক্ষর)"
-                    className="w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
+                    className="w-full pl-4 pr-11 py-2 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                   />
                   <button
                     type="button"
@@ -684,7 +677,7 @@ export default function StepByStepRegistration({
               </div>
 
               {/* Confirm Password */}
-              <div className="space-y-1.5 text-left">
+              <div className="space-y-1 sm:space-y-1.5 text-left">
                 <label className="block text-xs sm:text-sm font-semibold text-neutral-300">
                   পাসওয়ার্ড নিশ্চিত করো
                 </label>
@@ -696,20 +689,20 @@ export default function StepByStepRegistration({
                     setError(null);
                   }}
                   placeholder="পাসওয়ার্ড পুনরায় লিখো"
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
+                  className="w-full px-4 py-2 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                 />
               </div>
 
               {/* Final Submit Button */}
-              <div className="pt-2">
+              <div className="pt-1 sm:pt-2">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3 sm:py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                       <span>অ্যাকাউন্ট তৈরি হচ্ছে...</span>
                     </>
                   ) : (
@@ -717,6 +710,7 @@ export default function StepByStepRegistration({
                   )}
                 </button>
               </div>
+
             </div>
           </form>
         )}

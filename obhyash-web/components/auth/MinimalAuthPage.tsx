@@ -314,25 +314,25 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
     : identifier.trim().length > 0;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-8 selection:bg-red-500/20 font-sans">
+    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-2.5 sm:py-8 overflow-hidden relative selection:bg-red-500/20 font-sans">
       {/* Background Subtle Gradient Vignette */}
       <div
         className="pointer-events-none fixed inset-0 bg-radial-at-c from-neutral-900/30 via-transparent to-black/60"
         aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-[380px] sm:max-w-[410px] flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-[360px] sm:max-w-[410px] flex flex-col items-center">
         {/* Top: Obhyash Logo */}
-        <Link href="/" className="mb-4 inline-flex items-center justify-center transition-transform hover:scale-105 duration-200">
+        <Link href="/" className="mb-2 sm:mb-4 inline-flex items-center justify-center transition-transform hover:scale-105 duration-200">
           <img
             src="/obhyash_full_logo_dark.svg"
             alt="Obhyash Logo"
-            className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
+            className="h-8 sm:h-11 w-auto object-contain drop-shadow-md"
           />
         </Link>
 
         {/* Subtitle / Header */}
-        <h1 className="text-lg sm:text-xl font-bold text-neutral-100 tracking-tight text-center mb-6">
+        <h1 className="text-base sm:text-xl font-bold text-neutral-100 tracking-tight text-center mb-2.5 sm:mb-5">
           {isPasswordStep ? 'লগ ইন' : 'রেজিস্ট্রেশন/ লগ ইন'}
         </h1>
 
@@ -351,10 +351,10 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
         )}
 
         {/* Main Form */}
-        <form onSubmit={handleSubmit} className="w-full space-y-4">
+        <form onSubmit={handleSubmit} className="w-full space-y-2.5 sm:space-y-4">
           {/* Stage 1: Mobile or Email Input */}
           {!isPasswordStep ? (
-            <div className="space-y-1.5 text-left">
+            <div className="space-y-1 sm:space-y-1.5 text-left">
               <label className="block text-xs sm:text-sm font-semibold text-neutral-300">
                 মোবাইল নম্বর বা ইমেইল
               </label>
@@ -370,12 +370,12 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
                 disabled={loading || googleLoading}
                 autoComplete="username"
                 autoFocus
-                className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50 focus:shadow-[0_0_22px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50 focus:shadow-[0_0_22px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50"
               />
             </div>
           ) : (
             /* Stage 2: Confirmed Identifier Chip */
-            <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#131620]/80 backdrop-blur-md border border-white/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.3)] text-xs sm:text-sm animate-in fade-in">
+            <div className="flex items-center justify-between px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#131620]/80 backdrop-blur-md border border-white/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.3)] text-xs sm:text-sm animate-in fade-in">
               <div className="flex items-center gap-2 text-neutral-300 truncate mr-2">
                 <span className="text-neutral-500 font-medium shrink-0">
                   {identifier.includes('@') ? 'ইমেইল:' : 'মোবাইল:'}
@@ -401,7 +401,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
 
           {/* Stage 2: Password (ONLY shown when isPasswordStep is true) */}
           {isPasswordStep && (
-            <div className="space-y-1.5 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="space-y-1 sm:space-y-1.5 text-left animate-in fade-in slide-in-from-top-2 duration-200">
               <label className="block text-xs sm:text-sm font-semibold text-neutral-300">
                 পাসওয়ার্ড
               </label>
@@ -417,7 +417,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
                   placeholder="পাসওয়ার্ড লিখো"
                   disabled={loading || googleLoading}
                   autoComplete="current-password"
-                  className="w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50 focus:shadow-[0_0_22px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50"
+                  className="w-full pl-4 pr-11 py-2.5 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50 focus:shadow-[0_0_22px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -432,7 +432,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
               <div className="flex justify-end pt-0.5">
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-neutral-400 hover:text-red-400 transition-colors"
+                  className="text-[11px] sm:text-xs text-neutral-400 hover:text-red-400 transition-colors"
                 >
                   পাসওয়ার্ড ভুলে গেছো?
                 </Link>
@@ -441,11 +441,11 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
           )}
 
           {/* Action Button: "এগিয়ে যাও" initially, "লগইন করো" when password step */}
-          <div className="pt-1">
+          <div className="pt-0.5 sm:pt-1">
             <button
               type="submit"
               disabled={loading || googleLoading || !isButtonActive}
-              className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all duration-150 ${
+              className={`w-full py-3 sm:py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all duration-150 ${
                 isButtonActive && !loading && !googleLoading
                   ? 'bg-[#991b1b] hover:bg-[#b91c1c] text-white border-b-[4px] border-[#5e0e0e] shadow-[0_4px_16px_rgba(153,27,27,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none cursor-pointer'
                   : 'bg-[#1b1e28] text-neutral-500 border-b-[3px] border-[#13151d] cursor-not-allowed opacity-75'
@@ -464,7 +464,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
 
           {/* Direct Link to Register (only on initial step) */}
           {!isPasswordStep && (
-            <div className="pt-1 text-center">
+            <div className="pt-0.5 sm:pt-1 text-center">
               <button
                 type="button"
                 onClick={() => {
@@ -508,11 +508,11 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
 
         {/* Divider: অথবা, (shown on initial step) */}
         {!isPasswordStep && (
-          <div className="relative w-full my-6 flex items-center justify-center">
+          <div className="relative w-full my-3 sm:my-5 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-neutral-800" />
             </div>
-            <span className="relative z-10 px-3 bg-[#0d0f15] text-xs sm:text-sm font-medium text-neutral-400">
+            <span className="relative z-10 px-3 bg-[#0d0f15] text-[11px] sm:text-sm font-medium text-neutral-400">
               অথবা,
             </span>
           </div>
@@ -524,12 +524,12 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading || googleLoading}
-            className="w-full py-3 sm:py-3.5 px-4 rounded-xl bg-[#161923]/80 hover:bg-[#1f2330] border border-white/[0.08] border-b-[3px] border-b-[#12141c] text-neutral-200 font-semibold text-sm sm:text-base flex items-center justify-center gap-3 transition-all active:translate-y-[1px] active:border-b-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_3px_0_0_#12141c,0_4px_14px_rgba(0,0,0,0.3)]"
+            className="w-full py-2.5 sm:py-3.5 px-4 rounded-xl bg-[#161923]/80 hover:bg-[#1f2330] border border-white/[0.08] border-b-[3px] border-b-[#12141c] text-neutral-200 font-semibold text-xs sm:text-base flex items-center justify-center gap-2.5 sm:gap-3 transition-all active:translate-y-[1px] active:border-b-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_3px_0_0_#12141c,0_4px_14px_rgba(0,0,0,0.3)]"
           >
             {googleLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-neutral-400" />
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-neutral-400" />
             ) : (
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -553,7 +553,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
         )}
 
         {/* Support Link Text: google diye caliye jao er niche just text */}
-        <div className="pt-3.5 text-center">
+        <div className="pt-2 sm:pt-3 text-center">
           <Link
             href="/support"
             className="text-xs sm:text-sm text-neutral-400 hover:text-emerald-400 transition-colors cursor-pointer hover:underline"
@@ -563,7 +563,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
         </div>
 
         {/* Footer info & Links */}
-        <div className="mt-8 text-center text-xs text-neutral-500">
+        <div className="mt-3 sm:mt-6 text-center text-xs text-neutral-500">
           <div className="flex items-center justify-center gap-3 text-[11px] text-neutral-500">
             <Link href="/privacy" className="hover:underline hover:text-neutral-400">
               গোপনীয়তা নীতি

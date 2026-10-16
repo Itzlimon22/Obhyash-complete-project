@@ -492,29 +492,8 @@ export default function OnboardingPage() {
                       className="w-full h-10 sm:h-11 px-3 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-[#066b4f] focus:ring-2 focus:ring-[#066b4f]/15 transition-all appearance-none pr-8 cursor-pointer"
                     >
                       <option value="Science">Science (বিজ্ঞান)</option>
-                      {stream === 'SSC' ? (
-                        <>
-                          <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
-                          <option value="Humanities">Humanities (মানবিক)</option>
-                        </>
-                      ) : (
-                        <>
-                          <option
-                            value="Business Studies"
-                            disabled
-                            className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800"
-                          >
-                            Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
-                          </option>
-                          <option
-                            value="Humanities"
-                            disabled
-                            className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800"
-                          >
-                            Humanities (মানবিক) - শীঘ্রই আসছে
-                          </option>
-                        </>
-                      )}
+                      <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
+                      <option value="Humanities">Humanities (মানবিক)</option>
                     </select>
                     <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500">
                       <ChevronRight className="w-3.5 h-3.5 rotate-90" />

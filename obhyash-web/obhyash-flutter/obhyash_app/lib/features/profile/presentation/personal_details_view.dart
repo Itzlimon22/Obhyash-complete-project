@@ -835,27 +835,11 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             const SizedBox(height: 16),
                             Builder(
                               builder: (context) {
-                                final groupOptions = _stream == 'SSC'
-                                    ? const [
-                                        AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
-                                        AppDropdownOption(value: 'Business Studies', label: 'Business Studies (ব্যবসায় শিক্ষা)'),
-                                        AppDropdownOption(value: 'Humanities', label: 'Humanities (মানবিক)'),
-                                      ]
-                                    : const [
-                                        AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
-                                        AppDropdownOption(
-                                          value: 'Business Studies',
-                                          label: 'Business Studies (ব্যবসায় শিক্ষা)',
-                                          isEnabled: false,
-                                          disabledBadge: 'শীঘ্রই আসছে',
-                                        ),
-                                        AppDropdownOption(
-                                          value: 'Humanities',
-                                          label: 'Humanities (মানবিক)',
-                                          isEnabled: false,
-                                          disabledBadge: 'শীঘ্রই আসছে',
-                                        ),
-                                      ];
+                                final groupOptions = const [
+                                  AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                                  AppDropdownOption(value: 'Business Studies', label: 'Business Studies (ব্যবসায় শিক্ষা)'),
+                                  AppDropdownOption(value: 'Humanities', label: 'Humanities (মানবিক)'),
+                                ];
 
                                 final batchOptions = _stream == 'SSC'
                                     ? const ['SSC 2026', 'SSC 2027', 'SSC 2028']

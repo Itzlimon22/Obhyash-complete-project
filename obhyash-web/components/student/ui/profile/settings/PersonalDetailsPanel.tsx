@@ -413,21 +413,8 @@ export default function PersonalDetailsPanel({
                 className={selectClass}
               >
                 <option value="Science">Science (বিজ্ঞান)</option>
-                {formData.stream === 'SSC' ? (
-                  <>
-                    <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
-                    <option value="Humanities">Humanities (মানবিক)</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                      Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
-                    </option>
-                    <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                      Humanities (মানবিক) - শীঘ্রই আসছে
-                    </option>
-                  </>
-                )}
+                <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
+                <option value="Humanities">Humanities (মানবিক)</option>
               </select>
             </div>
 
