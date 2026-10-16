@@ -47,6 +47,7 @@ import InArticleRelatedCard from '@/components/blog/InArticleRelatedCard';
 import ResultStepFlow from '@/components/blog/ResultStepFlow';
 import SscScholarshipConversionCard from '@/components/blog/SscScholarshipConversionCard';
 import HscPhysicsPdfDownloadCard from '@/components/blog/HscPhysicsPdfDownloadCard';
+import SscMathAppMockupCard from '@/components/blog/SscMathAppMockupCard';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -114,9 +115,13 @@ function formatBanglaDate(dateStr: string) {
 }
 
 // Helper to inject HSC Science Ka-Kha PDF download card across all blog posts (like on the britti page)
-function injectHscNotesCard(content: string): string {
-  // If the article already contains the widget (e.g. manually placed or britti page), do not duplicate
-  if (content.includes('data-widget="hsc-physics-pdf-download"')) {
+function injectHscNotesCard(content: string, slug?: string): string {
+  // If the article already contains a custom widget, or is the SSC Math article, do not inject HSC physics card
+  if (
+    content.includes('data-widget="hsc-physics-pdf-download"') ||
+    content.includes('data-widget="ssc-math-app-mockup"') ||
+    slug === 'ssc-general-math-all-board-questions-solution-2026'
+  ) {
     return content;
   }
 
@@ -272,8 +277,8 @@ export default async function BlogPostPage({
     post.slug === 'ssc-scholarship-britti-result-2026-check' ||
     post.slug.includes('britti');
 
-  // 1. Ensure HSC Science Ka-Kha PDF card is injected across all posts (like on the britti page)
-  const withHscCard = injectHscNotesCard(post.content);
+  // 1. Ensure HSC Science Ka-Kha PDF card is injected across relevant posts (like on the britti page)
+  const withHscCard = injectHscNotesCard(post.content, post.slug);
 
   // 2. Inject related posts card for non-britti articles
   const processedContent = isBrittiPost
@@ -375,6 +380,9 @@ export default async function BlogPostPage({
             sourceCategory={post.category}
           />
         );
+      }
+      if (widget === 'ssc-math-app-mockup') {
+        return <SscMathAppMockupCard />;
       }
       if (widget === 'related-post') {
         if (isBrittiPost) return null;
