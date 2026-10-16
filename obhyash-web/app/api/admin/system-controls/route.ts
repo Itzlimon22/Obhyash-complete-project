@@ -31,6 +31,7 @@ export async function GET() {
         promo_banner_title: '',
         promo_banner_subtitle: '',
         promo_banner_target: '',
+        auth_system_mode: data?.auth_system_mode || 'minimal',
         ...(data || {
           maintenance_mode: false,
           live_exams_enabled: true,
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
         'promo_banner_subtitle',
         'promo_banner_type',
         'promo_banner_target',
+        'auth_system_mode',
       ];
       const fallbackPayload = { ...payload };
       let hadMissing = false;

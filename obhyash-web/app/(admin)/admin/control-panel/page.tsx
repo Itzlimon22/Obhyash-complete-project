@@ -504,6 +504,40 @@ export default function ControlPanelPage() {
             </p>
           </div>
 
+          {/* Card: Auth System Mode */}
+          <div className="p-5 rounded-3xl border border-slate-100 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-900/50 hover:border-slate-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-4 shadow-xs">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                  <Sliders size={17} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-950 dark:text-white">
+                    অথেন্টিকেশন সিস্টেম মোড
+                  </h4>
+                  <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                    {(config.auth_system_mode || 'minimal') === 'minimal' ? 'আধুনিক ৩ডি • Minimal' : 'আগের ক্লাসিক • Classic'}
+                  </span>
+                </div>
+              </div>
+              <ModernSwitch
+                checked={(config.auth_system_mode || 'minimal') === 'minimal'}
+                onChange={(checked) => {
+                  const newMode: 'minimal' | 'classic' = checked ? 'minimal' : 'classic';
+                  const updated: AppConfig = { ...config, auth_system_mode: newMode };
+                  setConfig(updated);
+                  saveConfig(updated);
+                }}
+                color="purple"
+              />
+            </div>
+            <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
+              {(config.auth_system_mode || 'minimal') === 'minimal'
+                ? 'নতুন আধুনিক মিনিমাল, ব্লার বর্ডার ও ৩ডি বাটন সম্পন্ন পেজ সক্রিয়'
+                : 'আগের মাল্টি-স্টেপ ক্লাসিক সাইনআপ ও প্রোফাইল ফর্ম সক্রিয়'}
+            </p>
+          </div>
+
           {/* Card: Payment Gateways */}
           <div className="p-5 rounded-3xl border border-slate-100 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-900/50 hover:border-slate-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-4 shadow-xs">
             <div className="flex items-start justify-between gap-2">

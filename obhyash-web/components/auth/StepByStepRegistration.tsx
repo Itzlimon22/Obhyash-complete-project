@@ -350,15 +350,6 @@ export default function StepByStepRegistration({
       </button>
 
       <div className="relative z-10 w-full max-w-[380px] sm:max-w-[420px] flex flex-col items-center">
-        {/* Top: Obhyash Logo */}
-        <div className="mb-6 inline-flex items-center justify-center">
-          <img
-            src="/obhyash_full_logo_dark.svg"
-            alt="Obhyash Logo"
-            className="h-9 sm:h-10 w-auto object-contain drop-shadow-md"
-          />
-        </div>
-
         {/* Error Alert */}
         {error && (
           <div className="w-full mb-4 px-4 py-2.5 rounded-xl bg-red-950/70 border border-red-800/80 text-red-200 text-xs sm:text-sm text-center animate-in fade-in">
@@ -369,7 +360,7 @@ export default function StepByStepRegistration({
         {/* ── STEP 1: Name & Institute (Formerly Step 5) ───────────── */}
         {step === 1 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
+            <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তোমার নাম ও প্রতিষ্ঠান?
               </h2>
@@ -444,7 +435,7 @@ export default function StepByStepRegistration({
         {/* ── STEP 2: Gender Selection (Formerly Step 4) ───────────── */}
         {step === 2 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
+            <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তুমি একজন
               </h2>
@@ -489,7 +480,7 @@ export default function StepByStepRegistration({
         {/* ── STEP 3: Stream Selection (Formerly Step 1) ───────────── */}
         {step === 3 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
+            <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তুমি কি বিষয়ে অভ্যাস করতে চাও?
               </h2>
@@ -530,7 +521,7 @@ export default function StepByStepRegistration({
         {/* ── STEP 4: Group Selection ─────────────────────────────────── */}
         {step === 4 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
+            <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তুমি কোন বিভাগে?
               </h2>
@@ -578,7 +569,7 @@ export default function StepByStepRegistration({
         {/* ── STEP 5: Batch Selection (Formerly Step 3) ────────────── */}
         {step === 5 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
+            <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 তোমার ব্যাচ?
               </h2>
@@ -612,7 +603,7 @@ export default function StepByStepRegistration({
         {/* ── STEP 6: Password Setup ─────────────────────────────────── */}
         {step === 6 && (
           <form onSubmit={handleFinalSubmit} className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
+            <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
                 একটি পাসওয়ার্ড সেট করো
               </h2>

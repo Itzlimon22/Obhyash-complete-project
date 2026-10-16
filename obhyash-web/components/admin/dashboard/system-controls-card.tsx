@@ -51,6 +51,7 @@ export interface AppConfig {
   promo_banner_subtitle?: string;
   promo_banner_type?: string;
   promo_banner_target?: string;
+  auth_system_mode?: 'minimal' | 'classic';
 }
 
 interface SystemControlsCardProps {
@@ -206,6 +207,34 @@ export function SystemControlsCard({
           </div>
           <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
             {config.registration_enabled ? 'নতুন শিক্ষার্থীরা সাইন আপ করতে পারবে' : 'নতুন সাইন আপ সাময়িক লক'}
+          </p>
+        </div>
+
+        {/* Switch 4: Auth System Mode */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <Sliders size={14} className="text-emerald-500" />
+              অথ সিস্টেম মোড
+            </span>
+            <select
+              value={config.auth_system_mode || 'minimal'}
+              onChange={(e) => {
+                const val = e.target.value as 'minimal' | 'classic';
+                const updated = { ...config, auth_system_mode: val };
+                setConfig(updated);
+                saveConfig(updated);
+              }}
+              className="text-xs font-bold bg-white dark:bg-zinc-900 border border-neutral-300 dark:border-zinc-700 rounded-lg px-2 py-1 text-neutral-800 dark:text-neutral-200 cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            >
+              <option value="minimal">আধুনিক (Minimal)</option>
+              <option value="classic">আগের (Classic)</option>
+            </select>
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.auth_system_mode === 'classic'
+              ? 'আগের ক্লাসিক মাল্টি-স্টেপ সাইনআপ পেজ সক্রিয়'
+              : 'নতুন আধুনিক ৩ডি ও ব্লার ইন্টারফেস সক্রিয়'}
           </p>
         </div>
 

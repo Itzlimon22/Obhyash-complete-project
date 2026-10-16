@@ -1,20 +1,15 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { AUTH_SYSTEM_MODE } from '@/lib/constants/auth-config';
+import { useAuthSystemMode } from '@/lib/auth-system-mode';
 import MinimalAuthPage from '@/components/auth/MinimalAuthPage';
 import ClassicLoginPage from '@/components/auth/ClassicLoginPage';
 import { Loader2 } from 'lucide-react';
 
 function AuthLoginRouter() {
-  const searchParams = useSearchParams();
-  const urlMode = searchParams.get('mode');
+  const { mode } = useAuthSystemMode();
 
-  // URL query parameter ?mode=classic or ?mode=minimal overrides default config
-  const activeMode = urlMode === 'classic' || urlMode === 'minimal' ? urlMode : AUTH_SYSTEM_MODE;
-
-  if (activeMode === 'classic') {
+  if (mode === 'classic') {
     return <ClassicLoginPage />;
   }
 
