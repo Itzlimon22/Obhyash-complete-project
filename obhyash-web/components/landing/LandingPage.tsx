@@ -3,18 +3,14 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GooglePlayButton } from './GooglePlayButton';
 import { MobileAppInstallBanner } from './MobileAppInstallBanner';
 import {
-  BookOpen,
   User,
   ArrowRight,
   Sun,
   Moon,
   Sparkles,
-  FileText,
   ScanLine,
   History,
   Trophy,
-  Zap,
-  Video,
   Swords,
   HelpCircle,
   GraduationCap,
@@ -35,7 +31,6 @@ import {
   Flame,
   Facebook,
   Youtube,
-  RotateCcw,
   Target,
   Star,
   XCircle,
@@ -523,85 +518,308 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
               {/* 1. Real Exam & Option Locking */}
-              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-900/30">
-                  <Zap className="w-6 h-6 md:w-7 md:h-7 text-emerald-400" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Screen Bezel */}
+                      <rect x="28" y="24" width="104" height="62" rx="8" stroke="#1E293B" strokeWidth="4" fill="#F8FAFC" />
+                      
+                      {/* Laptop Base */}
+                      <path d="M14 88C14 86 15.6 84 18 84H142C144.4 84 146 86 146 88V91C146 94.3 143.3 97 140 97H20C16.7 97 14 94.3 14 91V88Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="4" strokeLinejoin="round" />
+                      <path d="M68 84H92" stroke="#1E293B" strokeWidth="3.5" strokeLinecap="round" />
+
+                      {/* Header mini bar with clock */}
+                      <rect x="36" y="30" width="88" height="8" rx="4" fill="#E2E8F0" />
+                      <circle cx="42" cy="34" r="2" fill="#10B981" />
+                      <rect x="94" y="31.5" width="26" height="5" rx="2.5" fill="#10B981" opacity="0.3" />
+
+                      {/* Option A (unselected) */}
+                      <rect x="36" y="44" width="88" height="15" rx="4" fill="white" stroke="#CBD5E1" strokeWidth="2" />
+                      <circle cx="44" cy="51.5" r="3.5" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="1.5" />
+                      <line x1="52" y1="51.5" x2="84" y2="51.5" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+
+                      {/* Option B (Locked & Selected) */}
+                      <g style={{ animation: 'popCard 2.4s ease-in-out infinite', transformOrigin: '80px 68px' }}>
+                        <rect x="36" y="63" width="88" height="17" rx="4" fill="#10B981" stroke="#1E293B" strokeWidth="2.5" />
+                        <circle cx="44" cy="71.5" r="4" fill="white" />
+                        <path d="M42 71.5L43.5 73L46 70" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <line x1="52" y1="71.5" x2="80" y2="71.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                        
+                        {/* Lock badge on right */}
+                        <rect x="94" y="66" width="24" height="11" rx="3" fill="#047857" stroke="#1E293B" strokeWidth="1.5" />
+                        <path d="M102 66V64C102 62.5 103 61.5 104.5 61.5C106 61.5 107 62.5 107 64V66" stroke="#1E293B" strokeWidth="1.5" />
+                        <circle cx="104.5" cy="71.5" r="1.5" fill="white" />
+                      </g>
+
+                      {/* Floating Sparkle */}
+                      <g style={{ animation: 'sparkleBurst 2s ease-in-out infinite', transformOrigin: '124px 28px' }}>
+                        <path d="M124 23L125 27L129 28L125 29L124 33L123 29L119 28L123 27Z" fill="#F59E0B" />
+                      </g>
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
-                  রিয়েল এক্সাম ও অপশন লকিং
-                </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  পরীক্ষার হলের মতোই একবার অপশন দাগালে লক হয়ে যাবে। সাথে থাকছে ০ মিলিসেকেন্ডে তাৎক্ষণিক খাতা জমা ও ফলাফল।
-                </p>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                    রিয়েল এক্সাম ও অপশন লকিং
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    পরীক্ষার হলের মতোই একবার অপশন দাগালে লক হয়ে যাবে। সাথে থাকছে ০ মিলিসেকেন্ডে তাৎক্ষণিক খাতা জমা ও ফলাফল।
+                  </p>
+                </div>
               </div>
 
               {/* 2. Textbook Solutions & References */}
-              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-red-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-900/30">
-                  <BookOpen className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Open Textbook base */}
+                      <g transform="translate(20, 26)">
+                        {/* Left Page */}
+                        <path d="M60 76C42 72 20 74 6 78V16C20 12 42 10 60 14V76Z" fill="#FFF" stroke="#1E293B" strokeWidth="3.5" strokeLinejoin="round" />
+                        {/* Right Page */}
+                        <path d="M60 76C78 72 100 74 114 78V16C100 12 78 10 60 14V76Z" fill="#FAF5FF" stroke="#1E293B" strokeWidth="3.5" strokeLinejoin="round" />
+                        
+                        {/* Spine Center */}
+                        <line x1="60" y1="14" x2="60" y2="76" stroke="#CBD5E1" strokeWidth="3" />
+
+                        {/* Left page text lines */}
+                        <line x1="16" y1="26" x2="48" y2="24" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" />
+                        <line x1="16" y1="36" x2="52" y2="34" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="16" y1="46" x2="44" y2="44" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+                        {/* Little chemistry/physics diagram on left */}
+                        <circle cx="26" cy="60" r="5" fill="#E0E7FF" stroke="#6366F1" strokeWidth="1.5" />
+                        <circle cx="44" cy="58" r="3.5" fill="#FEE2E2" stroke="#EF4444" strokeWidth="1.5" />
+                        <line x1="31" y1="59.5" x2="40.5" y2="58.5" stroke="#1E293B" strokeWidth="1.5" />
+
+                        {/* Right page solution highlight box */}
+                        <rect x="68" y="22" width="38" height="24" rx="4" fill="#FEF3C7" stroke="#F59E0B" strokeWidth="1.5" />
+                        <line x1="72" y1="29" x2="100" y2="29" stroke="#B45309" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="72" y1="37" x2="94" y2="37" stroke="#B45309" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="68" y1="54" x2="104" y2="54" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="68" y1="62" x2="96" y2="62" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+                      </g>
+
+                      {/* Floating Ribbon Bookmark */}
+                      <path d="M76 22V48L80 44L84 48V22" fill="#EF4444" stroke="#1E293B" strokeWidth="2.5" strokeLinejoin="round" />
+
+                      {/* Floating Verified Seal Badge with Float Animation */}
+                      <g style={{ animation: 'floatAvatar 3s ease-in-out infinite', transformOrigin: '122px 28px' }}>
+                        <circle cx="122" cy="28" r="14" fill="#10B981" stroke="#1E293B" strokeWidth="3" />
+                        <path d="M116 28L120 32L128 24" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </g>
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
-                  প্রমাণসহ বিস্তারিত সমাধান
-                </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  প্রতিটি প্রশ্নের সাথে মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সহ পুঙ্খানুপুঙ্খ ব্যাখ্যা ও সঠিক সূত্র।
-                </p>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                    প্রমাণসহ বিস্তারিত সমাধান
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    প্রতিটি প্রশ্নের সাথে মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সহ পুঙ্খানুপুঙ্খ ব্যাখ্যা ও সঠিক সূত্র।
+                  </p>
+                </div>
               </div>
 
               {/* 3. Question Paper & Result PDF Downloads */}
-              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-900/30">
-                  <FileText className="w-6 h-6 md:w-7 md:h-7 text-emerald-400" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Back Shadow Paper */}
+                      <rect x="52" y="16" width="60" height="76" rx="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="3" transform="rotate(4 82 54)" />
+
+                      {/* Front Main Document Sheet */}
+                      <rect x="44" y="14" width="64" height="80" rx="5" fill="white" stroke="#1E293B" strokeWidth="3.5" />
+                      
+                      {/* PDF Red Corner Badge */}
+                      <rect x="44" y="14" width="26" height="12" rx="3" fill="#EF4444" stroke="#1E293B" strokeWidth="2" />
+                      <text x="57" y="23" fill="white" fontSize="7" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">PDF</text>
+
+                      {/* 2-Column Question Layout Lines */}
+                      {/* Column 1 */}
+                      <line x1="52" y1="34" x2="70" y2="34" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+                      <line x1="52" y1="40" x2="68" y2="40" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="52" y1="46" x2="66" y2="46" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+                      
+                      {/* Divider Line */}
+                      <line x1="75" y1="32" x2="75" y2="76" stroke="#E2E8F0" strokeWidth="1.5" strokeDasharray="2 2" />
+
+                      {/* Column 2 */}
+                      <line x1="80" y1="34" x2="98" y2="34" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+                      <line x1="80" y1="40" x2="96" y2="40" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="80" y1="46" x2="92" y2="46" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+
+                      {/* Floating Animated Download Badge */}
+                      <g style={{ animation: 'bounceDown 2s ease-in-out infinite', transformOrigin: '80px 76px' }}>
+                        <circle cx="80" cy="76" r="15" fill="#10B981" stroke="#1E293B" strokeWidth="3" />
+                        <path d="M80 69V81M75 77L80 82L85 77" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </g>
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
-                  অফলাইন PDF ডাউনলোড
-                </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  অনুশীলনের পর এক ক্লিকেই সম্পূর্ণ ২-কলাম প্রশ্নপত্র এবং ব্যাখ্যা সহ উত্তরপত্র PDF প্রিন্ট বা ডাউনলোড করো।
-                </p>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                    অফলাইন PDF ডাউনলোড
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    অনুশীলনের পর এক ক্লিকেই সম্পূর্ণ ২-কলাম প্রশ্নপত্র এবং ব্যাখ্যা সহ উত্তরপত্র PDF প্রিন্ট বা ডাউনলোড করো।
+                  </p>
+                </div>
               </div>
 
               {/* 4. Live Model Test */}
-              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-red-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-900/30">
-                  <Video className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Screen Bezel */}
+                      <rect x="24" y="24" width="112" height="64" rx="8" stroke="#1E293B" strokeWidth="4" fill="#0F172A" />
+                      
+                      {/* Laptop Base */}
+                      <path d="M14 90C14 88 15.6 86 18 86H142C144.4 86 146 88 146 90V93C146 96.3 143.3 99 140 99H20C16.7 99 14 96.3 14 93V90Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="4" strokeLinejoin="round" />
+
+                      {/* LIVE Red Pulsing Badge */}
+                      <rect x="34" y="32" width="34" height="13" rx="4" fill="#EF4444" stroke="#1E293B" strokeWidth="1.5" />
+                      <circle cx="41" cy="38.5" r="2.5" fill="white" style={{ animation: 'dotPulse 1.2s ease-in-out infinite' }} />
+                      <text x="56" y="41.5" fill="white" fontSize="7" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">LIVE</text>
+
+                      {/* Live Wave Radar Signals */}
+                      <g style={{ animation: 'sparkleBurst 2.5s ease-in-out infinite', transformOrigin: '120px 38px' }}>
+                        <path d="M112 38C112 34 116 32 120 32C124 32 128 34 128 38" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" fill="none" />
+                        <path d="M108 38C108 30 114 27 120 27C126 27 132 30 132 38" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" fill="none" />
+                      </g>
+
+                      {/* Podium Rankings (3 Avatars) */}
+                      {/* Rank 2 (Left) */}
+                      <rect x="42" y="60" width="22" height="20" rx="3" fill="#334155" stroke="#1E293B" strokeWidth="2" />
+                      <circle cx="53" cy="52" r="6" fill="#94A3B8" stroke="#1E293B" strokeWidth="2" />
+                      <text x="53" y="73" fill="white" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">2</text>
+
+                      {/* Rank 1 (Center - Elevated with Crown) */}
+                      <g style={{ animation: 'popCard 2.4s ease-in-out infinite', transformOrigin: '80px 52px' }}>
+                        <rect x="69" y="52" width="22" height="28" rx="3" fill="#047857" stroke="#1E293B" strokeWidth="2" />
+                        <circle cx="80" cy="43" r="7" fill="#10B981" stroke="#1E293B" strokeWidth="2" />
+                        {/* Crown */}
+                        <path d="M75 34L77 37L80 33L83 37L85 34V38H75V34Z" fill="#F59E0B" stroke="#1E293B" strokeWidth="1.5" />
+                        <text x="80" y="68" fill="white" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">1</text>
+                      </g>
+
+                      {/* Rank 3 (Right) */}
+                      <rect x="96" y="64" width="22" height="16" rx="3" fill="#334155" stroke="#1E293B" strokeWidth="2" />
+                      <circle cx="107" cy="56" r="6" fill="#B45309" stroke="#1E293B" strokeWidth="2" />
+                      <text x="107" y="76" fill="white" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">3</text>
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2 flex items-center gap-2">
-                  <span>লাইভ মডেল টেস্ট</span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 text-[10px] font-extrabold uppercase">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                    Live
-                  </span>
-                </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  একই সময়ে সারা দেশের হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম লাইভ পরীক্ষায় অংশ নিয়ে যাচাই করো জাতীয় মেধাতালিকায় তোমার অবস্থান।
-                </p>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5 flex items-center gap-2">
+                    <span>লাইভ মডেল টেস্ট</span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 text-[10px] font-extrabold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                      Live
+                    </span>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    একই সময়ে সারা দেশের হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম লাইভ পরীক্ষায় অংশ নিয়ে যাচাই করো জাতীয় মেধাতালিকায় তোমার অবস্থান।
+                  </p>
+                </div>
               </div>
 
               {/* 5. Daily Streak & Leaderboard */}
-              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-900/30">
-                  <Flame className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Shield / Calendar Base */}
+                      <rect x="42" y="18" width="76" height="82" rx="14" fill="#FFFBEB" stroke="#1E293B" strokeWidth="3.5" />
+                      
+                      {/* Calendar Header */}
+                      <path d="M42 32C42 24.268 48.268 18 56 18H104C111.732 18 118 24.268 118 32V34H42V32Z" fill="#EF4444" stroke="#1E293B" strokeWidth="3.5" />
+                      <circle cx="60" cy="26" r="3" fill="white" />
+                      <circle cx="100" cy="26" r="3" fill="white" />
+
+                      {/* Center Flame Icon with Dancing Animation */}
+                      <g style={{ animation: 'popCard 2s ease-in-out infinite', transformOrigin: '80px 60px' }}>
+                        {/* Outer Flame (Orange) */}
+                        <path d="M80 42C74 50 68 56 68 66C68 74 73 80 80 80C87 80 92 74 92 66C92 56 86 50 80 42Z" fill="#F97316" stroke="#1E293B" strokeWidth="3" strokeLinejoin="round" />
+                        {/* Inner Core Flame (Yellow) */}
+                        <path d="M80 54C76 60 73 63 73 69C73 74 76 77 80 77C84 77 87 74 87 69C87 63 84 60 80 54Z" fill="#FDE047" />
+                      </g>
+
+                      {/* Streak Badge Pill */}
+                      <g style={{ animation: 'floatAvatar 2.8s ease-in-out infinite', transformOrigin: '80px 92px' }}>
+                        <rect x="50" y="84" width="60" height="17" rx="8.5" fill="#1E293B" />
+                        <circle cx="60" cy="92.5" r="3" fill="#F59E0B" />
+                        <text x="83" y="96" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">৭ দিনের স্ট্রিক</text>
+                      </g>
+
+                      {/* Floating XP star */}
+                      <g style={{ animation: 'sparkleBurst 2.2s ease-in-out infinite', transformOrigin: '118px 24px' }}>
+                        <circle cx="118" cy="24" r="10" fill="#F59E0B" stroke="#1E293B" strokeWidth="2.5" />
+                        <text x="118" y="27.5" fill="white" fontSize="7" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">XP</text>
+                      </g>
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
-                  ডেইলি স্ট্রাইক ও লিডারবোর্ড
-                </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  পড়াশোনার ধারাবাহিকতা বজায় রাখতে ফ্লেম স্ট্রিক এবং কলেজ ও জাতীয় লিডারবোর্ডে বন্ধুদের সাথে প্রতিযোগিতা।
-                </p>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                    ডেইলি স্ট্রাইক ও লিডারবোর্ড
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    পড়াশোনার ধারাবাহিকতা বজায় রাখতে ফ্লেম স্ট্রিক এবং কলেজ ও জাতীয় লিডারবোর্ডে বন্ধুদের সাথে প্রতিযোগিতা।
+                  </p>
+                </div>
               </div>
 
               {/* 6. Spaced Repetition Revision */}
-              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-red-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-900/30">
-                  <RotateCcw className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Spiral Mistake Notebook */}
+                      <rect x="36" y="20" width="88" height="78" rx="7" fill="white" stroke="#1E293B" strokeWidth="3.5" />
+
+                      {/* Spiral Rings on Left */}
+                      {[28, 38, 48, 58, 68, 78, 88].map((y, idx) => (
+                        <rect key={idx} x="32" y={y} width="9" height="4" rx="2" fill="#94A3B8" stroke="#1E293B" strokeWidth="1.5" />
+                      ))}
+
+                      {/* Left: Red Error Box with ✕ */}
+                      <g transform="translate(48, 32)">
+                        <rect width="28" height="28" rx="6" fill="#FEE2E2" stroke="#EF4444" strokeWidth="2" />
+                        <path d="M9 9L19 19M19 9L9 19" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
+                        <line x1="4" y1="36" x2="24" y2="36" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+                      </g>
+
+                      {/* Curved Transform Arrow in Middle */}
+                      <g style={{ animation: 'tapFinger 2.2s ease-in-out infinite', transformOrigin: '87px 46px' }}>
+                        <path d="M80 46H94M90 41L95 46L90 51" stroke="#6366F1" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </g>
+
+                      {/* Right: Green Success Box with ✓ */}
+                      <g transform="translate(98, 32)" style={{ animation: 'popCard 2.4s ease-in-out infinite', transformOrigin: '112px 46px' }}>
+                        <rect width="28" height="28" rx="6" fill="#D1FAE5" stroke="#10B981" strokeWidth="2" />
+                        <path d="M7 14L12 19L21 9" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <line x1="4" y1="36" x2="24" y2="36" stroke="#10B981" strokeWidth="2" strokeLinecap="round" />
+                      </g>
+
+                      {/* Bottom Notebook Revision Badge */}
+                      <rect x="52" y="74" width="60" height="14" rx="4" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="1.5" />
+                      <circle cx="60" cy="81" r="3" fill="#10B981" />
+                      <text x="83" y="84" fill="#334155" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">স্মার্ট নোটবুক</text>
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
-                  ভুল প্রশ্নের স্মার্ট রিভিশন
-                </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  পরীক্ষায় যেসব প্রশ্ন ভুল হয়, সেগুলোকে চিহ্নিত করে বারবার অনুশীলনের মাধ্যমে দুর্বলতা চিরতরে দূর করো।
-                </p>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                    ভুল প্রশ্নের স্মার্ট রিভিশন
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    পরীক্ষায় যেসব প্রশ্ন ভুল হয়, সেগুলোকে চিহ্নিত করে বারবার অনুশীলনের মাধ্যমে দুর্বলতা চিরতরে দূর করো।
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1269,6 +1487,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
 
       <style>{`
+        @keyframes bounceDown {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(6px); }
+        }
         @keyframes scan {
           0% { top: 0%; }
           50% { top: 100%; }
