@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Loader2, UserPlus, HelpCircle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, UserPlus } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import StepByStepRegistration from './StepByStepRegistration';
 
@@ -492,14 +492,13 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
           <span>Google দিয়ে চালিয়ে যাও</span>
         </button>
 
-        {/* Support Link Button: google diye caliye jao er niche support lagbe button */}
-        <div className="w-full pt-3">
+        {/* Support Link Text: google diye caliye jao er niche just text */}
+        <div className="pt-3.5 text-center">
           <Link
             href="/support"
-            className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#141720] hover:bg-[#1c202c] border border-[#232734] text-neutral-300 hover:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+            className="text-xs sm:text-sm text-neutral-400 hover:text-emerald-400 transition-colors cursor-pointer hover:underline"
           >
-            <HelpCircle className="w-4 h-4 text-emerald-400" />
-            <span>সাপোর্ট লাগবে?</span>
+            সাপোর্ট লাগবে?
           </Link>
         </div>
 
