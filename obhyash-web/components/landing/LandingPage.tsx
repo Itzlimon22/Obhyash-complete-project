@@ -11,8 +11,6 @@ import {
   ScanLine,
   History,
   Trophy,
-  Swords,
-  HelpCircle,
   GraduationCap,
   MapPin,
   Phone,
