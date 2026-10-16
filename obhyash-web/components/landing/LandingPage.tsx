@@ -560,12 +560,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white">
                     রিয়েল এক্সাম ও অপশন লকিং
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    পরীক্ষার হলের মতোই একবার অপশন দাগালে লক হয়ে যাবে। সাথে থাকছে ০ মিলিসেকেন্ডে তাৎক্ষণিক খাতা জমা ও ফলাফল।
-                  </p>
                 </div>
               </div>
 
@@ -613,12 +610,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white">
                     প্রমাণসহ বিস্তারিত সমাধান
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    প্রতিটি প্রশ্নের সাথে মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সহ পুঙ্খানুপুঙ্খ ব্যাখ্যা ও সঠিক সূত্র।
-                  </p>
                 </div>
               </div>
 
@@ -660,12 +654,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white">
                     অফলাইন PDF ডাউনলোড
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    অনুশীলনের পর এক ক্লিকেই সম্পূর্ণ ২-কলাম প্রশ্নপত্র এবং ব্যাখ্যা সহ উত্তরপত্র PDF প্রিন্ট বা ডাউনলোড করো।
-                  </p>
                 </div>
               </div>
 
@@ -714,16 +705,13 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5 flex items-center gap-2">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white flex items-center gap-2">
                     <span>লাইভ মডেল টেস্ট</span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 text-[10px] font-extrabold uppercase">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
                       Live
                     </span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    একই সময়ে সারা দেশের হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম লাইভ পরীক্ষায় অংশ নিয়ে যাচাই করো জাতীয় মেধাতালিকায় তোমার অবস্থান।
-                  </p>
                 </div>
               </div>
 
@@ -764,12 +752,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white">
                     ডেইলি স্ট্রাইক ও লিডারবোর্ড
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    পড়াশোনার ধারাবাহিকতা বজায় রাখতে ফ্লেম স্ট্রিক এবং কলেজ ও জাতীয় লিডারবোর্ডে বন্ধুদের সাথে প্রতিযোগিতা।
-                  </p>
                 </div>
               </div>
 
@@ -813,12 +798,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white">
                     ভুল প্রশ্নের স্মার্ট রিভিশন
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    পরীক্ষায় যেসব প্রশ্ন ভুল হয়, সেগুলোকে চিহ্নিত করে বারবার অনুশীলনের মাধ্যমে দুর্বলতা চিরতরে দূর করো।
-                  </p>
                 </div>
               </div>
             </div>
@@ -832,50 +814,197 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-6 opacity-90">
-              {/* Quiz Battle (Battle) */}
-              <div className="relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-neutral-900/60 to-neutral-800/30 border border-dashed border-neutral-700/70 hover:border-neutral-600 transition-colors">
-                <div className="flex items-center gap-3 sm:gap-4 mb-2.5 sm:mb-4">
-                  <div className="p-2.5 sm:p-3 bg-red-900/20 rounded-xl text-red-500">
-                    <Swords className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+              {/* 1. Quiz Battle (Battle) */}
+              <div className="bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Battle Arena Platform */}
+                      <ellipse cx="80" cy="98" rx="66" ry="14" fill="#F1F5F9" stroke="#1E293B" strokeWidth="3" />
+                      
+                      {/* Player 1 (Blue) Avatar - Left */}
+                      <g style={{ animation: 'floatAvatar 2.6s ease-in-out infinite', transformOrigin: '38px 60px' }}>
+                        {/* Body Shield / Armor */}
+                        <path d="M26 68C26 58 38 56 38 56C38 56 50 58 50 68V80H26V68Z" fill="#3B82F6" stroke="#1E293B" strokeWidth="3" strokeLinejoin="round" />
+                        {/* Head Helmet */}
+                        <circle cx="38" cy="46" r="13" fill="#60A5FA" stroke="#1E293B" strokeWidth="3" />
+                        <rect x="31" y="44" width="14" height="4.5" rx="2" fill="#1E293B" />
+                        {/* Health Bar (Green) */}
+                        <rect x="22" y="24" width="32" height="6.5" rx="3" fill="#1E293B" />
+                        <rect x="23.5" y="25.5" width="22" height="3.5" rx="1.75" fill="#10B981" />
+                      </g>
+
+                      {/* Player 2 (Red) Avatar - Right */}
+                      <g style={{ animation: 'floatAvatar 2.6s ease-in-out infinite 1.3s', transformOrigin: '122px 60px' }}>
+                        {/* Body Shield / Armor */}
+                        <path d="M110 68C110 58 122 56 122 56C122 56 134 58 134 68V80H110V68Z" fill="#EF4444" stroke="#1E293B" strokeWidth="3" strokeLinejoin="round" />
+                        {/* Head Helmet */}
+                        <circle cx="122" cy="46" r="13" fill="#F87171" stroke="#1E293B" strokeWidth="3" />
+                        <rect x="115" y="44" width="14" height="4.5" rx="2" fill="#1E293B" />
+                        {/* Health Bar (Orange) */}
+                        <rect x="106" y="24" width="32" height="6.5" rx="3" fill="#1E293B" />
+                        <rect x="107.5" y="25.5" width="16" height="3.5" rx="1.75" fill="#F59E0B" />
+                      </g>
+
+                      {/* Crossed Swords in Center with Clash */}
+                      <g style={{ animation: 'popCard 2s ease-in-out infinite', transformOrigin: '80px 56px' }}>
+                        {/* Sword 1: Left to Top Right */}
+                        <path d="M60 76L96 36" stroke="#94A3B8" strokeWidth="5.5" strokeLinecap="round" />
+                        <path d="M60 76L96 36" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+                        {/* Hilt */}
+                        <path d="M56 72L64 80" stroke="#F59E0B" strokeWidth="3.5" strokeLinecap="round" />
+                        <circle cx="58" cy="78" r="3" fill="#B45309" stroke="#1E293B" strokeWidth="1.5" />
+
+                        {/* Sword 2: Right to Top Left */}
+                        <path d="M100 76L64 36" stroke="#94A3B8" strokeWidth="5.5" strokeLinecap="round" />
+                        <path d="M100 76L64 36" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+                        {/* Hilt */}
+                        <path d="M104 72L96 80" stroke="#F59E0B" strokeWidth="3.5" strokeLinecap="round" />
+                        <circle cx="102" cy="78" r="3" fill="#B45309" stroke="#1E293B" strokeWidth="1.5" />
+                      </g>
+
+                      {/* Clash Spark Burst at intersection */}
+                      <g style={{ animation: 'sparkleBurst 1.6s ease-in-out infinite', transformOrigin: '80px 56px' }}>
+                        <path d="M80 44L83 53L92 56L83 59L80 68L77 59L68 56L77 53Z" fill="#FBBF24" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+                        <circle cx="80" cy="56" r="3" fill="#FFF" />
+                      </g>
+
+                      {/* Center "VS" Badge */}
+                      <g style={{ animation: 'popCard 2.2s ease-in-out infinite', transformOrigin: '80px 88px' }}>
+                        <rect x="67" y="79" width="26" height="18" rx="9" fill="#1E293B" stroke="#F59E0B" strokeWidth="2" />
+                        <text x="80" y="92" fill="#FBBF24" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">VS</text>
+                      </g>
+                    </svg>
                   </div>
-                  <h3 className="font-bold text-sm sm:text-base text-white">
-                    কুইজ ব্যাটল (Battle)
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white flex items-center justify-between">
+                    <span>কুইজ ব্যাটল (Battle)</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/40 text-red-400 text-[10px] font-extrabold uppercase">
+                      Soon
+                    </span>
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-300">
-                  বন্ধুদের সাথে রিয়েল-টাইমে ১v১ লাইভ কুইজ যুদ্ধে অংশ নিয়ে নিজের মেধার পরীক্ষা নাও।
-                </p>
               </div>
 
-              {/* Doubt Solve */}
-              <div className="relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-neutral-900/60 to-neutral-800/30 border border-dashed border-neutral-700/70 hover:border-neutral-600 transition-colors">
-                <div className="flex items-center gap-3 sm:gap-4 mb-2.5 sm:mb-4">
-                  <div className="p-2.5 sm:p-3 bg-emerald-900/20 rounded-xl text-emerald-400">
-                    <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+              {/* 2. Doubt Solve */}
+              <div className="bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Base Notepad / Screen */}
+                      <rect x="28" y="20" width="104" height="82" rx="12" fill="#F8FAFC" stroke="#1E293B" strokeWidth="3.5" />
+                      
+                      {/* Question Bubble (Student - Top Left) */}
+                      <g style={{ animation: 'floatAvatar 2.8s ease-in-out infinite', transformOrigin: '48px 40px' }}>
+                        <path d="M36 32H74C78.4 32 82 35.6 82 40V52C82 56.4 78.4 60 74 60H46L36 67V40C36 35.6 39.6 32 36 32Z" fill="#FEE2E2" stroke="#1E293B" strokeWidth="2.5" strokeLinejoin="round" />
+                        {/* Question mark & lines */}
+                        <circle cx="48" cy="46" r="6" fill="#EF4444" />
+                        <text x="48" y="50" fill="white" fontSize="9" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">?</text>
+                        <line x1="58" y1="42" x2="72" y2="42" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="58" y1="48" x2="68" y2="48" stroke="#F87171" strokeWidth="2" strokeLinecap="round" />
+                      </g>
+
+                      {/* Smart Solution Bulb in Center Top */}
+                      <g style={{ animation: 'sparkleBurst 2.2s ease-in-out infinite', transformOrigin: '80px 22px' }}>
+                        {/* Glow background */}
+                        <circle cx="80" cy="22" r="14" fill="#FEF3C7" />
+                        {/* Bulb glass */}
+                        <path d="M74 20C74 16.7 76.7 14 80 14C83.3 14 86 16.7 86 20C86 22 84.5 24 83.5 25.5V28H76.5V25.5C75.5 24 74 22 74 20Z" fill="#F59E0B" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+                        {/* Screw base */}
+                        <rect x="77" y="28" width="6" height="3" rx="1" fill="#64748B" stroke="#1E293B" strokeWidth="1" />
+                        {/* Rays */}
+                        <line x1="80" y1="8" x2="80" y2="11" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="90" y1="12" x2="88" y2="15" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="70" y1="12" x2="72" y2="15" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                      </g>
+
+                      {/* Answer Bubble (Mentor - Bottom Right) */}
+                      <g style={{ animation: 'popCard 2.4s ease-in-out infinite', transformOrigin: '104px 72px' }}>
+                        <path d="M84 56H122C126.4 56 130 59.6 130 64V80C130 84.4 126.4 88 122 88H118L112 95V88H84C79.6 88 76 84.4 76 80V64C76 59.6 79.6 56 84 56Z" fill="#D1FAE5" stroke="#1E293B" strokeWidth="2.5" strokeLinejoin="round" />
+                        {/* Verified Check Circle */}
+                        <circle cx="88" cy="72" r="6.5" fill="#10B981" stroke="#1E293B" strokeWidth="1.5" />
+                        <path d="M85 72L87 74.5L91.5 69.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        {/* Solution text lines */}
+                        <line x1="98" y1="68" x2="120" y2="68" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="98" y1="75" x2="114" y2="75" stroke="#34D399" strokeWidth="2" strokeLinecap="round" />
+                      </g>
+
+                      {/* Floating 24/7 Support Pill */}
+                      <g style={{ animation: 'floatAvatar 3s ease-in-out infinite', transformOrigin: '50px 88px' }}>
+                        <rect x="34" y="80" width="38" height="15" rx="7.5" fill="#1E293B" />
+                        <circle cx="42" cy="87.5" r="3" fill="#10B981" style={{ animation: 'dotPulse 1.2s ease-in-out infinite' }} />
+                        <text x="56" y="90.5" fill="white" fontSize="6.5" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">২৪/৭ লাইভ</text>
+                      </g>
+                    </svg>
                   </div>
-                  <h3 className="font-bold text-sm sm:text-base text-white">
-                    ডাউট সলভ
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white flex items-center justify-between">
+                    <span>ডাউট সলভ</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 text-[10px] font-extrabold uppercase">
+                      Soon
+                    </span>
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-300">
-                  এক্সপার্ট মেন্টরদের কাছ থেকে কঠিন প্রশ্নের সমাধান।
-                </p>
               </div>
 
-              {/* Varsity Predictor */}
-              <div className="relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-neutral-900/60 to-neutral-800/30 border border-dashed border-neutral-700/70 hover:border-neutral-600 transition-colors">
-                <div className="flex items-center gap-3 sm:gap-4 mb-2.5 sm:mb-4">
-                  <div className="p-2.5 sm:p-3 bg-emerald-900/20 rounded-xl text-emerald-400">
-                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
+              {/* 3. Varsity Predictor */}
+              <div className="bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Target Probability Gauge Arc (Speedometer) */}
+                      <path d="M40 86A46 46 0 0 1 120 86" stroke="#E2E8F0" strokeWidth="10" strokeLinecap="round" fill="none" />
+                      <path d="M40 86A46 46 0 0 1 114 62" stroke="#10B981" strokeWidth="10" strokeLinecap="round" fill="none" strokeDasharray="130" strokeDashoffset="20" />
+
+                      {/* University Gate / Pillars in center backdrop */}
+                      <rect x="64" y="62" width="6" height="26" rx="2" fill="#CBD5E1" stroke="#1E293B" strokeWidth="1.5" />
+                      <rect x="90" y="62" width="6" height="26" rx="2" fill="#CBD5E1" stroke="#1E293B" strokeWidth="1.5" />
+                      <rect x="60" y="58" width="40" height="5" rx="2" fill="#94A3B8" stroke="#1E293B" strokeWidth="1.5" />
+
+                      {/* Graduation Cap (Mortarboard) - Floating on Top */}
+                      <g style={{ animation: 'floatAvatar 2.6s ease-in-out infinite', transformOrigin: '80px 36px' }}>
+                        {/* Cap Skull cap */}
+                        <path d="M68 34C68 38 73 41 80 41C87 41 92 38 92 34V39C92 42 87 45 80 45C73 45 68 42 68 39V34Z" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+                        {/* Diamond Board */}
+                        <path d="M80 18L106 28L80 38L54 28L80 18Z" fill="#1E293B" stroke="#0F172A" strokeWidth="3" strokeLinejoin="round" />
+                        <circle cx="80" cy="28" r="3" fill="#F59E0B" />
+                        {/* Tassel */}
+                        <path d="M80 28L100 36V46" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="100" cy="47" r="2.5" fill="#F59E0B" />
+                      </g>
+
+                      {/* Gauge Needle pointing towards High Chance (95%) */}
+                      <g style={{ animation: 'popCard 2.4s ease-in-out infinite', transformOrigin: '80px 86px' }}>
+                        <circle cx="80" cy="86" r="6" fill="#1E293B" />
+                        <circle cx="80" cy="86" r="3" fill="#FFFFFF" />
+                        <line x1="80" y1="86" x2="108" y2="60" stroke="#EF4444" strokeWidth="3" strokeLinecap="round" />
+                      </g>
+
+                      {/* Prediction Success Pill: "৯৫% চান্স" */}
+                      <g style={{ animation: 'popCard 2s ease-in-out infinite', transformOrigin: '80px 98px' }}>
+                        <rect x="46" y="88" width="68" height="20" rx="10" fill="#047857" stroke="#1E293B" strokeWidth="2" />
+                        <circle cx="56" cy="98" r="3" fill="#10B981" style={{ animation: 'dotPulse 1.2s ease-in-out infinite' }} />
+                        <text x="82" y="102" fill="white" fontSize="9" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">৯৫% চান্স</text>
+                      </g>
+
+                      {/* Floating Sparkles */}
+                      <g style={{ animation: 'sparkleBurst 2.4s ease-in-out infinite', transformOrigin: '124px 28px' }}>
+                        <path d="M124 22L125.5 26.5L130 28L125.5 29.5L124 34L122.5 29.5L118 28L122.5 26.5Z" fill="#F59E0B" />
+                      </g>
+                    </svg>
                   </div>
-                  <h3 className="font-bold text-sm sm:text-base text-white">
-                    ভার্সিটি প্রেডিক্টর
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white flex items-center justify-between">
+                    <span>ভার্সিটি প্রেডিক্টর</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 text-[10px] font-extrabold uppercase">
+                      Soon
+                    </span>
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-300">
-                  তোমার স্কোর অনুযায়ী চান্স পাওয়ার সম্ভাবনা যাচাই।
-                </p>
               </div>
             </div>
           </div>
