@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Mail, Phone } from 'lucide-react';
 import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
 import { createClient } from '@/utils/supabase/client';
 import { getRandomAvatar } from '@/lib/avatar-utils';
@@ -30,9 +30,15 @@ export default function StepByStepRegistration({
   const [name, setName] = useState('');
   const [institute, setInstitute] = useState('');
   const [phoneOrEmail, setPhoneOrEmail] = useState(initialIdentifier);
+  const [secondaryIdentifier, setSecondaryIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Check whether initial input is a phone number
+  const isInitialPhone = Boolean(
+    phoneOrEmail && !phoneOrEmail.includes('@') && /^[0-9+০-৯\s-]+$/.test(phoneOrEmail.trim())
+  );
 
   // College suggestions
   const [collegeSuggestions, setCollegeSuggestions] = useState<string[]>([]);
@@ -139,11 +145,54 @@ export default function StepByStepRegistration({
     e.preventDefault();
     setError(null);
 
-    const cleanContact = phoneOrEmail.trim();
-    if (!cleanContact) {
+    const cleanPrimary = phoneOrEmail.trim();
+    const cleanSecondary = secondaryIdentifier.trim();
+
+    if (!cleanPrimary) {
       setError('মোবাইল নম্বর অথবা ইমেইল দাও');
       return;
     }
+
+    if (!cleanSecondary) {
+      if (isInitialPhone) {
+        setError('তোমার ইমেইল অ্যাড্রেস (Gmail) প্রদান করা বাধ্যতামূলক');
+      } else {
+        setError('তোমার ১১ ডিজিটের মোবাইল নম্বর প্রদান করা বাধ্যতামূলক');
+      }
+      return;
+    }
+
+    const rawPhone = isInitialPhone ? cleanPrimary : cleanSecondary;
+    const rawEmail = isInitialPhone ? cleanSecondary : cleanPrimary;
+
+    // 1. Phone Normalization & Validation
+    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    let phoneDigits = rawPhone;
+    for (let i = 0; i < 10; i++) {
+      phoneDigits = phoneDigits.split(bnDigits[i]).join(i.toString());
+    }
+    const cleanDigits = phoneDigits.replace(/\D/g, '');
+    let normalizedPhone = cleanDigits;
+    if (normalizedPhone.startsWith('8801') && normalizedPhone.length === 13) {
+      normalizedPhone = normalizedPhone.substring(2);
+    } else if (normalizedPhone.startsWith('1') && normalizedPhone.length === 10) {
+      normalizedPhone = '0' + normalizedPhone;
+    }
+
+    if (normalizedPhone.length !== 11 || !normalizedPhone.startsWith('01')) {
+      setError('সঠিক ১১ ডিজিটের মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)');
+      return;
+    }
+
+    // 2. Email Validation
+    const cleanEmail = rawEmail.toLowerCase().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!cleanEmail || !emailRegex.test(cleanEmail)) {
+      setError('সঠিক ইমেইল অ্যাড্রেস লিখো (যেমন: student@gmail.com)');
+      return;
+    }
+
+    // 3. Password Validation
     if (!password) {
       setError('পাসওয়ার্ড লিখো');
       return;
@@ -160,48 +209,18 @@ export default function StepByStepRegistration({
     setLoading(true);
 
     try {
-      // 1. Bengali to English digits
-      const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-      let targetInput = cleanContact;
-      for (let i = 0; i < 10; i++) {
-        targetInput = targetInput.split(bnDigits[i]).join(i.toString());
-      }
-
-      let targetEmail = targetInput.toLowerCase();
-      let inputPhone = '';
-      const isPhone = !targetInput.includes('@') && /^[0-9+]+$/.test(targetInput.replace(/\s|-/g, ''));
-
-      if (isPhone) {
-        const cleanDigits = targetInput.replace(/\D/g, '');
-        let normalizedPhone = cleanDigits;
-        if (normalizedPhone.startsWith('8801') && normalizedPhone.length === 13) {
-          normalizedPhone = normalizedPhone.substring(2);
-        } else if (normalizedPhone.startsWith('1') && normalizedPhone.length === 10) {
-          normalizedPhone = '0' + normalizedPhone;
-        }
-
-        if (normalizedPhone.length !== 11 || !normalizedPhone.startsWith('01')) {
-          setError('সঠিক ১১ ডিজিটের মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)');
-          setLoading(false);
-          return;
-        }
-
-        inputPhone = normalizedPhone;
-        targetEmail = `${normalizedPhone}@user.obhyash.com`;
-      }
-
       // 2. Prepare Canonical Data
       const canonicalCollege = getCanonicalCollegeName(institute.trim()) || 'অন্যান্য প্রতিষ্ঠান';
 
-      // 3. Register via Supabase Auth
+      // 3. Register via Supabase Auth with REAL email & phone
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: targetEmail,
+        email: cleanEmail,
         password,
         options: {
           data: {
             full_name: name.trim(),
             name: name.trim(),
-            phone: inputPhone || null,
+            phone: normalizedPhone,
             role: 'Student',
             stream: stream,
             batch: batch,
@@ -214,7 +233,7 @@ export default function StepByStepRegistration({
 
       if (signUpError) {
         if (signUpError.message.includes('User already registered')) {
-          setError('এই মোবাইল/ইমেইল দিয়ে ইতোমধ্যে একাউন্ট খোলা আছে। লগইন করো।');
+          setError('এই মোবাইল অথবা ইমেইল দিয়ে ইতোমধ্যে একাউন্ট খোলা আছে। লগইন করো।');
         } else {
           setError(signUpError.message || 'রেজিস্ট্রেশন সম্পন্ন করা যায়নি।');
         }
@@ -229,7 +248,7 @@ export default function StepByStepRegistration({
         if (!session) {
           try {
             const { data: signInData } = await supabase.auth.signInWithPassword({
-              email: targetEmail,
+              email: cleanEmail,
               password,
             });
             if (signInData?.session) {
@@ -252,7 +271,7 @@ export default function StepByStepRegistration({
               userId: user.id,
               profileData: {
                 name: name.trim(),
-                phone: inputPhone || cleanContact,
+                phone: normalizedPhone,
                 gender: gender,
                 institute: canonicalCollege,
                 stream: stream,
@@ -273,7 +292,8 @@ export default function StepByStepRegistration({
             .from('users')
             .update({
               name: name.trim(),
-              phone: inputPhone || null,
+              email: cleanEmail,
+              phone: normalizedPhone,
               gender: gender,
               institute: canonicalCollege,
               stream: stream,
@@ -370,7 +390,7 @@ export default function StepByStepRegistration({
                   }}
                   placeholder="তোমার নাম লিখো"
                   autoFocus
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#171a23] border border-[#262a36] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:border-emerald-500/80 focus:ring-1 focus:ring-emerald-500/50 transition-all"
+                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                 />
               </div>
 
@@ -387,12 +407,12 @@ export default function StepByStepRegistration({
                     if (institute.trim().length >= 2) setShowSuggestions(true);
                   }}
                   placeholder="কলেজ বা প্রতিষ্ঠানের নাম লিখো"
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#171a23] border border-[#262a36] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:border-emerald-500/80 focus:ring-1 focus:ring-emerald-500/50 transition-all"
+                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                 />
 
                 {/* College Autocomplete Dropdown */}
                 {showSuggestions && collegeSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-[#1a1e29] border border-[#2e3447] rounded-xl shadow-2xl z-30 divide-y divide-neutral-800">
+                  <div className="absolute top-full left-0 right-0 mt-1.5 max-h-48 overflow-y-auto bg-[#141824]/90 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-[0_12px_32px_rgba(0,0,0,0.6)] z-30 divide-y divide-white/[0.04]">
                     {collegeSuggestions.map((colName, idx) => (
                       <button
                         key={idx}
@@ -412,7 +432,7 @@ export default function StepByStepRegistration({
                 <button
                   type="button"
                   onClick={handleNextFromName}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white shadow-lg shadow-emerald-950/50 transition-all cursor-pointer"
+                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none transition-all cursor-pointer"
                 >
                   এগিয়ে যাও
                 </button>
@@ -439,8 +459,8 @@ export default function StepByStepRegistration({
                 }}
                 className={`w-full py-4 px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
                   gender === 'Male'
-                    ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)]'
-                    : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200'
+                    ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
+                    : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                 }`}
               >
                 <span className="text-2xl">👦</span>
@@ -455,8 +475,8 @@ export default function StepByStepRegistration({
                 }}
                 className={`w-full py-4 px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer ${
                   gender === 'Female'
-                    ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)]'
-                    : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200'
+                    ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
+                    : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                 }`}
               >
                 <span className="text-2xl">👧</span>
@@ -491,8 +511,8 @@ export default function StepByStepRegistration({
                     }}
                     className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)]'
-                        : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200'
+                        ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
+                        : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
@@ -532,10 +552,10 @@ export default function StepByStepRegistration({
                     }}
                     className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 ${
                       isDisabled
-                        ? 'opacity-40 cursor-not-allowed border border-[#232734]/50 bg-[#12141c] text-neutral-500'
+                        ? 'opacity-40 cursor-not-allowed border border-white/[0.04] bg-[#12141c]/50 text-neutral-500'
                         : isSelected
-                        ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)] cursor-pointer'
-                        : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200 cursor-pointer'
+                        ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] cursor-pointer active:translate-y-[2px] active:border-b-2'
+                        : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] cursor-pointer active:translate-y-[1px] active:border-b-2'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
@@ -577,8 +597,8 @@ export default function StepByStepRegistration({
                     }}
                     className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)]'
-                        : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200'
+                        ? 'border-2 border-emerald-500 border-b-[4px] border-b-[#047857] bg-[#064e3b]/35 backdrop-blur-md text-white shadow-[0_3px_0_0_#047857,0_0_20px_rgba(16,185,129,0.2)] active:translate-y-[2px] active:border-b-2'
+                        : 'border border-white/[0.08] border-b-[3px] border-b-[#1b1f2d] bg-[#131620]/75 backdrop-blur-md text-neutral-200 shadow-[0_3px_0_0_#1b1f2d,0_4px_14px_rgba(0,0,0,0.3)] hover:bg-[#1a1e2b] hover:border-b-[#262c3e] active:translate-y-[1px] active:border-b-2'
                     }`}
                   >
                     <span className="font-bold text-sm sm:text-base">{opt.title}</span>
@@ -601,10 +621,12 @@ export default function StepByStepRegistration({
             <div className="w-full space-y-4">
               {/* Confirmed Mobile/Email Display */}
               {phoneOrEmail && (
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#141720] border border-[#232734] text-xs sm:text-sm">
+                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] text-xs sm:text-sm">
                   <div className="flex items-center gap-2 text-neutral-300 truncate mr-2">
-                    <span className="text-neutral-500 font-medium shrink-0">মোবাইল / ইমেইল:</span>
-                    <span className="font-bold text-white tracking-wide truncate">{phoneOrEmail}</span>
+                    <span className="text-neutral-500 font-medium shrink-0">
+                      {isInitialPhone ? 'মোবাইল নম্বর:' : 'ইমেইল অ্যাড্রেস:'}
+                    </span>
+                    <span className="font-bold text-white tracking-wide truncate font-mono">{phoneOrEmail}</span>
                   </div>
                   <button
                     type="button"
@@ -615,6 +637,34 @@ export default function StepByStepRegistration({
                   </button>
                 </div>
               )}
+
+              {/* Dynamic Secondary Identifier Input (Mandatory) */}
+              <div className="space-y-1.5 text-left">
+                <label className="block text-xs sm:text-sm font-semibold text-neutral-300 flex items-center justify-between">
+                  <span>{isInitialPhone ? 'ইমেইল অ্যাড্রেস (Gmail)' : 'মোবাইল নম্বর'}</span>
+                  <span className="text-[11px] text-emerald-400 font-normal">বাধ্যতামূলক</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400">
+                    {isInitialPhone ? <Mail className="w-4 h-4 sm:w-5 sm:h-5" /> : <Phone className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  </div>
+                  <input
+                    type={isInitialPhone ? 'email' : 'tel'}
+                    required
+                    value={secondaryIdentifier}
+                    onChange={(e) => {
+                      setSecondaryIdentifier(e.target.value);
+                      setError(null);
+                    }}
+                    placeholder={
+                      isInitialPhone
+                        ? 'তোমার জিমেইল লিখো (যেমন: student@gmail.com)'
+                        : '১১ ডিজিটের মোবাইল নম্বর (যেমন: 017XXXXXXXX)'
+                    }
+                    className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all font-mono"
+                  />
+                </div>
+              </div>
 
               {/* Password */}
               <div className="space-y-1.5 text-left">
@@ -630,7 +680,7 @@ export default function StepByStepRegistration({
                       setError(null);
                     }}
                     placeholder="পাসওয়ার্ড লিখো (কমপক্ষে ৬ অক্ষর)"
-                    className="w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-xl bg-[#171a23] border border-[#262a36] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:border-emerald-500/80 focus:ring-1 focus:ring-emerald-500/50 transition-all"
+                    className="w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                   />
                   <button
                     type="button"
@@ -655,7 +705,7 @@ export default function StepByStepRegistration({
                     setError(null);
                   }}
                   placeholder="পাসওয়ার্ড পুনরায় লিখো"
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#171a23] border border-[#262a36] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:border-emerald-500/80 focus:ring-1 focus:ring-emerald-500/50 transition-all"
+                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all"
                 />
               </div>
 
@@ -664,7 +714,7 @@ export default function StepByStepRegistration({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white shadow-lg shadow-emerald-950/50 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? (
                     <>
