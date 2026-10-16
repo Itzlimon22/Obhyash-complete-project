@@ -70,6 +70,15 @@ export async function POST(request: Request) {
       user = cookieUser;
     }
 
+    // Fallback: If caller supplied a valid userId (e.g. from fresh signup), verify via admin
+    if (!user && body.userId && typeof body.userId === 'string') {
+      const { data: adminUserData, error: adminUserErr } =
+        await supabaseAdmin.auth.admin.getUserById(body.userId);
+      if (!adminUserErr && adminUserData?.user) {
+        user = adminUserData.user;
+      }
+    }
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -135,15 +144,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: upsertError.message }, { status: 500 });
     }
 
-    // 4. If an optional password was provided, set it via Supabase Admin
-    if (password && typeof password === 'string' && password.trim().length >= 6) {
-      try {
-        await supabaseAdmin.auth.admin.updateUserById(user.id, {
-          password: password.trim(),
-        });
-      } catch (pwdErr) {
-        console.warn('Could not set initial password:', pwdErr);
+    // 4. Update auth user metadata so Supabase Auth user record stays in sync
+    try {
+      const updatePayload: { password?: string; user_metadata: Record<string, any> } = {
+        user_metadata: {
+          name: name,
+          full_name: name,
+          phone: phone,
+          stream: stream,
+          batch: batch,
+          division: division,
+          institute: institute,
+          role: 'Student',
+        },
+      };
+
+      if (password && typeof password === 'string' && password.trim().length >= 6) {
+        updatePayload.password = password.trim();
       }
+
+      await supabaseAdmin.auth.admin.updateUserById(user.id, updatePayload);
+    } catch (pwdErr) {
+      console.warn('Could not update user metadata/password:', pwdErr);
     }
 
     // 5. Handle referral code if provided
@@ -171,6 +193,8 @@ export async function POST(request: Request) {
         userId: user.id,
         role: 'student',
         status: 'Active',
+        stream: stream,
+        batch: batch,
       }),
       { maxAge: 180, path: '/' },
     );

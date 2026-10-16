@@ -35,15 +35,15 @@ export default function LoginSupportModal({ isOpen, onClose }: LoginSupportModal
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error('অনুগ্রহ করে তোমার নাম লিখুন');
+      toast.error('অনুগ্রহ করে তোমার নাম লিখো');
       return;
     }
     if (!contactInfo.trim()) {
-      toast.error('মোবাইল নম্বর বা ইমেইল প্রদান করুন');
+      toast.error('মোবাইল নম্বর বা ইমেইল দাও');
       return;
     }
     if (!description.trim()) {
-      toast.error('সমস্যার বিবরণ লিখুন');
+      toast.error('সমস্যার বিবরণ লিখো');
       return;
     }
 
@@ -71,7 +71,7 @@ export default function LoginSupportModal({ isOpen, onClose }: LoginSupportModal
       });
       toast.success('অনুরোধ সফলভাবে পাঠানো হয়েছে!');
     } catch (err: any) {
-      toast.error(err.message || 'একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      toast.error(err.message || 'একটি সমস্যা হয়েছে। আবার চেষ্টা করো।');
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +148,7 @@ export default function LoginSupportModal({ isOpen, onClose }: LoginSupportModal
                   onClick={handleResetAndClose}
                   className="w-full py-2.5 px-4 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors"
                 >
-                  বন্ধ করুন
+                  বন্ধ করো
                 </button>
               </div>
             </div>
@@ -162,7 +162,7 @@ export default function LoginSupportModal({ isOpen, onClose }: LoginSupportModal
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="পূর্ণ নাম লিখুন"
+                  placeholder="পূর্ণ নাম লিখো"
                   required
                   className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-[#006A4E] dark:focus:border-emerald-500 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
                 />
@@ -226,7 +226,7 @@ export default function LoginSupportModal({ isOpen, onClose }: LoginSupportModal
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    অনুরোধ জমা দিন
+                    অনুরোধ জমা দাও
                   </>
                 )}
               </button>
@@ -239,7 +239,7 @@ export default function LoginSupportModal({ isOpen, onClose }: LoginSupportModal
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  জরুরি হলে সরাসরি WhatsApp-এ বার্তা দিন
+                  জরুরি হলে সরাসরি WhatsApp-এ বার্তা দাও
                 </a>
               </div>
             </form>

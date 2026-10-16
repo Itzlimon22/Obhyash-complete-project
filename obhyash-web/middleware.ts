@@ -64,6 +64,8 @@ export const config = {
     '/personal/:path*',
     '/login',
     '/signup',
+    '/register',
+    '/auth/:path*',
     '/onboarding',
     '/deactivated',
   ],

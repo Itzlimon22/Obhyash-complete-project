@@ -49,7 +49,12 @@ export async function updateSession(request: NextRequest) {
   const isRootRoute = pathname === '/';
   const isAdminRoute = pathname.startsWith('/admin');
   const isTeacherRoute = pathname.startsWith('/teacher');
-  const isAuthRoute = pathname === '/login' || pathname === '/signup';
+  const isAuthRoute =
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/register' ||
+    pathname === '/auth/login' ||
+    pathname === '/auth/register';
 
   // All student tab paths that map into the SPA (including deep-link sub-paths)
   const STUDENT_TAB_PATHS = [
@@ -166,7 +171,10 @@ export async function updateSession(request: NextRequest) {
         }
         const parsed = JSON.parse(val);
         if (parsed && parsed.role && parsed.userId === user.id) {
-          profile = parsed;
+          // Only use cache if it has complete profile info (or staff), otherwise fetch fresh from DB
+          if (parsed.role === 'admin' || parsed.role === 'teacher' || (parsed.stream && parsed.batch)) {
+            profile = parsed;
+          }
         }
       } catch (e) {
         // ignore

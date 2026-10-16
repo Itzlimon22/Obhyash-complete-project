@@ -44,10 +44,12 @@ export default function StepByStepRegistration({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialIdentifier && !phoneOrEmail) {
+    if (initialIdentifier) {
       setPhoneOrEmail(initialIdentifier);
+    } else if (!phoneOrEmail) {
+      onBackToLogin();
     }
-  }, [initialIdentifier]);
+  }, [initialIdentifier, phoneOrEmail, onBackToLogin]);
 
   // College search handler
   const handleInstituteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +186,11 @@ export default function StepByStepRegistration({
         targetEmail = `${normalizedPhone}@user.obhyash.com`;
       }
 
-      // 2. Register via Supabase
+      // 2. Prepare Canonical Data
+      const canonicalCollege = getCanonicalCollegeName(institute.trim()) || 'অন্যান্য প্রতিষ্ঠান';
+      const mappedStream = stream === 'Dakhil' || stream === 'Alim' ? 'HSC' : stream;
+
+      // 3. Register via Supabase Auth
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: targetEmail,
         password,
@@ -194,6 +200,11 @@ export default function StepByStepRegistration({
             name: name.trim(),
             phone: inputPhone || null,
             role: 'Student',
+            stream: mappedStream,
+            batch: batch,
+            division: group,
+            institute: canonicalCollege,
+            gender: gender,
           },
         },
       });
@@ -210,45 +221,83 @@ export default function StepByStepRegistration({
 
       const user = signUpData?.user;
       if (user) {
-        // Upsert full profile data
-        const canonicalCollege = getCanonicalCollegeName(institute.trim());
-        const mappedStream = stream === 'Dakhil' || stream === 'Alim' ? 'HSC' : stream;
+        // Ensure active session
+        let session = signUpData.session;
+        if (!session) {
+          try {
+            const { data: signInData } = await supabase.auth.signInWithPassword({
+              email: targetEmail,
+              password,
+            });
+            if (signInData?.session) {
+              session = signInData.session;
+            }
+          } catch {
+            // non-fatal
+          }
+        }
 
-        await supabase.from('users').upsert(
-          {
-            id: user.id,
-            email: targetEmail,
-            name: name.trim(),
-            phone: inputPhone || null,
-            gender: gender,
-            institute: canonicalCollege,
-            stream: mappedStream,
-            division: group,
-            batch: batch,
-            exam_target: 'Engineering',
-            optional_subject: 'Biology',
-            role: 'Student',
-            status: 'Active',
-            avatar_url: getRandomAvatar(gender, user.id),
-            is_subscribed: false,
-            subscription_status: 'Inactive',
-            xp: 0,
-            level: 'Beginner',
-            exams_taken: 0,
-            enrolled_exams: 0,
-            created_at: new Date().toISOString(),
-            last_active: new Date().toISOString(),
-          },
-          { onConflict: 'id' },
-        );
+        // 4. Complete profile via server-side Admin API (bypasses RLS & triggers safely)
+        try {
+          await fetch('/api/auth/complete-profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              profileData: {
+                name: name.trim(),
+                phone: inputPhone || cleanContact,
+                gender: gender,
+                institute: canonicalCollege,
+                stream: mappedStream,
+                group: group,
+                batch: batch,
+                examTarget: 'Engineering',
+              },
+              password,
+            }),
+          });
+        } catch (apiErr) {
+          console.warn('complete-profile API call warning:', apiErr);
+        }
 
-        // Cache role cookie
+        // 5. Also perform direct update with client as immediate fallback
+        try {
+          await supabase
+            .from('users')
+            .update({
+              name: name.trim(),
+              phone: inputPhone || null,
+              gender: gender,
+              institute: canonicalCollege,
+              stream: mappedStream,
+              division: group,
+              batch: batch,
+              exam_target: 'Engineering',
+            })
+            .eq('id', user.id);
+        } catch (dbErr) {
+          console.warn('Direct user update warning:', dbErr);
+        }
+
+        // 6. Cache role cookie WITH stream and batch for instant middleware validation
         try {
           const roleCookieValue = encodeURIComponent(
-            JSON.stringify({ userId: user.id, role: 'student', status: 'Active' })
+            JSON.stringify({
+              userId: user.id,
+              role: 'student',
+              status: 'Active',
+              stream: mappedStream,
+              batch: batch,
+            })
           );
           document.cookie = `obhyash_role_cache=${roleCookieValue}; path=/; max-age=180; SameSite=Lax`;
           localStorage.removeItem('obhyash_user_profile');
+          localStorage.removeItem('obhyash_cached_subjects');
+          localStorage.removeItem('obhyash_exam_history');
         } catch {
           // non-fatal
         }
@@ -260,13 +309,13 @@ export default function StepByStepRegistration({
       }
     } catch (err: unknown) {
       console.error('Registration error:', err);
-      setError('একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করো।');
+      setError('একটি সমস্যা হয়েছে। আবার চেষ্টা করো।');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-8 relative selection:bg-emerald-500/20">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-8 relative selection:bg-emerald-500/20 font-sans">
       {/* Top Left: Back Navigation Arrow */}
       <button
         type="button"
@@ -515,6 +564,23 @@ export default function StepByStepRegistration({
             <MascotAvatar speechText="একটি পাসওয়ার্ড সেট করো" mood="thinking" />
 
             <div className="w-full space-y-4">
+              {/* Confirmed Mobile/Email Display */}
+              {phoneOrEmail && (
+                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#141720] border border-[#232734] text-xs sm:text-sm">
+                  <div className="flex items-center gap-2 text-neutral-300 truncate mr-2">
+                    <span className="text-neutral-500 font-medium shrink-0">মোবাইল / ইমেইল:</span>
+                    <span className="font-bold text-white tracking-wide truncate">{phoneOrEmail}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onBackToLogin}
+                    className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer shrink-0"
+                  >
+                    পরিবর্তন
+                  </button>
+                </div>
+              )}
+
               {/* Password */}
               <div className="space-y-1.5 text-left">
                 <label className="block text-xs sm:text-sm font-semibold text-neutral-300">

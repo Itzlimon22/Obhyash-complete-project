@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Loader2, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, Loader2, UserPlus, HelpCircle } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import StepByStepRegistration from './StepByStepRegistration';
 
@@ -34,8 +34,9 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const [isRegistering, setIsRegistering] = useState(defaultMode === 'register');
+  const [isRegistering, setIsRegistering] = useState(false);
   const [identifier, setIdentifier] = useState('');
+  const identifierInputRef = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,9 +50,9 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
   useEffect(() => {
     const err = searchParams.get('error');
     if (err === 'unregistered_google') {
-      setError('এই গুগল অ্যাকাউন্ট দিয়ে কোনো প্রোফাইল পাওয়া যায়নি। দয়া করে আবার চেষ্টা করুন।');
+      setError('এই গুগল অ্যাকাউন্ট দিয়ে কোনো প্রোফাইল পাওয়া যায়নি। আবার চেষ্টা করো।');
     } else if (err === 'oauth_cancelled') {
-      setError('গুগল লগইন বাতিল করা হয়েছে। আবার চেষ্টা করুন।');
+      setError('গুগল লগইন বাতিল করা হয়েছে। আবার চেষ্টা করো।');
     }
   }, [searchParams]);
 
@@ -63,6 +64,11 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
         onBackToLogin={() => {
           setIsRegistering(false);
           setError(null);
+          try {
+            window.history.replaceState(null, '', '/auth/login');
+          } catch {
+            // ignore
+          }
         }}
         nextUrl={nextParam}
       />
@@ -77,11 +83,11 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
 
     const cleanInput = identifier.trim();
     if (!cleanInput) {
-      setError('মোবাইল নম্বর অথবা ইমেইল লিখুন');
+      setError('মোবাইল নম্বর অথবা ইমেইল লিখো');
       return;
     }
     if (!password) {
-      setError('পাসওয়ার্ড লিখুন');
+      setError('পাসওয়ার্ড লিখো');
       return;
     }
     if (password.length < 6) {
@@ -114,7 +120,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
         }
 
         if (normalizedPhone.length !== 11 || !normalizedPhone.startsWith('01')) {
-          setError('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)');
+          setError('সঠিক ১১ ডিজিটের মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)');
           setLoading(false);
           return;
         }
@@ -134,6 +140,11 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
           } else {
             // User does not exist with this phone -> Transition to step-by-step registration!
             setLoading(false);
+            try {
+              window.history.replaceState(null, '', '/auth/register');
+            } catch {
+              // ignore
+            }
             setIsRegistering(true);
             return;
           }
@@ -148,7 +159,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
           email: targetEmail,
           password,
         }),
-        'অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করুন।',
+        'অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করো।',
       );
 
       // --- CASE A: Login Success ---
@@ -181,7 +192,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
         // Cache role cookie
         try {
           const roleCookieValue = encodeURIComponent(
-            JSON.stringify({ userId: user.id, role, status })
+            JSON.stringify({ userId: user.id, role, status, stream, batch })
           );
           document.cookie = `obhyash_role_cache=${roleCookieValue}; path=/; max-age=180; SameSite=Lax`;
           localStorage.removeItem('obhyash_user_profile');
@@ -233,13 +244,18 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
 
         // If user already exists in DB, it means they entered an incorrect password!
         if (isUserExisting) {
-          setError('পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড দিন অথবা পাসওয়ার্ড রিসেট করুন।');
+          setError('পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড দাও অথবা পাসওয়ার্ড রিসেট করো।');
           setLoading(false);
           return;
         }
 
         // If user does not exist at all, transition into Step-by-Step Registration!
         setLoading(false);
+        try {
+          window.history.replaceState(null, '', '/auth/register');
+        } catch {
+          // ignore
+        }
         setIsRegistering(true);
         return;
       }
@@ -248,8 +264,8 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
       const msg = err instanceof Error ? err.message : '';
       setError(
         msg.includes('timeout') || msg.includes('সময়সীমা')
-          ? 'সার্ভার রেসপন্স দিতে দেরি করছে। আবার চেষ্টা করুন।'
-          : 'একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+          ? 'সার্ভার রেসপন্স দিতে দেরি করছে। আবার চেষ্টা করো।'
+          : 'একটি সমস্যা হয়েছে। আবার চেষ্টা করো।',
       );
       setLoading(false);
     }
@@ -269,7 +285,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
       if (oauthError) throw oauthError;
     } catch (err: unknown) {
       console.error('Google login error:', err);
-      setError('গুগল লগইন সম্পন্ন করা যায়নি। আবার চেষ্টা করুন।');
+      setError('গুগল লগইন সম্পন্ন করা যায়নি। আবার চেষ্টা করো।');
       setGoogleLoading(false);
     }
   };
@@ -277,7 +293,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
   const isButtonActive = identifier.trim().length > 0 && password.length > 0;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-8 selection:bg-red-500/20">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-8 selection:bg-red-500/20 font-sans">
       {/* Background Subtle Gradient Vignette */}
       <div
         className="pointer-events-none fixed inset-0 bg-radial-at-c from-neutral-900/30 via-transparent to-black/60"
@@ -286,14 +302,12 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
 
       <div className="relative z-10 w-full max-w-[380px] sm:max-w-[410px] flex flex-col items-center">
         {/* Top: Obhyash Logo */}
-        <Link href="/" className="mb-3 group inline-flex flex-col items-center transition-transform hover:scale-105 duration-200">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden flex items-center justify-center bg-[#071500] shadow-xl border border-neutral-800">
-            <img
-              src="/obhyash_logo.svg"
-              alt="Obhyash Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <Link href="/" className="mb-4 inline-flex items-center justify-center transition-transform hover:scale-105 duration-200">
+          <img
+            src="/obhyash_full_logo_dark.svg"
+            alt="Obhyash Logo"
+            className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
+          />
         </Link>
 
         {/* Subtitle / Header */}
@@ -323,9 +337,13 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
               মোবাইল নম্বর বা ইমেইল
             </label>
             <input
+              ref={identifierInputRef}
               type="text"
               value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              onChange={(e) => {
+                setIdentifier(e.target.value);
+                if (error) setError(null);
+              }}
               placeholder="01XXXXXXXXX অথবা example@mail.com"
               disabled={loading || googleLoading}
               autoComplete="username"
@@ -343,7 +361,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="পাসওয়ার্ড লিখুন"
+                placeholder="পাসওয়ার্ড লিখো"
                 disabled={loading || googleLoading}
                 autoComplete="current-password"
                 className="w-full pl-4 pr-11 py-3 sm:py-3.5 rounded-xl bg-[#171a23] border border-[#262a36] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:border-red-500/80 focus:ring-1 focus:ring-red-500/50 transition-all disabled:opacity-50"
@@ -363,7 +381,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
                 href="/forgot-password"
                 className="text-xs text-neutral-400 hover:text-red-400 transition-colors"
               >
-                পাসওয়ার্ড ভুলে গেছেন?
+                পাসওয়ার্ড ভুলে গেছো?
               </Link>
             </div>
           </div>
@@ -382,7 +400,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                  <span>অপেক্ষা করুন...</span>
+                  <span>অপেক্ষা করো...</span>
                 </>
               ) : (
                 <span>এগিয়ে যাও</span>
@@ -395,16 +413,39 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
             <button
               type="button"
               onClick={() => {
-                if (!identifier.trim()) {
-                  setError('প্রথমে মোবাইল নম্বর বা ইমেইল লিখুন');
+                const cleanInput = identifier.trim();
+                if (!cleanInput) {
+                  setError('রেজিস্ট্রেশন শুরু করতে প্রথমে তোমার মোবাইল নম্বর বা ইমেইল লিখো');
+                  identifierInputRef.current?.focus();
                   return;
+                }
+
+                // If mobile number, validate 11 digits
+                const isPhone = !cleanInput.includes('@') && /^[0-9+]+$/.test(cleanInput.replace(/\s|-/g, ''));
+                if (isPhone) {
+                  const cleanDigits = cleanInput.replace(/\D/g, '');
+                  let norm = cleanDigits;
+                  if (norm.startsWith('8801') && norm.length === 13) norm = norm.substring(2);
+                  if (norm.startsWith('1') && norm.length === 10) norm = '0' + norm;
+                  if (norm.length !== 11 || !norm.startsWith('01')) {
+                    setError('সঠিক ১১ ডিজিটের মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)');
+                    identifierInputRef.current?.focus();
+                    return;
+                  }
+                }
+
+                setError(null);
+                try {
+                  window.history.replaceState(null, '', '/auth/register');
+                } catch {
+                  // ignore
                 }
                 setIsRegistering(true);
               }}
               className="text-xs sm:text-sm text-neutral-400 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
             >
               <UserPlus className="w-3.5 h-3.5" />
-              <span>নতুন শিক্ষার্থী? রেজিস্ট্রেশন করুন</span>
+              <span>নতুন শিক্ষার্থী? রেজিস্ট্রেশন করো</span>
             </button>
           </div>
         </form>
@@ -451,13 +492,19 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
           <span>Google দিয়ে চালিয়ে যাও</span>
         </button>
 
+        {/* Support Link Button: google diye caliye jao er niche support lagbe button */}
+        <div className="w-full pt-3">
+          <Link
+            href="/support"
+            className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#141720] hover:bg-[#1c202c] border border-[#232734] text-neutral-300 hover:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+          >
+            <HelpCircle className="w-4 h-4 text-emerald-400" />
+            <span>সাপোর্ট লাগবে?</span>
+          </Link>
+        </div>
+
         {/* Footer info & Links */}
-        <div className="mt-8 text-center text-xs text-neutral-500 space-y-2">
-          <div>
-            <Link href="/" className="hover:text-neutral-300 transition-colors">
-              ← হোমপেজে ফিরে যাও
-            </Link>
-          </div>
+        <div className="mt-8 text-center text-xs text-neutral-500">
           <div className="flex items-center justify-center gap-3 text-[11px] text-neutral-500">
             <Link href="/privacy" className="hover:underline hover:text-neutral-400">
               গোপনীয়তা নীতি

@@ -130,10 +130,9 @@ const config = {
       },
       fontFamily: {
         sans: [
-          'var(--font-hind)',
-          "'Hind Siliguri'",
-          'HindSiliguri',
           'var(--font-inter)',
+          'var(--font-noto-sans-bengali)',
+          "'Noto Sans Bengali'",
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',
@@ -160,10 +159,14 @@ const config = {
           'sans-serif',
         ],
         bengali: [
-          'var(--font-hind)',
-          "'Hind Siliguri'",
           'var(--font-inter)',
+          'var(--font-noto-sans-bengali)',
+          "'Noto Sans Bengali'",
           'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
           'sans-serif',
         ],
         noto: [
