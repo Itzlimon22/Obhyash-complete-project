@@ -23,7 +23,7 @@ export default function StepByStepRegistration({
   const [step, setStep] = useState(1);
 
   // Form State
-  const [stream, setStream] = useState<'HSC' | 'SSC' | 'Dakhil' | 'Alim'>('HSC');
+  const [stream, setStream] = useState<'HSC' | 'SSC'>('HSC');
   const [group, setGroup] = useState('Science');
   const [batch, setBatch] = useState('HSC 2026');
   const [gender, setGender] = useState<'Male' | 'Female'>('Male');
@@ -81,31 +81,36 @@ export default function StepByStepRegistration({
     }
   };
 
-  // Step 1: Stream Options
+  // Step 3: Stream Options - Pure Bangla in UI
   const streamOptions = [
-    { id: 'HSC', title: 'এইচএসসি / অ্যাডমিশন', badge: 'সবচেয়ে জনপ্রিয়', icon: '🎓' },
+    { id: 'HSC', title: 'এইচএসসি', badge: 'জনপ্রিয়', icon: '🎓' },
     { id: 'SSC', title: 'এসএসসি', icon: '🎒' },
-    { id: 'Dakhil', title: 'দাখিল', icon: '📖' },
-    { id: 'Alim', title: 'আলিম', icon: '🏛️' },
   ];
 
-  // Step 2: Group Options
-  const groupOptions = [
-    { id: 'Science', title: 'বিজ্ঞান', icon: '🧪' },
-    { id: 'English Version', title: 'ইংলিশ ভার্সন', icon: '🔬' },
-    { id: 'Humanities', title: 'মানবিক', icon: '🌍' },
-    { id: 'Business', title: 'বাণিজ্য', icon: '💼' },
-  ];
+  // Step 4: Group Options - Pure Bangla in UI
+  const getGroupOptions = () => {
+    if (stream === 'SSC') {
+      return [
+        { id: 'Science', title: 'বিজ্ঞান', icon: '🧪' },
+        { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼' },
+        { id: 'Humanities', title: 'মানবিক', icon: '🌍' },
+      ];
+    }
+    return [
+      { id: 'Science', title: 'বিজ্ঞান', icon: '🧪' },
+      { id: 'Business Studies', title: 'ব্যবসায় শিক্ষা', icon: '💼', badge: 'শীঘ্রই আসছে', disabled: true },
+      { id: 'Humanities', title: 'মানবিক', icon: '🌍', badge: 'শীঘ্রই আসছে', disabled: true },
+    ];
+  };
 
-  // Step 3: Batch Options based on Stream
+  // Step 5: Batch Options based on Stream - Pure Bangla in UI
   const getBatchOptions = () => {
     if (stream === 'HSC') {
       return [
-        { id: 'Admission 2026', title: 'অ্যাডমিশন ২০২৬' },
+        { id: 'HSC 2025', title: 'এইচএসসি ২০২৫' },
         { id: 'HSC 2026', title: 'এইচএসসি ২০২৬' },
         { id: 'HSC 2027', title: 'এইচএসসি ২০২৭' },
         { id: 'HSC 2028', title: 'এইচএসসি ২০২৮' },
-        { id: 'Re-Admission 2025', title: 'রি-অ্যাডমিশন ২০২৫' },
       ];
     }
     return [
@@ -187,7 +192,6 @@ export default function StepByStepRegistration({
 
       // 2. Prepare Canonical Data
       const canonicalCollege = getCanonicalCollegeName(institute.trim()) || 'অন্যান্য প্রতিষ্ঠান';
-      const mappedStream = stream === 'Dakhil' || stream === 'Alim' ? 'HSC' : stream;
 
       // 3. Register via Supabase Auth
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -199,7 +203,7 @@ export default function StepByStepRegistration({
             name: name.trim(),
             phone: inputPhone || null,
             role: 'Student',
-            stream: mappedStream,
+            stream: stream,
             batch: batch,
             division: group,
             institute: canonicalCollege,
@@ -251,7 +255,7 @@ export default function StepByStepRegistration({
                 phone: inputPhone || cleanContact,
                 gender: gender,
                 institute: canonicalCollege,
-                stream: mappedStream,
+                stream: stream,
                 group: group,
                 batch: batch,
                 examTarget: 'Engineering',
@@ -272,7 +276,7 @@ export default function StepByStepRegistration({
               phone: inputPhone || null,
               gender: gender,
               institute: canonicalCollege,
-              stream: mappedStream,
+              stream: stream,
               division: group,
               batch: batch,
               exam_target: 'Engineering',
@@ -289,7 +293,7 @@ export default function StepByStepRegistration({
               userId: user.id,
               role: 'student',
               status: 'Active',
-              stream: mappedStream,
+              stream: stream,
               batch: batch,
             })
           );
@@ -479,9 +483,10 @@ export default function StepByStepRegistration({
                     key={opt.id}
                     type="button"
                     onClick={() => {
-                      setStream(opt.id as any);
+                      setStream(opt.id as 'HSC' | 'SSC');
                       const defaultBatch = opt.id === 'HSC' ? 'HSC 2026' : 'SSC 2026';
                       setBatch(defaultBatch);
+                      setGroup('Science');
                       setStep(4);
                     }}
                     className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
@@ -502,7 +507,7 @@ export default function StepByStepRegistration({
           </div>
         )}
 
-        {/* ── STEP 4: Group Selection (Formerly Step 2) ────────────── */}
+        {/* ── STEP 4: Group Selection ─────────────────────────────────── */}
         {step === 4 && (
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="text-center mb-8">
@@ -512,27 +517,37 @@ export default function StepByStepRegistration({
             </div>
 
             <div className="w-full space-y-3">
-              {groupOptions.map((opt) => {
+              {getGroupOptions().map((opt) => {
                 const isSelected = group === opt.id;
+                const isDisabled = (opt as any).disabled;
                 return (
                   <button
                     key={opt.id}
                     type="button"
+                    disabled={isDisabled}
                     onClick={() => {
+                      if (isDisabled) return;
                       setGroup(opt.id);
                       setStep(5);
                     }}
-                    className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer ${
-                      isSelected
-                        ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)]'
-                        : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200'
+                    className={`w-full py-3.5 px-5 rounded-2xl flex items-center justify-between transition-all duration-200 ${
+                      isDisabled
+                        ? 'opacity-40 cursor-not-allowed border border-[#232734]/50 bg-[#12141c] text-neutral-500'
+                        : isSelected
+                        ? 'border-2 border-emerald-500 bg-[#0f231c] text-white shadow-[0_0_18px_rgba(16,185,129,0.22)] cursor-pointer'
+                        : 'border border-[#232734] bg-[#161922] hover:bg-[#1e222e] text-neutral-200 cursor-pointer'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
                       <span className="text-xl">{opt.icon}</span>
                       <span className="font-bold text-sm sm:text-base">{opt.title}</span>
+                      {(opt as any).badge && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 border border-neutral-700 font-medium">
+                          {(opt as any).badge}
+                        </span>
+                      )}
                     </div>
-                    {isSelected && <Check className="w-5 h-5 text-emerald-400" />}
+                    {isSelected && !isDisabled && <Check className="w-5 h-5 text-emerald-400" />}
                   </button>
                 );
               })}
