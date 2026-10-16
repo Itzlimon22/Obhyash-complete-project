@@ -328,6 +328,33 @@ export default function BlogHeader() {
               <span>এক্সাম দাও</span>
             </Link>
 
+            {/* Login Button (Desktop only) */}
+            <Link
+              href="/auth/login"
+              onClick={() =>
+                trackBlogConversion({
+                  eventType: 'login_click',
+                  buttonLocation: 'header_desktop',
+                })
+              }
+              className="hidden lg:flex items-center px-3.5 py-1.5 sm:py-2 rounded-full border border-slate-200/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs sm:text-sm font-bold font-noto transition-colors shrink-0"
+            >
+              লগইন
+            </Link>
+
+            {/* Register Button (Desktop only) */}
+            <Link
+              href="/auth/register"
+              onClick={() =>
+                trackBlogConversion({
+                  eventType: 'signup_click',
+                  buttonLocation: 'header_desktop',
+                })
+              }
+              className="hidden lg:flex items-center px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#064e3b] hover:bg-[#065f46] active:bg-[#022c22] text-white text-xs sm:text-sm font-bold font-noto shadow-xs transition-all shrink-0"
+            >
+              রেজিস্ট্রেশন
+            </Link>
 
             {/* Burger Menu Button (Neutral Slate Circular) */}
             <button
@@ -428,6 +455,36 @@ export default function BlogHeader() {
               </span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
+
+            {/* Login & Register Direct Buttons */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <Link
+                href="/auth/login"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  trackBlogConversion({
+                    eventType: 'login_click',
+                    buttonLocation: 'drawer',
+                  });
+                }}
+                className="flex items-center justify-center py-2.5 px-3 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm transition-all"
+              >
+                লগইন
+              </Link>
+              <Link
+                href="/auth/register"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  trackBlogConversion({
+                    eventType: 'signup_click',
+                    buttonLocation: 'drawer',
+                  });
+                }}
+                className="flex items-center justify-center py-2.5 px-3 rounded-2xl bg-[#064e3b] hover:bg-[#065f46] text-white font-bold text-xs sm:text-sm shadow-sm transition-all"
+              >
+                রেজিস্ট্রেশন
+              </Link>
+            </div>
           </div>
 
           {/* Drawer Navigation Links */}

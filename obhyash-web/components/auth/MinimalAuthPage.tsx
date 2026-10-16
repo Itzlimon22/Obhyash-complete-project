@@ -314,59 +314,44 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
     : identifier.trim().length > 0;
 
   return (
-    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col items-center justify-between bg-[#0a0c12] text-white px-4 py-4 sm:py-8 overflow-hidden relative selection:bg-emerald-500/20 font-sans">
-      {/* Background Soft Ambient Glow to eliminate empty void */}
+    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#0d0f15] text-white px-4 py-2.5 sm:py-8 overflow-hidden relative selection:bg-red-500/20 font-sans">
+      {/* Background Subtle Gradient Vignette */}
       <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_28%,rgba(16,185,129,0.12),transparent_60%)]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none fixed inset-0 bg-radial-at-c from-neutral-900/20 via-transparent to-black/70"
+        className="pointer-events-none fixed inset-0 bg-radial-at-c from-neutral-900/30 via-transparent to-black/60"
         aria-hidden="true"
       />
 
-      {/* Top Flex Spacer for balanced optical centering */}
-      <div className="w-full shrink-0 h-2 sm:h-6" aria-hidden="true" />
-
-      {/* Center Form Container */}
-      <div className="relative z-10 w-full max-w-[360px] sm:max-w-[400px] flex flex-col items-center my-auto">
+      <div className="relative z-10 w-full max-w-[360px] sm:max-w-[410px] flex flex-col items-center">
         {/* Top: Obhyash Logo */}
-        <Link href="/" className="mb-3 sm:mb-4 inline-flex items-center justify-center transition-transform hover:scale-105 duration-200">
+        <Link href="/" className="mb-2 sm:mb-4 inline-flex items-center justify-center transition-transform hover:scale-105 duration-200">
           <img
             src="/obhyash_full_logo_dark.svg"
             alt="Obhyash Logo"
-            className="h-9 sm:h-11 w-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+            className="h-8 sm:h-11 w-auto object-contain drop-shadow-md"
           />
         </Link>
 
-        {/* Clear Title & Welcoming Subtitle */}
-        <div className="text-center mb-4 sm:mb-6">
-          <h1 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
-            {isPasswordStep ? 'পাসওয়ার্ড দাও' : 'লগ ইন বা রেজিস্ট্রেশন'}
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1 max-w-[290px] mx-auto leading-relaxed">
-            {isPasswordStep
-              ? 'তোমার অ্যাকাউন্টের পাসওয়ার্ড লিখে প্রবেশ করো'
-              : 'শুরু করতে তোমার মোবাইল নম্বর বা ইমেইল লিখো'}
-          </p>
-        </div>
+        {/* Subtitle / Header */}
+        <h1 className="text-base sm:text-xl font-bold text-neutral-100 tracking-tight text-center mb-2.5 sm:mb-5">
+          {isPasswordStep ? 'লগ ইন' : 'রেজিস্ট্রেশন/ লগ ইন'}
+        </h1>
 
         {/* Error Alert */}
         {error && (
-          <div className="w-full mb-3 px-3.5 py-2 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs sm:text-sm text-center leading-relaxed animate-in fade-in">
+          <div className="w-full mb-4 px-3.5 py-2.5 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs sm:text-sm text-center leading-relaxed animate-in fade-in">
             {error}
           </div>
         )}
 
         {/* Success Alert */}
         {successMessage && (
-          <div className="w-full mb-3 px-3.5 py-2 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-200 text-xs sm:text-sm text-center leading-relaxed animate-in fade-in">
+          <div className="w-full mb-4 px-3.5 py-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-200 text-xs sm:text-sm text-center leading-relaxed animate-in fade-in">
             {successMessage}
           </div>
         )}
 
         {/* Main Form */}
-        <form onSubmit={handleSubmit} className="w-full space-y-2.5 sm:space-y-3.5">
+        <form onSubmit={handleSubmit} className="w-full space-y-2.5 sm:space-y-4">
           {/* Stage 1: Mobile or Email Input */}
           {!isPasswordStep ? (
             <div className="space-y-1 sm:space-y-1.5 text-left">
@@ -385,7 +370,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
                 disabled={loading || googleLoading}
                 autoComplete="username"
                 autoFocus
-                className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#131620]/80 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all disabled:opacity-50"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50 focus:shadow-[0_0_22px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50"
               />
             </div>
           ) : (
@@ -432,7 +417,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
                   placeholder="পাসওয়ার্ড লিখো"
                   disabled={loading || googleLoading}
                   autoComplete="current-password"
-                  className="w-full pl-4 pr-11 py-2.5 sm:py-3 rounded-xl bg-[#131620]/80 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 focus:shadow-[0_0_22px_rgba(16,185,129,0.25)] transition-all disabled:opacity-50"
+                  className="w-full pl-4 pr-11 py-2.5 sm:py-3.5 rounded-xl bg-[#131620]/75 backdrop-blur-md border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.4)] text-white placeholder-neutral-500 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50 focus:shadow-[0_0_22px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -447,7 +432,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
               <div className="flex justify-end pt-0.5">
                 <Link
                   href="/forgot-password"
-                  className="text-[11px] sm:text-xs text-neutral-400 hover:text-emerald-400 transition-colors"
+                  className="text-[11px] sm:text-xs text-neutral-400 hover:text-red-400 transition-colors"
                 >
                   পাসওয়ার্ড ভুলে গেছো?
                 </Link>
@@ -460,10 +445,10 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
             <button
               type="submit"
               disabled={loading || googleLoading || !isButtonActive}
-              className={`w-full py-2.5 sm:py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all duration-150 ${
+              className={`w-full py-3 sm:py-3.5 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all duration-150 ${
                 isButtonActive && !loading && !googleLoading
-                  ? 'bg-[#064e3b] hover:bg-[#065f46] text-white border-b-[4px] border-[#022c22] shadow-[0_4px_16px_rgba(6,78,59,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none cursor-pointer'
-                  : 'bg-[#151922] text-neutral-400 border border-white/[0.05] border-b-[3px] border-b-[#0e1118] cursor-not-allowed opacity-80'
+                  ? 'bg-[#991b1b] hover:bg-[#b91c1c] text-white border-b-[4px] border-[#5e0e0e] shadow-[0_4px_16px_rgba(153,27,27,0.4)] active:translate-y-[2px] active:border-b-2 active:shadow-none cursor-pointer'
+                  : 'bg-[#1b1e28] text-neutral-500 border-b-[3px] border-[#13151d] cursor-not-allowed opacity-75'
               }`}
             >
               {loading ? (
@@ -476,16 +461,59 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
               )}
             </button>
           </div>
+
+          {/* Direct Link to Register (only on initial step) */}
+          {!isPasswordStep && (
+            <div className="pt-0.5 sm:pt-1 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  const cleanInput = identifier.trim();
+                  if (!cleanInput) {
+                    setError('রেজিস্ট্রেশন শুরু করতে প্রথমে তোমার মোবাইল নম্বর বা ইমেইল লিখো');
+                    identifierInputRef.current?.focus();
+                    return;
+                  }
+
+                  // If mobile number, validate 11 digits
+                  const isPhone = !cleanInput.includes('@') && /^[0-9+]+$/.test(cleanInput.replace(/\s|-/g, ''));
+                  if (isPhone) {
+                    const cleanDigits = cleanInput.replace(/\D/g, '');
+                    let norm = cleanDigits;
+                    if (norm.startsWith('8801') && norm.length === 13) norm = norm.substring(2);
+                    if (norm.startsWith('1') && norm.length === 10) norm = '0' + norm;
+                    if (norm.length !== 11 || !norm.startsWith('01')) {
+                      setError('সঠিক ১১ ডিজিটের মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)');
+                      identifierInputRef.current?.focus();
+                      return;
+                    }
+                  }
+
+                  setError(null);
+                  try {
+                    window.history.replaceState(null, '', '/auth/register');
+                  } catch {
+                    // ignore
+                  }
+                  setIsRegistering(true);
+                }}
+                className="text-xs sm:text-sm text-neutral-400 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>নতুন শিক্ষার্থী? রেজিস্ট্রেশন করো</span>
+              </button>
+            </div>
+          )}
         </form>
 
-        {/* Divider: অথবা (shown on initial step) */}
+        {/* Divider: অথবা, (shown on initial step) */}
         {!isPasswordStep && (
-          <div className="relative w-full my-3 sm:my-4 flex items-center justify-center">
+          <div className="relative w-full my-3 sm:my-5 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.08]" />
+              <div className="w-full border-t border-neutral-800" />
             </div>
-            <span className="relative z-10 px-3 bg-[#0a0c12] text-[11px] sm:text-xs font-medium text-neutral-400">
-              অথবা
+            <span className="relative z-10 px-3 bg-[#0d0f15] text-[11px] sm:text-sm font-medium text-neutral-400">
+              অথবা,
             </span>
           </div>
         )}
@@ -496,7 +524,7 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading || googleLoading}
-            className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#141824]/90 hover:bg-[#1b2030] border border-white/[0.08] border-b-[3px] border-b-[#0e111a] text-neutral-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2.5 sm:gap-3 transition-all active:translate-y-[1px] active:border-b-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_3px_0_0_#0e111a,0_4px_14px_rgba(0,0,0,0.3)]"
+            className="w-full py-2.5 sm:py-3.5 px-4 rounded-xl bg-[#161923]/80 hover:bg-[#1f2330] border border-white/[0.08] border-b-[3px] border-b-[#12141c] text-neutral-200 font-semibold text-xs sm:text-base flex items-center justify-center gap-2.5 sm:gap-3 transition-all active:translate-y-[1px] active:border-b-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_3px_0_0_#12141c,0_4px_14px_rgba(0,0,0,0.3)]"
           >
             {googleLoading ? (
               <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-neutral-400" />
@@ -524,31 +552,31 @@ function MinimalAuthForm({ defaultMode = 'login' }: MinimalAuthPageProps) {
           </button>
         )}
 
-        {/* Support Link */}
-        <div className="pt-2 text-center">
+        {/* Support Link Text: google diye caliye jao er niche just text */}
+        <div className="pt-2 sm:pt-3 text-center">
           <Link
             href="/support"
-            className="text-xs text-neutral-400 hover:text-emerald-400 transition-colors cursor-pointer hover:underline"
+            className="text-xs sm:text-sm text-neutral-400 hover:text-emerald-400 transition-colors cursor-pointer hover:underline"
           >
             সাপোর্ট লাগবে?
           </Link>
         </div>
-      </div>
 
-      {/* Footer info & Links - Pin to bottom area gracefully */}
-      <div className="w-full shrink-0 text-center text-xs text-neutral-500 pt-2 pb-1 sm:pb-3">
-        <div className="flex items-center justify-center gap-3 text-[11px] text-neutral-500">
-          <Link href="/privacy" className="hover:underline hover:text-neutral-400">
-            গোপনীয়তা নীতি
-          </Link>
-          <span>•</span>
-          <Link href="/terms" className="hover:underline hover:text-neutral-400">
-            শর্তাবলী
-          </Link>
-          <span>•</span>
-          <Link href="/support" className="hover:underline hover:text-neutral-400">
-            সহায়তা
-          </Link>
+        {/* Footer info & Links */}
+        <div className="mt-3 sm:mt-6 text-center text-xs text-neutral-500">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-neutral-500">
+            <Link href="/privacy" className="hover:underline hover:text-neutral-400">
+              গোপনীয়তা নীতি
+            </Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:underline hover:text-neutral-400">
+              শর্তাবলী
+            </Link>
+            <span>•</span>
+            <Link href="/support" className="hover:underline hover:text-neutral-400">
+              সহায়তা
+            </Link>
+          </div>
         </div>
       </div>
     </div>

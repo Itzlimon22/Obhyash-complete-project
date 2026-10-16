@@ -78,15 +78,23 @@ export async function GET(request: NextRequest) {
       if (userLike) hasLiked = true;
     }
 
+    const isGuest = !user;
     return NextResponse.json(
       {
         likes: count || 0,
         hasLiked,
       },
       {
-        headers: {
-          'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=86400',
-        },
+        headers: isGuest
+          ? {
+              'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600',
+              'CDN-Cache-Control': 'public, s-maxage=600, stale-while-revalidate=3600',
+              'Vercel-CDN-Cache-Control': 'public, s-maxage=600, stale-while-revalidate=3600',
+              'Vary': 'Authorization, Cookie',
+            }
+          : {
+              'Cache-Control': 'private, no-store',
+            },
       },
     );
   } catch (error: any) {

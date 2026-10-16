@@ -181,7 +181,7 @@ const nextConfig: NextConfig = {
         ],
       },
 
-      // ── Cache-Control ───────────────────────────────────────────────
+      // ── Cache-Control & Edge CDN Caching ───────────────────────────
       // Next.js static assets have content hashes in their filenames — safe to cache forever
       {
         source: '/_next/static/(.*)',
@@ -200,9 +200,53 @@ const nextConfig: NextConfig = {
             key: 'Cache-Control',
             value: 'public, max-age=86400, stale-while-revalidate=3600',
           },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=2592000, stale-while-revalidate=86400',
+          },
         ],
       },
-      // Landing page (middleware redirects authenticated users before this renders)
+      // Public static files & favicon/icons
+      {
+        source: '/(favicon.ico|icon.svg|icon-512.png|icon.png|og-image.png|robots.txt|sitemap.xml)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=2592000, stale-while-revalidate=2592000',
+          },
+        ],
+      },
+      // Public auth & feature 3D icons (immutable images)
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=31536000, immutable',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=31536000, immutable',
+          },
+        ],
+      },
+      // Landing page — Edge cached globally (0ms compute)
       {
         source: '/',
         headers: [
@@ -210,9 +254,17 @@ const nextConfig: NextConfig = {
             key: 'Cache-Control',
             value: 'public, s-maxage=3600, stale-while-revalidate=86400',
           },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
         ],
       },
-      // Blog post pages — ISR aligned with unstable_cache revalidate: 3600
+      // Blog post pages — Edge cached globally
       {
         source: '/blog/:slug+',
         headers: [
@@ -220,25 +272,84 @@ const nextConfig: NextConfig = {
             key: 'Cache-Control',
             value: 'public, s-maxage=3600, stale-while-revalidate=86400',
           },
-        ],
-      },
-      // Static public info pages
-      {
-        source: '/(faq|privacy|terms|refund|referral-program)(.*)',
-        headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=3600',
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
           },
         ],
       },
-      // Blog listing — public static page cached on CDN
+      // Blog listing & search routes
       {
         source: '/blog',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/blog/search',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      // Notes hub & notes pages
+      {
+        source: '/notes/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
+          },
+        ],
+      },
+      // Static public info pages
+      {
+        source: '/(faq|privacy|privacy-policy|terms|terms-and-conditions|refund|refund-policy|about-us|referral-program)(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
         ],
       },
@@ -267,10 +378,45 @@ const nextConfig: NextConfig = {
           { key: 'Pragma', value: 'no-cache' },
         ],
       },
-      // API routes — no-store by default; individual routes may override via NextResponse headers
+      // Default API routes — no-store for dynamic/authenticated APIs
       {
-        source: '/api/(.*)',
+        source: '/api/((?!blog/latest|blog/search).*)',
         headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      },
+      // High-traffic public blog APIs cached aggressively on Vercel Edge CDN (0ms compute)
+      {
+        source: '/api/blog/latest',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/api/blog/search',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=300, stale-while-revalidate=86400',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=1800, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
       },
     ];
   },

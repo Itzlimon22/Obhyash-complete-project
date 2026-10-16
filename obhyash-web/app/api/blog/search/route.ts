@@ -51,7 +51,9 @@ export async function GET(req: NextRequest) {
     { posts: paginated, postCounts, total, page, pageSize: PAGE_SIZE },
     {
       headers: {
-        'Cache-Control': 'no-store', // search results must be fresh
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=86400',
+        'CDN-Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
       },
     },
   );

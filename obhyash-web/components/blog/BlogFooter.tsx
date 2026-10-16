@@ -183,7 +183,7 @@ export default function BlogFooter() {
               </li>
               <li>
                 <Link
-                  href="/login"
+                  href="/auth/login"
                   onClick={() =>
                     trackBlogConversion({
                       eventType: 'login_click',
@@ -197,7 +197,7 @@ export default function BlogFooter() {
               </li>
               <li>
                 <Link
-                  href="/signup"
+                  href="/auth/register"
                   onClick={() =>
                     trackBlogConversion({
                       eventType: 'signup_click',

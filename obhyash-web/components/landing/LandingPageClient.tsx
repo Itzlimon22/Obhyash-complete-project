@@ -18,8 +18,8 @@ export default function LandingPageClient() {
   return (
     <div className="dark bg-black min-h-screen text-neutral-100">
       <LandingPage
-        onGetStarted={() => router.push('/signup')}
-        onLogin={() => router.push('/login')}
+        onGetStarted={() => router.push('/auth/register')}
+        onLogin={() => router.push('/auth/login')}
       />
     </div>
   );
