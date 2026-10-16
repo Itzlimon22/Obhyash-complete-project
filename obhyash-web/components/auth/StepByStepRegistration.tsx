@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
-import MascotAvatar from './MascotAvatar';
 import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
 import { createClient } from '@/utils/supabase/client';
 import { getRandomAvatar } from '@/lib/avatar-utils';
@@ -326,19 +325,16 @@ export default function StepByStepRegistration({
         <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
-      {/* Progress Dots / Steps */}
-      <div className="absolute top-7 right-5 sm:right-8 flex items-center gap-1.5 z-20">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <span
-            key={i}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === step ? 'w-6 bg-emerald-500' : i < step ? 'w-2 bg-emerald-700' : 'w-2 bg-neutral-800'
-            }`}
-          />
-        ))}
-      </div>
-
       <div className="relative z-10 w-full max-w-[380px] sm:max-w-[420px] flex flex-col items-center">
+        {/* Top: Obhyash Logo */}
+        <div className="mb-6 inline-flex items-center justify-center">
+          <img
+            src="/obhyash_full_logo_dark.svg"
+            alt="Obhyash Logo"
+            className="h-9 sm:h-10 w-auto object-contain drop-shadow-md"
+          />
+        </div>
+
         {/* Error Alert */}
         {error && (
           <div className="w-full mb-4 px-4 py-2.5 rounded-xl bg-red-950/70 border border-red-800/80 text-red-200 text-xs sm:text-sm text-center animate-in fade-in">
@@ -348,8 +344,12 @@ export default function StepByStepRegistration({
 
         {/* ── STEP 1: Name & Institute (Formerly Step 5) ───────────── */}
         {step === 1 && (
-          <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <MascotAvatar speechText="তোমার নাম ও প্রতিষ্ঠান?" mood="happy" />
+          <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+                তোমার নাম ও প্রতিষ্ঠান?
+              </h2>
+            </div>
 
             <div className="w-full space-y-4">
               {/* Name Field */}
@@ -419,8 +419,12 @@ export default function StepByStepRegistration({
 
         {/* ── STEP 2: Gender Selection (Formerly Step 4) ───────────── */}
         {step === 2 && (
-          <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <MascotAvatar speechText="তুমি একজন" mood="thinking" />
+          <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+                তুমি একজন
+              </h2>
+            </div>
 
             <div className="w-full space-y-3">
               <button
@@ -460,8 +464,12 @@ export default function StepByStepRegistration({
 
         {/* ── STEP 3: Stream Selection (Formerly Step 1) ───────────── */}
         {step === 3 && (
-          <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <MascotAvatar speechText="তুমি কি বিষয়ে অভ্যাস করতে চাও?" mood="reading" />
+          <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+                তুমি কি বিষয়ে অভ্যাস করতে চাও?
+              </h2>
+            </div>
 
             <div className="w-full space-y-3">
               {streamOptions.map((opt) => {
@@ -496,8 +504,12 @@ export default function StepByStepRegistration({
 
         {/* ── STEP 4: Group Selection (Formerly Step 2) ────────────── */}
         {step === 4 && (
-          <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <MascotAvatar speechText="তুমি কোন বিভাগে?" mood="happy" />
+          <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+                তুমি কোন বিভাগে?
+              </h2>
+            </div>
 
             <div className="w-full space-y-3">
               {groupOptions.map((opt) => {
@@ -530,8 +542,12 @@ export default function StepByStepRegistration({
 
         {/* ── STEP 5: Batch Selection (Formerly Step 3) ────────────── */}
         {step === 5 && (
-          <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <MascotAvatar speechText="তোমার ব্যাচ?" mood="thinking" />
+          <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+                তোমার ব্যাচ?
+              </h2>
+            </div>
 
             <div className="w-full space-y-3">
               {getBatchOptions().map((opt) => {
@@ -558,10 +574,14 @@ export default function StepByStepRegistration({
           </div>
         )}
 
-        {/* ── STEP 6: Password Setup (User: erpor ashbe password setup page) */}
+        {/* ── STEP 6: Password Setup ─────────────────────────────────── */}
         {step === 6 && (
-          <form onSubmit={handleFinalSubmit} className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <MascotAvatar speechText="একটি পাসওয়ার্ড সেট করো" mood="thinking" />
+          <form onSubmit={handleFinalSubmit} className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight">
+                একটি পাসওয়ার্ড সেট করো
+              </h2>
+            </div>
 
             <div className="w-full space-y-4">
               {/* Confirmed Mobile/Email Display */}
