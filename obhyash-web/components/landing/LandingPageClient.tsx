@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import LandingPage from './LandingPage';
+import Landing from './Landing';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
 export default function LandingPageClient() {
@@ -15,13 +15,13 @@ export default function LandingPageClient() {
     document.documentElement.classList.add('dark');
   }, [setTheme]);
 
+  const handleStart = () => {
+    router.push('/login');
+  };
+
   return (
-    <div className="dark bg-black min-h-screen text-neutral-100">
-      <LandingPage
-        onGetStarted={() => router.push('/auth/register')}
-        onLogin={() => router.push('/auth/login')}
-      />
+    <div className="dark bg-[#0a0b0b] min-h-screen text-white">
+      <Landing onStart={handleStart} />
     </div>
   );
 }
-
