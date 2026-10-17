@@ -77,7 +77,7 @@ export default function Academic({
   return (
     <>
       <BackButton onClick={onBack} />
-      <Heading title="তুমি কি বিষয়ে অভ্যাস করতে চাও?" />
+      <Heading title="কী নিয়ে অভ্যাস করতে চাও?" />
       <div className="mt-4 sm:mt-8 grid grid-cols-1 gap-2.5 sm:gap-4">
         {levels.map((l) => (
           <Option key={l} label={l} size="lg" active={level === l} onClick={() => pick(l)} />

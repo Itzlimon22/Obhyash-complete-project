@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import React, { useEffect } from "react";
 import { GooglePlayIcon } from "./BrandIcons";
 import Header from "./Header";
@@ -89,8 +90,8 @@ export default function Landing({ onStart }: { onStart: () => void }) {
                 </span>
               </span>
             </a>
-            <a
-              href="#demo"
+            <Link
+              href="/demo"
               className="group flex h-[58px] items-center justify-center gap-3 rounded-xl bg-[#8f1915] px-5 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_0_#4a0b09] transition hover:bg-[#a3201c] active:translate-y-0.5 active:shadow-none"
             >
               <span className="grid h-7 w-7 place-items-center">
@@ -109,7 +110,7 @@ export default function Landing({ onStart }: { onStart: () => void }) {
               </span>
               ডেমো পরীক্ষা দাও
               <span className="ml-1 transition group-hover:translate-x-1">→</span>
-            </a>
+            </Link>
           </div>
         </div>
 

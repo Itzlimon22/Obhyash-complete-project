@@ -489,7 +489,7 @@ export default function StepByStepRegistration({
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="text-center mb-5 sm:mb-14">
               <h2 className="text-lg sm:text-2xl font-bold text-neutral-100 tracking-tight">
-                তুমি কি বিষয়ে অভ্যাস করতে চাও?
+                কী নিয়ে অভ্যাস করতে চাও?
               </h2>
             </div>
 

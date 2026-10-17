@@ -490,16 +490,10 @@ export default function AuthFlow({ defaultMode = 'login', initialIdentifier = ''
   })();
 
   return (
-    <div className="min-h-[100dvh] bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif] flex flex-col justify-between overflow-x-hidden">
-      <main
-        className={`mx-auto flex w-full max-w-md flex-1 flex-col items-center px-4 sm:px-5 py-3 sm:py-8 ${
-          ['academic', 'batch', 'name', 'gender'].includes(step)
-            ? 'justify-start pt-8 sm:pt-14'
-            : 'justify-center'
-        }`}
-      >
-        {showLogo && <Logo className="shrink-0" />}
-        <div key={step} className={`animate-step w-full ${showLogo ? 'mt-3 sm:mt-8' : ''}`}>
+    <div className="min-h-[100dvh] w-full bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif] flex flex-col items-center justify-center overflow-x-hidden relative">
+      <main className="mx-auto flex w-full max-w-md flex-col items-center justify-center px-4 sm:px-5 py-8 sm:py-12">
+        {showLogo && <Logo className="shrink-0 mb-4 sm:mb-6" />}
+        <div key={step} className="animate-step w-full">
           {view}
         </div>
         {showFooter && (
