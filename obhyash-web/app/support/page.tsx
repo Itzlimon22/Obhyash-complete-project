@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Logo, Heading, PrimaryButton, BackButton } from '@/components/auth/figma/ui';
+import { Heading, PrimaryButton, BackButton } from '@/components/auth/figma/ui';
 import { toast } from 'sonner';
 
 const ISSUE_TYPES = [
@@ -103,9 +103,7 @@ export default function SupportPage() {
     <div className="min-h-screen bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif]">
       <BackButton onClick={() => router.push('/auth/login')} />
       <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-12">
-        <Logo />
-
-        <div className="mt-8 sm:mt-10 w-full animate-step">
+        <div className="w-full animate-step">
           {submittedTicket ? (
             /* SUCCESS STATE */
             <div className="text-center space-y-6">
@@ -159,10 +157,7 @@ export default function SupportPage() {
           ) : (
             /* FORM STATE */
             <>
-              <Heading
-                title="সাপোর্টে যোগাযোগ"
-                sub="কোনো সমস্যা হলে নিচে জানাও, আমাদের টিম দ্রুত সমাধান করবে"
-              />
+              <Heading title="সাপোর্টে যোগাযোগ" />
 
               <form onSubmit={handleSubmit} className="mt-8 space-y-4 font-['Kalpurush',sans-serif]">
                 {/* 1. সমস্যার ক্যাটাগরি */}

@@ -3,28 +3,31 @@
 import React, { useEffect, useRef, useState, type ReactNode, type InputHTMLAttributes, type ButtonHTMLAttributes } from 'react';
 import { createPortal } from 'react-dom';
 
+import Link from 'next/link';
+
 export const toBn = (s: string | number) => String(s).replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[+d]);
 
-export function Logo() {
+export function Logo({ className = '' }: { className?: string }) {
   return (
-    <div className="flex items-end gap-1 select-none">
-      <div className="relative h-11 w-8">
-        <span className="absolute left-0 top-1 h-3 w-3 rounded-[3px] bg-[#ef4136]" />
-        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-[3px] bg-[#ef4136]" />
-        <svg viewBox="0 0 32 44" className="absolute inset-0 h-full w-full" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M6 18v18h10M12 31l5 5-5 5M20 4l-5 5 5 5M15 9h10v18" />
-        </svg>
-      </div>
-      <span className="text-5xl font-bold leading-none tracking-tight text-white font-['Kalpurush',sans-serif]">ভ্যাস</span>
-    </div>
+    <Link
+      href="/"
+      aria-label="অভ্যাস হোমপেজ"
+      className={`inline-flex items-center justify-center select-none transition-transform hover:scale-105 active:scale-95 duration-200 ${className}`}
+    >
+      <img
+        src="/obhyash_full_logo_dark.svg"
+        alt="অভ্যাস"
+        className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
+      />
+    </Link>
   );
 }
 
 export function Heading({ title, sub }: { title: string; sub?: ReactNode }) {
   return (
     <div className="text-center">
-      <h1 className="text-2xl font-bold font-['Kalpurush',sans-serif]">{title}</h1>
-      {sub && <p className="mt-2 text-sm text-zinc-400 font-['Kalpurush',sans-serif]">{sub}</p>}
+      <h1 className="text-xl sm:text-2xl font-bold font-['Kalpurush',sans-serif]">{title}</h1>
+      {sub && <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-zinc-400 font-['Kalpurush',sans-serif]">{sub}</p>}
     </div>
   );
 }
@@ -34,7 +37,7 @@ export function PrimaryButton({ children, loading, ...p }: ButtonHTMLAttributes<
     <button
       {...p}
       disabled={p.disabled || loading}
-      className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#8b1e3f] text-base font-semibold text-white shadow-[0_5px_0_#4f0f22] transition-all duration-100 hover:bg-[#9e2549] active:translate-y-[5px] active:shadow-none disabled:cursor-not-allowed disabled:bg-[#22242c] disabled:text-zinc-400 disabled:shadow-[0_5px_0_#121318] disabled:active:translate-y-0 font-['Kalpurush',sans-serif]"
+      className="mt-3 sm:mt-5 flex h-12 sm:h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#8b1e3f] text-sm sm:text-base font-semibold text-white shadow-[0_4px_0_#4f0f22] sm:shadow-[0_5px_0_#4f0f22] transition-all duration-100 hover:bg-[#9e2549] active:translate-y-[4px] active:shadow-none disabled:cursor-not-allowed disabled:bg-[#22242c] disabled:text-zinc-400 disabled:shadow-[0_4px_0_#121318] disabled:active:translate-y-0 font-['Kalpurush',sans-serif]"
     >
       {loading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : children}
     </button>
@@ -45,8 +48,8 @@ type FieldProps = InputHTMLAttributes<HTMLInputElement> & { label: string; error
 
 export function Field({ label, error, right, icon, ...p }: FieldProps) {
   return (
-    <div className="mb-4">
-      <label className="mb-2 block text-sm font-medium text-zinc-300 font-['Kalpurush',sans-serif]">{label}</label>
+    <div className="mb-3 sm:mb-4">
+      <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-zinc-300 font-['Kalpurush',sans-serif]">{label}</label>
       <div className="group relative">
         {icon && (
           <svg className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 transition group-focus-within:text-[#ef4136]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -65,11 +68,11 @@ export function Field({ label, error, right, icon, ...p }: FieldProps) {
         )}
         <input
           {...p}
-          className={`h-14 w-full rounded-2xl border bg-black/40 ${icon ? 'pl-12' : 'pl-4'} pr-4 text-lg text-white outline-none transition placeholder:text-zinc-600 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] ${right ? 'pr-16' : ''} ${error ? 'border-[#ef4136]/70' : 'border-white/10 focus:border-[#ef4136]/60'}`}
+          className={`h-12 sm:h-14 w-full rounded-2xl border bg-black/40 ${icon ? 'pl-11 sm:pl-12' : 'pl-4'} pr-4 text-base sm:text-lg text-white outline-none transition placeholder:text-zinc-600 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] ${right ? 'pr-16' : ''} ${error ? 'border-[#ef4136]/70' : 'border-white/10 focus:border-[#ef4136]/60'}`}
         />
         {right && <div className="absolute right-2 top-1/2 -translate-y-1/2">{right}</div>}
       </div>
-      {error && <p className="mt-2 text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">{error}</p>}
+      {error && <p className="mt-1.5 text-xs sm:text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">{error}</p>}
     </div>
   );
 }

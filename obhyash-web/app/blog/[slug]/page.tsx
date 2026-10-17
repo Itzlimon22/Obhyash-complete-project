@@ -272,6 +272,7 @@ export default async function BlogPostPage({
     .filter((p) => p.category === post.category || p.tags.some((t) => post.tags.includes(t)))
     .concat(otherPosts)
     .filter((p, index, self) => self.findIndex((item) => item.slug === p.slug) === index)
+    .slice(0, 4);
   // Britti / scholarship page should not have in-article related card
   const isBrittiPost =
     post.slug === 'ssc-scholarship-britti-result-2026-check' ||

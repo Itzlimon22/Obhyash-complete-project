@@ -48,8 +48,8 @@ export default function Identify({
   return (
     <>
       <Heading title="রেজিস্ট্রেশন / লগ ইন" />
-      <form className="mt-8" onSubmit={handleSubmit}>
-        <label htmlFor="id" className="mb-2 block text-sm font-medium text-zinc-300 font-['Kalpurush',sans-serif]">
+      <form className="mt-4 sm:mt-6" onSubmit={handleSubmit}>
+        <label htmlFor="id" className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-zinc-300 font-['Kalpurush',sans-serif]">
           মোবাইল নম্বর বা ইমেইল
         </label>
         <div className="group relative">
@@ -64,11 +64,11 @@ export default function Identify({
             onBlur={() => setTouched(true)}
             onChange={(e) => setValue(e.target.value)}
             placeholder="01XXXXXXXXX অথবা example@mail.com"
-            className={`h-14 w-full rounded-2xl border bg-black/40 pl-12 pr-4 text-lg text-white outline-none transition placeholder:text-zinc-600 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] ${showErr ? 'border-[#ef4136]/70' : 'border-white/10 focus:border-[#ef4136]/60'}`}
+            className={`h-12 sm:h-14 w-full rounded-2xl border bg-black/40 pl-11 sm:pl-12 pr-4 text-base sm:text-lg text-white outline-none transition placeholder:text-zinc-600 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] ${showErr ? 'border-[#ef4136]/70' : 'border-white/10 focus:border-[#ef4136]/60'}`}
           />
         </div>
         {showErr && (
-          <p className="mt-2 text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">
+          <p className="mt-1.5 text-xs sm:text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">
             সঠিক মোবাইল নম্বর (০১ দিয়ে শুরু, ১১ সংখ্যা) বা ইমেইল দাও
           </p>
         )}
@@ -80,7 +80,7 @@ export default function Identify({
         </PrimaryButton>
       </form>
 
-      <div className="my-7 flex items-center gap-4 text-xs text-zinc-500 font-['Kalpurush',sans-serif]">
+      <div className="my-3.5 sm:my-6 flex items-center gap-4 text-xs text-zinc-500 font-['Kalpurush',sans-serif]">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/10" />
         অথবা
         <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/10" />
@@ -89,7 +89,7 @@ export default function Identify({
       <button
         type="button"
         onClick={onGoogleLogin}
-        className="mx-auto flex h-11 items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-[#16181e] px-5 text-sm font-medium text-white shadow-[0_4px_0_#0b0c10] transition-all duration-100 hover:bg-[#1c1f26] active:translate-y-[4px] active:shadow-none font-['Kalpurush',sans-serif]"
+        className="mx-auto flex h-10 sm:h-11 items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-[#16181e] px-5 text-xs sm:text-sm font-medium text-white shadow-[0_3px_0_#0b0c10] sm:shadow-[0_4px_0_#0b0c10] transition-all duration-100 hover:bg-[#1c1f26] active:translate-y-[3px] active:shadow-none font-['Kalpurush',sans-serif]"
       >
         <svg className="h-4 w-4" viewBox="0 0 48 48">
           <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.4-.4-3.5z" />

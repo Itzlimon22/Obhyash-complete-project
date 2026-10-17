@@ -45,7 +45,7 @@ export default function Batch({
     <>
       <BackButton onClick={onBack} />
       <Heading title="তোমার ব্যাচ?" />
-      <div className="mt-14 grid grid-cols-1 gap-4 font-['Kalpurush',sans-serif]">
+      <div className="mt-4 sm:mt-8 grid grid-cols-1 gap-2.5 sm:gap-4 font-['Kalpurush',sans-serif]">
         {batches.map((b) => {
           const active = sel === b;
           return (
@@ -53,14 +53,14 @@ export default function Batch({
               key={b}
               type="button"
               onClick={() => handleSelect(b)}
-              className={`flex h-20 items-center gap-4 rounded-2xl px-5 text-lg font-semibold transition-all duration-150 active:translate-y-[4px] active:shadow-none ${
+              className={`flex h-13 sm:h-20 items-center gap-3 sm:gap-4 rounded-2xl px-4 sm:px-5 text-base sm:text-lg font-semibold transition-all duration-150 active:translate-y-[3px] sm:active:translate-y-[4px] active:shadow-none ${
                 active
                   ? 'border-2 border-[#10b981] bg-[#0c241c] text-white shadow-[0_0_24px_rgba(16,185,129,0.22),0_4px_0_#071812]'
                   : 'border border-white/10 bg-[#14161f] text-zinc-200 shadow-[0_4px_0_#0c0e15] hover:bg-[#1a1d28]'
               }`}
             >
               <CalendarIcon />
-              <span className="flex-1 text-left text-lg font-bold tracking-wide">{b}</span>
+              <span className="flex-1 text-left text-base sm:text-lg font-bold tracking-wide">{b}</span>
               {active && (
                 <svg
                   className="h-6 w-6 text-[#10b981]"

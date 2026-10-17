@@ -44,7 +44,7 @@ export default function NameInstitution({
       <BackButton onClick={onBack} />
       <Heading title="তোমার নাম ও প্রতিষ্ঠান?" />
       <form
-        className="mt-14"
+        className="mt-4 sm:mt-8"
         onSubmit={(e) => {
           e.preventDefault();
           if (valid) onDone({ name: name.trim(), institution: institution.trim() });

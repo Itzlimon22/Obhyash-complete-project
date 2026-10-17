@@ -72,7 +72,7 @@ export default function Otp({
       />
       <IdChip id={id} onEdit={onBack} />
       <form
-        className="mt-8"
+        className="mt-4 sm:mt-8"
         onSubmit={(e) => {
           e.preventDefault();
           verify();
@@ -87,12 +87,12 @@ export default function Otp({
           error={!!err}
           resetKey={resetKey}
         />
-        {err && <p className="mt-3 text-center text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">{err}</p>}
+        {err && <p className="mt-2 text-center text-xs sm:text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">{err}</p>}
         <PrimaryButton disabled={!complete} loading={loading}>
           যাচাই করো
         </PrimaryButton>
       </form>
-      <p className="mt-6 text-center text-sm text-zinc-400 font-['Kalpurush',sans-serif]">
+      <p className="mt-3.5 sm:mt-6 text-center text-xs sm:text-sm text-zinc-400 font-['Kalpurush',sans-serif]">
         কোড পাওনি?{' '}
         {t > 0 ? (
           <span className="text-zinc-500">{toBn(t)} সেকেন্ড পর আবার পাঠাও</span>

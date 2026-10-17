@@ -490,27 +490,27 @@ export default function AuthFlow({ defaultMode = 'login', initialIdentifier = ''
   })();
 
   return (
-    <div className="min-h-screen bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif]">
+    <div className="min-h-[100dvh] bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif] flex flex-col justify-between overflow-x-hidden">
       <main
-        className={`mx-auto flex min-h-screen max-w-md flex-col items-center px-5 py-12 ${
+        className={`mx-auto flex w-full max-w-md flex-1 flex-col items-center px-4 sm:px-5 py-3 sm:py-8 ${
           ['academic', 'batch', 'name', 'gender'].includes(step)
-            ? 'justify-start pt-20 sm:pt-24'
+            ? 'justify-start pt-8 sm:pt-14'
             : 'justify-center'
         }`}
       >
-        {showLogo && <Logo />}
-        <div key={step} className={`animate-step w-full ${showLogo ? 'mt-8 sm:mt-10' : ''}`}>
+        {showLogo && <Logo className="shrink-0" />}
+        <div key={step} className={`animate-step w-full ${showLogo ? 'mt-3 sm:mt-8' : ''}`}>
           {view}
         </div>
         {showFooter && (
-          <>
+          <div className="mt-4 sm:mt-8 flex flex-col items-center shrink-0">
             <a
               href="/support"
-              className="mt-12 text-sm text-zinc-400 transition hover:text-white"
+              className="text-xs sm:text-sm text-zinc-400 transition hover:text-white"
             >
               সাপোর্ট লাগবে?
             </a>
-            <nav className="mt-5 flex items-center gap-3 text-xs text-zinc-600">
+            <nav className="mt-2.5 sm:mt-3 flex items-center gap-3 text-[11px] sm:text-xs text-zinc-600">
               <a href="/privacy-policy" className="hover:text-zinc-300">
                 গোপনীয়তা নীতি
               </a>
@@ -523,7 +523,7 @@ export default function AuthFlow({ defaultMode = 'login', initialIdentifier = ''
                 সহায়তা
               </a>
             </nav>
-          </>
+          </div>
         )}
       </main>
     </div>
