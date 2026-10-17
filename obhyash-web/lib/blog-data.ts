@@ -289,7 +289,7 @@ export const getAllPosts = unstable_cache(
   },
   ['obhyash-blog-posts'],
   {
-    revalidate: 3600,
+    revalidate: false, // Frozen: 0 runtime ISR compute, 0 writes
     tags: ['blog-posts'],
   },
 );

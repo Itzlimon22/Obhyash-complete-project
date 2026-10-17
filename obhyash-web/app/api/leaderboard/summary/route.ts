@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
     {
       headers: {
         // Cache at CDN for 3 minutes — leaderboard changes aren't instant anyway.
-        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360',
+        'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
       },
     },
   );

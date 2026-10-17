@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
 import { getAllPosts } from '@/lib/blog-data';
 
-// Regenerate the sitemap at most once every 24 hours
-export const revalidate = 86400;
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://obhyash.com';

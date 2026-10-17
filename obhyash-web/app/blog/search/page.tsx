@@ -3,7 +3,8 @@ import { Suspense } from 'react';
 import { getAllPosts } from '@/lib/blog-data';
 import BlogSearchPage from '@/components/blog/BlogSearchPage';
 
-export const revalidate = 3600;
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'আর্টিকেল খুঁজুন — Obhyash Blog',

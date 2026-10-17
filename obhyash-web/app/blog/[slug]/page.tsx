@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { getBlogPost, getAllPosts } from '@/lib/blog-data';
 import { getPostCover } from '@/lib/blog-images';
 
-// ISR: serve cached HTML, revalidate in background every hour
-// Aligned with the unstable_cache revalidate: 3600 in lib/blog-data.ts
-export const revalidate = 3600;
+// 100% Static HTML on Vercel CDN — 0 CPU execution, 0 ISR writes
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 // Pre-render all known slugs at build time; unknown slugs render on demand
 export async function generateStaticParams() {

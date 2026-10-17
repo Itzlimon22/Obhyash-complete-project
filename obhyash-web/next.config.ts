@@ -262,33 +262,33 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
           {
             key: 'Vercel-CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
         ],
       },
-      // Blog post pages — Edge cached globally
+      // Blog post pages — Edge cached globally (zero compute & zero ISR writes on repeat hits)
       {
         source: '/blog/:slug+',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
           {
             key: 'Vercel-CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
         ],
       },
@@ -298,15 +298,15 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
           {
             key: 'Vercel-CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
         ],
       },
@@ -315,15 +315,15 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
           {
             key: 'Vercel-CDN-Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, s-maxage=604800, stale-while-revalidate=2592000',
           },
         ],
       },
@@ -390,7 +390,7 @@ const nextConfig: NextConfig = {
       },
       // Default API routes — no-store for dynamic/authenticated APIs
       {
-        source: '/api/((?!blog/latest|blog/search|referral/leaderboard).*)',
+        source: '/api/((?!blog/latest|blog/search|blog/likes|referral/leaderboard|leaderboard).*)',
         headers: [{ key: 'Cache-Control', value: 'no-store' }],
       },
       // High-traffic public blog & referral APIs cached aggressively on Vercel Edge CDN (0ms compute)
@@ -399,7 +399,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+            value: 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'CDN-Cache-Control',
@@ -416,11 +416,28 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=300, stale-while-revalidate=86400',
+            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'CDN-Cache-Control',
-            value: 'public, s-maxage=1800, stale-while-revalidate=86400',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/api/blog/likes',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
           },
           {
             key: 'Vercel-CDN-Cache-Control',
@@ -433,7 +450,24 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/api/leaderboard/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
           },
           {
             key: 'CDN-Cache-Control',

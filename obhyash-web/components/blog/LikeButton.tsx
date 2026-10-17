@@ -32,7 +32,12 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
   const { data, error, mutate, isLoading } = useSWR<{
     likes: number;
     hasLiked: boolean;
-  }>(`/api/blog/likes?slug=${postSlug}`, fetcher);
+  }>(isAuthed ? `/api/blog/likes?slug=${postSlug}` : null, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    dedupingInterval: 600000, // 10 minutes deduping in browser
+  });
 
   // Sync server data to local state when it loads
   useEffect(() => {

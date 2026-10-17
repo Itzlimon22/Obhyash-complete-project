@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getAllPosts } from '@/lib/blog-data';
 
-export const revalidate = 86400;
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export async function GET() {
   try {

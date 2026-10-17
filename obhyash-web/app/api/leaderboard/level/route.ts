@@ -129,7 +129,7 @@ export async function GET(req: NextRequest) {
     { users, hasMore: rows.length === limit, nextOffset: offset + rows.length },
     {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
       },
     },
   );

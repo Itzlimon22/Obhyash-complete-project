@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import LandingPageClient from '@/components/landing/LandingPageClient';
 
-export const revalidate = 86400;
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'Obhyash (অভ্যাস) - The Smart Exam Platform for Students',

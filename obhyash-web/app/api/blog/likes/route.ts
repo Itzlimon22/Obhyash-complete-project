@@ -87,9 +87,9 @@ export async function GET(request: NextRequest) {
       {
         headers: isGuest
           ? {
-              'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600',
-              'CDN-Cache-Control': 'public, s-maxage=600, stale-while-revalidate=3600',
-              'Vercel-CDN-Cache-Control': 'public, s-maxage=600, stale-while-revalidate=3600',
+              'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+              'CDN-Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+              'Vercel-CDN-Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
               'Vary': 'Authorization, Cookie',
             }
           : {

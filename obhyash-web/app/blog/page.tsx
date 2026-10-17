@@ -12,8 +12,9 @@ import {
   getBlogPostCounts,
 } from '@/lib/blog-recommendations';
 
-// Fully public, statically generated with ISR (revalidates once per hour in background)
-export const revalidate = 3600;
+// 100% Static HTML on Vercel CDN — 0 CPU execution, 0 ISR writes
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'Obhyash Blog — Study Tips, Exam Strategies & More for Students',

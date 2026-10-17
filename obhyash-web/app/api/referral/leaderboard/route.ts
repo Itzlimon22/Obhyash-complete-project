@@ -12,9 +12,9 @@ export const GET = async () => {
       { leaderboard: leaderboard || [] },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-          'CDN-Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-          'Vercel-CDN-Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+          'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+          'CDN-Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+          'Vercel-CDN-Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
         },
       },
     );
