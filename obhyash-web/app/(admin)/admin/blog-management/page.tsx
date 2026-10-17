@@ -17,7 +17,7 @@ export default async function BlogManagementPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   // NOTE: If you have an admin role system, verify it here.

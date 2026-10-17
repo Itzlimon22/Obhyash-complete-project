@@ -130,6 +130,7 @@ const config = {
       },
       fontFamily: {
         sans: [
+          "'Kalpurush'",
           'var(--font-inter)',
           'var(--font-noto-sans-bengali)',
           "'Noto Sans Bengali'",
@@ -138,6 +139,11 @@ const config = {
           'BlinkMacSystemFont',
           '"Segoe UI"',
           'Roboto',
+          'sans-serif',
+        ],
+        kalpurush: [
+          "'Kalpurush'",
+          "'Hind Siliguri'",
           'sans-serif',
         ],
         hind: [

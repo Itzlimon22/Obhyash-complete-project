@@ -82,7 +82,7 @@ export default function TeacherSidebar() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   const userName =

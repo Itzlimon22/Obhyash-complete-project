@@ -78,7 +78,7 @@ export const logoutAction = async (): Promise<void> => {
   cookieStore.delete('obhyash_user_profile'); // Clear the client-side profile cache
 
   // Redirect is called OUTSIDE try/catch (it throws to interrupt execution).
-  redirect('/login');
+  redirect('/auth/login');
 };
 
 // ─── Demo Login Action (replace with your Supabase auth flow) ────────────────

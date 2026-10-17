@@ -171,7 +171,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(getMobileRedirectUrl({ error: 'oauth_cancelled' }));
   }
 
-  const redirectUrl = new URL('/login', origin);
+  const redirectUrl = new URL('/auth/login', origin);
   redirectUrl.searchParams.set('error', 'oauth_cancelled');
   return NextResponse.redirect(redirectUrl);
 }

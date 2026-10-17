@@ -1,31 +1,17 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import React, { Suspense } from 'react';
-import { useAuthSystemMode } from '@/lib/auth-system-mode';
-import MinimalAuthPage from '@/components/auth/MinimalAuthPage';
-import ClassicLoginPage from '@/components/auth/ClassicLoginPage';
-import { Loader2 } from 'lucide-react';
-
-function LoginRouter() {
-  const { mode } = useAuthSystemMode();
-
-  if (mode === 'classic') {
-    return <ClassicLoginPage />;
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = searchParams ? await searchParams : {};
+  const qs = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      if (typeof v === 'string') qs.set(k, v);
+    });
   }
-
-  return <MinimalAuthPage />;
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen w-full flex items-center justify-center bg-[#0d0f15]">
-          <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
-        </div>
-      }
-    >
-      <LoginRouter />
-    </Suspense>
-  );
+  const query = qs.toString();
+  redirect(`/auth/login${query ? `?${query}` : ''}`);
 }

@@ -46,13 +46,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/login`,
+      url: `${baseUrl}/auth/login`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/signup`,
+      url: `${baseUrl}/auth/register`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'monthly',
       priority: 0.6,

@@ -19,7 +19,7 @@ export default function AuthCodeErrorPage() {
         
         <div className="space-y-3">
           <Link
-            href="/login"
+            href="/auth/login"
             className="flex items-center justify-center gap-2 w-full py-3.5 px-6 font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-95"
           >
             আবার লগইন করো

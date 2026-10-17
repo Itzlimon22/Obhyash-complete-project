@@ -70,13 +70,13 @@ export default function ReferralProgramPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/login"
+              href="/auth/login"
               className="px-4 py-2 text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:text-[#12544F] dark:hover:text-emerald-400 transition-colors"
             >
               লগইন
             </Link>
             <Link
-              href="/signup"
+              href="/auth/register"
               className="px-4 py-2 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-[#12544F]/20 transition-all hover:scale-105"
             >
               ফ্রি রেজিস্ট্রেশন
@@ -196,7 +196,7 @@ export default function ReferralProgramPage() {
 
             <div className="pt-6 mt-6 border-t border-neutral-100 dark:border-neutral-800">
               <Link
-                href="/login"
+                href="/auth/login"
                 className="w-full py-2.5 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl text-center font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
               >
                 <span>ড্যাশবোর্ড থেকে রেফারেল লিংক নাও</span>
@@ -452,13 +452,13 @@ export default function ReferralProgramPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
-              href="/login"
+              href="/auth/login"
               className="px-6 py-3 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-[#12544F]/20 transition-all hover:scale-105"
             >
               লগইন করে রেফারেল ড্যাশবোর্ডে যাও
             </Link>
             <Link
-              href="/signup"
+              href="/auth/register"
               className="px-6 py-3 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl font-bold text-xs sm:text-sm transition-all"
             >
               নতুন অ্যাকাউন্ট তৈরি করো

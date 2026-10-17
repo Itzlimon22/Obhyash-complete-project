@@ -51,7 +51,7 @@ export const requireUser = async (): Promise<JwtPayload> => {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   return currentUser;

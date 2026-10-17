@@ -23,7 +23,7 @@ async function withTimeout<T>(
 
 export async function updateSession(request: NextRequest) {
   // If explicitly logging out via query parameter, bypass session check and clear cookies immediately
-  if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.has('logout')) {
+  if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/auth/login') && request.nextUrl.searchParams.has('logout')) {
     const logoutResponse = NextResponse.next({ request });
     request.cookies.getAll().forEach((cookie) => {
       if (
@@ -46,6 +46,19 @@ export async function updateSession(request: NextRequest) {
 
   // Define route types
   const { pathname } = request.nextUrl;
+
+  // Immediate redirect for legacy auth URLs to official /auth/login and /auth/register
+  if (pathname === '/login') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/login';
+    return NextResponse.redirect(url);
+  }
+  if (pathname === '/signup' || pathname === '/register') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/register';
+    return NextResponse.redirect(url);
+  }
+
   const isRootRoute = pathname === '/';
   const isAdminRoute = pathname.startsWith('/admin');
   const isTeacherRoute = pathname.startsWith('/teacher');
@@ -54,7 +67,8 @@ export async function updateSession(request: NextRequest) {
     pathname === '/signup' ||
     pathname === '/register' ||
     pathname === '/auth/login' ||
-    pathname === '/auth/register';
+    pathname === '/auth/register' ||
+    pathname === '/auth/resister';
 
   // All student tab paths that map into the SPA (including deep-link sub-paths)
   const STUDENT_TAB_PATHS = [
@@ -85,10 +99,10 @@ export async function updateSession(request: NextRequest) {
 
   // If user does not even have an auth cookie:
   if (!hasAuthCookie) {
-    // 1. Trying to access protected route -> instant redirect to /login without calling Supabase
+    // 1. Trying to access protected route -> instant redirect to /auth/login without calling Supabase
     if (isProtectedRoute) {
       const url = request.nextUrl.clone();
-      url.pathname = '/login';
+      url.pathname = '/auth/login';
       return NextResponse.redirect(url);
     }
     // 2. Unauthenticated visitor accessing public/auth routes (/, /login, /signup) -> instant allow without calling Supabase
@@ -144,7 +158,7 @@ export async function updateSession(request: NextRequest) {
   // SCENARIO A: Not logged in and trying to access a protected route
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = '/auth/login';
     const response = NextResponse.redirect(url);
     // Copy cookies from supabaseResponse to the redirect response, preserving options
     supabaseResponse.cookies.getAll().forEach((cookie) => {

@@ -15,7 +15,7 @@ export async function getStudentPageData(): Promise<{
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   const [{ data: dbProfile }, { data: subjectsData }, { data: examResultsData }] = await Promise.all([

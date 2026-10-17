@@ -47,7 +47,7 @@ export default function Landing({ onStart }: { onStart: () => void }) {
 
   return (
     <div
-      className="min-h-screen overflow-x-clip bg-[#0a0b0b] text-white"
+      className="min-h-screen overflow-x-clip bg-[#0a0b0b] text-white landing-root font-kalpurush"
       style={{ fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" }}
     >
       <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-[#e5534b]/15 blur-[140px]" />

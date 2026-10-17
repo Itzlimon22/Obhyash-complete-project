@@ -19,7 +19,7 @@ const quick = [
 ];
 const policy = [
   { name: "About Us", href: "/about-us" },
-  { name: "Privacy Policy", href: "/privacy-policy" },
+  { name: "Privacy Policy", href: "/privacy" },
   { name: "Terms & Conditions", href: "/terms-and-conditions" },
   { name: "Refund Policy", href: "/refund-policy" },
   { name: "FAQ", href: "/about-us#faq" },

@@ -51,7 +51,7 @@ export default function DeactivatedPage() {
 
           <div className="space-y-4">
             <Link
-              href="/login"
+              href="/auth/login"
               className={`group w-full bg-neutral-900 hover:bg-black dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 pointer-events-none' : ''}`}
             >
               {loading ? (

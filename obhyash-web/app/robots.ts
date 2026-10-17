@@ -19,8 +19,8 @@ export default function robots(): MetadataRoute.Robots {
           '/privacy-policy',
           '/terms-and-conditions',
           '/refund-policy',
-          '/login',
-          '/signup',
+          '/auth/login',
+          '/auth/register',
         ],
         disallow: [
           // App Core (Requires Login)

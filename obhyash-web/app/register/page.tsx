@@ -1,5 +1,17 @@
 import { redirect } from 'next/navigation';
 
-export default function RegisterRedirectPage() {
-  redirect('/auth/register');
+export default async function RegisterRedirectPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = searchParams ? await searchParams : {};
+  const qs = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      if (typeof v === 'string') qs.set(k, v);
+    });
+  }
+  const query = qs.toString();
+  redirect(`/auth/register${query ? `?${query}` : ''}`);
 }

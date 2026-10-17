@@ -16,11 +16,11 @@ export default function LandingPageClient() {
   }, [setTheme]);
 
   const handleStart = () => {
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   return (
-    <div className="dark bg-[#0a0b0b] min-h-screen text-white">
+    <div className="dark bg-[#0a0b0b] min-h-screen text-white landing-root font-kalpurush">
       <Landing onStart={handleStart} />
     </div>
   );

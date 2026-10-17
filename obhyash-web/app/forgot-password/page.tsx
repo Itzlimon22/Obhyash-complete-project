@@ -137,7 +137,7 @@ function ForgotPasswordContent() {
 
       setSuccessMessage('তোমার পাসওয়ার্ড সফলভাবে পরিবর্তিত হয়েছে! এখন লগইন করতে পারো।');
       setTimeout(() => {
-        router.push('/login');
+        router.push('/auth/login');
       }, 2500);
     } catch (err) {
       console.error('Update password error:', err);
@@ -156,7 +156,7 @@ function ForgotPasswordContent() {
       {/* Top Header */}
       <header className="w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
         <Link
-          href="/login"
+          href="/auth/login"
           className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
         >
           <span>← লগইন</span>
@@ -316,7 +316,7 @@ function ForgotPasswordContent() {
           <div className="pt-2 text-center text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
             পাসওয়ার্ড মনে পড়েছে?{' '}
             <Link
-              href="/login"
+              href="/auth/login"
               className="text-[#006A4E] dark:text-[#00A87E] hover:underline font-bold transition-all ml-1"
             >
               লগইন করো
