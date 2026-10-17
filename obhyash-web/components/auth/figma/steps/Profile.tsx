@@ -12,7 +12,7 @@ export default function Profile({
 }: {
   id: string;
   onBack: () => void;
-  onEditId: () => void;
+  onEditId?: () => void;
   onDone: (data: { password: string; secondaryId: string }) => Promise<{ success: boolean; error?: string }>;
 }) {
   const isInitialPhone = isPhone(id);
@@ -80,31 +80,21 @@ export default function Profile({
       <Heading title="একটি পাসওয়ার্ড সেট করো" />
 
       <form className="mt-8 space-y-4 font-['Kalpurush',sans-serif]" onSubmit={handleSubmit}>
-        {/* Identifier Display with Edit button */}
-        <div className="flex h-14 items-center justify-between rounded-2xl border border-white/10 bg-[#14161f] px-5 shadow-[0_4px_0_#0c0e15]">
+        {/* Identifier Display */}
+        <div className="flex h-14 items-center rounded-2xl border border-white/10 bg-[#14161f] px-5 shadow-[0_4px_0_#0c0e15]">
           <div className="flex items-center gap-2 text-base text-zinc-300">
             <span className="text-zinc-500 font-medium">
               {isInitialPhone ? 'মোবাইল:' : 'ইমেইল:'}
             </span>
             <span className="font-bold text-white tracking-wide">{id}</span>
           </div>
-          <button
-            type="button"
-            onClick={onEditId}
-            className="text-sm font-semibold text-[#10b981] hover:underline"
-          >
-            পরিবর্তন
-          </button>
         </div>
 
         {/* Secondary Identifier Input */}
         <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="text-sm font-medium text-zinc-300">
-              {isInitialPhone ? 'ইমেইল অ্যাড্রেস (Gmail)' : 'মোবাইল নম্বর'}
-            </label>
-            <span className="text-xs font-medium text-[#10b981]">বাধ্যতামূলক</span>
-          </div>
+          <label className="mb-2 block text-sm font-medium text-zinc-300">
+            {isInitialPhone ? 'ইমেইল অ্যাড্রেস (Gmail)' : 'মোবাইল নম্বর'}
+          </label>
           <input
             type={isInitialPhone ? 'email' : 'tel'}
             required

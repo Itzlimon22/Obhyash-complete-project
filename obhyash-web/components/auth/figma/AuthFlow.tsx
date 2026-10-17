@@ -128,9 +128,35 @@ export default function AuthFlow({ defaultMode = 'login', initialIdentifier = ''
   };
 
   // Password Login
-  const handlePasswordSubmit = async (password: string) => {
+  const handlePasswordSubmit = async (password: string, currentId?: string) => {
     try {
-      const target = resolvedEmail || (id.includes('@') ? id : `${id.replace(/\D/g, '')}@user.obhyash.com`);
+      let target = resolvedEmail;
+      const activeId = currentId ? normalizeToEn(currentId) : id;
+      if (currentId && currentId !== id) {
+        setId(activeId);
+        target = '';
+      }
+
+      if (!target) {
+        if (isPhone(activeId)) {
+          const cleanPhone = activeId.replace(/\D/g, '');
+          const normPhone =
+            cleanPhone.length === 10
+              ? '0' + cleanPhone
+              : cleanPhone.startsWith('8801')
+              ? cleanPhone.substring(2)
+              : cleanPhone;
+          const { data: userRows } = await supabase
+            .from('users')
+            .select('id, email, phone')
+            .or(`phone.eq.${normPhone},phone.eq.+88${normPhone},phone.eq.88${normPhone}`)
+            .limit(1);
+          target = userRows?.[0]?.email || `${normPhone}@user.obhyash.com`;
+        } else {
+          target = activeId.toLowerCase().trim();
+        }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: target,
         password,
@@ -348,6 +374,7 @@ export default function AuthFlow({ defaultMode = 'login', initialIdentifier = ''
               router.push(`/forgot-password?identifier=${encodeURIComponent(id)}`);
             }}
             onDone={handlePasswordSubmit}
+            onGoogleLogin={handleGoogleLogin}
           />
         );
       case 'reg-otp':
@@ -478,7 +505,7 @@ export default function AuthFlow({ defaultMode = 'login', initialIdentifier = ''
         {showFooter && (
           <>
             <a
-              href="mailto:support@obhyash.com"
+              href="/support"
               className="mt-12 text-sm text-zinc-400 transition hover:text-white"
             >
               সাপোর্ট লাগবে?
