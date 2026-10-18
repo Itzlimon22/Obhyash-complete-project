@@ -286,7 +286,7 @@ export default function Features() {
   }, []);
 
   return (
-    <section id="features" className="relative mx-auto max-w-6xl px-5 py-16 md:py-24">
+    <section id="features" className="relative mx-auto max-w-6xl overflow-hidden px-5 py-16 md:py-24">
       <div data-reveal className="text-center">
         <h2 className="text-4xl font-bold leading-tight md:text-5xl" style={display}>
           তোমার প্রস্তুতিকে দাও

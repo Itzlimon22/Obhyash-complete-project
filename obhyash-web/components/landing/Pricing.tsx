@@ -77,8 +77,10 @@ export default function Pricing({ onStart }: { onStart: () => void }) {
   const [sel, setSel] = useState(1);
 
   return (
-    <section id="pricing" className="relative mx-auto max-w-7xl px-5 py-16 md:py-24">
-      <div className="pointer-events-none absolute left-1/2 top-40 h-[420px] w-[700px] -translate-x-1/2 rounded-full bg-[#5fcf6b]/10 blur-[130px]" />
+    <section id="pricing" className="relative mx-auto max-w-7xl overflow-hidden px-5 py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-x-0 top-40 h-[420px] overflow-hidden">
+        <div className="mx-auto h-[420px] w-[min(700px,100vw)] rounded-full bg-[#5fcf6b]/10 blur-[130px]" />
+      </div>
       <div data-reveal className="relative text-center">
         <h2 className="text-4xl font-extrabold leading-tight md:text-5xl" style={display}>
           তোমার প্রস্তুতির সেরা প্ল্যানটি{" "}

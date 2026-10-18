@@ -6,15 +6,15 @@ const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
 const ink = "#1d2430";
 
 const Laptop = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex flex-col items-center">
+  <div className="flex flex-col items-center max-w-full">
     <div
-      className="relative h-[84px] w-[124px] rounded-t-xl border-[3px] bg-[#f4f6fb] p-2"
+      className="relative h-[84px] w-[124px] max-w-full rounded-t-xl border-[3px] bg-[#f4f6fb] p-2"
       style={{ borderColor: ink }}
     >
       {children}
     </div>
     <div
-      className="h-3 w-[150px] rounded-b-lg border-[3px] bg-[#d9dee6]"
+      className="h-3 w-[150px] max-w-full rounded-b-lg border-[3px] bg-[#d9dee6]"
       style={{ borderColor: ink }}
     />
   </div>
@@ -165,7 +165,7 @@ export default function Steps({ onStart }: { onStart: () => void }) {
   }, [active]);
 
   return (
-    <section id="how" className="relative mx-auto max-w-6xl px-5 py-16 md:py-24">
+    <section id="how" className="relative mx-auto max-w-6xl overflow-hidden px-5 py-16 md:py-24">
       <div data-reveal className="text-center">
         <h2 className="text-4xl font-bold md:text-5xl" style={display}>
           শুরু করা{" "}
@@ -178,9 +178,9 @@ export default function Steps({ onStart }: { onStart: () => void }) {
         </p>
       </div>
 
-      <div data-reveal className="relative mt-10 md:mt-14">
+      <div data-reveal className="relative mt-10 overflow-hidden md:mt-14">
         <div
-          className="pointer-events-none absolute -top-32 h-64 w-96 rounded-full blur-[110px] transition-all duration-700"
+          className="pointer-events-none absolute -top-32 h-64 w-80 max-w-full rounded-full blur-[110px] transition-all duration-700 sm:w-96"
           style={{
             background: steps[active].c,
             opacity: 0.18,

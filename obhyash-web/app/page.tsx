@@ -183,7 +183,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchema) }}
       />
-      <main>
+      <main className="w-full max-w-full overflow-x-hidden">
         <LandingPageClient />
       </main>
     </>

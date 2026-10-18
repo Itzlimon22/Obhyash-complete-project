@@ -28,7 +28,7 @@ export default function PhoneMock() {
   const d = dark;
 
   return (
-    <div className="relative w-[280px] shrink-0 rounded-[46px] border-[6px] border-[#8a8a8e] bg-black p-[6px] shadow-[0_40px_120px_-30px_rgba(229,83,75,0.45)] sm:w-[310px]">
+    <div className="relative w-[280px] max-w-[calc(100vw-40px)] shrink-0 rounded-[46px] border-[6px] border-[#8a8a8e] bg-black p-[6px] shadow-[0_40px_120px_-30px_rgba(229,83,75,0.45)] sm:w-[310px]">
       <span className="absolute -right-[10px] top-36 h-14 w-1 rounded-r bg-[#8a8a8e]" />
       <span className="absolute -right-[10px] top-56 h-24 w-1 rounded-r bg-[#8a8a8e]" />
       <div className={`relative flex h-[590px] flex-col overflow-hidden rounded-[36px] ${d ? "bg-[#0f1514] text-white" : "bg-white text-[#1d2327]"}`} style={{ fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" }}>

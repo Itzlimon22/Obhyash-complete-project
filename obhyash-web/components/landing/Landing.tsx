@@ -48,17 +48,19 @@ export default function Landing({ onStart }: { onStart: () => void }) {
 
   return (
     <div
-      className="min-h-screen overflow-x-clip bg-[#0a0b0b] text-white landing-root font-kalpurush"
+      className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-[#0a0b0b] text-white landing-root font-kalpurush"
       style={{ fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" }}
     >
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-[#e5534b]/15 blur-[140px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] overflow-hidden">
+        <div className="mx-auto h-[600px] w-[min(900px,100vw)] rounded-full bg-[#e5534b]/15 blur-[140px]" />
+      </div>
 
       <Header onStart={onStart} />
 
       <section className="relative mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-8 lg:grid-cols-[1.1fr_1fr] lg:pt-12">
         <div className="text-center lg:self-start lg:pt-28 lg:text-left">
           <h1
-            className="text-[42px] font-extrabold leading-[1.18] sm:text-5xl md:text-7xl"
+            className="text-[34px] sm:text-5xl md:text-7xl font-extrabold leading-[1.18]"
             style={display}
           >
             ভুল থেকেই
