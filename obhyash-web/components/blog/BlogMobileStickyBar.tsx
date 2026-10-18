@@ -60,36 +60,40 @@ export default function BlogMobileStickyBar() {
       aria-label="মোবাইল কুইক অ্যাকশন বার"
       className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-white/10 shadow-[0_-6px_24px_rgba(0,0,0,0.12)] px-3.5 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] transition-all duration-200"
     >
-      <div className="max-w-md mx-auto flex items-center justify-between gap-3">
-        {/* Left: Text "আনলিমিটেড এক্সাম দাও" */}
-        <Link
-          href="/demo"
-          onClick={() =>
-            trackBlogConversion({
-              eventType: 'practice_click',
-              sourceSlug: currentSlug,
-              sourceCategory: cohortCategory,
-              buttonLocation: 'mobile_sticky_left_text',
-            })
-          }
-          className="flex items-center min-w-0 flex-1 py-1 group"
-        >
-          <span className="text-[13px] sm:text-[14px] font-bold text-slate-800 dark:text-slate-100 font-noto truncate tracking-tight group-hover:text-[#0e7490] dark:group-hover:text-cyan-400 transition-colors">
-            আনলিমিটেড এক্সাম দাও
-          </span>
-        </Link>
-
-        {/* Right: Deep Green: App Download Button */}
+      <div className="max-w-md mx-auto flex items-center gap-2.5">
+        {/* Secondary: Sleek Google Play Store Icon Button */}
         <a
           href={PLAY_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleAppDownloadClick}
-          className="group relative flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#065f46] hover:bg-[#047857] active:bg-[#022c22] text-white font-noto font-bold text-[13px] sm:text-[14px] shadow-sm hover:shadow-md transition-all duration-150 text-center shrink-0"
+          title="Google Play থেকে অ্যাপ ইনস্টল করো"
+          aria-label="Google Play থেকে অ্যাপ ইনস্টল করো"
+          className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 font-noto font-semibold text-xs shrink-0 transition-colors"
         >
           <GooglePlayStoreIcon className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate tracking-wide">App Download</span>
+          <span className="hidden xs:inline">অ্যাপ</span>
         </a>
+
+        {/* Primary Dominant CTA: ফ্রি প্র্যাকটিস শুরু করো */}
+        <Link
+          href="/auth/register"
+          onClick={() =>
+            trackBlogConversion({
+              eventType: 'practice_click',
+              sourceSlug: currentSlug,
+              sourceCategory: cohortCategory,
+              buttonLocation: 'mobile_sticky_primary',
+            })
+          }
+          className="group flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#065f46] hover:bg-[#047857] active:bg-[#022c22] text-white font-noto font-bold text-[14px] shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-center"
+        >
+          <span>ফ্রি প্র্যাকটিস শুরু করো</span>
+          <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </Link>
       </div>
     </aside>
   );

@@ -264,20 +264,20 @@ export default function BlogHeader() {
             />
           </Link>
 
-          {/* ─── 2. MOBILE ONLY: FREE EXAM BUTTON IN EXACT CENTER ─── */}
-          <div className="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-auto">
+          {/* ─── 2. MOBILE ONLY: HIGH-CONVERTING QUICK ACTION BUTTON ─── */}
+          <div className="lg:hidden flex items-center justify-center pointer-events-auto mx-auto">
             <Link
-              href="/demo"
+              href="/auth/register"
               onClick={() =>
                 trackBlogConversion({
                   eventType: 'practice_click',
-                  buttonLocation: 'header_mobile_center',
+                  buttonLocation: 'header_mobile_quick_action',
                 })
               }
-              className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] active:scale-95 text-white text-xs font-bold font-noto shadow-xs transition-all shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#065f46] hover:bg-[#047857] active:bg-[#022c22] active:scale-95 text-white text-xs sm:text-[13px] font-bold font-noto shadow-[0_2px_10px_rgba(6,95,70,0.35)] transition-all shrink-0"
             >
-              <WritingOnPaperIcon className="w-3.5 h-3.5 text-cyan-200" />
-              <span>এক্সাম দাও</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+              <span>ফ্রি প্র্যাকটিস</span>
             </Link>
           </div>
 
