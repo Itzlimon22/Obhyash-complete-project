@@ -122,7 +122,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       )}
 
       {/* ── Main Content Container ── */}
-      <main className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 flex justify-center">
+      <main className="flex-1 px-3 sm:px-4 py-4 sm:py-6 flex justify-center">
         <div className="w-full max-w-md flex flex-col gap-4 pb-28">
           {/* ── Card 1: Subject Header with 4-Stat Ribbon inside ── */}
           <div className="bg-white dark:bg-[#111417] rounded-3xl border border-neutral-200/80 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs flex flex-col gap-4">

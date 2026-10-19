@@ -276,7 +276,7 @@ export default function DemoExamClient() {
   );
 
   return (
-    <div className="min-h-screen font-['HindSiliguri',sans-serif] bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100 transition-colors duration-200">
+    <div className="min-h-screen overflow-x-clip font-['HindSiliguri',sans-serif] bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100 transition-colors duration-200">
       {/* ── 1. Setup Stage ── */}
       {stage === 'setup' && (
         <div className="py-6 sm:py-10 px-3 sm:px-6">

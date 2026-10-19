@@ -20,7 +20,7 @@ export default function LandingPageClient() {
   };
 
   return (
-    <div className="dark bg-[#0a0b0b] min-h-screen w-full max-w-full overflow-x-hidden text-white landing-root font-kalpurush">
+    <div className="dark bg-[#0a0b0b] min-h-screen text-white landing-root font-kalpurush">
       <Landing onStart={handleStart} />
     </div>
   );

@@ -40,7 +40,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
   const answeredCount = Object.keys(selectedAnswers).length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif] max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif] max-w-full overflow-x-clip">
       {/* ── Top AppBar (Exact same structure as ExamRunner) ── */}
       {showHeader && (
         <header className="sticky top-0 z-30 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-white/[0.08] shadow-2xs">
@@ -78,7 +78,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
       )}
 
       {/* ── Main Question List (Exact same layout as ExamRunner) ── */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-1.5 sm:px-6 py-5 pb-28 space-y-5 min-w-0 max-w-full overflow-x-hidden">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-1.5 sm:px-6 py-5 pb-28 space-y-5 min-w-0 max-w-full">
         {questions.length === 0 ? (
           <div className="text-center py-16 text-neutral-500 dark:text-neutral-400 font-sans">
             কোনো প্রশ্ন পাওয়া যায়নি।

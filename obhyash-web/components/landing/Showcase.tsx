@@ -67,7 +67,7 @@ export default function Showcase() {
   const cur = screens[active];
 
   return (
-    <section id="app" className="relative overflow-hidden py-16 md:py-24" style={{ contain: "paint" }}>
+    <section id="app" className="relative overflow-hidden py-16 md:py-24">
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px] transition-colors duration-700"
         style={{ background: cur.c, opacity: 0.18 }}
