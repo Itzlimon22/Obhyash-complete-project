@@ -54,13 +54,13 @@
   <!-- 4. Center Hero Headline (Guaranteed Safe Width) -->
   <g transform="translate(600, 275)">
     <!-- Line 1: Dark Slate -->
-    <text x="0" y="0" class="title" font-size="47" fill="#0F172A" text-anchor="middle">
-      এইচএসসি রেজাল্ট ২০২৬ কবে দিবে?
+    <text x="0" y="0" class="title" font-size="52" fill="#0F172A" text-anchor="middle">
+      HSC Result 2026 কবে দিবে?
     </text>
 
     <!-- Line 2: Thematic Accent Color -->
-    <text x="0" y="71" class="title" font-size="44" fill="#DC2626" text-anchor="middle">
-      বোর্ড প্রকাশের সম্ভাব্য তারিখ
+    <text x="0" y="76" class="title" font-size="44" fill="#DC2626" text-anchor="middle">
+      এইচএসসি রেজাল্ট প্রকাশের তারিখ
     </text>
   </g>
 
