@@ -19,6 +19,8 @@ publishedAt: '2026-10-04T06:30:00.000Z'
 updatedAt: '2026-10-09T01:10:00.000Z'
 featured: true
 coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.svg
+hideConversionBanner: true
+hideInArticleRelated: true
 ---
 
 # এসএসসি বৃত্তি রেজাল্ট ২০২৬: মেধা ও সাধারণ বৃত্তির গেজেট ও বোর্ডভিত্তিক তালিকা
@@ -44,6 +46,28 @@ coverImage: /images/blog-covers/titles/ssc-scholarship-britti-result-2026-check.
 <div data-widget="ssc-scholarship-alert"></div>
 
 ---
+
+<div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 1.15rem; margin: 1.75rem 0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <span style="background: #ef4444; color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 0.375rem; letter-spacing: 0.05em;">MUST WATCH</span>
+      <span style="color: #cbd5e1; font-size: 0.875rem; font-weight: 600;">এসএসসির পর সামনে কলেজ জীবন ও বোর্ড পরীক্ষায় টপাররা পড়া কীভাবে মনে রাখে? মাত্র ৫ মিনিটে দেখে নাও বৈজ্ঞানিক ৩টি কৌশল:</span>
+    </div>
+    <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 500;">⏱ ৫ মিনিটের ভিডিও</span>
+  </div>
+
+  <a href="https://youtu.be/9TmZYOAXJas?si=mZeZ1x-lElZnrSIV" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; position: relative; border-radius: 0.75rem; overflow: hidden; aspect-ratio: 16/9; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+    <img src="https://i.ytimg.com/vi/9TmZYOAXJas/maxresdefault.jpg" alt="যেভাবে পড়ছো সেটাই তোমার ভুলে যাওয়ার কারণ" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" />
+    
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; background: rgba(239, 68, 68, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+    </div>
+    
+    <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+      <span>YouTube-এ দেখুন</span> <span>↗</span>
+    </div>
+  </a>
+</div>
 
 ## এসএসসি মেধা ও সাধারণ বৃত্তি আসলে কী?
 

@@ -254,58 +254,8 @@ function injectInArticleRelated(content: string, relatedSlug?: string): string {
   return processed;
 }
 
-// Helper to inject smart contextual in-article conversion banner
+// Helper to inject smart contextual in-article conversion banner (disabled globally)
 function injectCategoryConversionBanner(content: string): string {
-  // If the article already contains a major conversion widget, avoid duplicate clutter
-  if (
-    content.includes('data-widget="category-conversion-banner"') ||
-    content.includes('data-widget="ssc-scholarship-alert"') ||
-    content.includes('data-widget="ssc-college-prep"')
-  ) {
-    return content;
-  }
-
-  const blocks = content.split(/\n{2,}/);
-  if (blocks.length < 4) {
-    return content;
-  }
-
-  let paragraphCount = 0;
-  let insertIndex = -1;
-
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i].trim();
-    if (
-      !block ||
-      block.startsWith('#') ||
-      block.startsWith('```') ||
-      block.startsWith('<') ||
-      block.startsWith('|') ||
-      block.startsWith('>') ||
-      block.startsWith('- ') ||
-      block.startsWith('* ') ||
-      /^\d+\.\s/.test(block)
-    ) {
-      continue;
-    }
-
-    paragraphCount++;
-    if (paragraphCount === 3) {
-      insertIndex = i + 1;
-      break;
-    }
-  }
-
-  if (insertIndex === -1 && blocks.length >= 4) {
-    insertIndex = Math.floor(blocks.length / 2);
-  }
-
-  if (insertIndex !== -1 && insertIndex < blocks.length) {
-    const widgetHtml = '<div data-widget="category-conversion-banner"></div>';
-    blocks.splice(insertIndex, 0, widgetHtml);
-    return blocks.join('\n\n');
-  }
-
   return content;
 }
 
@@ -334,6 +284,19 @@ export default async function BlogPostPage({
     post.slug === 'ssc-scholarship-britti-result-2026-check' ||
     post.slug.includes('britti');
 
+  // Targeted blogs where user requested to hide both in-article related card and conversion banner
+  const TARGET_PROMO_SLUGS = new Set([
+    'ssc-general-math-all-board-questions-solution-2026',
+    'ssc-scholarship-britti-result-2026-check',
+    'hsc-2027-bangla-syllabus-marks-distribution',
+    'hsc-2027-syllabus-exam-system-breakdown',
+  ]);
+
+  const shouldHideInArticleRelated =
+    Boolean(post.hideInArticleRelated) ||
+    TARGET_PROMO_SLUGS.has(post.slug) ||
+    isBrittiPost;
+
   // 1. Ensure HSC Science Ka-Kha PDF card is only injected for HSC physics/science relevant posts
   const textToCheck = `${post.category} ${post.tags.join(' ')} ${post.slug}`.toLowerCase();
   const isHscSciencePost =
@@ -345,13 +308,13 @@ export default async function BlogPostPage({
     ? injectHscNotesCard(post.content, post.slug)
     : post.content;
 
-  // 2. Inject related posts card for non-britti articles
-  const withRelated = isBrittiPost
+  // 2. Inject related posts card for articles that don't have it hidden
+  const withRelated = shouldHideInArticleRelated
     ? withHscCard
     : injectInArticleRelated(withHscCard, relatedPosts[0]?.slug);
 
-  // 3. Inject smart in-article category conversion banner
-  const processedContent = injectCategoryConversionBanner(withRelated);
+  // 3. Processed markdown content
+  const processedContent = withRelated;
 
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
@@ -453,17 +416,10 @@ export default async function BlogPostPage({
         return <SscMathAppMockupCard />;
       }
       if (widget === 'category-conversion-banner') {
-        return (
-          <CategoryConversionBanner
-            category={post.category}
-            tags={post.tags}
-            slug={post.slug}
-            placement="in_article"
-          />
-        );
+        return null;
       }
       if (widget === 'related-post') {
-        if (isBrittiPost) return null;
+        if (shouldHideInArticleRelated) return null;
         const targetSlug = (props as Record<string, unknown>)['data-slug'] as string;
         const targetPost = postsBySlug.get(targetSlug) || relatedPosts[0];
         if (targetPost) {
@@ -999,15 +955,6 @@ export default async function BlogPostPage({
                 </div>
               </div>
 
-              {/* End of Article High-Impact Conversion Banner */}
-              <div className="mt-10">
-                <CategoryConversionBanner
-                  category={post.category}
-                  tags={post.tags}
-                  slug={post.slug}
-                  placement="end_of_article"
-                />
-              </div>
             </div>
             {/* end max-w readable */}
           </article>

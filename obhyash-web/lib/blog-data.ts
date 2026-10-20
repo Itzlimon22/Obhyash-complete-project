@@ -23,6 +23,8 @@ export interface BlogPost {
   featured: boolean;
   coverColor: string; // tailwind gradient classes — used as fallback when no image
   coverImage?: string; // absolute URL to a cover image (Notion page cover, Unsplash, etc.)
+  hideConversionBanner?: boolean;
+  hideInArticleRelated?: boolean;
 }
 
 export const BLOG_CATEGORIES = [
@@ -263,6 +265,8 @@ const getLocalPosts = async (): Promise<BlogPost[]> => {
       featured: data.featured || false,
       coverColor: data.coverColor || 'from-neutral-500 to-neutral-600',
       coverImage: data.coverImage || undefined,
+      hideConversionBanner: Boolean(data.hideConversionBanner),
+      hideInArticleRelated: Boolean(data.hideInArticleRelated),
       content: content,
     } as BlogPost;
   });
