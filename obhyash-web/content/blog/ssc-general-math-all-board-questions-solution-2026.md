@@ -48,8 +48,8 @@ hideInArticleRelated: true
     <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 500;">⏱ ৫ মিনিটের ভিডিও</span>
   </div>
 
-  <a href="https://youtu.be/9TmZYOAXJas?si=mZeZ1x-lElZnrSIV" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; position: relative; border-radius: 0.75rem; overflow: hidden; aspect-ratio: 16/9; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-    <img src="https://i.ytimg.com/vi/9TmZYOAXJas/maxresdefault.jpg" alt="যেভাবে পড়ছো সেটাই তোমার ভুলে যাওয়ার কারণ" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" />
+  <a href="https://youtu.be/T1IcHqydc3A?si=ShWe_xOM-Xg5aCgp" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; position: relative; border-radius: 0.75rem; overflow: hidden; aspect-ratio: 16/9; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+    <img src="https://i.ytimg.com/vi/T1IcHqydc3A/maxresdefault.jpg" alt="বেশি পড়েও মনে থাকে না? ৩টি বৈজ্ঞানিক পদ্ধতিতে পড়া মনে রাখুন" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" />
     
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; background: rgba(239, 68, 68, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
