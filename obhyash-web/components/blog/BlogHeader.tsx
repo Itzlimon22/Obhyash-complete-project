@@ -379,13 +379,13 @@ export default function BlogHeader() {
       )}
 
       <div
-        className={`fixed top-0 right-0 bottom-0 z-[101] w-80 sm:w-96 bg-white dark:bg-[#161616] border-l border-slate-200 dark:border-white/10 p-6 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-out font-noto overflow-y-auto no-scrollbar ${
+        className={`fixed top-0 right-0 bottom-0 z-[101] w-72 sm:w-80 bg-white dark:bg-[#111111] border-l border-slate-200/80 dark:border-zinc-800 p-5 sm:p-6 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-out font-noto overflow-y-auto no-scrollbar ${
           isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="space-y-5">
+        <div className="space-y-6">
           {/* Drawer Header & Close Button */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
+          <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-zinc-800/80">
             <Link
               href="/blog"
               onClick={() => setIsDrawerOpen(false)}
@@ -395,69 +395,76 @@ export default function BlogHeader() {
               <Image
                 src="/obhyash_full_logo.svg"
                 alt="অভ্যাস"
-                width={110}
-                height={28}
-                className="h-7 w-auto object-contain dark:hidden"
+                width={105}
+                height={26}
+                className="h-6 sm:h-7 w-auto object-contain dark:hidden"
               />
               <Image
                 src="/obhyash_full_logo_dark.svg"
                 alt="অভ্যাস"
-                width={110}
-                height={28}
-                className="h-7 w-auto object-contain hidden dark:block"
+                width={105}
+                height={26}
+                className="h-6 sm:h-7 w-auto object-contain hidden dark:block"
               />
             </Link>
             <button
               onClick={() => setIsDrawerOpen(false)}
-              className="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+              className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
               aria-label="Close"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Top Quick Actions (Dashboard, Bookmarks, Demo Exam) */}
-          <div className="space-y-2">
-            {/* Obhyash Dashboard Redirect */}
+          {/* Clean Navigation Links (Minimal & Spaced) */}
+          <nav className="space-y-1">
             <Link
-              href="/dashboard"
-              onClick={() => {
-                setIsDrawerOpen(false);
-                trackBlogConversion({
-                  eventType: 'signup_click',
-                  buttonLocation: 'drawer',
-                });
-              }}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-sm shadow-sm transition-all"
+              href="/blog"
+              onClick={() => setIsDrawerOpen(false)}
+              className="block px-3 py-2 rounded-xl text-[14.5px] font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/60 transition-colors"
             >
-              <span className="flex items-center gap-2.5">
-                <LayoutDashboard className="w-4 h-4" />
-                <span>অভ্যাস ড্যাশবোর্ড</span>
-              </span>
-              <ArrowRight className="w-4 h-4 opacity-80" />
+              সকল আর্টিকেল
             </Link>
-
-            {/* Exam Demo Link */}
             <Link
-              href="/demo"
-              onClick={() => {
-                setIsDrawerOpen(false);
-                trackBlogConversion({
-                  eventType: 'practice_click',
-                  buttonLocation: 'drawer',
-                });
-              }}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-sm transition-all"
+              href="/blog?category=HSC 2027"
+              onClick={() => setIsDrawerOpen(false)}
+              className="block px-3 py-2 rounded-xl text-[14.5px] font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/60 transition-colors"
             >
-              <span className="flex items-center gap-2.5">
-                <WritingOnPaperIcon className="w-4 h-4 text-[#0e7490] dark:text-cyan-400" />
-                <span>এক্সাম দাও (ডেমো টেস্ট)</span>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+              এইচএসসি ২০২৭ গাইড
             </Link>
+            <Link
+              href="/blog?category=HSC 2026"
+              onClick={() => setIsDrawerOpen(false)}
+              className="block px-3 py-2 rounded-xl text-[14.5px] font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/60 transition-colors"
+            >
+              এইচএসসি ২০২৬ রিভিশন
+            </Link>
+            <Link
+              href="/blog?category=ভর্তি পরীক্ষা"
+              onClick={() => setIsDrawerOpen(false)}
+              className="block px-3 py-2 rounded-xl text-[14.5px] font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/60 transition-colors"
+            >
+              ভর্তি পরীক্ষা নির্দেশিকা
+            </Link>
+            <Link
+              href="/blog?category=স্টাডি হ্যাকস"
+              onClick={() => setIsDrawerOpen(false)}
+              className="block px-3 py-2 rounded-xl text-[14.5px] font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/60 transition-colors"
+            >
+              স্টাডি হ্যাকস ও টিপস
+            </Link>
+            <Link
+              href="/question-bank"
+              onClick={() => setIsDrawerOpen(false)}
+              className="block px-3 py-2 rounded-xl text-[14.5px] font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/60 transition-colors"
+            >
+              বোর্ড প্রশ্ন ব্যাংক
+            </Link>
+          </nav>
 
-            {/* Login & Register Direct Buttons */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+          {/* Quick Actions (Minimalist Buttons) */}
+          <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 space-y-2.5">
+            <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/auth/login"
                 onClick={() => {
@@ -467,7 +474,7 @@ export default function BlogHeader() {
                     buttonLocation: 'drawer',
                   });
                 }}
-                className="flex items-center justify-center py-2.5 px-3 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm transition-all"
+                className="flex items-center justify-center py-2 px-3 rounded-xl border border-slate-200/80 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-zinc-800/50 text-xs sm:text-[13px] font-semibold transition-all"
               >
                 লগইন
               </Link>
@@ -480,73 +487,30 @@ export default function BlogHeader() {
                     buttonLocation: 'drawer',
                   });
                 }}
-                className="flex items-center justify-center py-2.5 px-3 rounded-2xl bg-[#064e3b] hover:bg-[#065f46] text-white font-bold text-xs sm:text-sm shadow-sm transition-all"
+                className="flex items-center justify-center py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-slate-900 text-xs sm:text-[13px] font-semibold shadow-2xs transition-all"
               >
                 রেজিস্ট্রেশন
               </Link>
             </div>
-          </div>
 
-          {/* Drawer Navigation Links */}
-          <div className="py-2 space-y-1 border-t border-slate-100 dark:border-white/5">
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 pt-2">
-              নেভিগেশন
-            </h4>
             <Link
-              href="/blog"
-              onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-            >
-              <span>সকল আর্টিকেল (Home)</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
-            <Link
-              href="/blog?category=HSC 2027"
-              onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-            >
-              <span>এইচএসসি ২০২৭ সিলেবাস ও গাইড</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
-            <Link
-              href="/blog?category=HSC 2026"
-              onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-            >
-              <span>এইচএসসি ২০২৬ রিভিশন ও রুটিন</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
-            <Link
-              href="/blog?category=ভর্তি পরীক্ষা"
-              onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-            >
-              <span>ভর্তি পরীক্ষা নির্দেশিকা</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
-            <Link
-              href="/blog?category=স্টাডি হ্যাকস"
-              onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-            >
-              <span>স্টাডি হ্যাকস ও রুটিন</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
-            <Link
-              href="/question-bank"
-              onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center justify-between py-2 px-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+              href="/demo"
+              onClick={() => {
+                setIsDrawerOpen(false);
+                trackBlogConversion({
+                  eventType: 'practice_click',
+                  buttonLocation: 'drawer',
+                });
+              }}
+              className="flex items-center justify-between px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors"
             >
               <span className="flex items-center gap-2">
-                <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-                <span>বোর্ড প্রশ্ন ব্যাংক</span>
+                <WritingOnPaperIcon className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
+                <span>ফ্রি এক্সাম টেস্ট দাও</span>
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-[11px] text-slate-400">ডেমো →</span>
             </Link>
-          </div>
 
-          {/* Google Play Store App Download Card */}
-          <div className="pt-2 border-t border-slate-100 dark:border-white/5">
             <a
               href="https://play.google.com/store/apps/details?id=com.obhyash.app"
               target="_blank"
@@ -557,49 +521,42 @@ export default function BlogHeader() {
                   buttonLocation: 'drawer',
                 });
               }}
-              className="group flex items-center gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/80 dark:bg-white/5 hover:border-slate-400 dark:hover:border-white/20 transition-all text-slate-800 dark:text-white"
+              className="flex items-center justify-between px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors"
             >
-              <div className="w-10 h-10 rounded-xl bg-white dark:bg-black/30 border border-slate-200/60 dark:border-white/10 flex items-center justify-center shrink-0 shadow-xs">
-                <GooglePlayIcon className="w-6 h-6" />
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none mb-1">
-                  GET IT ON
-                </span>
-                <span className="text-xs sm:text-sm font-bold leading-tight block truncate">
-                  Google Play Store
-                </span>
-              </div>
-              <Download className="w-4 h-4 text-slate-400 group-hover:translate-y-0.5 transition-transform shrink-0" />
+              <span className="flex items-center gap-2">
+                <GooglePlayIcon className="w-3.5 h-3.5 shrink-0" />
+                <span>Google Play অ্যাপ</span>
+              </span>
+              <span className="text-[11px] text-slate-400">↗</span>
             </a>
           </div>
         </div>
 
-        {/* Drawer Footer Socials (Facebook & YouTube with Official Links) */}
-        <div className="pt-4 border-t border-slate-100 dark:border-white/5">
-          <div className="flex items-center justify-center gap-3">
+        {/* Drawer Footer Socials & Copyright */}
+        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-slate-400 dark:text-zinc-500">
+          <div className="flex items-center gap-3">
             <a
               href="https://www.facebook.com/obhyash.official"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-300 transition-all shadow-xs"
+              className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
-              <Facebook className="w-4 h-4 fill-current" />
+              <Facebook className="w-3.5 h-3.5 fill-current" />
             </a>
             <a
               href="https://www.youtube.com/@phymathnerds"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
-              className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-300 transition-all shadow-xs"
+              className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
-              <YouTubeIcon className="w-4 h-4" />
+              <YouTubeIcon className="w-3.5 h-3.5" />
             </a>
           </div>
-          <p className="text-center text-[11px] text-slate-400 mt-3 font-mono">
-            © {new Date().getFullYear()} Obhyash. All rights reserved.
-          </p>
+          <span className="text-[11px] font-mono text-slate-400 dark:text-zinc-600">
+            © {new Date().getFullYear()} Obhyash
+          </span>
         </div>
       </div>
 
