@@ -502,28 +502,28 @@ export default async function BlogPostPage({
       const config: Record<string, CalloutConfig> = {
         NOTE: {
           color:
-            'bg-blue-50/60 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-950 dark:text-blue-200',
-          icon: <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
+            'bg-slate-50/80 dark:bg-zinc-900/60 border-slate-200/80 dark:border-zinc-800 border-l-4 border-l-blue-500 text-slate-800 dark:text-zinc-200',
+          icon: <Info className="w-4 h-4 text-blue-500 dark:text-blue-400" />,
         },
         TIP: {
           color:
-            'bg-emerald-50/60 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-950 dark:text-emerald-200',
-          icon: <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
+            'bg-slate-50/80 dark:bg-zinc-900/60 border-slate-200/80 dark:border-zinc-800 border-l-4 border-l-emerald-500 text-slate-800 dark:text-zinc-200',
+          icon: <Lightbulb className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />,
         },
         IMPORTANT: {
           color:
-            'bg-purple-50/60 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 text-purple-950 dark:text-purple-200',
-          icon: <CheckCircle2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />,
+            'bg-slate-50/80 dark:bg-zinc-900/60 border-slate-200/80 dark:border-zinc-800 border-l-4 border-l-purple-500 text-slate-800 dark:text-zinc-200',
+          icon: <CheckCircle2 className="w-4 h-4 text-purple-500 dark:text-purple-400" />,
         },
         WARNING: {
           color:
-            'bg-amber-50/60 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-950 dark:text-amber-200',
-          icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />,
+            'bg-slate-50/80 dark:bg-zinc-900/60 border-slate-200/80 dark:border-zinc-800 border-l-4 border-l-amber-500 text-slate-800 dark:text-zinc-200',
+          icon: <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />,
         },
         CAUTION: {
           color:
-            'bg-rose-50/60 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-950 dark:text-rose-200',
-          icon: <AlertOctagon className="w-5 h-5 text-rose-600 dark:text-rose-400" />,
+            'bg-slate-50/80 dark:bg-zinc-900/60 border-slate-200/80 dark:border-zinc-800 border-l-4 border-l-rose-500 text-slate-800 dark:text-zinc-200',
+          icon: <AlertOctagon className="w-4 h-4 text-rose-500 dark:text-rose-400" />,
         },
       };
 
@@ -531,10 +531,10 @@ export default async function BlogPostPage({
 
       return (
         <div
-          className={`not-prose flex flex-col sm:flex-row gap-3.5 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-noto not-italic shadow-sm`}
+          className={`not-prose flex flex-col sm:flex-row gap-3 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-noto not-italic`}
         >
           <div className="shrink-0 mt-0.5">{icon}</div>
-          <div className="flex-1 min-w-0 text-[15px] sm:text-[16.5px] leading-relaxed space-y-2 [&_p]:my-1.5 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-1 [&_strong]:font-bold [&_p]:before:content-none [&_p]:after:content-none">
+          <div className="flex-1 min-w-0 text-[14.5px] sm:text-[15.5px] leading-relaxed space-y-1.5 [&_p]:my-1 [&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5 [&_strong]:font-semibold [&_p]:before:content-none [&_p]:after:content-none">
             {cleanText}
           </div>
         </div>
@@ -594,7 +594,7 @@ export default async function BlogPostPage({
       if (inline) {
         return (
           <code
-            className="bg-rose-50 dark:bg-rose-500/10 px-1.5 py-0.5 rounded-md text-[13px] sm:text-[14px] font-mono font-medium text-rose-600 dark:text-rose-400 before:content-none after:content-none border border-rose-100 dark:border-rose-900/30"
+            className="bg-slate-100 dark:bg-zinc-800/80 px-1.5 py-0.5 rounded text-[13px] sm:text-[13.5px] font-mono font-normal text-slate-800 dark:text-zinc-200 before:content-none after:content-none border border-slate-200/60 dark:border-zinc-700/60"
             {...props}
           >
             {children}
@@ -611,23 +611,21 @@ export default async function BlogPostPage({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'table'> & { node?: unknown }) => (
-      <figure className="not-prose my-8 sm:my-10 relative rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4)] bg-white dark:bg-slate-900/95 overflow-hidden">
-        {/* Top vibrant brand gradient ribbon */}
-        <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500" />
+      <div className="not-prose my-8 overflow-hidden rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-2xs">
         <div className="overflow-x-auto custom-scrollbar">
           <table
-            className="w-full text-left border-collapse m-0 min-w-[520px] font-noto tabular-nums text-[14.5px] sm:text-[15.5px]"
+            className="w-full text-left border-collapse m-0 min-w-[500px] font-noto tabular-nums text-[14px] sm:text-[15px]"
             {...props}
           />
         </div>
-      </figure>
+      </div>
     ),
     thead: ({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'thead'> & { node?: unknown }) => (
       <thead
-        className="bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80"
+        className="bg-slate-50 dark:bg-zinc-800/60 border-b border-slate-200/80 dark:border-zinc-800 text-slate-700 dark:text-zinc-200"
         {...props}
       />
     ),
@@ -636,7 +634,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'th'> & { node?: unknown }) => (
       <th
-        className="px-5 sm:px-6 py-4 align-middle font-bold text-slate-800 dark:text-slate-100 font-noto tracking-wider text-[13px] sm:text-[14px] uppercase whitespace-nowrap first:pl-6 last:pr-6"
+        className="px-4 sm:px-5 py-3 align-middle font-semibold text-slate-800 dark:text-zinc-200 font-noto text-xs sm:text-[13px] tracking-normal first:pl-5 last:pr-5"
         {...props}
       />
     ),
@@ -645,7 +643,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'td'> & { node?: unknown }) => (
       <td
-        className="px-5 sm:px-6 py-3.5 sm:py-4 align-middle text-slate-700 dark:text-slate-300 leading-relaxed border-b border-slate-100 dark:border-slate-800/80 first:font-semibold first:text-slate-900 dark:first:text-white first:pl-6 last:pr-6"
+        className="px-4 sm:px-5 py-3.5 align-middle text-slate-700 dark:text-zinc-300 leading-relaxed border-b border-slate-100 dark:border-zinc-800/60 first:font-medium first:text-slate-900 dark:first:text-zinc-100 first:pl-5 last:pr-5"
         {...props}
       />
     ),
@@ -654,7 +652,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'tr'> & { node?: unknown }) => (
       <tr
-        className="odd:bg-white even:bg-slate-50/50 dark:odd:bg-slate-900 dark:even:bg-slate-800/30 hover:bg-blue-50/60 dark:hover:bg-blue-950/25 transition-colors duration-150 last:border-b-0"
+        className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/30 transition-colors duration-100 last:border-b-0"
         {...props}
       />
     ),
@@ -664,17 +662,17 @@ export default async function BlogPostPage({
       src,
       ...props
     }: React.ComponentPropsWithoutRef<'img'> & { node?: unknown }) => (
-      <span className="block my-8 sm:my-10 group relative rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+      <span className="block my-8 sm:my-10 group relative rounded-2xl overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt ?? ''}
           {...props}
-          className="w-full h-auto object-contain max-h-[600px] md:group-hover:scale-[1.01] transition-transform duration-500 m-0"
+          className="w-full h-auto object-contain max-h-[600px] transition-transform duration-300 m-0"
           loading="lazy"
         />
         {alt && (
-          <span className="block text-center text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 p-3 font-noto italic bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+          <span className="block text-center text-xs text-slate-500 dark:text-zinc-400 p-2.5 font-noto border-t border-slate-100 dark:border-zinc-800/80 bg-white dark:bg-zinc-900">
             {alt}
           </span>
         )}
@@ -685,7 +683,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'ul'> & { node?: unknown }) => (
       <ul
-        className="list-none ml-2 sm:ml-4 space-y-2 sm:space-y-3 my-6 sm:my-8 font-noto"
+        className="list-none ml-1 sm:ml-2 space-y-2.5 my-6 sm:my-8 font-noto"
         {...props}
       />
     ),
@@ -694,7 +692,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'ol'> & { node?: unknown }) => (
       <ol
-        className="list-decimal list-outside ml-5 sm:ml-6 space-y-2 sm:space-y-3 marker:text-rose-500/80 dark:marker:text-rose-400/80 marker:font-medium my-6 font-noto"
+        className="list-decimal list-outside ml-5 sm:ml-6 space-y-2.5 marker:text-slate-500 dark:marker:text-zinc-400 marker:font-medium my-6 font-noto"
         {...props}
       />
     ),
@@ -706,21 +704,21 @@ export default async function BlogPostPage({
       node?: unknown;
       children?: React.ReactNode;
     }) => {
-      // For unordered lists, add custom bullet icon
+      // For unordered lists, add custom minimal bullet
       const isUnordered =
         (node as { parent?: { tagName?: string } } | undefined)?.parent
           ?.tagName === 'ul';
       if (isUnordered) {
         return (
-          <li className="relative pl-6 sm:pl-7 text-slate-700 dark:text-slate-300 leading-[1.8] text-[16px] sm:text-[17px] md:text-[18px]">
-            <span className="absolute left-1 sm:left-1.5 top-[10px] sm:top-2.5 w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></span>
+          <li className="relative pl-5 sm:pl-6 text-slate-700 dark:text-zinc-300 leading-[1.8] text-[16px] sm:text-[17px]">
+            <span className="absolute left-1 top-[11px] w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-500"></span>
             {children}
           </li>
         );
       }
       return (
         <li
-          className="pl-1 sm:pl-2 text-slate-700 dark:text-slate-300 leading-[1.8] text-[16px] sm:text-[17px] md:text-[18px]"
+          className="pl-1 sm:pl-2 text-slate-700 dark:text-zinc-300 leading-[1.8] text-[16px] sm:text-[17px]"
           {...props}
         >
           {children}
@@ -732,7 +730,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'a'> & { node?: unknown }) => (
       <a
-        className="text-rose-600 dark:text-rose-400 font-semibold underline decoration-rose-200 dark:decoration-rose-900 underline-offset-4 hover:decoration-rose-500 dark:hover:decoration-rose-500 transition-colors inline-block"
+        className="text-slate-900 dark:text-zinc-100 font-medium underline underline-offset-4 decoration-slate-300 dark:decoration-zinc-600 hover:decoration-slate-900 dark:hover:decoration-zinc-100 transition-colors inline-block"
         target="_blank"
         rel="noopener noreferrer"
         {...props}
@@ -743,7 +741,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'hr'> & { node?: unknown }) => (
       <hr
-        className="my-10 sm:my-14 border-slate-200 dark:border-slate-800"
+        className="my-10 sm:my-12 border-slate-200/80 dark:border-zinc-800"
         {...props}
       />
     ),
@@ -753,7 +751,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h2'> & { node?: unknown }) => (
       <h2
-        className="text-2xl sm:text-3xl md:text-[28px] font-bold mt-10 sm:mt-12 mb-4 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-2.5 font-noto tracking-normal leading-snug"
+        className="text-xl sm:text-2xl md:text-[26px] font-bold mt-10 sm:mt-12 mb-4 text-slate-900 dark:text-zinc-100 font-noto tracking-tight leading-snug"
         {...props}
       />
     ),
@@ -762,7 +760,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h3'> & { node?: unknown }) => (
       <h3
-        className="text-xl sm:text-2xl md:text-[22px] font-bold mt-8 mb-3 text-slate-800 dark:text-slate-100 font-noto tracking-normal leading-snug"
+        className="text-lg sm:text-xl md:text-[21px] font-bold mt-8 mb-3 text-slate-800 dark:text-zinc-200 font-noto tracking-tight leading-snug"
         {...props}
       />
     ),
@@ -771,7 +769,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h4'> & { node?: unknown }) => (
       <h4
-        className="text-lg sm:text-xl font-bold mt-6 mb-2.5 text-slate-800 dark:text-slate-200 font-noto tracking-normal"
+        className="text-base sm:text-lg font-bold mt-6 mb-2.5 text-slate-800 dark:text-zinc-200 font-noto tracking-tight"
         {...props}
       />
     ),
@@ -780,7 +778,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h5'> & { node?: unknown }) => (
       <h5
-        className="text-[16px] sm:text-[17px] font-semibold mt-5 mb-2 text-slate-700 dark:text-slate-300 font-noto tracking-normal"
+        className="text-[15px] sm:text-[16px] font-semibold mt-5 mb-2 text-slate-700 dark:text-zinc-300 font-noto tracking-tight"
         {...props}
       />
     ),
@@ -789,7 +787,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h6'> & { node?: unknown }) => (
       <h6
-        className="text-[14px] sm:text-[15px] font-semibold mt-5 mb-2 text-slate-600 dark:text-slate-400 font-noto uppercase tracking-normal"
+        className="text-[13px] sm:text-[14px] font-semibold mt-5 mb-2 text-slate-600 dark:text-zinc-400 font-noto uppercase tracking-wider"
         {...props}
       />
     ),
@@ -797,7 +795,7 @@ export default async function BlogPostPage({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'iframe'> & { node?: unknown }) => (
-      <div className="relative w-full aspect-video my-8 sm:my-10 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 bg-slate-900">
+      <div className="relative w-full aspect-video my-8 rounded-2xl overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-slate-900">
         <iframe
           className="absolute inset-0 w-full h-full border-0"
           allowFullScreen
@@ -810,7 +808,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'p'> & { node?: unknown }) => (
       <p
-        className="text-slate-700 dark:text-slate-300 leading-[1.85] sm:leading-[1.9] text-[16px] sm:text-[17px] mb-6 font-noto tracking-normal font-normal"
+        className="text-slate-700 dark:text-zinc-300 leading-[1.85] sm:leading-[1.9] text-[16px] sm:text-[17px] mb-6 font-noto font-normal"
         {...props}
       />
     ),
@@ -833,145 +831,122 @@ export default async function BlogPostPage({
       )}
       <ViewTracker slug={post.slug} />
 
-      {/* ─── Post Hero (Prothom Alo / BigganChinta Editorial Style) ─── */}
+      {/* ─── Post Hero (Modern Editorial / Substack Style) ─── */}
       <section className="bg-white dark:bg-[#0A0A0A]">
-        <div className="max-w-4xl mx-auto pt-6 sm:pt-10 px-4 sm:px-6">
-          {/* 1. Category Tag (Blue Underlined) */}
-          <div className="mb-3">
+        <div className="max-w-3xl mx-auto pt-6 sm:pt-10 px-4 sm:px-6">
+          {/* Top Breadcrumb & Share Action */}
+          <div className="flex items-center justify-between gap-4 mb-4">
             <Link
-              href={`/blog?category=${encodeURIComponent(post.category || '')}`}
-              className="text-[#0066cc] dark:text-[#38bdf8] font-bold text-base sm:text-lg underline underline-offset-4 decoration-2 hover:opacity-80 transition-opacity font-noto"
+              href="/blog"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors font-noto"
             >
-              {post.category || 'শিক্ষা ও পরীক্ষা'}
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>ব্লগ</span>
+              {post.category && (
+                <>
+                  <span className="text-slate-300 dark:text-zinc-700">/</span>
+                  <span className="text-slate-700 dark:text-zinc-300 font-normal">{post.category}</span>
+                </>
+              )}
             </Link>
-          </div>
 
-          {/* 2. Main Big Editorial Title */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-tight mb-4 font-noto">
-            {post.title}
-          </h1>
-
-          {/* 3. Small Accent Indicator Line */}
-          <div className="w-8 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mb-3" />
-
-          {/* 4. Author Line */}
-          <p className="text-sm sm:text-[15px] text-slate-600 dark:text-slate-400 font-noto mb-2">
-            <span className="font-bold text-slate-900 dark:text-slate-100">লেখা:</span> {post.author.name}
-          </p>
-
-          {/* 5. Publish Date (Left) & Share + Bookmark Icons (Right) */}
-          <div className="flex items-center justify-between gap-4 py-1 font-noto">
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              প্রকাশ: {formatBanglaDate(post.publishedAt)}
-            </p>
-
-            {/* Right: Only Share Button */}
             <div className="flex items-center gap-2">
               <BlogQuickShareButton title={post.title} url={jsonLd.url} />
             </div>
           </div>
 
-          {/* 6. Clean Divider Line */}
-          <hr className="border-t border-slate-200 dark:border-white/10 mt-3 mb-6" />
+          {/* Main Title */}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[38px] font-bold text-slate-900 dark:text-zinc-50 leading-[1.3] sm:leading-[1.25] tracking-tight mb-4 font-noto">
+            {post.title}
+          </h1>
+
+          {/* Author & Meta Row */}
+          <div className="flex items-center gap-3 text-xs sm:text-[13.5px] text-slate-500 dark:text-zinc-400 font-noto">
+            <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-zinc-300 shrink-0">
+              অ
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span className="font-semibold text-slate-800 dark:text-zinc-200">{post.author.name}</span>
+              <span className="text-slate-300 dark:text-zinc-700">·</span>
+              <span>{formatBanglaDate(post.publishedAt)}</span>
+              <span className="text-slate-300 dark:text-zinc-700">·</span>
+              <span>৫ মিনিট পাঠ</span>
+            </div>
+          </div>
+
+          {/* Clean Divider Line */}
+          <div className="border-t border-slate-200/70 dark:border-zinc-800 mt-5 mb-8" />
         </div>
       </section>
 
       {/* Cover image */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
-        <div className="relative w-full aspect-[1200/630] rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 dark:border-white/10 bg-white dark:bg-slate-900">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 mb-8">
+        <div className="relative w-full aspect-[16/9] sm:aspect-[1200/630] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
           <Image
             src={getPostCover(post)}
             alt={post.title}
             fill
             className="object-contain"
-            sizes="(max-width: 1024px) 100vw, 896px"
+            sizes="(max-width: 1024px) 100vw, 768px"
             priority
           />
         </div>
       </div>
 
-      {/* ─── Single-column layout ─── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="flex flex-col gap-10">
-          <article className="min-w-0">
-            {/* Back link */}
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 mb-8 transition-colors group font-noto"
+      {/* ─── Reading Article Layout ─── */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
+        <article className="min-w-0">
+          <div className="w-full">
+            <div
+              className="prose prose-slate dark:prose-invert max-w-none w-full
+              prose-strong:text-slate-900 dark:prose-strong:text-zinc-100 prose-strong:font-semibold font-normal font-noto
+              prose-p:text-[16px] sm:prose-p:text-[17px] prose-p:leading-[1.85] prose-p:text-slate-700 dark:prose-p:text-zinc-300
+            "
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              ব্লগে ফিরে যাও
-            </Link>
-
-            {/* Post body */}
-            <div className="w-full">
-              <div
-                className="prose prose-slate dark:prose-invert max-w-none w-full
-                prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-strong:font-semibold font-normal font-noto
-                prose-p:text-[16px] sm:prose-p:text-[17.5px] prose-p:leading-[1.85] prose-p:text-slate-700 dark:prose-p:text-slate-300
-              "
+              <ReactMarkdown
+                remarkPlugins={[remarkMath, remarkGfm]}
+                rehypePlugins={[
+                  rehypeKatex,
+                  rehypeRaw,
+                  rehypeSlug,
+                  [rehypeHighlight, { ignoreMissing: true }],
+                ]}
+                components={MarkdownComponents}
               >
-                <ReactMarkdown
-                  remarkPlugins={[remarkMath, remarkGfm]}
-                  rehypePlugins={[
-                    rehypeKatex,
-                    rehypeRaw,
-                    rehypeSlug,
-                    [rehypeHighlight, { ignoreMissing: true }],
-                  ]}
-                  components={MarkdownComponents}
-                >
-                  {processedContent}
-                </ReactMarkdown>
-              </div>
-              {/* Tags */}
-              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5 font-noto flex items-center gap-1.5">
-                  <svg
-                    className="w-3 h-3 text-[#059669]"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
-                    <line x1="7" y1="7" x2="7.01" y2="7" />
-                  </svg>
-                  ট্যাগ
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {post.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="inline-flex items-center gap-1 px-3 py-1 text-[12px] font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200/80 dark:border-white/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-[#059669] dark:hover:text-[#34d399] hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors"
-                    >
-                      <span className="text-[#059669] dark:text-[#34d399] font-bold">#</span>
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
+                {processedContent}
+              </ReactMarkdown>
             </div>
-            {/* end max-w readable */}
-          </article>
-        </div>
+
+            {/* Tags */}
+            <div className="mt-10 pt-6 border-t border-slate-200/70 dark:border-zinc-800">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs text-slate-400 dark:text-zinc-500 mr-1.5 font-noto">ট্যাগ:</span>
+                {post.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/blog?tag=${encodeURIComponent(tag)}`}
+                    className="inline-flex items-center px-3 py-1 text-xs font-medium text-slate-600 dark:text-zinc-400 bg-slate-100 dark:bg-zinc-800/80 rounded-full hover:bg-slate-200 dark:hover:bg-zinc-700 hover:text-slate-900 dark:hover:text-zinc-100 transition-colors font-noto"
+                  >
+                    {tag}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </article>
       </div>
 
-      {/* ─── 4-Card 'আরও পড়ুন' Section (Editorial Magazine / Newspaper Style) ─── */}
+      {/* ─── 4-Card 'আরও পড়ুন' Section (Clean Editorial Minimal) ─── */}
       {relatedPosts.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-16 border-t border-slate-200/80 dark:border-white/10">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-16 border-t border-slate-200/80 dark:border-zinc-800">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 font-noto flex items-center gap-2.5">
-              <span className="w-2.5 h-6 rounded-full bg-rose-600 dark:bg-rose-500 inline-block"></span>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100 font-noto">
               আরও পড়ুন
             </h2>
             <Link
               href="/blog"
-              className="text-xs sm:text-sm font-semibold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 font-noto"
+              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 flex items-center gap-1 font-noto transition-colors"
             >
               সব লেখা দেখুন →
             </Link>
@@ -984,19 +959,19 @@ export default async function BlogPostPage({
                 href={`/blog/${item.slug}`}
                 className="group flex flex-col"
               >
-                <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden bg-slate-50 dark:bg-[#121212] border border-slate-200/80 dark:border-white/10 mb-3 group-hover:shadow-md transition-all duration-300">
+                <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 mb-3 group-hover:border-slate-300 dark:group-hover:border-zinc-700 transition-all duration-200">
                   <Image
                     src={getPostCover(item)}
                     alt={item.title}
                     fill
-                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="object-contain group-hover:scale-[1.02] transition-transform duration-200"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                 </div>
-                <h3 className="text-[15px] sm:text-[16px] font-bold text-slate-900 dark:text-slate-100 leading-snug group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-2 mb-2 font-noto">
+                <h3 className="text-[14.5px] sm:text-[15px] font-bold text-slate-800 dark:text-zinc-200 leading-snug group-hover:text-slate-950 dark:group-hover:text-white transition-colors line-clamp-2 mb-1.5 font-noto">
                   {item.title}
                 </h3>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-noto mt-auto">
+                <p className="text-xs text-slate-400 dark:text-zinc-500 font-noto mt-auto">
                   {formatBanglaDate(item.publishedAt)}
                 </p>
               </Link>

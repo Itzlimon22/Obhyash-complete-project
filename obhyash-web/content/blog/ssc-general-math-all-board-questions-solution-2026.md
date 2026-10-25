@@ -37,29 +37,6 @@ hideInArticleRelated: true
 > - MCQ-তে ৩০টি প্রশ্ন, প্রতিটি ১ নম্বর, এবং একাধিক সেট (ক, খ, গ, ঘ) থাকে।
 > - অনলাইনের উত্তরমালা চোখ বুজে বিশ্বাস করবে না। মূল প্রশ্নপত্রের সঙ্গে মিলিয়ে নেবে।
 
----
-
-<div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 1.15rem; margin: 1.75rem 0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <span style="background: #ef4444; color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 0.375rem; letter-spacing: 0.05em;">MUST WATCH</span>
-      <span style="color: #cbd5e1; font-size: 0.875rem; font-weight: 600;">গণিতের সমাধান ও সূত্র শিখেও কি পরীক্ষার হলে ভুলে যাচ্ছো? মাত্র ৫ মিনিটে জেনে নাও পড়ার বৈজ্ঞানিক সমাধান:</span>
-    </div>
-    <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 500;">⏱ ৫ মিনিটের ভিডিও</span>
-  </div>
-
-  <a href="https://youtu.be/T1IcHqydc3A?si=ShWe_xOM-Xg5aCgp" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; position: relative; border-radius: 0.75rem; overflow: hidden; aspect-ratio: 16/9; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-    <img src="https://i.ytimg.com/vi/T1IcHqydc3A/maxresdefault.jpg" alt="বেশি পড়েও মনে থাকে না? ৩টি বৈজ্ঞানিক পদ্ধতিতে পড়া মনে রাখুন" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" />
-    
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; background: rgba(239, 68, 68, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-    </div>
-    
-    <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
-      <span>YouTube-এ দেখুন</span> <span>↗</span>
-    </div>
-  </a>
-</div>
 
 ## এসএসসি গণিত ২০২৬ প্রশ্নের কাঠামো ও মানবণ্টন
 

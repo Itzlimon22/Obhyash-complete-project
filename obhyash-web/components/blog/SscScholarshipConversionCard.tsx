@@ -51,55 +51,53 @@ export default function SscScholarshipConversionCard({
   };
 
   return (
-    <div className="my-8 sm:my-10 not-prose rounded-3xl bg-[#111417] text-white p-6 sm:p-10 shadow-xl border border-white/5 font-noto transition-all duration-300">
-      {/* 1. Main Title */}
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-noto leading-[1.25] tracking-tight mb-3">
-        {isAlert
-          ? 'বৃত্তির তালিকা এলেই সরাসরি ফোনে নোটিফিকেশন পাবে।'
-          : 'কলেজের প্রথম দিন থেকেই এগিয়ে থাকো।'}
-      </h2>
+    <div className="my-8 sm:my-10 not-prose rounded-2xl bg-slate-50/80 dark:bg-zinc-900/50 border border-slate-200/80 dark:border-zinc-800 p-6 sm:p-8 font-noto transition-all duration-200">
+      <div className="max-w-xl">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>{isAlert ? 'বোর্ড নোটিফিকেশন অ্যালার্ট' : 'স্মার্ট লার্নিং অ্যাপ'}</span>
+        </span>
 
-      {/* 2. Subtitle / Description */}
-      <p className="text-sm sm:text-base md:text-lg text-slate-300 font-noto leading-relaxed mb-8 max-w-2xl">
-        {isAlert
-          ? 'তোমার শিক্ষা বোর্ডের মেধা ও সাধারণ বৃত্তির গেজেট প্রকাশমাত্রই মোবাইলে অ্যালার্ট পেতে যুক্ত হও অভ্যাস অ্যাপে।'
-          : 'অধ্যায়ভিত্তিক ফ্রি টেস্ট দাও, আর প্রতিটি ভুলের ব্যাখ্যাসহ সমাধান দেখে নাও।'}
-      </p>
+        {/* 1. Main Title */}
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-zinc-100 font-noto leading-snug tracking-tight mb-2.5">
+          {isAlert
+            ? 'বৃত্তির তালিকা প্রকাশের সঙ্গে সঙ্গেই মোবাইলে নোটিফিকেশন পেতে চাও?'
+            : 'কলেজের প্রথম দিন থেকেই পড়াশোনায় এগিয়ে থাকো।'}
+        </h2>
 
-      {/* 3. Big White Google Play Download Pill Button */}
-      <div className="flex flex-col items-center">
-        <a
-          href={PLAY_STORE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleDownloadClick}
-          className="w-full max-w-xl flex items-center justify-center gap-3.5 py-3 sm:py-3.5 px-6 rounded-2xl bg-[#F1F3F4] hover:bg-white text-slate-900 shadow-md hover:shadow-xl transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-        >
-          <GooglePlayColorIcon className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
-          <div className="flex flex-col items-start leading-tight">
-            <span className="text-[11px] sm:text-xs text-slate-600 font-medium font-noto -mb-0.5">
-              বিনামূল্যে ডাউনলোড
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-slate-900 font-sans tracking-tight">
-              Google Play
-            </span>
-          </div>
-        </a>
+        {/* 2. Subtitle / Description */}
+        <p className="text-sm sm:text-[15px] text-slate-600 dark:text-zinc-400 font-noto leading-relaxed mb-6">
+          {isAlert
+            ? 'শিক্ষা বোর্ডের মেধা ও সাধারণ বৃত্তির অফিসিয়াল গেজেট প্রকাশমাত্রই ফোনে অ্যালার্ট পেতে অভ্যাস অ্যাপের সাথে থাকো।'
+            : 'অধ্যায়ভিত্তিক টেস্ট দাও, আর প্রতিটি ভুলের সহজ ব্যাখ্যা দেখে প্রস্তুতি গুছিয়ে নাও।'}
+        </p>
 
-        {/* 4. Secondary Action Link: ডেমো টেস্ট দিয়ে দেখো */}
-        <div className="mt-5 text-center">
+        {/* 3. Sleek Google Play Pill Button */}
+        <div className="flex flex-wrap items-center gap-4">
+          <a
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleDownloadClick}
+            className="inline-flex items-center gap-3 py-2.5 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-slate-900 shadow-xs hover:shadow-sm transition-all duration-150 active:scale-[0.98] cursor-pointer"
+          >
+            <GooglePlayColorIcon className="w-5 h-5 shrink-0" />
+            <div className="flex flex-col items-start leading-none">
+              <span className="text-[10px] text-slate-300 dark:text-zinc-500 font-medium">
+                ফ্রি ডাউনলোড
+              </span>
+              <span className="text-sm font-bold font-sans tracking-tight mt-0.5">
+                Google Play
+              </span>
+            </div>
+          </a>
+
           <Link
             href="/demo"
-            className="text-sm sm:text-base text-slate-200 hover:text-white underline underline-offset-4 decoration-slate-400 hover:decoration-white font-noto font-medium transition-colors"
+            className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white underline underline-offset-4 font-noto font-medium transition-colors"
           >
-            ডেমো টেস্ট দিয়ে দেখো
+            ডেমো টেস্ট দিয়ে দেখো →
           </Link>
-        </div>
-
-        {/* 5. Google Play Verified App Badge */}
-        <div className="mt-4 flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-400 font-noto">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Google Play ভেরিফাইড অ্যাপ</span>
         </div>
       </div>
     </div>
