@@ -48,6 +48,7 @@ import ResultStepFlow from '@/components/blog/ResultStepFlow';
 import SscScholarshipConversionCard from '@/components/blog/SscScholarshipConversionCard';
 import HscPhysicsPdfDownloadCard from '@/components/blog/HscPhysicsPdfDownloadCard';
 import SscMathAppMockupCard from '@/components/blog/SscMathAppMockupCard';
+import LiveExamAppMockupCard from '@/components/blog/LiveExamAppMockupCard';
 import CategoryConversionBanner from '@/components/blog/CategoryConversionBanner';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
@@ -286,7 +287,11 @@ export default async function BlogPostPage({
 
   // Targeted blogs where user requested to hide both in-article related card and conversion banner
   const TARGET_PROMO_SLUGS = new Set([
+    'medical-admission-circular-2026-guide',
+    'all-university-admission-circular-2026',
+    'buet-admission-2026-27',
     'ssc-general-math-all-board-questions-solution-2026',
+    'ssc-physics-all-board-questions-solution-2026',
     'ssc-scholarship-britti-result-2026-check',
     'hsc-2027-bangla-syllabus-marks-distribution',
     'hsc-2027-syllabus-exam-system-breakdown',
@@ -414,6 +419,20 @@ export default async function BlogPostPage({
       }
       if (widget === 'ssc-math-app-mockup') {
         return <SscMathAppMockupCard />;
+      }
+      if (widget === 'live-exam-app-mockup' || widget === 'app-live-exam-mockup') {
+        const title = (props as Record<string, unknown>)['data-title'] as string | undefined;
+        const subtitle = (props as Record<string, unknown>)['data-subtitle'] as string | undefined;
+        const badge = (props as Record<string, unknown>)['data-badge'] as string | undefined;
+        return (
+          <LiveExamAppMockupCard
+            sourceSlug={post.slug}
+            sourceCategory={post.category}
+            badge={badge}
+            title={title}
+            subtitle={subtitle}
+          />
+        );
       }
       if (widget === 'category-conversion-banner') {
         return null;
