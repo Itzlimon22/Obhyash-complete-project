@@ -5,8 +5,6 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import AuthProvider from "@/components/auth/AuthProvider";
 import SWRProvider from "@/components/providers/SWRProvider";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import NetworkStatusListener from "@/components/common/NetworkStatusListener";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
@@ -192,8 +190,7 @@ export default function RootLayout({
                     },
                   }}
                 />
-                <Analytics />
-                <SpeedInsights />
+                {/* Vercel Analytics & SpeedInsights disabled to prevent thousands of serverless edge beacon requests on free tier */}
               </SWRProvider>
             </AuthProvider>
           </ThemeProvider>
