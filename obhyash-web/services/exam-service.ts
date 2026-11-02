@@ -706,37 +706,42 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       }
     }
 
-    // Fallback: Insert new row (legacy IDs or if initiation failed)
+    // Fallback: Idempotent upsert row (guarantees zero duplicate rows on network retries)
     if (user) {
-      const { error } = await supabase.from('exam_results').insert({
-        user_id: user.id,
-        subject: result.subject,
-        exam_type: result.examType,
-        date: result.date || new Date().toISOString(),
-        score: result.score,
-        total_marks: result.totalMarks,
-        total_questions: result.totalQuestions,
-        correct_count: result.correctCount,
-        wrong_count: result.wrongCount,
-        time_taken: result.timeTaken,
-        negative_marking: result.negativeMarking,
-        questions: result.questions,
-        user_answers: result.userAnswers,
-        status: result.status || 'evaluated',
-        flagged_questions: result.flaggedQuestions,
-        chapters: result.chapters || 'General',
-        submission_type: result.submissionType || 'digital',
-        script_image_data: result.scriptImageData,
-      });
+      const stableId = isUuid ? result.id : crypto.randomUUID();
+      const { error } = await supabase.from('exam_results').upsert(
+        {
+          id: stableId,
+          user_id: user.id,
+          subject: result.subject,
+          exam_type: result.examType,
+          date: result.date || new Date().toISOString(),
+          score: result.score,
+          total_marks: result.totalMarks,
+          total_questions: result.totalQuestions,
+          correct_count: result.correctCount,
+          wrong_count: result.wrongCount,
+          time_taken: result.timeTaken,
+          negative_marking: result.negativeMarking,
+          questions: result.questions,
+          user_answers: result.userAnswers,
+          status: result.status || 'evaluated',
+          flagged_questions: result.flaggedQuestions,
+          chapters: result.chapters || 'General',
+          submission_type: result.submissionType || 'digital',
+          script_image_data: result.scriptImageData,
+        },
+        { onConflict: 'id' },
+      );
 
       if (error) {
-        console.error('[Exam Submit] Insert failed:', error);
+        console.error('[Exam Submit] Upsert failed:', error);
         // Don't throw — result is already in localStorage, student is not at risk
         // Just warn so they know the DB didn't persist
         throw error;
       }
 
-      console.log('✅ Exam result inserted to database successfully');
+      console.log('✅ Exam result upserted to database successfully (idempotent)');
 
       // Calculate and award balanced XP on web
       try {

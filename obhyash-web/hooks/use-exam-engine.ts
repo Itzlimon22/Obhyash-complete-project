@@ -77,6 +77,7 @@ export const useExamEngine = (
   // Synchronous mutex — prevents double-submit when a user taps Submit twice rapidly.
   // useRef is intentional: it updates synchronously unlike React state.
   const isSubmittingRef = useRef(false);
+  const hasSubmittedRef = useRef(false);
 
   const [isEvaluating, setIsEvaluating] = useState(false);
 
@@ -202,6 +203,8 @@ export const useExamEngine = (
       });
       setUserAnswers({});
       setFlaggedQuestions(new Set());
+      hasSubmittedRef.current = false;
+      isSubmittingRef.current = false;
       setAppState(AppState.INSTRUCTIONS);
 
       // DB sync (fire and forget)
@@ -298,6 +301,8 @@ export const useExamEngine = (
       setExamDetails(customDetails);
       setUserAnswers({});
       setFlaggedQuestions(new Set());
+      hasSubmittedRef.current = false;
+      isSubmittingRef.current = false;
       setAppState(AppState.INSTRUCTIONS);
     } catch (e: unknown) {
       console.error(e);
@@ -355,8 +360,8 @@ export const useExamEngine = (
 
       // stateRef is updated asynchronously (via useEffect after render), so it
       // cannot guard against two near-simultaneous clicks on its own.
-      // isSubmittingRef is a synchronous mutex that closes that gap.
-      if (isSubmittingRef.current) {
+      // isSubmittingRef and hasSubmittedRef are synchronous mutexes that close that gap.
+      if (isSubmittingRef.current || hasSubmittedRef.current) {
         return { success: false, error: 'Already submitting' };
       }
       if (
@@ -367,6 +372,15 @@ export const useExamEngine = (
       }
 
       isSubmittingRef.current = true;
+      hasSubmittedRef.current = true;
+      stateRef.current = AppState.COMPLETED; // Immediately lock ref against re-entry
+
+      // Cancel timer immediately to stop any subsequent interval ticks
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+
       setIsEvaluating(true);
       setErrorDetails('');
 
@@ -420,6 +434,8 @@ export const useExamEngine = (
 
         return { success: true, result: newResult };
       } catch (error: unknown) {
+        hasSubmittedRef.current = false;
+        stateRef.current = AppState.ACTIVE;
         console.error('Submit Exam Failed:', error);
         let errorMsg = 'Failed to submit exam.';
         if (error instanceof Error) errorMsg = error.message;
@@ -593,7 +609,13 @@ export const useExamEngine = (
                 )
               : 0;
             if (remaining <= 0) {
-              submitExam(false);
+              if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+              }
+              if (!hasSubmittedRef.current && !isSubmittingRef.current) {
+                submitExam(false);
+              }
               return 0;
             }
             return remaining;
@@ -601,13 +623,21 @@ export const useExamEngine = (
         }, 1000);
       } else {
         // Immediate submit if time is already 0 (e.g. hydrated with 0 time)
-        submitExam(false);
+        if (!hasSubmittedRef.current && !isSubmittingRef.current) {
+          submitExam(false);
+        }
       }
     } else if (appState === AppState.GRACE_PERIOD && graceTimeLeft > 0) {
       timerRef.current = window.setInterval(() => {
         setGraceTimeLeft((prev) => {
           if (prev <= 1) {
-            submitExam(false); // Auto-submit when grace period expires
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+              timerRef.current = null;
+            }
+            if (!hasSubmittedRef.current && !isSubmittingRef.current) {
+              submitExam(false); // Auto-submit when grace period expires
+            }
             return 0;
           }
           return prev - 1;
@@ -628,7 +658,9 @@ export const useExamEngine = (
         );
         setTimeLeft(remaining);
         if (remaining <= 0) {
-          submitExam(false);
+          if (!hasSubmittedRef.current && !isSubmittingRef.current) {
+            submitExam(false);
+          }
         }
       }
     };

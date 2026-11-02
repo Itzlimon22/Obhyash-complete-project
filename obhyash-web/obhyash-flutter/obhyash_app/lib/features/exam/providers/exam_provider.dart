@@ -95,6 +95,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
   Timer? _timer;
   DateTime? _examStartTime;
   int _totalDurationSeconds = 0;
+  bool _isSubmitting = false;
 
   @override
   ExamEngineState build() {
@@ -105,6 +106,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
   }
 
   Future<bool> startExam(ExamConfig config) async {
+    _isSubmitting = false;
     state = state.copyWith(
       appState: AppState.loading,
       errorDetails: '',
@@ -1227,12 +1229,16 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
 
   Future<void> submitExam() async {
-    if (state.appState == AppState.completed ||
+    if (_isSubmitting ||
+        state.appState == AppState.completed ||
         state.appState == AppState.submitted) {
       return;
     }
 
+    _isSubmitting = true;
     _timer?.cancel();
+    _timer = null;
+    state = state.copyWith(appState: AppState.submitted);
 
     int correct = 0;
     int wrong = 0;
@@ -1256,8 +1262,12 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     final finalScore =
         ((rawScore - negativeMarks) * 10000).round() / 10000.0;
 
+    final stableId = (state.dbSessionId != null && state.dbSessionId!.isNotEmpty)
+        ? state.dbSessionId!
+        : DateTime.now().millisecondsSinceEpoch.toString();
+
     var result = ExamResult(
-      id: state.dbSessionId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: stableId,
       subject: state.examDetails?.subject ?? 'Unknown',
       subjectLabel: state.examDetails?.subjectLabel,
       examType: state.examDetails?.examType,
@@ -1312,7 +1322,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         );
 
         final nowIso = DateTime.now().toUtc().toIso8601String();
-        final insertRes = await supabase.from('exam_results').insert({
+        final insertRes = await supabase.from('exam_results').upsert({
+          'id': stableId,
           'user_id': authId,
           'subject': result.subject,
           'subject_label': result.subjectLabel,
@@ -1330,7 +1341,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           'user_answers': userAnswersJson,
           'negative_marking': result.negativeMarking,
           'status': 'evaluated',
-        }).select('id').maybeSingle();
+        }, onConflict: 'id').select('id').maybeSingle();
 
         if (insertRes != null && insertRes['id'] != null) {
           final serverId = insertRes['id'].toString();
@@ -1424,6 +1435,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     // Clear active ongoing draft once evaluated
     await LocalExamCacheService.clearActiveExamDraft();
 
+    _isSubmitting = false;
     state = state.copyWith(
       appState: AppState.completed,
       completedResult: result,
@@ -1432,6 +1444,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
   void resetExam() {
     _timer?.cancel();
+    _timer = null;
+    _isSubmitting = false;
     LocalExamCacheService.clearActiveExamDraft();
     state = const ExamEngineState();
   }
