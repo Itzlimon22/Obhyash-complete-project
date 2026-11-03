@@ -124,6 +124,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
           if (cat === "all") {
             map.engineering = true;
             map.medical = true;
+            map.gke = true;
             map.hsc = true;
             map.ssc_board = true;
             map.ssc_school = true;
@@ -302,6 +303,17 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
         solidBg: "bg-[#BE123C]", // Deep Red (rose-700)
         accentColor: "#FFE4E6",
         hasLive: !!liveExamsMap.medical,
+      },
+      {
+        key: "gke",
+        tag: "জিকে ও ইংলিশ",
+        title: "GKE ব্যাচ",
+        subtitle: "মডেল টেস্ট",
+        description: "মেডিকেল সাধারণ জ্ঞান ও ইংরেজি পূর্ণাঙ্গ প্রস্তুতি",
+        svgAsset: "/images/subjects/academic.svg",
+        solidBg: "bg-[#0F766E]", // Deep Teal (teal-700)
+        accentColor: "#CCFBF1",
+        hasLive: !!liveExamsMap.gke,
       },
       {
         key: "varsity",

@@ -23,6 +23,7 @@ interface Props {
 const CATEGORY_OPTIONS = [
   { id: 'hsc', label: 'HSC Science (এইচএসসি বিজ্ঞান)' },
   { id: 'medical', label: 'Medical Admission (ডিএমসি / মেডিকেল)' },
+  { id: 'gke', label: 'GKE Batch (মেডিকেল জিকে ও ইংলিশ)' },
   { id: 'engineering', label: 'Engineering Admission (বুয়েট / ইঞ্জিনিয়ারিং)' },
   { id: 'varsity_a', label: 'Varsity A-Unit (ঢাবি ক / জিএসটি)' },
   { id: 'ssc', label: 'SSC (এসএসসি)' },

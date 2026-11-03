@@ -34,6 +34,7 @@ interface LiveExamRoutineModalProps {
 
 const TRACKS: { key: TrackKey; label: string; badge: string; color: string }[] = [
   { key: "Medical", label: "মেডিকেল ভর্তি", badge: "MBBS ২০২৬-২৭", color: "from-emerald-500 to-teal-600" },
+  { key: "GKE", label: "GKE ব্যাচ", badge: "জিকে ও ইংলিশ", color: "from-teal-500 to-cyan-600" },
   { key: "Engineering", label: "ইঞ্জিনিয়ারিং", badge: "BUET/CKRUET", color: "from-blue-500 to-indigo-600" },
   { key: "Varsity_A", label: "ঢাবি 'ক' ইউনিট", badge: "DU Science", color: "from-amber-500 to-orange-600" },
 ];

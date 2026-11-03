@@ -19,7 +19,23 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // 2. Return 503 for API routes to prevent database/CPU load
+    // 2. Admin Panel & Admin APIs exemption: Keep Admin panel and auth fully accessible
+    const isAdminRoute = pathname.startsWith('/admin');
+    const isAdminApi = pathname.startsWith('/api/admin');
+    const isAuthRoute =
+      pathname.startsWith('/auth') ||
+      pathname === '/login' ||
+      pathname.startsWith('/api/auth');
+
+    if (isAdminApi) {
+      return NextResponse.next();
+    }
+
+    if (isAdminRoute || isAuthRoute) {
+      return await updateSession(request);
+    }
+
+    // 3. Return 503 for all other API routes to prevent database/CPU load
     if (pathname.startsWith('/api/')) {
       return NextResponse.json(
         { error: 'System undergoing scheduled upgrade. Please use the mobile app.' },
@@ -27,7 +43,7 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    // 3. Rewrite all other web traffic to the black maintenance page with Play Store CTA
+    // 4. Rewrite all other web traffic to the black maintenance page with Play Store CTA
     return NextResponse.rewrite(new URL('/maintenance', request.url));
   }
 

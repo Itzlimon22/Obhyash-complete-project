@@ -481,6 +481,7 @@ export default function LiveExamDashboard() {
             <option value="all">সকল ক্যাটাগরি</option>
             <option value="hsc">HSC Science</option>
             <option value="medical">Medical</option>
+            <option value="gke">GKE Batch</option>
             <option value="engineering">Engineering</option>
             <option value="varsity_a">Varsity A</option>
             <option value="ssc">SSC</option>

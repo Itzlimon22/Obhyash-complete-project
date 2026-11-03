@@ -66,6 +66,8 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
     switch (cat.toLowerCase().trim()) {
       case "medical":
         return "মেডিকেল";
+      case "gke":
+        return "GKE ব্যাচ";
       case "engineering":
         return "ইঞ্জিনিয়ারিং";
       case "varsity":

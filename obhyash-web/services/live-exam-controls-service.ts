@@ -36,6 +36,7 @@ export const DEFAULT_LIVE_EXAM_CONTROLS: LiveExamControlsConfig = {
   routine_spreadsheet_id: "1b9YeiVz89q0dSisDg1kpK8peO-FA6G9Y4K4UVQ7Tvug",
   routine_sheet_mapping: {
     medical: "Medical",
+    gke: "GKE",
     engineering: "Engineering",
     varsity: "Varsity_A",
     hsc: "HSC",
@@ -43,6 +44,7 @@ export const DEFAULT_LIVE_EXAM_CONTROLS: LiveExamControlsConfig = {
   },
   available_tracks: [
     { key: "Medical", label: "মেডিকেল ভর্তি", badge: "MBBS ২০২৬-২৭", color: "from-emerald-500 to-teal-600", has_routine: true },
+    { key: "GKE", label: "GKE এক্সাম ব্যাচ", badge: "জিকে ও ইংলিশ", color: "from-teal-500 to-cyan-600", has_routine: true },
     { key: "Engineering", label: "ইঞ্জিনিয়ারিং", badge: "BUET/CKRUET", color: "from-blue-500 to-indigo-600", has_routine: true },
     { key: "Varsity_A", label: "ঢাবি 'ক' ইউনিট", badge: "DU Science", color: "from-amber-500 to-orange-600", has_routine: true },
     { key: "HSC", label: "এইচএসসি স্পেশাল", badge: "HSC Board Prep", color: "from-purple-500 to-indigo-600", has_routine: false },

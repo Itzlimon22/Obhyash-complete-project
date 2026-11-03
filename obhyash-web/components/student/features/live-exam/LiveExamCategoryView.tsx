@@ -15,6 +15,8 @@ import { LiveExam } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import LiveExamDetailsView from "./LiveExamDetailsView";
 import LiveExamRoutinePageView from "./LiveExamRoutinePageView";
+import LiveExamHistoryPageView from "./LiveExamHistoryPageView";
+import GkeBatchDashboardView from "./GkeBatchDashboardView";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +30,7 @@ const CATEGORY_NAMES: Record<string, string> = {
   all: "সকল লাইভ পরীক্ষা",
   engineering: "ইঞ্জিনিয়ারিং",
   medical: "মেডিকেল",
+  gke: "GKE এক্সাম ব্যাচ",
   varsity: "ভার্সিটি ক-ইউনিট",
   hsc: "এইচএসসি স্পেশাল",
   ssc_board: "এসএসসি বোর্ড স্পেশাল",
@@ -54,6 +57,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   const [exams, setExams] = useState<(LiveExam & { userAttemptStatus?: string })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRoutineOpen, setIsRoutineOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [now, setNow] = useState<Date>(new Date());
 
   // 1-second interval for real-time countdown timer
@@ -247,6 +251,27 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     );
   }
 
+  if (isHistoryOpen) {
+    return (
+      <AppLayout
+        activeTab="live_exam"
+        {...commonLayoutProps}
+        title="পরীক্ষার রেকর্ড ও ফলাফল"
+        onBack={() => setIsHistoryOpen(false)}
+      >
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 pt-5 pb-24 font-['HindSiliguri']">
+          <LiveExamHistoryPageView
+            onBack={() => setIsHistoryOpen(false)}
+            onViewSolution={(examId) => {
+              setIsHistoryOpen(false);
+              handleSelectExam({ id: examId, title: "ফলাফল ও সমাধান", status: "taken" });
+            }}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout
       activeTab="live_exam"
@@ -254,9 +279,21 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
       title={displayCategoryTitle}
       onBack={onBack}
     >
-      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 pt-4 sm:pt-5 pb-28 font-['HindSiliguri']">
-        {/* Filters & Routine Action Bar matching Flutter live_exam_category_view */}
-        <div className="flex items-center justify-between gap-3 mb-4">
+      <div className="w-full max-w-5xl mx-auto px-2.5 sm:px-4 pt-4 sm:pt-5 pb-28 font-['HindSiliguri']">
+        {activeCategory.toLowerCase() === "gke" ? (
+          <GkeBatchDashboardView
+            exams={exams}
+            isLoading={isLoading}
+            now={now}
+            onSelectExam={handleSelectExam}
+            onOpenRoutine={handleOpenRoutine}
+            onOpenHistory={() => setIsHistoryOpen(true)}
+            onBack={onBack}
+          />
+        ) : (
+          <>
+            {/* Filters & Routine Action Bar matching Flutter live_exam_category_view */}
+            <div className="flex items-center justify-between gap-3 mb-4">
           {/* Filter Chips Capsule (All, Ongoing, Upcoming) */}
           <div className="p-0.5 rounded-full bg-white dark:bg-[#181A24] border border-[#E2E8F0] dark:border-[#272A38] flex items-center shadow-2xs">
             {(["All", "Ongoing", "Upcoming"] as const).map((f) => {
@@ -448,6 +485,8 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
               );
             })}
           </div>
+        )}
+          </>
         )}
       </div>
     </AppLayout>
