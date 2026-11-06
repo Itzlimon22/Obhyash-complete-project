@@ -39,6 +39,8 @@ class LiveExamRoutineSheet extends ConsumerStatefulWidget {
     switch (cat.toLowerCase().trim()) {
       case 'medical':
         return 'মেডিকেল ভর্তি';
+      case 'gke':
+        return 'GKE এক্সাম ব্যাচ';
       case 'engineering':
         return 'ইঞ্জিনিয়ারিং ভর্তি';
       case 'varsity':

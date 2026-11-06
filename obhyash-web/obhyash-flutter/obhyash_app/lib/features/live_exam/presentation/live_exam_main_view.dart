@@ -19,6 +19,7 @@ class ExamTone {
 
   static const cyan = ExamTone(Color(0xFF0B5F73));
   static const red = ExamTone(Color(0xFF8F1D32));
+  static const teal = ExamTone(Color(0xFF0B6356));
   static const blue = ExamTone(Color(0xFF27409C));
   static const green = ExamTone(Color(0xFF0D6040));
 }
@@ -162,6 +163,15 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
           icon: Icons.biotech_rounded,
           tone: ExamTone.red,
           hasLive: _hasLive(exams, 'medical'),
+        ),
+        _ObhyashCategoryData(
+          key: 'gke',
+          title: 'GKE ব্যাচ',
+          kind: 'মডেল টেস্ট',
+          description: 'মেডিকেল সাধারণ জ্ঞান ও ইংরেজি পূর্ণাঙ্গ প্রস্তুতি',
+          icon: Icons.menu_book_rounded,
+          tone: ExamTone.teal,
+          hasLive: _hasLive(exams, 'gke'),
         ),
         _ObhyashCategoryData(
           key: 'varsity',

@@ -54,6 +54,7 @@ class LiveExamControlsModel {
     this.routineSpreadsheetId = '1b9YeiVz89q0dSisDg1kpK8peO-FA6G9Y4K4UVQ7Tvug',
     this.routineSheetMapping = const {
       'medical': 'Medical',
+      'gke': 'GKE',
       'engineering': 'Engineering',
       'varsity': 'Varsity_A',
       'hsc': 'HSC',
@@ -61,6 +62,7 @@ class LiveExamControlsModel {
     },
     this.availableTracks = const [
       LiveExamTrackInfo(key: 'Medical', label: 'মেডিকেল ভর্তি', badge: 'MBBS ২০২৬-২৭', color: 'from-emerald-500 to-teal-600', hasRoutine: true),
+      LiveExamTrackInfo(key: 'GKE', label: 'GKE এক্সাম ব্যাচ', badge: 'জিকে ও ইংলিশ', color: 'from-teal-500 to-cyan-600', hasRoutine: true),
       LiveExamTrackInfo(key: 'Engineering', label: 'ইঞ্জিনিয়ারিং', badge: 'BUET/CKRUET', color: 'from-blue-500 to-indigo-600', hasRoutine: true),
       LiveExamTrackInfo(key: 'Varsity_A', label: "ঢাবি 'ক' ইউনিট", badge: 'DU Science', color: 'from-amber-500 to-orange-600', hasRoutine: true),
       LiveExamTrackInfo(key: 'HSC', label: 'এইচএসসি স্পেশাল', badge: 'HSC Board Prep', color: 'from-purple-500 to-indigo-600', hasRoutine: false),
@@ -78,6 +80,7 @@ class LiveExamControlsModel {
   factory LiveExamControlsModel.fromJson(Map<String, dynamic> json) {
     Map<String, String> mapping = {
       'medical': 'Medical',
+      'gke': 'GKE',
       'engineering': 'Engineering',
       'varsity': 'Varsity_A',
       'hsc': 'HSC',
@@ -98,6 +101,7 @@ class LiveExamControlsModel {
     if (tracks.isEmpty) {
       tracks = const [
         LiveExamTrackInfo(key: 'Medical', label: 'মেডিকেল ভর্তি', badge: 'MBBS ২০২৬-২৭', color: 'from-emerald-500 to-teal-600', hasRoutine: true),
+        LiveExamTrackInfo(key: 'GKE', label: 'GKE এক্সাম ব্যাচ', badge: 'জিকে ও ইংলিশ', color: 'from-teal-500 to-cyan-600', hasRoutine: true),
         LiveExamTrackInfo(key: 'Engineering', label: 'ইঞ্জিনিয়ারিং', badge: 'BUET/CKRUET', color: 'from-blue-500 to-indigo-600', hasRoutine: true),
         LiveExamTrackInfo(key: 'Varsity_A', label: "ঢাবি 'ক' ইউনিট", badge: 'DU Science', color: 'from-amber-500 to-orange-600', hasRoutine: true),
         LiveExamTrackInfo(key: 'HSC', label: 'এইচএসসি স্পেশাল', badge: 'HSC Board Prep', color: 'from-purple-500 to-indigo-600', hasRoutine: false),

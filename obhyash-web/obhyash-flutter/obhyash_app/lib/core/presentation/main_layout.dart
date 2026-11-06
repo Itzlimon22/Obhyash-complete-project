@@ -229,6 +229,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       const liveNames = {
         'engineering': 'ইঞ্জিনিয়ারিং লাইভ এক্সাম',
         'medical': 'মেডিকেল লাইভ এক্সাম',
+        'gke': 'GKE ব্যাচ ০১ (জিকে ও ইংলিশ)',
         'varsity': 'ভার্সিটি লাইভ এক্সাম',
         'varsity_a': 'ভার্সিটি লাইভ এক্সাম',
         'hsc': 'এইচএসসি লাইভ এক্সাম',

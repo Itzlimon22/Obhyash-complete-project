@@ -278,19 +278,65 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
   final supabase = Supabase.instance.client;
   final user = supabase.auth.currentUser;
 
+  // GKE Practice Exam on-the-fly handling
+  if (examId.startsWith('gke_practice_') || examId.startsWith('gke-practice-')) {
+    final isEn = examId.contains('english');
+    final isInt = examId.contains('international');
+    final isBd = examId.contains('bangladesh');
+    final title = isEn
+        ? 'GKE ইংরেজি স্পেশাল প্র্যাকটিস টেস্ট'
+        : isInt
+            ? 'GKE আন্তর্জাতিক বিষয়াবলী প্র্যাকটিস টেস্ট'
+            : isBd
+                ? 'GKE বাংলাদেশ বিষয়াবলী প্র্যাকটিস টেস্ট'
+                : 'GKE কম্বাইন্ড কুইক প্র্যাকটিস টেস্ট';
+    final practiceExam = LiveExam(
+      id: examId,
+      title: title,
+      description: 'GKE প্র্যাকটিস প্রশ্নব্যাংক থেকে ৫০ নম্বরের অনুশীলন পরীক্ষা',
+      category: 'gke',
+      durationMinutes: 30,
+      totalMarks: 50,
+      totalQuestions: 50,
+      negativeMarking: 0.25,
+      status: 'published',
+      startTime: DateTime.now().subtract(const Duration(hours: 1)),
+      endTime: DateTime.now().add(const Duration(days: 365)),
+      isLeaderboardPublished: true,
+      isAnswerPublished: true,
+      isPracticeEnabled: true,
+    );
+    return (exam: practiceExam, attempt: null);
+  }
+
   // 1. Fetch Exam with fallback
   Map<String, dynamic> examData;
+  String targetId = examId;
+  final isUuid = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$').hasMatch(examId);
+
   try {
+    if (!isUuid) {
+      final normalizedExamId = examId.replaceAll('-', '_');
+      final match = await supabase
+          .from('live_exams')
+          .select('id')
+          .or('exam_id.eq.$examId,exam_id.eq.$normalizedExamId')
+          .maybeSingle();
+      if (match != null && match['id'] != null) {
+        targetId = match['id'].toString();
+      }
+    }
+
     examData = await supabase
         .from('live_exams')
         .select('*, total_questions:live_exam_questions(count)')
-        .eq('id', examId)
+        .eq('id', targetId)
         .single();
   } catch (_) {
     examData = await supabase
         .from('live_exams')
         .select()
-        .eq('id', examId)
+        .eq('id', targetId)
         .single();
   }
 
@@ -303,7 +349,7 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
       final attemptData = await supabase
           .from('live_exam_attempts')
           .select()
-          .eq('live_exam_id', examId)
+          .eq('live_exam_id', targetId)
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -320,16 +366,6 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
 final liveExamQuestionsProvider =
     FutureProvider.autoDispose.family<List<Question>, String>((ref, examId) async {
   final supabase = Supabase.instance.client;
-
-  // 1. Fetch junction rows with serial, points, question_id, and direct secret question fields
-  final junctionRes = await supabase
-      .from('live_exam_questions')
-      .select('id, serial, points, question_id, question, options, correct_answer_index, explanation, subject')
-      .eq('live_exam_id', examId)
-      .order('serial', ascending: true);
-
-  final junctionList = (junctionRes as List).cast<Map<String, dynamic>>();
-  if (junctionList.isEmpty) return [];
 
   List<Question> groupBySubject(List<Question> qList) {
     if (qList.isEmpty) return qList;
@@ -350,6 +386,83 @@ final liveExamQuestionsProvider =
     }
     return res;
   }
+
+  // GKE Practice Exam questions on-the-fly from gke_questions (strictly excluding Model Test)
+  if (examId.startsWith('gke_practice_') || examId.startsWith('gke-practice-')) {
+    try {
+      final cleanId = examId.replaceAll('-', '_');
+      var query = supabase
+          .from('gke_questions')
+          .select('id, question, options, answer, correct_answer_indices, explanation, category, sheet_name')
+          .neq('category', 'Model Test');
+
+      if (cleanId.contains('bangladesh')) {
+        query = query.eq('category', 'Bangladesh');
+      } else if (cleanId.contains('international')) {
+        query = query.eq('category', 'International');
+      } else if (cleanId.contains('english')) {
+        query = query.eq('category', 'English');
+      }
+
+      final res = await query.limit(50);
+      final list = (res as List).cast<Map<String, dynamic>>();
+      if (list.isNotEmpty) {
+        final practiceQuestions = list.map((q) {
+          final rawOpts = q['options'];
+          final List<String> options = (rawOpts is List)
+              ? rawOpts.map((e) => e.toString()).toList()
+              : <String>[];
+          final correctIndices = q['correct_answer_indices'] as List<dynamic>?;
+          int correctIdx = 0;
+          if (correctIndices != null && correctIndices.isNotEmpty) {
+            correctIdx = (correctIndices[0] as num).toInt();
+          } else {
+            final ans = q['answer']?.toString() ?? 'A';
+            correctIdx = ans == 'B' ? 1 : ans == 'C' ? 2 : ans == 'D' ? 3 : 0;
+          }
+
+          return Question(
+            id: q['id']?.toString() ?? '',
+            subject: q['category'] == 'English' ? 'ইংরেজি' : 'সাধারণ জ্ঞান',
+            question: q['question']?.toString() ?? '',
+            options: options,
+            correctAnswerIndex: correctIdx,
+            correctAnswerIndices: [correctIdx],
+            explanation: q['explanation']?.toString(),
+            points: 1,
+          );
+        }).toList();
+
+        return groupBySubject(practiceQuestions);
+      }
+    } catch (_) {}
+  }
+
+  String targetExamId = examId;
+  final isUuid = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$').hasMatch(examId);
+  if (!isUuid) {
+    try {
+      final normalizedExamId = examId.replaceAll('-', '_');
+      final match = await supabase
+          .from('live_exams')
+          .select('id')
+          .or('exam_id.eq.$examId,exam_id.eq.$normalizedExamId')
+          .maybeSingle();
+      if (match != null && match['id'] != null) {
+        targetExamId = match['id'].toString();
+      }
+    } catch (_) {}
+  }
+
+  // 1. Fetch junction rows with serial, points, question_id, and direct secret question fields
+  final junctionRes = await supabase
+      .from('live_exam_questions')
+      .select('id, serial, points, question_id, question, options, correct_answer_index, explanation, subject')
+      .eq('live_exam_id', targetExamId)
+      .order('serial', ascending: true);
+
+  final junctionList = (junctionRes as List).cast<Map<String, dynamic>>();
+  if (junctionList.isEmpty) return [];
 
   // Direct secret questions stored directly in live_exam_questions
   final isDirect = junctionList.any((j) => (j['question']?.toString().trim().isNotEmpty ?? false));

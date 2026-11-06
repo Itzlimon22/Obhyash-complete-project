@@ -9,6 +9,7 @@ import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 import '../domain/models.dart';
 import 'live_exam_routine_page.dart';
 import '../../../../core/providers/app_config_provider.dart';
+import 'widgets/gke_batch_dashboard_widget.dart';
 
 class LiveExamCategoryView extends ConsumerStatefulWidget {
   final String category;
@@ -22,6 +23,7 @@ class LiveExamCategoryView extends ConsumerStatefulWidget {
 
 class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
   Timer? _timer;
+  bool _showGkeExamsList = false;
 
   @override
   void initState() {
@@ -44,171 +46,242 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
     final isLoading = liveExamsAsync.isLoading;
     final filter = ref.watch(liveExamFilterProvider);
     final isLiveExamsEnabled = ref.watch(isLiveExamsEnabledProvider);
+    final isGke = widget.category.toLowerCase().contains('gke');
 
-    return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFFFAFAFA),
-      body: AppRefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(liveExamsCategoryProvider(widget.category));
-          try {
-            await ref.read(liveExamsCategoryProvider(widget.category).future);
-          } catch (_) {}
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          padding: const EdgeInsets.fromLTRB(10, 20, 10, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (!isLiveExamsEnabled) ...[
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF3B1E08) : const Color(0xFFFFFBEB),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFFD97706).withValues(alpha: 0.6)
-                          : const Color(0xFFFDE68A),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(LucideIcons.alertTriangle, size: 20, color: Color(0xFFD97706)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'লাইভ এক্সাম সাময়িক স্থগিত রয়েছে। অ্যাডমিন কর্তৃক পুনরায় চালু না করা পর্যন্ত নতুন লাইভ পরীক্ষা দেওয়া যাবে না।',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-
-              // Filters & Routine Action Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Filter Chips (All, Ongoing, Upcoming)
+    return PopScope(
+      canPop: !isGke || !_showGkeExamsList,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (isGke && _showGkeExamsList) {
+          setState(() {
+            _showGkeExamsList = false;
+          });
+        }
+      },
+      child: Scaffold(
+        backgroundColor: isDark
+            ? const Color(0xFF000000)
+            : const Color(0xFFFAFAFA),
+        body: AppRefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(liveExamsCategoryProvider(widget.category));
+            try {
+              await ref.read(liveExamsCategoryProvider(widget.category).future);
+            } catch (_) {}
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (!isLiveExamsEnabled) ...[
                   Container(
-                    padding: const EdgeInsets.all(3),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF181A24) : Colors.white,
-                      borderRadius: BorderRadius.circular(24),
+                      color: isDark ? const Color(0xFF3B1E08) : const Color(0xFFFFFBEB),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF272A38)
-                            : const Color(0xFFE2E8F0),
+                            ? const Color(0xFFD97706).withValues(alpha: 0.6)
+                            : const Color(0xFFFDE68A),
                       ),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: ['All', 'Ongoing', 'Upcoming'].map((f) {
-                        final isActive = filter == f;
-                        return GestureDetector(
-                          onTap: () {
-                            ref
-                                .read(liveExamFilterProvider.notifier)
-                                .updateFilter(f);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isActive
-                                  ? const Color(0xFF004633)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              f,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: isActive
-                                    ? Colors.white
-                                    : (isDark
-                                        ? const Color(0xFF94A3B8)
-                                        : const Color(0xFF64748B)),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-
-                  // Routine Action Button
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (_) => LiveExamRoutinePage(
-                            categoryTitle: widget.category,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF1E3A8A).withValues(alpha: 0.25)
-                            : const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF1E3A8A).withValues(alpha: 0.5)
-                              : const Color(0xFFBFDBFE),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.calendar,
-                            size: 13,
-                            color: isDark
-                                ? const Color(0xFF60A5FA)
-                                : const Color(0xFF2563EB),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            'রুটিন',
+                      children: [
+                        const Icon(LucideIcons.alertTriangle, size: 20, color: Color(0xFFD97706)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'লাইভ এক্সাম সাময়িক স্থগিত রয়েছে। অ্যাডমিন কর্তৃক পুনরায় চালু না করা পর্যন্ত নতুন লাইভ পরীক্ষা দেওয়া যাবে না।',
                             style: TextStyle(
                               fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: isDark
-                                  ? const Color(0xFF60A5FA)
-                                  : const Color(0xFF2563EB),
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                if (isGke && !_showGkeExamsList) ...[
+                  GkeBatchDashboardWidget(
+                    exams: liveExamsAsync.value ?? [],
+                    isLoading: isLoading,
+                    onOpenExamList: () => setState(() => _showGkeExamsList = true),
+                  ),
+                ] else ...[
+                  // Filters & Routine Action Bar (Single Clean Header Row)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Filter Chips (All, Ongoing, Upcoming)
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF181A24) : Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF272A38)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: ['All', 'Ongoing', 'Upcoming'].map((f) {
+                            final isActive = filter == f;
+                            return GestureDetector(
+                              onTap: () {
+                                ref
+                                    .read(liveExamFilterProvider.notifier)
+                                    .updateFilter(f);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isActive
+                                      ? const Color(0xFF004633)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  f,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: isActive
+                                        ? Colors.white
+                                        : (isDark
+                                            ? const Color(0xFF94A3B8)
+                                            : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+
+                      // Right Actions (Dashboard Button if GKE + Routine Button)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (isGke && _showGkeExamsList) ...[
+                            GestureDetector(
+                              onTap: () => setState(() => _showGkeExamsList = false),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF1E293B)
+                                      : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? const Color(0xFF334155)
+                                        : const Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      LucideIcons.layoutDashboard,
+                                      size: 13,
+                                      color: isDark
+                                          ? const Color(0xFF94A3B8)
+                                          : const Color(0xFF475569),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'ড্যাশবোর্ড',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark
+                                            ? const Color(0xFFE2E8F0)
+                                            : const Color(0xFF334155),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+
+                          // Routine Action Button
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                  builder: (_) => LiveExamRoutinePage(
+                                    categoryTitle: widget.category,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF1E3A8A).withValues(alpha: 0.25)
+                                    : const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFF1E3A8A).withValues(alpha: 0.5)
+                                      : const Color(0xFFBFDBFE),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    LucideIcons.calendar,
+                                    size: 13,
+                                    color: isDark
+                                        ? const Color(0xFF60A5FA)
+                                        : const Color(0xFF2563EB),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'রুটিন',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: isDark
+                                          ? const Color(0xFF60A5FA)
+                                          : const Color(0xFF2563EB),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-              // Exams List
+                  // Exams List
               if (isLoading)
                 const LiveExamListSkeleton()
               else if (filteredExams.isEmpty)
@@ -237,11 +310,13 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                     return _LiveExamCard(exam: filteredExams[index]);
                   },
                 ),
+              ],
               const SizedBox(height: 20),
             ],
           ),
         ),
       ),
+    ),
     );
   }
 }
