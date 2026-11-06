@@ -1,11 +1,16 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/utils/supabase/middleware';
 
-// 🔴 MAINTENANCE MODE SWITCH: Set to true to pause web traffic & show maintenance page (keeping /blog alive)
-export const MAINTENANCE_MODE = true;
+// 🔴 MAINTENANCE MODE SWITCH: Set to false to resume normal web traffic
+export const MAINTENANCE_MODE = false;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // If user visits /maintenance while maintenance mode is off, redirect to home
+  if (!MAINTENANCE_MODE && pathname === '/maintenance') {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
   // ─── MAINTENANCE MODE ENFORCEMENT ──────────────────────────────────────────
   if (MAINTENANCE_MODE) {
