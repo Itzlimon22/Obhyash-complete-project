@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllPosts } from '@/lib/blog-data';
 import { SSC_SUBJECTS } from '@/lib/data/ssc-question-bank-data';
+import { HSC_SUBJECTS } from '@/lib/data/hsc-question-bank-data';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
@@ -24,6 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/question-bank/ssc`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/question-bank/hsc`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'daily',
       priority: 0.95,
@@ -116,5 +123,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  return [...routes, ...blogRoutes, ...qbSubjectRoutes, ...qbChapterRoutes];
+  // Dynamic HSC Question Bank Subject & Chapter Routes
+  const hscSubjectRoutes: MetadataRoute.Sitemap = HSC_SUBJECTS.map((subj) => ({
+    url: `${baseUrl}/question-bank/hsc/${subj.slug}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  }));
+
+  const hscChapterRoutes: MetadataRoute.Sitemap = HSC_SUBJECTS.flatMap((subj) =>
+    subj.chapters.map((ch) => ({
+      url: `${baseUrl}/question-bank/hsc/${subj.slug}/${ch.slug}`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    }))
+  );
+
+  return [
+    ...routes,
+    ...blogRoutes,
+    ...qbSubjectRoutes,
+    ...qbChapterRoutes,
+    ...hscSubjectRoutes,
+    ...hscChapterRoutes,
+  ];
 }

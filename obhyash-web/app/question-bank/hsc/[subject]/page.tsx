@@ -1,0 +1,240 @@
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import {
+  ChevronRight,
+  BookOpen,
+  FileText,
+  Layers,
+  PlayCircle,
+  Download,
+} from 'lucide-react';
+import { getHscSubjectBySlug, HSC_SUBJECTS } from '@/lib/data/hsc-question-bank-data';
+
+interface PageProps {
+  params: Promise<{
+    subject: string;
+  }>;
+}
+
+export const dynamic = 'force-static';
+export const revalidate = false;
+
+export function generateStaticParams() {
+  return HSC_SUBJECTS.map((subj) => ({
+    subject: subj.slug,
+  }));
+}
+
+const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.obhyash.app&referrer=utm_source%3Dweb_question_bank%26utm_medium%3Dhsc_subject_page';
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { subject } = await params;
+  const subj = getHscSubjectBySlug(subject);
+  if (!subj) return { title: 'বিষয় খুঁজে পাওয়া যায়নি | অভ্যাস' };
+
+  const title = `এইচএসসি ${subj.name} প্রশ্ন ব্যাংক ২০২৬ (HSC ${subj.name} Question Bank) | অধ্যায়ভিত্তিক MCQ ও সমাধান`;
+  const description = `এইচএসসি ${subj.name} বিষয়ের সকল অধ্যায়ের বিগত ১০ বছরের বোর্ড MCQ প্রশ্ন, সমাধান ও ফ্রি মডেল টেস্ট। মোট ${subj.totalQuestions.toLocaleString('bn-BD')}টি প্রশ্ন ও ${subj.totalChapters}টি অধ্যায়।`;
+  const canonicalUrl = `https://obhyash.com/question-bank/hsc/${subject}`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      `hsc ${subj.slug} question bank`,
+      `এইচএসসি ${subj.name} প্রশ্ন ব্যাংক ২০২৬`,
+      `hsc ${subj.name} board question solution`,
+      `hsc ${subj.slug} chapterwise mcq`,
+      'obhyash question bank',
+    ],
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: 'Obhyash (অভ্যাস)',
+      locale: 'bn_BD',
+      type: 'website',
+      images: [
+        {
+          url: 'https://obhyash.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['https://obhyash.com/og-image.png'],
+    },
+  };
+}
+
+export default async function HscSubjectPage({ params }: PageProps) {
+  const { subject } = await params;
+  const subj = getHscSubjectBySlug(subject);
+
+  if (!subj) {
+    notFound();
+  }
+
+  return (
+    <div className="min-h-screen bg-[#07090E] text-white selection:bg-brand-500/30 font-sans antialiased">
+      {/* ─── 1. NAVBAR ─────────────────────────────────────────── */}
+      <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#07090E]/85 backdrop-blur-xl">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+          <Link href="/question-bank/hsc" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
+              অ
+            </div>
+            <span className="text-xs sm:text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+              এইচএসসি প্রশ্ন ব্যাংক
+            </span>
+          </Link>
+
+          <Link
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500 text-white hover:bg-indigo-400 transition-all flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>অ্যাপ ইনস্টল</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* ─── 2. HERO HEADER ────────────────────────────────────── */}
+      <div className="border-b border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent py-10 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-1.5 text-xs text-neutral-400 mb-4 overflow-x-auto scrollbar-none">
+            <Link href="/" className="hover:text-white">হোম</Link>
+            <ChevronRight className="w-3 h-3 text-neutral-600 shrink-0" />
+            <Link href="/question-bank/hsc" className="hover:text-white">এইচএসসি প্রশ্ন ব্যাংক</Link>
+            <ChevronRight className="w-3 h-3 text-neutral-600 shrink-0" />
+            <span className="text-indigo-400 font-medium">{subj.name}</span>
+          </nav>
+
+          <div className="flex items-center gap-2 mb-3">
+            <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${subj.badgeColor}`}>
+              {subj.streamName}
+            </span>
+            {subj.code && (
+              <span className="text-[10px] text-neutral-500 font-mono">বিষয় কোড: {subj.code}</span>
+            )}
+          </div>
+
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug mb-3">
+            এইচএসসি {subj.name} প্রশ্ন ব্যাংক ২০২৬
+          </h1>
+
+          <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed mb-6">
+            {subj.description} সকল অধ্যায়ের বিগত ১০ বছরের বোর্ড প্রশ্ন ও নির্ভুল সমাধান নিচে তালিকাভুক্ত করা হয়েছে।
+          </p>
+
+          {/* Stats Bar */}
+          <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-300 pt-4 border-t border-white/[0.06]">
+            <div className="flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-emerald-400" />
+              <span>মোট <strong className="text-white">{subj.totalQuestions.toLocaleString('bn-BD')}টি</strong> বোর্ড প্রশ্ন</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-neutral-600" />
+            <div className="flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-cyan-400" />
+              <span>মোট <strong className="text-white">{subj.chapters.length.toLocaleString('bn-BD')}টি</strong> অধ্যায়</span>
+            </div>
+            {subj.blogSlug && (
+              <>
+                <div className="w-1 h-1 rounded-full bg-neutral-600" />
+                <Link
+                  href={`/blog/${subj.blogSlug}`}
+                  className="text-amber-400 hover:underline flex items-center gap-1 font-medium"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>বোর্ড সমাধান গাইড →</span>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── 3. CHAPTERS LIST ──────────────────────────────────── */}
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm sm:text-base font-bold text-white">
+            অধ্যায় তালিকা (Syllabus Chapters)
+          </h2>
+          <span className="text-xs text-neutral-400">
+            {subj.chapters.length}টি অধ্যায়
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {subj.chapters.map((ch, idx) => (
+            <Link
+              key={ch.id}
+              href={`/question-bank/hsc/${subj.slug}/${ch.slug}`}
+              className="group p-4 rounded-2xl bg-[#0D1017] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-[#10141D] transition-all flex items-center justify-between gap-4 shadow-sm"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                  {(idx + 1).toLocaleString('bn-BD')}
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">
+                    {ch.name}
+                  </h3>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    {ch.count.toLocaleString('bn-BD')}টি বিগত বছরের বোর্ড MCQ প্রশ্ন ও ব্যাখ্যা
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-indigo-400 font-medium shrink-0">
+                <span className="hidden sm:inline">প্রশ্ন ও সমাধান দেখুন</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* ─── 4. BOTTOM ACTION CTA ─────────────────────────────── */}
+        <div className="mt-12 p-6 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-[#0C1217] to-[#0A0D14] border border-indigo-500/25 text-center">
+          <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
+            সম্পূর্ণ {subj.name} বিষয়ের উপর ফ্রি মডেল টেস্ট দাও
+          </h3>
+          <p className="text-xs text-neutral-300 max-w-md mx-auto mb-5 leading-relaxed">
+            টাইমার ও স্বয়ংক্রিয় লিডারবোর্ড সহ পূর্ণাঙ্গ পরীক্ষার অভিজ্ঞতা নাও সম্পূর্ণ ফ্রিতে।
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg"
+            >
+              <Download className="w-4 h-4" />
+              <span>অ্যাপে মডেল টেস্ট দিন</span>
+            </Link>
+            <Link
+              href={`/demo?subject=${subj.id}`}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] text-white border border-white/10 font-semibold text-xs transition-all flex items-center justify-center gap-2"
+            >
+              <PlayCircle className="w-4 h-4 text-indigo-400" />
+              <span>ওয়েব ডেমো টেস্ট</span>
+            </Link>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
