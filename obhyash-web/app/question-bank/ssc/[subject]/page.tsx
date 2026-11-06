@@ -124,11 +124,6 @@ export default async function SscSubjectPage({ params }: PageProps) {
             <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
               {subj.streamName}
             </span>
-            {subj.code && (
-              <span className="text-[10px] text-slate-400 font-mono">
-                বিষয় কোড: {subj.code}
-              </span>
-            )}
           </div>
 
           <h1
