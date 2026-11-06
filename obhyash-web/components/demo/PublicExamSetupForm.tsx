@@ -13,21 +13,26 @@ import {
   CheckCheck,
   CheckCircle2,
   Info,
+  Search,
 } from 'lucide-react';
 import { ExamConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { MathRenderer } from '@/components/common/MathRenderer';
 import {
+  LevelId,
+  StreamId,
   PUBLIC_LEVELS,
+  PUBLIC_STREAMS,
   PUBLIC_SUBJECTS,
   PUBLIC_CHAPTERS,
   PublicSubject,
   PublicChapter,
 } from '@/lib/data/public-mock-data';
 import AppInstallPromptModal from '@/components/demo/AppInstallPromptModal';
+import { SubjectColorfulIcon } from '@/components/question-bank/SubjectIcons';
 
 interface PublicExamSetupFormProps {
-  onStartExam: (config: ExamConfig, selectedLevel: 'HSC' | 'SSC') => void;
+  onStartExam: (config: ExamConfig, selectedLevel: LevelId) => void;
   isLoading?: boolean;
 }
 
@@ -35,13 +40,20 @@ export default function PublicExamSetupForm({
   onStartExam,
   isLoading = false,
 }: PublicExamSetupFormProps) {
-  // 1. Level / Class State (Normal Dropdown)
-  const [selectedLevel, setSelectedLevel] = useState<'HSC' | 'SSC'>('HSC');
+  // 1. Level / Class State
+  const [selectedLevel, setSelectedLevel] = useState<LevelId>('HSC');
+  // 2. Division / Stream State (Science, Commerce, Arts, All)
+  const [selectedStream, setSelectedStream] = useState<StreamId>('all');
 
-  // 2. Filter subjects by selected level
+  // Filter subjects by selected level and selected stream
   const availableSubjects = useMemo(() => {
-    return PUBLIC_SUBJECTS.filter((s) => s.level === selectedLevel);
-  }, [selectedLevel]);
+    return PUBLIC_SUBJECTS.filter((s) => {
+      if (s.level !== selectedLevel) return false;
+      if (selectedStream === 'all') return true;
+      if (s.stream === 'general') return true;
+      return s.stream === selectedStream;
+    });
+  }, [selectedLevel, selectedStream]);
 
   // Form State
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(
@@ -71,6 +83,9 @@ export default function PublicExamSetupForm({
 
   // Dynamic exam types based on selected level and subject
   const availableExamTypes = useMemo(() => {
+    if (selectedLevel === 'CLASS_8') {
+      return ['Academic', 'Board'];
+    }
     if (selectedLevel === 'SSC') {
       return ['Board', 'Academic'];
     }
@@ -82,12 +97,16 @@ export default function PublicExamSetupForm({
       subId.includes('biology') || subName.includes('biology') || subLabel.includes('জীববিজ্ঞান');
     const isICT =
       subId.includes('ict') || subName.includes('ict') || subLabel.includes('তথ্য');
+    const isCommerce =
+      selectedSubData?.stream === 'commerce' || subLabel.includes('হিসাব') || subLabel.includes('ফিন্যান্স');
+    const isHumanities =
+      selectedSubData?.stream === 'humanities' || subLabel.includes('অর্থনীতি') || subLabel.includes('পৌরনীতি');
 
     if (isBiology) {
       return ['Medical', 'Varsity', 'Board', 'Academic'];
     }
-    if (isICT) {
-      return ['Board', 'Academic'];
+    if (isICT || isCommerce || isHumanities) {
+      return ['Varsity', 'Board', 'Academic'];
     }
     return ['Engineering', 'Varsity', 'Board', 'Academic'];
   }, [selectedLevel, selectedSubjectId, selectedSubData]);
@@ -104,9 +123,33 @@ export default function PublicExamSetupForm({
   }, [availableExamTypes]);
 
   // Handle level change
-  const handleLevelChange = (newLevel: 'HSC' | 'SSC') => {
+  const handleLevelChange = (newLevel: LevelId) => {
     setSelectedLevel(newLevel);
-    const newSubjects = PUBLIC_SUBJECTS.filter((s) => s.level === newLevel);
+    const targetStream = newLevel === 'CLASS_8' ? 'all' : selectedStream;
+    if (newLevel === 'CLASS_8') {
+      setSelectedStream('all');
+    }
+    const newSubjects = PUBLIC_SUBJECTS.filter((s) => {
+      if (s.level !== newLevel) return false;
+      if (targetStream === 'all') return true;
+      if (s.stream === 'general') return true;
+      return s.stream === targetStream;
+    });
+    if (newSubjects.length > 0) {
+      setSelectedSubjectId(newSubjects[0].id);
+    }
+    setSelectedChapters(new Set());
+  };
+
+  // Handle stream change (Science, Commerce, Arts, All)
+  const handleStreamChange = (newStream: StreamId) => {
+    setSelectedStream(newStream);
+    const newSubjects = PUBLIC_SUBJECTS.filter((s) => {
+      if (s.level !== selectedLevel) return false;
+      if (newStream === 'all') return true;
+      if (s.stream === 'general') return true;
+      return s.stream === newStream;
+    });
     if (newSubjects.length > 0) {
       setSelectedSubjectId(newSubjects[0].id);
     }
@@ -149,12 +192,48 @@ export default function PublicExamSetupForm({
             <select
               id="public-level-select"
               value={selectedLevel}
-              onChange={(e) => handleLevelChange(e.target.value as 'HSC' | 'SSC')}
+              onChange={(e) => handleLevelChange(e.target.value as LevelId)}
               className="w-full appearance-none px-3.5 py-2.5 pr-9 text-sm sm:text-base font-bold rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] outline-none cursor-pointer"
             >
               {PUBLIC_LEVELS.map((lvl) => (
                 <option key={lvl.id} value={lvl.id}>
                   {lvl.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={18}
+              className="text-neutral-400 dark:text-neutral-500 absolute right-3 top-3.5 pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* ─── Stream / Division Dropdown (Science, Commerce, Arts) ─── */}
+        <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="public-stream-select"
+              className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]"
+            >
+              বিভাগ নির্বাচন (Science, Commerce, Arts)
+            </label>
+            {selectedLevel === 'CLASS_8' && (
+              <span className="text-[11px] text-neutral-400 font-normal">
+                (অষ্টম শ্রেণির সকল বিষয় আবশ্যিক)
+              </span>
+            )}
+          </div>
+          <div className="relative">
+            <select
+              id="public-stream-select"
+              value={selectedStream}
+              disabled={selectedLevel === 'CLASS_8'}
+              onChange={(e) => handleStreamChange(e.target.value as StreamId)}
+              className="w-full appearance-none px-3.5 py-2.5 pr-9 text-sm sm:text-base font-bold rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {PUBLIC_STREAMS.map((str) => (
+                <option key={str.id} value={str.id}>
+                  {str.name}
                 </option>
               ))}
             </select>
@@ -713,44 +792,126 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
   onSelect,
   onClose,
 }) => {
+  const [modalSearch, setModalSearch] = useState('');
+
+  const filtered = useMemo(() => {
+    if (!modalSearch.trim()) return subjects;
+    const q = modalSearch.trim().toLowerCase();
+    return subjects.filter(
+      (s) =>
+        s.label.toLowerCase().includes(q) ||
+        s.streamName.toLowerCase().includes(q) ||
+        s.name.toLowerCase().includes(q)
+    );
+  }, [subjects, modalSearch]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh] border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in slide-in-from-bottom duration-300">
         <div className="sm:hidden w-10 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mx-auto my-3" />
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-neutral-100 dark:border-white/[0.08]">
-          <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
-            বিষয় নির্বাচন করো
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-white p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
-          >
-            <X size={20} />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-2">
-          {subjects.map((sub) => {
-            const isSelected = sub.id === selectedId;
-            return (
+
+        {/* Header & Search */}
+        <div className="px-5 pt-4 pb-3 border-b border-neutral-100 dark:border-white/[0.08]">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                বিষয় নির্বাচন করো
+              </h3>
+              <p className="text-xs text-neutral-500">
+                মোট {filtered.length}টি বিষয় উপলব্ধ
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-white p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={modalSearch}
+              onChange={(e) => setModalSearch(e.target.value)}
+              placeholder="বিষয় খুঁজুন (যেমন: পদার্থ, হিসাববিজ্ঞান, গণিত...)"
+              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white outline-hidden focus:ring-2 focus:ring-emerald-500/20"
+            />
+            {modalSearch && (
               <button
-                key={sub.id}
-                type="button"
-                onClick={() => onSelect(sub.id)}
-                className={cn(
-                  "w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
-                  isSelected
-                    ? 'bg-[#12544F] border-[#12544F] text-white shadow-sm active:scale-[0.99]'
-                    : 'bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700'
-                )}
+                onClick={() => setModalSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-0.5"
               >
-                <span className="text-base font-bold">{sub.label}</span>
-                {isSelected && (
-                  <CheckCircle2 size={20} className="text-white shrink-0 ml-2" />
-                )}
+                <X size={14} />
               </button>
-            );
-          })}
+            )}
+          </div>
+        </div>
+
+        {/* Subjects List */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-2">
+          {filtered.length > 0 ? (
+            filtered.map((sub) => {
+              const isSelected = sub.id === selectedId;
+              return (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => onSelect(sub.id)}
+                  className={cn(
+                    "w-full flex items-center justify-between p-3 rounded-2xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer group",
+                    isSelected
+                      ? 'bg-[#12544F] border-[#12544F] text-white shadow-sm'
+                      : 'bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700'
+                  )}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className={cn(
+                        "w-9 h-9 rounded-xl flex items-center justify-center p-1.5 shrink-0 transition-all",
+                        isSelected
+                          ? "bg-white/10"
+                          : "bg-neutral-100 dark:bg-neutral-800"
+                      )}
+                    >
+                      <SubjectColorfulIcon
+                        name={(sub.iconName || '') + ' ' + sub.name}
+                        className="w-6 h-6"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-sm sm:text-base font-bold truncate">
+                          {sub.label}
+                        </span>
+                        <span
+                          className={cn(
+                            "text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0",
+                            isSelected
+                              ? "bg-white/20 text-white border-white/30"
+                              : "bg-neutral-200/60 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-300/60 dark:border-neutral-700"
+                          )}
+                        >
+                          {sub.streamName}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {isSelected && (
+                    <CheckCircle2 size={20} className="text-white shrink-0 ml-2" />
+                  )}
+                </button>
+              );
+            })
+          ) : (
+            <div className="py-10 text-center text-neutral-400 dark:text-neutral-500 font-['Anek_Bangla',sans-serif] text-sm">
+              &ldquo;{modalSearch}&rdquo; দিয়ে কোনো বিষয় খুঁজে পাওয়া যায়নি।
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -113,7 +113,7 @@ export default async function HscChapterQuestionsPage({ params }: PageProps) {
           correctIndex: 2,
           boardTag: 'ঢাকা বোর্ড ২০২৪',
           explanation: `এই অধ্যায়ের বোর্ড পরীক্ষায় বারবার আসা কমন নিয়মের ব্যাখ্যা। বিস্তারিত জানতে অভ্যাস মোবাইল অ্যাপ ডাউনলোড করুন।`,
-          shortcutTip: '💡 শর্টকাট: বিগত বছরের বোর্ড পরীক্ষার অনুরূপ নিয়মের প্রশ্ন বেশি বেশি অনুশীলন করুন।',
+          shortcutTip: 'শর্টকাট: বিগত বছরের বোর্ড পরীক্ষার অনুরূপ নিয়মের প্রশ্ন বেশি বেশি অনুশীলন করুন।',
           isLocked: false,
         },
         {

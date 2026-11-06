@@ -59,7 +59,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           'জার্মান গণিতবিদ জর্জ ক্যান্টর (Georg Cantor) সর্বপ্রথম সেটের প্রাথমিক ধারণা দেন। তাঁর এই যুগান্তকারী উদ্ভাবন গণিতশাস্ত্রে "সেট তত্ত্ব" (Set Theory) নামে সুপরিচিত।',
         shortcutTip:
-          "💡 মনে রাখার নিয়ম: Georg Cantor = Father of Set Theory (সেট তত্ত্বের জনক)।",
+          "মনে রাখার নিয়ম: Georg Cantor = Father of Set Theory (সেট তত্ত্বের জনক)।",
         isLocked: false,
       },
       {
@@ -72,7 +72,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           'দুটি সেটের কার্তেসীয় গুণজকে (Cartesian Product) গুণ চিহ্নের মাধ্যমে প্রকাশ করা হয় এবং এটিকে পড়া হয় "A ক্রস B" (A cross B)। এর উপাদানগুলো ক্রমজোড় (Ordered Pair) আকারে থাকে।',
         shortcutTip:
-          '💡 Cartesian Product এর গুণ চিহ্নকে সর্বদা "ক্রস" (Cross) পড়া হয়।',
+          'Cartesian Product এর গুণ চিহ্নকে সর্বদা "ক্রস" (Cross) পড়া হয়।',
         isLocked: false,
       },
       {
@@ -86,7 +86,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           'একজোড়া উপাদানের মধ্যে প্রথম ও দ্বিতীয় উপাদানের অবস্থান নির্দিষ্ট করে (x, y) আকারে জোড়া তৈরি করার প্রক্রিয়াকে বলা হয় "ক্রমজোড়" (Ordered Pair)। প্রথম উপাদানটি ডোমেন এবং দ্বিতীয় উপাদানটি রেঞ্জ নির্দেশ করে।',
         shortcutTip:
-          "💡 ক্রমজোড়ের প্রথম পদকে প্রথম উপাদান এবং দ্বিতীয় পদকে দ্বিতীয় উপাদান বলে।",
+          "ক্রমজোড়ের প্রথম পদকে প্রথম উপাদান এবং দ্বিতীয় পদকে দ্বিতীয় উপাদান বলে।",
         isLocked: false,
       },
       {
@@ -99,7 +99,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "x² - 5x + 6 = 0 কে উৎপাদকে বিশ্লেষণ করলে পাই:\nx² - 2x - 3x + 6 = 0\n⇒ x(x - 2) - 3(x - 2) = 0\n⇒ (x - 2)(x - 3) = 0\nঅতএব, x = 2 অথবা x = 3। সুতরাং সেটের উপাদান হলো {2, 3}। অপশনে 2 থাকায় সঠিক উত্তর (গ)।",
         shortcutTip:
-          "💡 শর্টকাট: সমীকরণের ধ্রুবক পদ 6 = 2 × 3 এবং মধ্যপদ (-2 - 3) = -5। মূলদ্বয় হবে +2 ও +3।",
+          "শর্টকাট: সমীকরণের ধ্রুবক পদ 6 = 2 × 3 এবং মধ্যপদ (-2 - 3) = -5। মূলদ্বয় হবে +2 ও +3।",
         isLocked: true,
       },
       {
@@ -111,7 +111,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "দিনাজপুর বোর্ড ২০২৩",
         explanation:
           "কোনো সেটের উপাদান সংখ্যা n হলে মোট উপসেট সংখ্যা 2ⁿ এবং প্রকৃত উপসেট সংখ্যা (2ⁿ - 1)। এখানে n = 2, সুতরাং মোট উপসেট 2² = 4টি, কিন্তু প্রকৃত উপসেট হবে (4 - 1) = 3টি ({a}, {b}, ∅)।",
-        shortcutTip: "💡 গোল্ডেন রুল: উপসেট = 2ⁿ, প্রকৃত উপসেট = (2ⁿ - 1)।",
+        shortcutTip: "গোল্ডেন রুল: উপসেট = 2ⁿ, প্রকৃত উপসেট = (2ⁿ - 1)।",
         isLocked: true,
       },
       {
@@ -123,7 +123,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "চট্টগ্রাম বোর্ড ২০২৪",
         explanation:
           "A ∩ B (ছেদ সেট বা Intersection) হলো উভয় সেটের সাধারণ (Common) উপাদান নিয়ে গঠিত সেট। A ও B উভয়ের মধ্যেই শুধুমাত্র 2 বিদ্যমান। সুতরাং A ∩ B = {2}।",
-        shortcutTip: "💡 ইন্টারসেকশন (∩) মানে কেবল কমন (Common) উপাদান নেওয়া।",
+        shortcutTip: "ইন্টারসেকশন (∩) মানে কেবল কমন (Common) উপাদান নেওয়া।",
         isLocked: true,
       },
       {
@@ -136,7 +136,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "f(2) = (2)³ - 2(2) + 6 = 8 - 4 + 6 = 10। সুতরাং f(2) এর মান 10।",
         shortcutTip:
-          "💡 সরাসরি x এর স্থানে 2 বসিয়ে হিসাব করুন: 8 - 4 + 6 = 10।",
+          "সরাসরি x এর স্থানে 2 বসিয়ে হিসাব করুন: 8 - 4 + 6 = 10।",
         isLocked: true,
       },
       {
@@ -149,7 +149,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "ময়মনসিংহ বোর্ড ২০২৪",
         explanation:
           "যদি n(A) = p এবং n(B) = q হয়, তবে n(A × B) = p × q। এখানে 3 × 2 = 6।",
-        shortcutTip: "💡 n(A × B) = n(A) × n(B)।",
+        shortcutTip: "n(A × B) = n(A) × n(B)।",
         isLocked: true,
       },
     ],
@@ -189,7 +189,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "ঢাকা বোর্ড ২০২৪",
         explanation:
           "সকল মূলদ সংখ্যা (Rational Numbers) এবং সকল অমূলদ সংখ্যাকে (Irrational Numbers) একত্রে বাস্তব সংখ্যা (Real Numbers, ℝ) বলা হয়।",
-        shortcutTip: "💡 Real Numbers = Rational (ℚ) ∪ Irrational (ℚ')।",
+        shortcutTip: "Real Numbers = Rational (ℚ) ∪ Irrational (ℚ')।",
         isLocked: false,
       },
       {
@@ -202,7 +202,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "যেসব সংখ্যাকে দুটি পূর্ণসংখ্যার অনুপাত p/q (যেখানে q ≠ 0) আকারে প্রকাশ করা যায় না, তাদের অমূলদ সংখ্যা বলে। পূর্ণবর্গ নয় এমন যেকোনো স্বাভাবিক সংখ্যার বর্গমূল অমূলদ সংখ্যা। এখানে 7 পূর্ণবর্গ নয়, তাই √7 একটি অমূলদ সংখ্যা।",
         shortcutTip:
-          "💡 পূর্ণবর্গ নয় (যেমন √2, √3, √5, √7) সবসময় অমূলদ সংখ্যা।",
+          "পূর্ণবর্গ নয় (যেমন √2, √3, √5, √7) সবসময় অমূলদ সংখ্যা।",
         isLocked: false,
       },
       {
@@ -214,7 +214,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "রাজশাহী বোর্ড ২০২৪",
         explanation:
           "আবৃত্ত দশমিককে সাধারণ ভগ্নাংশে রূপান্তরের নিয়ম অনুযায়ী:\n0.3̇ = (3 - 0)/9 = 3/9 = 1/3।",
-        shortcutTip: "💡 পৌনঃপুনিক সংখ্যা একটি হলে হরে একটি 9 বসবে: 3/9 = 1/3।",
+        shortcutTip: "পৌনঃপুনিক সংখ্যা একটি হলে হরে একটি 9 বসবে: 3/9 = 1/3।",
         isLocked: false,
       },
       {
@@ -228,7 +228,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "যেকোনো দুটি ক্রমিক জোড় সংখ্যা ধরুন: 2 ও 4, গুণফল = 8 (যা 8 দ্বারা বিভাজ্য)। আবার 4 ও 6 ধরলে গুণফল 24 (যা 8 দ্বারা বিভাজ্য)। সুতরাং দুইটি ক্রমিক জোড় সংখ্যার গুণফল সর্বদা 8 দ্বারা বিভাজ্য।",
         shortcutTip:
-          "💡 উদাহরণ ধরে ট্রাই করুন: 2 × 4 = 8, যা 8 দ্বারা নিঃশেষে বিভাজ্য।",
+          "উদাহরণ ধরে ট্রাই করুন: 2 × 4 = 8, যা 8 দ্বারা নিঃশেষে বিভাজ্য।",
         isLocked: true,
       },
       {
@@ -241,7 +241,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "দিনাজপুর বোর্ড ২০২৪",
         explanation:
           "আসন্ন মানের নিয়ম অনুসারে, বাদ দেওয়া অংশের প্রথম অঙ্কটি 5 বা তদূর্ধ্ব হলে পূর্ববর্তী অঙ্কের সাথে 1 যোগ করতে হয়।",
-        shortcutTip: "💡 ≥ 5 হলে +1 যোগ হবে, < 5 হলে অপরিবর্তিত থাকবে।",
+        shortcutTip: "≥ 5 হলে +1 যোগ হবে, < 5 হলে অপরিবর্তিত থাকবে।",
         isLocked: true,
       },
     ],
@@ -278,7 +278,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "যেসব রাশিকে সম্পূর্ণরূপে প্রকাশ করার জন্য মান ও দিক উভয়ের প্রয়োজন হয়, তাদের ভেক্টর রাশি বলে। সরণ (Displacement) একটি নির্দিষ্ট দিকে দূরত্বের পরিবর্তন নির্দেশ করে, তাই সরণ একটি ভেক্টর রাশি। পক্ষান্তরে দ্রুতি, কাজ ও শক্তি স্কেলার রাশি।",
         shortcutTip:
-          '💡 ভেক্টর ছন্দ: "ভবে সব প্রিয়তম ভাসে প্রেমে" (বেগ, সরণ, ত্বরন, মন্দন, বল ইত্যাদি)।',
+          'ভেক্টর ছন্দ: "ভবে সব প্রিয়তম ভাসে প্রেমে" (বেগ, সরণ, ত্বরন, মন্দন, বল ইত্যাদি)।',
         isLocked: false,
       },
       {
@@ -292,7 +292,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "পড়ন্ত বস্তুর ক্ষেত্রে h = 1/2 gt² (যেহেতু আদিবেগ u = 0)।\n⇒ 45 = 1/2 × g × (3)²\n⇒ 45 = 1/2 × g × 9\n⇒ g = (45 × 2) / 9 = 90 / 9 = 10 m/s²।",
         shortcutTip:
-          "💡 h = 1/2 gt² সূত্রে মান বসালেই দ্রুত উত্তর বের হয়ে আসে।",
+          "h = 1/2 gt² সূত্রে মান বসালেই দ্রুত উত্তর বের হয়ে আসে।",
         isLocked: false,
       },
       {
@@ -305,7 +305,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         boardTag: "রাজশাহী বোর্ড ২০২৪",
         explanation:
           "ত্বরণ a = (v - u) / t। এখানে আদিবেগ u = 10 m/s, শেষবেগ v = 25 m/s, সময় t = 5 s।\nঅতএব a = (25 - 10) / 5 = 15 / 5 = 3 m/s²।",
-        shortcutTip: "💡 ত্বরণ = (বেগ বৃদ্ধি) ÷ সময় = 15 ÷ 5 = 3 m/s²।",
+        shortcutTip: "ত্বরণ = (বেগ বৃদ্ধি) ÷ সময় = 15 ÷ 5 = 3 m/s²।",
         isLocked: false,
       },
       {
@@ -319,7 +319,7 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "বেগ-সময় (v-t) গ্রাফের নিচের ক্ষেত্রফল মূলত বেগ ও সময়ের গুণফল নির্দেশ করে, যা বস্তুর মোট অতিক্রান্ত দূরত্ব (s = vt) বা সরণের সমান।",
         shortcutTip:
-          "💡 v-t গ্রাফের ঢাল = ত্বরণ; v-t গ্রাফের ক্ষেত্রফল = সরণ/দূরত্ব।",
+          "v-t গ্রাফের ঢাল = ত্বরণ; v-t গ্রাফের ক্ষেত্রফল = সরণ/দূরত্ব।",
         isLocked: true,
       },
       {
@@ -332,12 +332,14 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
         explanation:
           "কোনো গতিশীল বস্তুর গতি যদি এমন হয় যে এটি নির্দিষ্ট বিন্দুকে নির্দিষ্ট সময় পরপর একই দিক থেকে অতিক্রম করে, তবে তাকে পর্যাবৃত্ত গতি (Periodic Motion) বলে। ঘড়ির কাঁটার গতি একটি নির্দিষ্ট সময় পরপর একই পথে ঘোরে, তাই এটি পর্যাবৃত্ত গতি।",
         shortcutTip:
-          "💡 সময় নির্দিষ্ট রেখে বারবার একই পথে ফিরলে তা পর্যাবৃত্ত গতি।",
+          "সময় নির্দিষ্ট রেখে বারবার একই পথে ফিরলে তা পর্যাবৃত্ত গতি।",
         isLocked: true,
       },
     ],
   },
 };
+
+import generatedSscQuestions from './ssc-generated-questions.json';
 
 /**
  * Helper to fetch chapter questions with fallback
@@ -347,5 +349,14 @@ export function getChapterQuestions(
   chapterSlug: string,
 ): ChapterDetails | null {
   const key = `${subjectSlug}-${chapterSlug}`;
-  return SSC_CHAPTER_QUESTIONS[key] || null;
+  // 1. Return hand-crafted detailed questions if present
+  if (SSC_CHAPTER_QUESTIONS[key]) {
+    return SSC_CHAPTER_QUESTIONS[key];
+  }
+  // 2. Fall back to statically generated chapter questions
+  const generated = (generatedSscQuestions as unknown as Record<string, ChapterDetails>)[key];
+  if (generated) {
+    return generated;
+  }
+  return null;
 }

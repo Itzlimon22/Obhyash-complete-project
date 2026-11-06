@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Question, UserAnswers, ExamConfig, ExamDetails, AppState } from '@/lib/types';
-import { PUBLIC_QUESTIONS } from '@/lib/data/public-mock-data';
+import { PUBLIC_QUESTIONS, LevelId } from '@/lib/data/public-mock-data';
 import PublicExamSetupForm from '@/components/demo/PublicExamSetupForm';
 import { ExamInstructionsView } from '@/components/student/features/exam/ExamInstructionsView';
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
@@ -12,6 +12,7 @@ import AppInstallPromptModal from '@/components/demo/AppInstallPromptModal';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { cn } from '@/lib/utils';
 import { trackBlogConversion } from '@/lib/track-blog-conversion';
+import { Timer, FileText, Award, ShieldCheck, ChevronRight } from 'lucide-react';
 
 // Fisher-Yates shuffle
 function shuffleArray<T>(array: T[]): T[] {
@@ -100,7 +101,7 @@ export default function DemoExamClient() {
 
   // Freemium Gate State (2-Exam Free Trial)
   const [showSecondExamGate, setShowSecondExamGate] = useState<boolean>(false);
-  const [selectedLevelState, setSelectedLevelState] = useState<'HSC' | 'SSC'>('HSC');
+  const [selectedLevelState, setSelectedLevelState] = useState<LevelId>('HSC');
   const [completedExamsCount, setCompletedExamsCount] = useState<number>(0);
 
   // Sync completed exams count from localStorage
@@ -153,7 +154,7 @@ export default function DemoExamClient() {
   }, [stage]);
 
   // Handle Setup Form "Start Exam" Click -> Moves to Instructions
-  const handleSetupComplete = (config: ExamConfig, selectedLevel: 'HSC' | 'SSC' = 'HSC') => {
+  const handleSetupComplete = (config: ExamConfig, selectedLevel: LevelId = 'HSC') => {
     setSelectedLevelState(selectedLevel);
 
     // Check if user already took their 2 free demo exams (2-Exam Trial)
@@ -277,31 +278,89 @@ export default function DemoExamClient() {
 
   return (
     <div className="min-h-screen overflow-x-clip font-['HindSiliguri',sans-serif] bg-[#FAFAF9] dark:bg-[#0C0A09] text-neutral-900 dark:text-neutral-100 transition-colors duration-200">
+      {/* ── 0. Setup Stage Top Navbar ── */}
+      {stage === 'setup' && (
+        <header className="border-b border-neutral-200/80 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 py-3">
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <a href="/" className="flex items-center gap-2.5">
+              <img
+                src={isDark ? "/landing/logo-white.svg" : "/obhyash_full_logo.svg"}
+                alt="অভ্যাস"
+                className="h-7 sm:h-8 w-auto"
+              />
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
+                পরীক্ষা কেন্দ্র
+              </span>
+            </a>
+
+            <div className="flex items-center gap-3 text-xs">
+              <a
+                href="/question-bank/hsc"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white font-medium hidden sm:inline"
+              >
+                প্রশ্ন ব্যাংক
+              </a>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.obhyash.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold text-xs hover:opacity-90 transition-opacity"
+              >
+                অ্যাপ ডাউনলোড
+              </a>
+            </div>
+          </div>
+        </header>
+      )}
+
       {/* ── 1. Setup Stage ── */}
       {stage === 'setup' && (
         <div className="py-6 sm:py-10 px-3 sm:px-6">
-          <div className="max-w-xl mx-auto mb-4 text-center">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 font-['Anek_Bangla',sans-serif]">
+          <div className="max-w-xl mx-auto mb-6 text-center">
+            {/* Academic Status Badge */}
+            <div className="inline-flex items-center gap-1.5 mb-2.5">
               {completedExamsCount === 0 ? (
-                <span className="bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20 px-2.5 py-0.5 rounded-full">
-                  ✨ ২টি ফ্রি ডেমো টেস্ট ট্রায়াল
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>গেস্ট মোড • সাইন-ইন ছাড়াই সরাসরি পরীক্ষা</span>
                 </span>
               ) : completedExamsCount === 1 ? (
-                <span className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
-                  🎯 ১ম টেস্ট সম্পন্ন • শেষ ১টি ফ্রি টেস্ট বাকি
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                  <span>১ম টেস্ট সম্পন্ন • আরও ১টি ফ্রি টেস্ট বাকি</span>
                 </span>
               ) : (
-                <span className="bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 px-2.5 py-0.5 rounded-full">
-                  🔒 ২টি ফ্রি ট্রায়াল শেষ
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
+                  <span>ফ্রি ট্রায়াল কোটা পূর্ণ • অ্যাপে আনলিমিটেড টেস্ট</span>
                 </span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
-              ফ্রি ডেমো মডেল টেস্ট
+
+            <h1
+              className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight"
+              style={{ fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" }}
+            >
+              অনলাইন মডেল টেস্ট
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-['Anek_Bangla',sans-serif]">
-              লগইন ছাড়াই সরাসরি বোর্ডের মানসম্মত মডেল টেস্ট দিয়ে নিজের প্রস্তুতি যাচাই করো
+
+            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-2 leading-relaxed">
+              টাইমার, নেগেティブ মার্কিং ও বিস্তারিত সমাধান সহ বাস্তব পরীক্ষার পরিবেশে প্রস্তুতি যাচাই করুন
             </p>
+
+            {/* Academic Quality Trust Chips */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] text-neutral-600 dark:text-neutral-400">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 shadow-2xs">
+                <Timer className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>২৫ মিনিট টাইমার</span>
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 shadow-2xs">
+                <FileText className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>২৫টি বোর্ড MCQ</span>
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 shadow-2xs">
+                <Award className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span>তাৎক্ষণিক ফলাফল ও র‍্যাংক</span>
+              </span>
+            </div>
           </div>
 
           <PublicExamSetupForm onStartExam={handleSetupComplete} />
