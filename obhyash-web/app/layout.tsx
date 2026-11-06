@@ -7,6 +7,8 @@ import AuthProvider from "@/components/auth/AuthProvider";
 import SWRProvider from "@/components/providers/SWRProvider";
 import NetworkStatusListener from "@/components/common/NetworkStatusListener";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // ✅ Configure Inter (Variable font - single request)
 const inter = Inter({
@@ -190,7 +192,9 @@ export default function RootLayout({
                     },
                   }}
                 />
-                {/* Vercel Analytics & SpeedInsights disabled to prevent thousands of serverless edge beacon requests on free tier */}
+                {/* ✅ Vercel Analytics & SpeedInsights enabled for real-time traffic tracking */}
+                <Analytics />
+                <SpeedInsights />
               </SWRProvider>
             </AuthProvider>
           </ThemeProvider>

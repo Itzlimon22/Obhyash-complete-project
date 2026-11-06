@@ -29,13 +29,45 @@ export interface TrackConversionOptions {
     | (string & {});
 }
 
+// In-memory debouncer to prevent duplicate clicks within 2 seconds
 const recentEvents = new Map<string, number>();
 
 /**
- * Button click conversion tracking — completely disabled to stop Vercel Serverless Function invocations
- * and keep CPU usage strictly within the Hobby tier.
+ * Button click conversion tracking — Active on Vercel Pro.
+ * Tracks App downloads, Signups, Demo exams, and CTA clicks across blog articles.
+ * Uses navigator.sendBeacon for zero-latency non-blocking network delivery.
  */
-export function trackBlogConversion(_options: TrackConversionOptions) {
-  // Disabled: no-op to eliminate serverless function CPU time
-  return;
+export function trackBlogConversion(options: TrackConversionOptions) {
+  if (typeof window === 'undefined') return;
+
+  const now = Date.now();
+  const key = `${options.eventType}:${options.sourceSlug || 'blog_home'}:${options.buttonLocation}`;
+  const lastFired = recentEvents.get(key) || 0;
+
+  // 2-second debounce per event/button
+  if (now - lastFired < 2000) return;
+  recentEvents.set(key, now);
+
+  const payload = JSON.stringify({
+    event_type: options.eventType,
+    source_slug: options.sourceSlug || 'blog_home',
+    source_category: options.sourceCategory || null,
+    button_location: options.buttonLocation || 'unknown',
+  });
+
+  try {
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon('/api/blog/track-conversion', blob);
+    } else {
+      fetch('/api/blog/track-conversion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    }
+  } catch {
+    // Non-fatal tracking failure
+  }
 }
