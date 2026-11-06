@@ -5,6 +5,8 @@ import { runLiveExamLifecycleAutomation } from '@/lib/live-exam-lifecycle-servic
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+export const maxDuration = 60;
+
 /**
  * Automated Cron Endpoint for Live Exam Lifecycle:
  * 1. Checks ended exams and enables Practice mode + Answer solutions immediately.

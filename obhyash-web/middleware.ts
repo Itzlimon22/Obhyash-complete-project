@@ -61,6 +61,7 @@ export async function middleware(request: NextRequest) {
   // 2. Completely bypass auth checks & serverless session logic for public pages and static info
   if (
     pathname.startsWith('/blog') ||
+    pathname.startsWith('/question-bank') ||
     pathname.startsWith('/notes') ||
     pathname.startsWith('/demo') ||
     pathname === '/faq' ||

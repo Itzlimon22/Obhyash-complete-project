@@ -5,6 +5,8 @@ import { requireAdmin } from '@/lib/utils/admin-auth';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+export const maxDuration = 60;
+
 const BUTTON_CONFIG: Record<
   string,
   { nameBn: string; nameEn: string; category: string }

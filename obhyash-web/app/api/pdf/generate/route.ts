@@ -4,6 +4,7 @@ import { generateQuestionPaperHtml } from '@/lib/pdf-generator/question-paper';
 import { QuestionItem, GeneratorSettings } from '@/lib/pdf-generator/types';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function OPTIONS() {
   return new NextResponse(null, {

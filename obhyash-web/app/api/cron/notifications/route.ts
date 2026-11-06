@@ -6,6 +6,8 @@ import { runCompleteSmartNotificationPipeline } from '@/lib/smart-notification-a
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+export const maxDuration = 60;
+
 /**
  * Automated Cron Endpoint for Scheduled Notifications & Live Exam Automation:
  * 1. Live Exam 30m Reminder, Start Alert & 15m Leaderboard with Nickname & FCM Push
