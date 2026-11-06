@@ -26,6 +26,7 @@ import {
 } from "@/lib/data/ssc-chapter-questions";
 import { SscSubject } from "@/lib/data/ssc-question-bank-data";
 import QuestionBankHeader from "./QuestionBankHeader";
+import Footer from "@/components/landing/Footer";
 
 const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
 
@@ -61,12 +62,12 @@ export default function SscChapterQuestionsClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-emerald-100 font-sans antialiased">
+    <div className="min-h-screen bg-[#FBFBFC] text-slate-900 selection:bg-slate-200 font-sans antialiased">
       {/* ─── 1. TOP NAVBAR MATCHING LANDING PAGE ──────────────────── */}
       <QuestionBankHeader activeSection="ssc" />
 
       {/* ─── 2. BREADCRUMBS & CHAPTER HEADER ─────────────────────── */}
-      <div className="border-b border-slate-200/80 bg-white py-8 px-4 sm:px-6">
+      <div className="border-b border-slate-200/70 bg-white py-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumb path */}
           <nav className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-500 mb-4 overflow-x-auto scrollbar-none pb-1">
@@ -88,20 +89,20 @@ export default function SscChapterQuestionsClient({
               {subjectData.name}
             </Link>
             <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
-            <span className="text-emerald-700 font-medium whitespace-nowrap">
+            <span className="text-slate-900 font-medium whitespace-nowrap">
               {chapterData.chapterNameBangla}
             </span>
           </nav>
 
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
               অধ্যায় {chapterData.chapterNumber.toLocaleString("bn-BD")}
             </span>
-            <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+            <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
               {subjectData.name} ({chapterData.subjectEnglish})
             </span>
-            <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+            <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
               {chapterData.totalQuestionsInDb.toLocaleString("bn-BD")}টি প্রশ্ন ডাটাবেজে
             </span>
           </div>
@@ -111,11 +112,7 @@ export default function SscChapterQuestionsClient({
             className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-[1.2] mb-3"
             style={display}
           >
-            {chapterData.chapterNameBangla} —{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
-              এসএসসি {subjectData.name}
-            </span>{" "}
-            বোর্ড MCQ প্রশ্ন ও সমাধান
+            {chapterData.chapterNameBangla} — এসএসসি {subjectData.name} বোর্ড MCQ প্রশ্ন ও সমাধান
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
@@ -142,15 +139,15 @@ export default function SscChapterQuestionsClient({
       {/* ─── 3. QUESTIONS LIST (PAPER-LIKE CLEAN DESIGN) ──────────── */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         {/* Banner Alert */}
-        <div className="mb-8 p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-start gap-3 text-xs text-slate-700">
-          <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+        <div className="mb-8 p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 text-xs text-slate-600">
+          <Sparkles className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
           <div>
             <span className="font-semibold text-slate-900">
               নমুনা বোর্ড প্রশ্ন ও উত্তরমালা:{" "}
             </span>
             প্রথম ৩টি প্রশ্নের সম্পূর্ণ সমাধান নিচে উন্মুক্ত রাখা হয়েছে। বাকি
             প্রশ্নের বিস্তারিত ব্যাখ্যা ও আরও{" "}
-            <span className="text-emerald-700 font-semibold">
+            <span className="text-slate-900 font-semibold">
               {chapterData.totalQuestionsInDb.toLocaleString("bn-BD")}টি
             </span>{" "}
             বোর্ড প্রশ্ন প্র্যাকটিস করতে ফ্রি অ্যাকাউন্ট তৈরি করুন।
@@ -171,7 +168,7 @@ export default function SscChapterQuestionsClient({
                 {/* Question Header */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-start gap-2.5">
-                    <span className="font-bold text-sm sm:text-base text-emerald-700">
+                    <span className="font-bold text-sm sm:text-base text-slate-900">
                       {q.number.toLocaleString("bn-BD")}.
                     </span>
                     <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">
@@ -179,7 +176,7 @@ export default function SscChapterQuestionsClient({
                     </h2>
                   </div>
                   {q.boardTag && (
-                    <span className="text-[10px] text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap">
+                    <span className="text-[10px] text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap">
                       {q.boardTag}
                     </span>
                   )}
@@ -194,7 +191,7 @@ export default function SscChapterQuestionsClient({
                         key={optIdx}
                         className={`flex items-center gap-2.5 py-1 px-2 rounded-lg transition-colors ${
                           isCorrect
-                            ? "text-emerald-800 font-medium bg-emerald-50/50"
+                            ? "text-slate-900 font-semibold bg-slate-50"
                             : "text-slate-700"
                         }`}
                       >
@@ -202,7 +199,7 @@ export default function SscChapterQuestionsClient({
                           {isCorrect ? "●" : "○"}
                         </span>
                         <span>
-                          <strong className="font-semibold text-slate-600 mr-1.5">
+                          <strong className="font-semibold text-slate-500 mr-1.5">
                             {OPTION_PREFIXES[optIdx]})
                           </strong>
                           {opt}
@@ -214,16 +211,16 @@ export default function SscChapterQuestionsClient({
 
                 {/* Correct Answer Pill */}
                 <div className="pt-3 pb-1 border-t border-slate-100 flex items-center justify-between">
-                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-slate-600" />
                     <span>
                       সঠিক উত্তর: ({correctLetter}) {correctText}
                     </span>
                   </div>
 
                   {q.isLocked && (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 font-medium">
-                      <Lock className="w-3 h-3 text-amber-600" />
+                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                      <Lock className="w-3 h-3 text-slate-400" />
                       <span>ব্যাখ্যা লকড</span>
                     </span>
                   )}
@@ -234,15 +231,15 @@ export default function SscChapterQuestionsClient({
                   {!q.isLocked ? (
                     /* Free Unlocked Explanation */
                     <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs leading-relaxed text-slate-700 space-y-2">
-                      <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-xs">
-                        <Unlock className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1.5 text-slate-900 font-semibold text-xs">
+                        <Unlock className="w-3.5 h-3.5 text-slate-600" />
                         <span>বিস্তারিত ব্যাখ্যা:</span>
                       </div>
                       <p className="whitespace-pre-line text-slate-700">
                         {q.explanation}
                       </p>
                       {q.shortcutTip && (
-                        <div className="pt-2 border-t border-slate-200 text-[11px] text-amber-800 font-medium">
+                        <div className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-600 font-medium">
                           {q.shortcutTip}
                         </div>
                       )}
@@ -251,7 +248,7 @@ export default function SscChapterQuestionsClient({
                     /* Locked Explanation (Frosted Glass Blur + Gate CTA) */
                     <div
                       onClick={() => handleOpenLock(q.number)}
-                      className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-4 cursor-pointer group hover:border-emerald-500/40 transition-all select-none"
+                      className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-4 cursor-pointer group hover:border-slate-300 transition-all select-none"
                     >
                       {/* Blurred placeholder text */}
                       <div className="filter blur-[4px] opacity-40 text-xs text-slate-500 line-clamp-2">
@@ -260,7 +257,7 @@ export default function SscChapterQuestionsClient({
 
                       {/* Frosted Glass Overlay with Lock Icon */}
                       <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[2px] p-2">
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-sm group-hover:bg-emerald-700 transition-all">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-white shadow-xs group-hover:bg-slate-800 transition-all">
                           <Lock className="w-3.5 h-3.5" />
                           <span>ব্যাখ্যা ও শর্টকাট দেখতে ক্লিক করুন</span>
                         </div>
@@ -274,9 +271,9 @@ export default function SscChapterQuestionsClient({
         </div>
 
         {/* ─── 4. BIG BOTTOM CONVERSION GATE ────────────────────── */}
-        <section className="mt-12 rounded-3xl bg-emerald-50/70 border border-emerald-200 p-6 sm:p-8 text-center relative overflow-hidden">
+        <section className="mt-12 rounded-3xl bg-slate-50 border border-slate-200 p-6 sm:p-8 text-center relative overflow-hidden">
           <div className="max-w-xl mx-auto relative z-10">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300/80 flex items-center justify-center text-emerald-700 mx-auto mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 mx-auto mb-4 shadow-xs">
               <Award className="w-6 h-6" />
             </div>
 
@@ -296,14 +293,14 @@ export default function SscChapterQuestionsClient({
                 href={PLAY_STORE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>Google Play থেকে অ্যাপ নামাও</span>
               </Link>
               <Link
                 href="/auth/register"
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
               >
                 <span>ওয়েবে ফ্রি অ্যাকাউন্ট খুলুন</span>
                 <ArrowRight className="w-4 h-4 text-slate-500" />
@@ -328,7 +325,7 @@ export default function SscChapterQuestionsClient({
 
           <Link
             href={`/question-bank/ssc/${subjectData.slug}`}
-            className="text-xs text-emerald-700 font-medium hover:underline"
+            className="text-xs text-slate-700 font-medium hover:text-slate-900 hover:underline"
           >
             {subjectData.name} এর সকল অধ্যায়
           </Link>
@@ -347,7 +344,10 @@ export default function SscChapterQuestionsClient({
         </div>
       </main>
 
-      {/* ─── 6. INTERACTIVE REGISTRATION GATE MODAL ─────────────── */}
+      {/* ─── 6. OFFICIAL LANDING FOOTER ───────────────────────── */}
+      <Footer />
+
+      {/* ─── 7. INTERACTIVE REGISTRATION GATE MODAL ─────────────── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
           <div
@@ -361,7 +361,7 @@ export default function SscChapterQuestionsClient({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 mx-auto mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800 mx-auto mb-3">
               <Lock className="w-6 h-6" />
             </div>
 
@@ -378,7 +378,7 @@ export default function SscChapterQuestionsClient({
                 href={PLAY_STORE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>Google Play থেকে অ্যাপ ডাউনলোড করুন</span>
@@ -386,7 +386,7 @@ export default function SscChapterQuestionsClient({
 
               <Link
                 href="/auth/register"
-                className="w-full py-3 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
               >
                 <span>ওয়েবে ফ্রি অ্যাকাউন্ট তৈরি করুন</span>
                 <ArrowRight className="w-4 h-4" />
@@ -397,7 +397,7 @@ export default function SscChapterQuestionsClient({
               ইতিমধ্যে অ্যাকাউন্ট আছে?{" "}
               <Link
                 href="/auth/login"
-                className="text-emerald-700 font-semibold hover:underline"
+                className="text-slate-900 font-semibold hover:underline"
               >
                 লগইন করুন
               </Link>

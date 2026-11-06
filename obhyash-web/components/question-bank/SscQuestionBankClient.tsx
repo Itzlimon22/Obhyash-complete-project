@@ -29,6 +29,7 @@ import {
 import { SSC_SUBJECTS } from '@/lib/data/ssc-question-bank-data';
 
 import QuestionBankHeader from './QuestionBankHeader';
+import Footer from '@/components/landing/Footer';
 
 const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.obhyash.app&referrer=utm_source%3Dweb_question_bank%26utm_medium%3Dssc_hub';
@@ -75,27 +76,24 @@ export default function SscQuestionBankClient() {
   }, [selectedStream]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-emerald-500/20 font-sans antialiased">
+    <div className="min-h-screen bg-[#FBFBFC] text-slate-900 selection:bg-slate-200 font-sans antialiased">
       {/* ─── 1. TOP NAV MATCHING LANDING PAGE ──────────────────── */}
       <QuestionBankHeader activeSection="ssc" />
 
       {/* ─── 2. HERO HEADER MATCHING LANDING PAGE ───────────────── */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 border-b border-slate-200/80 bg-white">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 border-b border-slate-200/70 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <nav className="flex items-center justify-center gap-1.5 text-xs text-slate-500 mb-4">
             <Link href="/" className="hover:text-slate-900 transition-colors">হোম</Link>
             <ChevronRight className="w-3 h-3 text-slate-400" />
-            <span className="text-emerald-700 font-semibold">এসএসসি প্রশ্ন ব্যাংক</span>
+            <span className="text-slate-900 font-semibold">এসএসসি প্রশ্ন ব্যাংক</span>
           </nav>
 
           <h1
             className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.2] mb-4"
             style={display}
           >
-            এসএসসি প্রশ্ন ব্যাংক{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
-              ২০২৬–২০২৭
-            </span>
+            এসএসসি প্রশ্ন ব্যাংক ২০২৬–২০২৭
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -116,14 +114,14 @@ export default function SscQuestionBankClient() {
                 onClick={() => setSelectedStream(tab.id)}
                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 border ${
                   active
-                    ? 'bg-emerald-600 text-white font-semibold border-emerald-600 shadow-sm'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-xs'
+                    ? 'bg-slate-900 text-white font-semibold border-slate-900 shadow-xs'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                    active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                   }`}
                 >
                   {tab.count}
@@ -142,10 +140,10 @@ export default function SscQuestionBankClient() {
               <Link
                 key={subj.id}
                 href={`/question-bank/ssc/${subj.slug}`}
-                className="group p-5 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/80 hover:border-emerald-500/50 transition-all flex items-center justify-between gap-4 shadow-xs hover:shadow-md hover:-translate-y-0.5"
+                className="group p-5 rounded-2xl bg-white hover:bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 transition-all flex items-center justify-between gap-4 shadow-xs"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:scale-105 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition-all shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:scale-105 group-hover:bg-slate-100 group-hover:text-slate-900 transition-all shrink-0">
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <div>
@@ -157,7 +155,7 @@ export default function SscQuestionBankClient() {
                         <span className="text-[10px] text-slate-400 font-mono">কোড: {subj.code}</span>
                       )}
                     </div>
-                    <h2 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    <h2 className="text-base font-bold text-slate-900 group-hover:text-slate-800 transition-colors">
                       {subj.name}
                     </h2>
                     <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
@@ -167,14 +165,14 @@ export default function SscQuestionBankClient() {
                       </span>
                       <span className="text-slate-300">•</span>
                       <span className="flex items-center gap-1">
-                        <FileText className="w-3 h-3 text-emerald-600" />
+                        <FileText className="w-3 h-3 text-slate-400" />
                         {subj.totalQuestions.toLocaleString('bn-BD')}টি প্রশ্ন
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-emerald-600 group-hover:text-white border border-slate-200 group-hover:border-emerald-600 flex items-center justify-center text-slate-500 transition-all shrink-0">
+                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-slate-900 group-hover:text-white border border-slate-200 group-hover:border-slate-900 flex items-center justify-center text-slate-400 transition-all shrink-0">
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </Link>
@@ -184,14 +182,14 @@ export default function SscQuestionBankClient() {
 
         {/* ─── 4. BOTTOM DOWNLOAD CALLOUT ───────────────────────── */}
         <div className="mt-12 p-6 rounded-2xl bg-white border border-slate-200/80 text-center shadow-xs">
-          <p className="text-xs text-slate-600 mb-3">
+          <p className="text-xs text-slate-600 mb-3 font-medium">
             সকল বিষয়ের আনলিমিটেড লাইভ মডেল টেস্ট ও স্মার্ট লিডারবোর্ড পেতে
           </p>
           <Link
             href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-bold text-xs transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-bold text-xs transition-all shadow-xs"
           >
             <Download className="w-4 h-4" />
             <span>গুগল প্লে স্টোর থেকে অভ্যাস অ্যাপ নামাও</span>
@@ -199,10 +197,8 @@ export default function SscQuestionBankClient() {
         </div>
       </main>
 
-      {/* ─── 5. FOOTER ─────────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500 mt-12">
-        <p>© ২০২৬ অভ্যাস (Obhyash) • এসএসসি পরীক্ষার স্মার্ট প্রস্তুতি</p>
-      </footer>
+      {/* ─── 5. OFFICIAL LANDING FOOTER ───────────────────────── */}
+      <Footer />
     </div>
   );
 }

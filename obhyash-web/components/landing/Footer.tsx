@@ -84,7 +84,7 @@ const Arrow = () => (
   </span>
 );
 
-export default function Footer({ onStart }: { onStart: () => void }) {
+export default function Footer({ onStart }: { onStart?: () => void } = {}) {
   const [copied, setCopied] = useState(false);
 
   return (

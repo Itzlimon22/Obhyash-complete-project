@@ -111,8 +111,8 @@ export default function QuestionBankHeader({ activeSection }: QuestionBankHeader
             href="/question-bank/ssc"
             className={`rounded-lg px-3 py-1.5 transition-colors ${
               activeSection === 'ssc'
-                ? 'text-emerald-700 font-semibold bg-emerald-50'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'text-slate-900 font-semibold bg-slate-100'
+                : 'hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
             এসএসসি
@@ -122,8 +122,8 @@ export default function QuestionBankHeader({ activeSection }: QuestionBankHeader
             href="/question-bank/hsc"
             className={`rounded-lg px-3 py-1.5 transition-colors ${
               activeSection === 'hsc'
-                ? 'text-indigo-700 font-semibold bg-indigo-50'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'text-slate-900 font-semibold bg-slate-100'
+                : 'hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
             এইচএসসি
@@ -131,14 +131,14 @@ export default function QuestionBankHeader({ activeSection }: QuestionBankHeader
 
           <Link
             href="/#features"
-            className="rounded-lg px-3 py-1.5 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="rounded-lg px-3 py-1.5 hover:bg-slate-50 hover:text-slate-900 transition-colors"
           >
             ফিচার
           </Link>
 
           <Link
             href="/blog"
-            className="rounded-lg px-3 py-1.5 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="rounded-lg px-3 py-1.5 hover:bg-slate-50 hover:text-slate-900 transition-colors"
           >
             ব্লগ
           </Link>
@@ -150,9 +150,9 @@ export default function QuestionBankHeader({ activeSection }: QuestionBankHeader
             href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100/80 hover:bg-slate-100 border border-slate-200 transition-colors"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-600" />
+            <Download className="w-3.5 h-3.5 text-slate-600" />
             <span>অ্যাপ ডাউনলোড</span>
           </Link>
 
