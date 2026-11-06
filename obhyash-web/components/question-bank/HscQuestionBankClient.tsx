@@ -188,7 +188,7 @@ export default function HscQuestionBankClient() {
       </main>
 
       {/* ─── 5. OFFICIAL LANDING FOOTER ───────────────────────── */}
-      <Footer />
+      <Footer theme="light" />
     </div>
   );
 }

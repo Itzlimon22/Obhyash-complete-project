@@ -254,7 +254,7 @@ export default async function SscSubjectPage({ params }: PageProps) {
       </main>
 
       {/* ─── 5. OFFICIAL LANDING FOOTER ───────────────────────── */}
-      <Footer />
+      <Footer theme="light" />
     </div>
   );
 }

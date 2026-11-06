@@ -198,7 +198,7 @@ export default function SscQuestionBankClient() {
       </main>
 
       {/* ─── 5. OFFICIAL LANDING FOOTER ───────────────────────── */}
-      <Footer />
+      <Footer theme="light" />
     </div>
   );
 }

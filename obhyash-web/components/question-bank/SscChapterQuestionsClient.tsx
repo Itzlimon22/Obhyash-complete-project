@@ -345,7 +345,7 @@ export default function SscChapterQuestionsClient({
       </main>
 
       {/* ─── 6. OFFICIAL LANDING FOOTER ───────────────────────── */}
-      <Footer />
+      <Footer theme="light" />
 
       {/* ─── 7. INTERACTIVE REGISTRATION GATE MODAL ─────────────── */}
       {isModalOpen && (

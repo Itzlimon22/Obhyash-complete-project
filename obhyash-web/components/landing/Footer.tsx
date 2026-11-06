@@ -84,24 +84,63 @@ const Arrow = () => (
   </span>
 );
 
-export default function Footer({ onStart }: { onStart?: () => void } = {}) {
+export default function Footer({
+  onStart,
+  theme = "dark",
+}: {
+  onStart?: () => void;
+  theme?: "dark" | "light";
+} = {}) {
+  const isLight = theme === "light";
   const [copied, setCopied] = useState(false);
 
+  const linkCls = isLight
+    ? "group inline-flex items-center gap-2 text-sm text-slate-600 sm:text-base transition hover:text-slate-900"
+    : "group inline-flex items-center gap-2 text-sm text-white/55 sm:text-base transition hover:text-white";
+
+  const Heading = ({ children }: { children: string }) => (
+    <h4
+      className={`flex items-center gap-2 text-lg font-bold ${
+        isLight ? "text-slate-900" : "text-white"
+      }`}
+      style={display}
+    >
+      <span className="h-4 w-1 rounded-full bg-gradient-to-b from-[#3fb68b] to-[#0b5a50]" />
+      {children}
+    </h4>
+  );
+
   return (
-    <footer className="relative overflow-hidden border-t border-white/[0.06] bg-black">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3fb68b]/25 to-transparent" />
+    <footer
+      className={`relative overflow-hidden border-t ${
+        isLight
+          ? "border-slate-200/80 bg-[#F8FAFC] text-slate-800"
+          : "border-white/[0.06] bg-black text-white"
+      }`}
+    >
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 h-px ${
+          isLight
+            ? "bg-gradient-to-r from-transparent via-[#0b5a50]/20 to-transparent"
+            : "bg-gradient-to-r from-transparent via-[#3fb68b]/25 to-transparent"
+        }`}
+      />
 
       <div className="relative mx-auto max-w-6xl px-5">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 pt-14 pb-12 sm:gap-12 sm:pt-16 sm:pb-14 lg:grid-cols-[1.3fr_0.8fr_1.2fr_1.1fr]">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-3">
               <img
-                src="/landing/logo-white.svg"
+                src={isLight ? "/obhyash_full_logo.svg" : "/landing/logo-white.svg"}
                 alt="অভ্যাস"
-                className="h-11 w-auto"
+                className={isLight ? "h-9 sm:h-10 w-auto" : "h-11 w-auto"}
               />
             </Link>
-            <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-white/50">
+            <p
+              className={`mt-5 max-w-xs text-[15px] leading-relaxed ${
+                isLight ? "text-slate-600" : "text-white/50"
+              }`}
+            >
               HSC, ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি ভর্তি পরীক্ষার জন্য
               বাংলাদেশের সবচেয়ে দ্রুত ও আধুনিক অনলাইন এক্সাম ও প্র্যাকটিস
               প্ল্যাটফর্ম।
@@ -114,7 +153,11 @@ export default function Footer({ onStart }: { onStart?: () => void } = {}) {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={n}
-                  className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/[0.04] transition hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08]"
+                  className={`grid h-11 w-11 place-items-center rounded-full border transition hover:-translate-y-1 ${
+                    isLight
+                      ? "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 hover:bg-slate-50 shadow-xs"
+                      : "border-white/10 bg-white/[0.04] text-white hover:border-white/25 hover:bg-white/[0.08]"
+                  }`}
                 >
                   <I className="h-5 w-5" />
                 </a>
@@ -124,17 +167,31 @@ export default function Footer({ onStart }: { onStart?: () => void } = {}) {
               href="https://play.google.com/store/apps/details?id=com.obhyash.app"
               target="_blank"
               rel="noreferrer"
-              className="mt-6 inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 transition hover:border-white/25 hover:bg-white/[0.06]"
+              className={`mt-6 inline-flex items-center gap-3 rounded-xl border px-4 py-2.5 transition ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50 shadow-xs"
+                  : "border-white/10 bg-white/[0.03] text-white hover:border-white/25 hover:bg-white/[0.06]"
+              }`}
             >
               <GooglePlayIcon className="h-7 w-7" />
               <span
                 className="leading-tight"
                 style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
               >
-                <span className="block text-[10px] font-medium uppercase tracking-wider text-white/55">
+                <span
+                  className={`block text-[10px] font-medium uppercase tracking-wider ${
+                    isLight ? "text-slate-500" : "text-white/55"
+                  }`}
+                >
                   Get it on
                 </span>
-                <span className="text-lg font-semibold">Google Play</span>
+                <span
+                  className={`text-lg font-semibold ${
+                    isLight ? "text-slate-900" : "text-white"
+                  }`}
+                >
+                  Google Play
+                </span>
               </span>
             </a>
           </div>
@@ -203,15 +260,35 @@ export default function Footer({ onStart }: { onStart?: () => void } = {}) {
                           }
                         : undefined
                     }
-                    className="group flex items-start gap-2 rounded-xl p-2 -m-2 sm:gap-3 transition hover:bg-white/[0.04]"
+                    className={`group flex items-start gap-2 rounded-xl p-2 -m-2 sm:gap-3 transition ${
+                      isLight ? "hover:bg-slate-100/70" : "hover:bg-white/[0.04]"
+                    }`}
                   >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg sm:h-9 sm:w-9 bg-[#3fb68b]/10 text-[#3fb68b] ring-1 ring-[#3fb68b]/20 transition group-hover:bg-[#3fb68b] group-hover:text-[#06210c]">
+                    <span
+                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg sm:h-9 sm:w-9 transition ${
+                        isLight
+                          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/80 group-hover:bg-emerald-600 group-hover:text-white"
+                          : "bg-[#3fb68b]/10 text-[#3fb68b] ring-1 ring-[#3fb68b]/20 group-hover:bg-[#3fb68b] group-hover:text-[#06210c]"
+                      }`}
+                    >
                       <Icon d={c.d} />
                     </span>
-                    <span className="min-w-0 whitespace-pre-line break-words pt-1 text-[13px] leading-snug sm:pt-1.5 sm:text-[15px] text-white/60 group-hover:text-white">
+                    <span
+                      className={`min-w-0 whitespace-pre-line break-words pt-1 text-[13px] leading-snug sm:pt-1.5 sm:text-[15px] transition-colors ${
+                        isLight
+                          ? "text-slate-600 group-hover:text-slate-900"
+                          : "text-white/60 group-hover:text-white"
+                      }`}
+                    >
                       {c.t}
                       {i === 2 && copied && (
-                        <span className="ml-2 text-xs text-[#7ee0a4]">
+                        <span
+                          className={`ml-2 text-xs ${
+                            isLight
+                              ? "text-emerald-700 font-semibold"
+                              : "text-[#7ee0a4]"
+                          }`}
+                        >
                           কপি হয়েছে
                         </span>
                       )}
@@ -223,10 +300,18 @@ export default function Footer({ onStart }: { onStart?: () => void } = {}) {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-sm text-white/40 sm:flex-row">
+        <div
+          className={`flex flex-col items-center justify-between gap-4 border-t py-6 text-sm sm:flex-row ${
+            isLight
+              ? "border-slate-200 text-slate-500"
+              : "border-white/10 text-white/40"
+          }`}
+        >
           <p>© ২০২৬ Obhyash Platform. সর্বস্বত্ব সংরক্ষিত।</p>
           <div
-            className="flex items-center gap-2 text-white/60"
+            className={`flex items-center gap-2 ${
+              isLight ? "text-slate-600" : "text-white/60"
+            }`}
             style={display}
           >
             অভ্যাসে শুরু{" "}
@@ -236,7 +321,11 @@ export default function Footer({ onStart }: { onStart?: () => void } = {}) {
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 transition hover:border-white/25 hover:text-white"
+            className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition ${
+              isLight
+                ? "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-100 text-slate-700 shadow-xs"
+                : "border-white/10 hover:border-white/25 hover:text-white"
+            }`}
           >
             ওপরে যাও ↑
           </button>
