@@ -1,3 +1,5 @@
+import generatedSscQuestions from './ssc-generated-questions.json';
+
 export interface ChapterMcqQuestion {
   id: string;
   number: number;
@@ -339,24 +341,42 @@ export const SSC_CHAPTER_QUESTIONS: Record<string, ChapterDetails> = {
   },
 };
 
-import generatedSscQuestions from './ssc-generated-questions.json';
-
 /**
- * Helper to fetch chapter questions with fallback
+ * Helper to fetch chapter questions with smart fallback
  */
 export function getChapterQuestions(
   subjectSlug: string,
   chapterSlug: string,
 ): ChapterDetails | null {
+  // 1. Try exact match key first
   const key = `${subjectSlug}-${chapterSlug}`;
-  // 1. Return hand-crafted detailed questions if present
   if (SSC_CHAPTER_QUESTIONS[key]) {
     return SSC_CHAPTER_QUESTIONS[key];
   }
-  // 2. Fall back to statically generated chapter questions
-  const generated = (generatedSscQuestions as unknown as Record<string, ChapterDetails>)[key];
-  if (generated) {
-    return generated;
+
+  const generatedMap = generatedSscQuestions as unknown as Record<string, ChapterDetails>;
+  if (generatedMap[key]) {
+    return generatedMap[key];
   }
+
+  // 2. Try loose match in generated map (handles "ch01" matching "ch01-motion" or vice-versa)
+  const subNormalized = subjectSlug.toLowerCase();
+  const chNormalized = chapterSlug.toLowerCase();
+
+  const foundEntry = Object.entries(generatedMap).find(([entryKey, data]) => {
+    if (data.subjectSlug.toLowerCase() !== subNormalized) return false;
+    const entrySlug = data.slug.toLowerCase();
+    return (
+      entrySlug === chNormalized ||
+      entrySlug.includes(chNormalized) ||
+      chNormalized.includes(entrySlug) ||
+      entryKey.endsWith(`-${chNormalized}`)
+    );
+  });
+
+  if (foundEntry) {
+    return foundEntry[1];
+  }
+
   return null;
 }

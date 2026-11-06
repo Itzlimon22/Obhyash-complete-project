@@ -4,17 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   Lock,
-  Unlock,
   CheckCircle2,
   ChevronRight,
   ChevronLeft,
   Download,
   ArrowRight,
-  Sparkles,
-  Award,
+  BookOpen,
   X,
-  Check,
-  Copy,
 } from 'lucide-react';
 import { HscChapterDetails } from '@/lib/data/hsc-chapter-questions';
 import { HscSubject } from '@/lib/data/hsc-question-bank-data';
@@ -38,18 +34,9 @@ export default function HscChapterQuestionsClient({
   subjectData,
 }: HscChapterQuestionsClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
 
   const handleOpenLock = () => {
     setIsModalOpen(true);
-  };
-
-  const handleCopy = () => {
-    if (typeof navigator !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2500);
-    }
   };
 
   return (
@@ -110,17 +97,25 @@ export default function HscChapterQuestionsClient({
         </div>
       </div>
 
-      {/* ─── 3. QUESTIONS LIST (PAPER-LIKE CLEAN DESIGN) ──────────── */}
+      {/* ─── 3. QUESTIONS LIST (EDITORIAL CLEAN DESIGN) ─────────── */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        {/* Banner Alert */}
-        <div className="mb-8 p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 text-xs text-slate-600">
-          <Sparkles className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-slate-900">নমুনা বোর্ড প্রশ্ন ও উত্তরমালা: </span>
-            প্রথম ৩টি প্রশ্নের সম্পূর্ণ সমাধান নিচে উন্মুক্ত রাখা হয়েছে। বাকি প্রশ্নের বিস্তারিত ব্যাখ্যা ও আরও{' '}
-            <span className="text-slate-900 font-semibold">{chapterData.totalQuestionsInDb.toLocaleString('bn-BD')}টি</span>{' '}
-            বোর্ড প্রশ্ন প্র্যাকটিস করতে ফ্রি অ্যাকাউন্ট তৈরি করুন।
+        {/* Banner Alert: Academic Notice */}
+        <div className="mb-6 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 text-xs text-slate-700">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>
+              <strong className="text-slate-900 font-semibold">বোর্ড প্রশ্ন ও উত্তরমালা:</strong> প্রথম ৩টি প্রশ্নের পূর্ণাঙ্গ সমাধান উন্মুক্ত।
+            </span>
           </div>
+          <Link
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold text-slate-900 hover:text-emerald-700 underline underline-offset-4 inline-flex items-center gap-1 shrink-0"
+          >
+            <span>সকল প্রশ্ন অনুশীলন করুন ({chapterData.totalQuestionsInDb.toLocaleString('bn-BD')}টি)</span>
+            <span>→</span>
+          </Link>
         </div>
 
         {/* Questions Cards */}
@@ -132,75 +127,84 @@ export default function HscChapterQuestionsClient({
             return (
               <article
                 key={q.id}
-                className="rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 p-5 sm:p-6 transition-all duration-200 shadow-xs"
+                className="rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 p-5 sm:p-6 transition-all duration-200 shadow-xs"
               >
                 {/* Question Header */}
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-start gap-2.5">
-                    <span className="font-bold text-sm sm:text-base text-slate-900">
-                      {q.number.toLocaleString('bn-BD')}.
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <span className="w-6 h-6 rounded-lg bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      {q.number.toLocaleString('bn-BD')}
                     </span>
-                    <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed" style={display}>
                       {q.question}
                     </h2>
                   </div>
                   {q.boardTag && (
-                    <span className="text-[10px] text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap">
+                    <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200/80 px-2.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
                       {q.boardTag}
                     </span>
                   )}
                 </div>
 
-                {/* 4 Options */}
-                <div className="space-y-2 my-4 pl-6 text-xs sm:text-sm text-slate-700">
+                {/* 4 Options Grid (2x2 Modern Exam Cards) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-4">
                   {q.options.map((opt, optIdx) => {
                     const isCorrect = optIdx === q.correctIndex;
+                    const prefix = OPTION_PREFIXES[optIdx];
                     return (
                       <div
                         key={optIdx}
-                        className={`flex items-center gap-2.5 py-1 px-2 rounded-lg transition-colors ${
-                          isCorrect ? 'text-slate-900 font-semibold bg-slate-50' : 'text-slate-700'
+                        className={`p-3 rounded-xl border text-xs sm:text-sm transition-all flex items-start gap-2.5 ${
+                          isCorrect
+                            ? 'bg-emerald-50/70 border-emerald-300 text-emerald-950 font-medium'
+                            : 'bg-white border-slate-200/90 text-slate-700 hover:border-slate-300'
                         }`}
                       >
-                        <span className="w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center text-[10px] text-slate-600 shrink-0">
-                          {isCorrect ? '●' : '○'}
+                        <span
+                          className={`w-5 h-5 rounded-md text-[11px] font-bold flex items-center justify-center shrink-0 ${
+                            isCorrect
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-slate-100 text-slate-700 border border-slate-200'
+                          }`}
+                        >
+                          {prefix}
                         </span>
-                        <span>
-                          <strong className="font-semibold text-slate-500 mr-1.5">{OPTION_PREFIXES[optIdx]})</strong>
-                          {opt}
-                        </span>
+                        <span className="leading-snug pt-0.5">{opt}</span>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Correct Answer Pill */}
-                <div className="pt-3 pb-1 border-t border-slate-100 flex items-center justify-between">
-                  <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-slate-600" />
-                    <span>সঠিক উত্তর: ({correctLetter}) {correctText}</span>
+                {/* Solution Accordion & Explanation */}
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>
+                        সঠিক উত্তর: ({correctLetter}) {correctText}
+                      </span>
+                    </div>
+
+                    {q.isLocked && (
+                      <span className="text-[11px] font-medium text-slate-400">
+                        ব্যাখ্যা সংরক্ষিত
+                      </span>
+                    )}
                   </div>
 
-                  {q.isLocked && (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                      <Lock className="w-3 h-3 text-slate-400" />
-                      <span>ব্যাখ্যা লকড</span>
-                    </span>
-                  )}
-                </div>
-
-                {/* Explanation Section */}
-                <div className="mt-3">
                   {!q.isLocked ? (
                     /* Free Unlocked Explanation */
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs leading-relaxed text-slate-700 space-y-2">
-                      <div className="flex items-center gap-1.5 text-slate-900 font-semibold text-xs">
-                        <Unlock className="w-3.5 h-3.5 text-slate-600" />
-                        <span>বিস্তারিত ব্যাখ্যা:</span>
+                    <div className="p-3.5 rounded-xl bg-slate-50/90 border border-slate-200/80 text-xs text-slate-700 space-y-2">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-900 text-[11px]">
+                        <span className="h-3 w-1 rounded-full bg-emerald-600" />
+                        <span>ব্যাখ্যা ও বিশ্লেষণ</span>
                       </div>
-                      <p className="whitespace-pre-line text-slate-700">{q.explanation}</p>
+                      <p className="whitespace-pre-line text-slate-700 leading-relaxed">
+                        {q.explanation}
+                      </p>
                       {q.shortcutTip && (
-                        <div className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-600 font-medium">
+                        <div className="pt-2 border-t border-slate-200/70 text-[11px] text-slate-700 font-medium bg-white/60 p-2 rounded-lg">
+                          <span className="font-semibold text-slate-900">শর্টকাট নোট: </span>
                           {q.shortcutTip}
                         </div>
                       )}
@@ -233,7 +237,7 @@ export default function HscChapterQuestionsClient({
         <section className="mt-12 rounded-3xl bg-slate-50 border border-slate-200 p-6 sm:p-8 text-center relative overflow-hidden">
           <div className="max-w-xl mx-auto relative z-10">
             <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 mx-auto mb-4 shadow-xs">
-              <Award className="w-6 h-6" />
+              <BookOpen className="w-6 h-6" />
             </div>
 
             <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">

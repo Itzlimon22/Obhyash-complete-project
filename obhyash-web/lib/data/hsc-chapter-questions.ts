@@ -1,3 +1,5 @@
+import generatedHscQuestions from './hsc-generated-questions.json';
+
 export interface HscChapterMcqQuestion {
   id: string;
   number: number;
@@ -256,19 +258,37 @@ export const HSC_CHAPTER_QUESTIONS: Record<string, HscChapterDetails> = {
   },
 };
 
-import generatedHscQuestions from './hsc-generated-questions.json';
-
 export function getHscChapterQuestions(subjectSlug: string, chapterSlug: string): HscChapterDetails | null {
+  // 1. Try exact match key first
   const key = `${subjectSlug}-${chapterSlug}`;
-  // 1. Return hand-crafted detailed questions if present
   if (HSC_CHAPTER_QUESTIONS[key]) {
     return HSC_CHAPTER_QUESTIONS[key];
   }
-  // 2. Fall back to statically generated chapter questions
-  const generated = (generatedHscQuestions as unknown as Record<string, HscChapterDetails>)[key];
-  if (generated) {
-    return generated;
+
+  const generatedMap = generatedHscQuestions as unknown as Record<string, HscChapterDetails>;
+  if (generatedMap[key]) {
+    return generatedMap[key];
   }
+
+  // 2. Try loose match in generated map
+  const subNormalized = subjectSlug.toLowerCase();
+  const chNormalized = chapterSlug.toLowerCase();
+
+  const foundEntry = Object.entries(generatedMap).find(([entryKey, data]) => {
+    if (data.subjectSlug.toLowerCase() !== subNormalized) return false;
+    const entrySlug = data.slug.toLowerCase();
+    return (
+      entrySlug === chNormalized ||
+      entrySlug.includes(chNormalized) ||
+      chNormalized.includes(entrySlug) ||
+      entryKey.endsWith(`-${chNormalized}`)
+    );
+  });
+
+  if (foundEntry) {
+    return foundEntry[1];
+  }
+
   return null;
 }
 
