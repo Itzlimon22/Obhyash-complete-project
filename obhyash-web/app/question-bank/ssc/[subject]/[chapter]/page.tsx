@@ -20,6 +20,15 @@ interface PageProps {
 export const dynamic = "force-static";
 export const revalidate = false;
 
+export function generateStaticParams() {
+  return SSC_SUBJECTS.flatMap((subj) =>
+    subj.chapters.map((ch) => ({
+      subject: subj.slug,
+      chapter: ch.slug,
+    }))
+  );
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {

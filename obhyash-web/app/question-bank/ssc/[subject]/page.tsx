@@ -26,6 +26,12 @@ interface PageProps {
 export const dynamic = "force-static";
 export const revalidate = false;
 
+export function generateStaticParams() {
+  return SSC_SUBJECTS.map((subj) => ({
+    subject: subj.slug,
+  }));
+}
+
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.obhyash.app&referrer=utm_source%3Dweb_question_bank%26utm_medium%3Dsubject_page";
 
