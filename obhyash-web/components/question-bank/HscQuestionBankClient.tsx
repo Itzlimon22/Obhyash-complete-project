@@ -23,8 +23,12 @@ import {
 } from 'lucide-react';
 import { HSC_SUBJECTS } from '@/lib/data/hsc-question-bank-data';
 
+import QuestionBankHeader from './QuestionBankHeader';
+
 const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.obhyash.app&referrer=utm_source%3Dweb_question_bank%26utm_medium%3Dhsc_hub';
+
+const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
 
 const iconMap: Record<string, React.ElementType> = {
   Atom,
@@ -61,57 +65,30 @@ export default function HscQuestionBankClient() {
   }, [selectedStream]);
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-white selection:bg-brand-500/30 font-sans antialiased">
-      {/* ─── 1. TOP NAV ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#07090E]/85 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 p-0.5">
-              <div className="w-full h-full bg-[#07090E] rounded-[10px] flex items-center justify-center">
-                <span className="font-bold text-sm text-indigo-400">অ</span>
-              </div>
-            </div>
-            <span className="font-bold text-sm text-white group-hover:text-indigo-300 transition-colors">
-              অভ্যাস <span className="text-indigo-400 font-medium">HSC প্রশ্ন ব্যাংক</span>
-            </span>
-          </Link>
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-indigo-100 font-sans antialiased">
+      {/* ─── 1. TOP NAV MATCHING LANDING PAGE ──────────────────── */}
+      <QuestionBankHeader activeSection="hsc" />
 
-          <div className="flex items-center gap-4 text-xs text-neutral-300">
-            <Link href="/" className="hover:text-white transition-colors hidden sm:inline">
-              হোম
-            </Link>
-            <Link href="/question-bank/ssc" className="hover:text-white transition-colors hidden sm:inline">
-              এসএসসি
-            </Link>
-            <Link href="/blog" className="hover:text-white transition-colors hidden sm:inline">
-              ব্লগ
-            </Link>
-            <Link
-              href={PLAY_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/25 transition-all"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>অ্যাপ ডাউনলোড</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* ─── 2. MINIMAL HEADER ──────────────────────────────────── */}
-      <section className="py-10 px-4 sm:px-6 border-b border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent">
+      {/* ─── 2. HERO HEADER MATCHING LANDING PAGE ───────────────── */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6 border-b border-slate-200/80 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <nav className="flex items-center justify-center gap-1.5 text-xs text-neutral-400 mb-3">
-            <Link href="/" className="hover:text-white">হোম</Link>
-            <ChevronRight className="w-3 h-3 text-neutral-600" />
-            <span className="text-indigo-400 font-medium">এইচএসসি প্রশ্ন ব্যাংক</span>
+          <nav className="flex items-center justify-center gap-1.5 text-xs text-slate-500 mb-4">
+            <Link href="/" className="hover:text-slate-900 transition-colors">হোম</Link>
+            <ChevronRight className="w-3 h-3 text-slate-400" />
+            <span className="text-indigo-700 font-semibold">এইচএসসি প্রশ্ন ব্যাংক</span>
           </nav>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
-            এইচএসসি প্রশ্ন ব্যাংক ২০২৬–২০২৭ (HSC Question Bank)
+          <h1
+            className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.2] mb-4"
+            style={display}
+          >
+            এইচএসসি প্রশ্ন ব্যাংক{" "}
+            <span className="bg-gradient-to-r from-indigo-600 via-sky-600 to-indigo-700 bg-clip-text text-transparent">
+              ২০২৬–২০২৭
+            </span>
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-300 max-w-xl mx-auto leading-relaxed">
+
+          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
             বিগত ১০ বছরের সকল শিক্ষা বোর্ডের অধ্যায়ভিত্তিক বোর্ড MCQ প্রশ্ন ও নির্ভুল সমাধানের জন্য নিচে আপনার বিষয়টি নির্বাচন করুন।
           </p>
         </div>
@@ -129,14 +106,14 @@ export default function HscQuestionBankClient() {
                 onClick={() => setSelectedStream(tab.id)}
                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 border ${
                   active
-                    ? 'bg-indigo-500 text-white font-semibold border-indigo-400 shadow-md shadow-indigo-500/20'
-                    : 'bg-white/[0.04] text-neutral-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white'
+                    ? 'bg-indigo-600 text-white font-semibold border-indigo-600 shadow-xs'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    active ? 'bg-white/20 text-white' : 'bg-white/10 text-neutral-400'
+                    active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                   }`}
                 >
                   {tab.count}
@@ -155,10 +132,10 @@ export default function HscQuestionBankClient() {
               <Link
                 key={subj.id}
                 href={`/question-bank/hsc/${subj.slug}`}
-                className="group p-5 rounded-2xl bg-[#0D1017] hover:bg-[#11151F] border border-white/[0.08] hover:border-indigo-500/40 transition-all flex items-center justify-between gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5"
+                className="group p-5 rounded-2xl bg-white hover:bg-slate-50/50 border border-slate-200/80 hover:border-indigo-400 hover:shadow-sm transition-all flex items-center justify-between gap-4"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-neutral-300 group-hover:scale-105 group-hover:bg-indigo-500/15 group-hover:text-indigo-400 transition-all shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:scale-105 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-200 transition-all shrink-0">
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <div>
@@ -167,27 +144,27 @@ export default function HscQuestionBankClient() {
                         {subj.streamName}
                       </span>
                       {subj.code && (
-                        <span className="text-[10px] text-neutral-500 font-mono">কোড: {subj.code}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">কোড: {subj.code}</span>
                       )}
                     </div>
-                    <h2 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
+                    <h2 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                       {subj.name}
                     </h2>
-                    <div className="flex items-center gap-3 text-xs text-neutral-400 mt-1">
+                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
                       <span className="flex items-center gap-1">
-                        <Layers className="w-3 h-3 text-cyan-400" />
+                        <Layers className="w-3 h-3 text-indigo-600" />
                         {subj.chapters.length}টি অধ্যায়
                       </span>
-                      <span className="text-neutral-600">•</span>
+                      <span className="text-slate-300">•</span>
                       <span className="flex items-center gap-1">
-                        <FileText className="w-3 h-3 text-emerald-400" />
+                        <FileText className="w-3 h-3 text-emerald-600" />
                         {subj.totalQuestions.toLocaleString('bn-BD')}টি প্রশ্ন
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="w-8 h-8 rounded-full bg-white/[0.04] group-hover:bg-indigo-500 group-hover:text-white border border-white/10 group-hover:border-indigo-400 flex items-center justify-center text-neutral-400 transition-all shrink-0">
+                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white border border-slate-200 group-hover:border-indigo-600 flex items-center justify-center text-slate-400 transition-all shrink-0">
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </Link>
@@ -196,15 +173,15 @@ export default function HscQuestionBankClient() {
         </div>
 
         {/* ─── 4. BOTTOM DOWNLOAD CALLOUT ───────────────────────── */}
-        <div className="mt-12 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-          <p className="text-xs text-neutral-300 mb-3">
+        <div className="mt-12 p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 text-center">
+          <p className="text-xs text-slate-600 mb-3 font-medium">
             এইচএসসি ও অ্যাডমিশন টেস্টের আনলিমিটেড লাইভ মডেল টেস্ট দিতে
           </p>
           <Link
             href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-400 font-bold text-xs transition-all shadow-md"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-xs transition-all shadow-xs"
           >
             <Download className="w-4 h-4" />
             <span>গুগল প্লে স্টোর থেকে অভ্যাস অ্যাপ নামাও</span>
@@ -213,7 +190,7 @@ export default function HscQuestionBankClient() {
       </main>
 
       {/* ─── 5. FOOTER ─────────────────────────────────────────── */}
-      <footer className="border-t border-white/[0.06] py-8 text-center text-xs text-neutral-500 mt-12">
+      <footer className="border-t border-slate-200 py-8 text-center text-xs text-slate-500 mt-12">
         <p>© ২০২৬ অভ্যাস (Obhyash) • এইচএসসি ও বিশ্ববিদ্যালয় ভর্তি পরীক্ষার স্মার্ট প্রস্তুতি</p>
       </footer>
     </div>
