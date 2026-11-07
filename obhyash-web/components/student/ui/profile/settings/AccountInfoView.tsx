@@ -141,7 +141,7 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
         </div>
 
         <div>
-          <h2 className="text-[19px] font-bold text-[#0F172A] dark:text-white font-['Anek_Bangla',sans-serif]">
+          <h2 className="text-[19px] font-bold text-[#0F172A] dark:text-white font-sans">
             {user.name || "শিক্ষার্থী"}
           </h2>
           <div className="mt-1 flex items-center justify-center gap-2">
@@ -154,7 +154,7 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
 
       {/* ── Info Items List (1:1 with Flutter AccountInfoModal) ── */}
       <div className="bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs space-y-2 mb-5">
-        <h3 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2 font-['Anek_Bangla',sans-serif]">
+        <h3 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2 font-sans">
           অ্যাকাউন্ট বিবরণী
         </h3>
 
@@ -177,12 +177,12 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
 
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] font-['Anek_Bangla',sans-serif]">
+                      <span className="text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] font-sans">
                         {row.label}
                       </span>
                     </div>
                     <p
-                      className={`text-sm sm:text-[15px] font-bold text-[#0F172A] dark:text-white truncate mt-0.5 font-['Anek_Bangla',sans-serif] ${
+                      className={`text-sm sm:text-[15px] font-bold text-[#0F172A] dark:text-white truncate mt-0.5 font-sans ${
                         row.isMonospace ? "font-mono text-xs sm:text-sm" : ""
                       }`}
                     >
@@ -219,7 +219,7 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
         <button
           type="button"
           onClick={copyAll}
-          className="w-full py-3.5 rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-['Anek_Bangla',sans-serif] font-bold text-[15.5px] flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
+          className="w-full py-3.5 rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-sans font-bold text-[15.5px] flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
         >
           <span>সব তথ্য কপি করো</span>
           <Copy className="w-4 h-4" />

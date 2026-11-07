@@ -66,12 +66,12 @@ export default function AppInstallPromptModal({
         </button>
 
         {/* Center Aligned Clean Heading */}
-        <h3 className="text-xl sm:text-2xl font-black text-center text-slate-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-snug mt-2 mb-2 px-3">
+        <h3 className="text-xl sm:text-2xl font-black text-center text-slate-900 dark:text-white font-sans leading-snug mt-2 mb-2 px-3">
           {title}
         </h3>
 
         {message && (
-          <p className="text-xs sm:text-sm text-center text-slate-500 dark:text-zinc-400 font-['Anek_Bangla',sans-serif] leading-relaxed mb-5 px-2">
+          <p className="text-xs sm:text-sm text-center text-slate-500 dark:text-zinc-400 font-sans leading-relaxed mb-5 px-2">
             {message}
           </p>
         )}
@@ -81,7 +81,7 @@ export default function AppInstallPromptModal({
           <Link
             href="/login"
             onClick={handleRegisterClick}
-            className="flex items-center justify-center py-3 px-2 sm:px-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm font-['Anek_Bangla',sans-serif] shadow-md hover:shadow-lg transition-all text-center cursor-pointer whitespace-nowrap"
+            className="flex items-center justify-center py-3 px-2 sm:px-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm font-sans shadow-md hover:shadow-lg transition-all text-center cursor-pointer whitespace-nowrap"
           >
             লগইন / রেজিস্টার
           </Link>
@@ -91,7 +91,7 @@ export default function AppInstallPromptModal({
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleInstallClick}
-            className="flex items-center justify-center py-3 px-2 sm:px-3 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-bold text-xs sm:text-sm font-['Anek_Bangla',sans-serif] shadow-md hover:shadow-lg transition-all text-center cursor-pointer whitespace-nowrap"
+            className="flex items-center justify-center py-3 px-2 sm:px-3 rounded-xl bg-[#0e7490] hover:bg-[#155e75] active:bg-[#164e63] text-white font-bold text-xs sm:text-sm font-sans shadow-md hover:shadow-lg transition-all text-center cursor-pointer whitespace-nowrap"
           >
             অ্যাপ ইনস্টল করো
           </a>

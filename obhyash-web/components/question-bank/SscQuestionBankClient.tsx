@@ -27,7 +27,7 @@ import { SubjectColorfulIcon } from './SubjectIcons';
 const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.obhyash.app&referrer=utm_source%3Dweb_question_bank%26utm_medium%3Dssc_hub';
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 
 type StreamFilter = 'all' | 'science' | 'general' | 'business' | 'humanities';
 

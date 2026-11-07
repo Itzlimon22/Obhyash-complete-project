@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 const ink = "#1d2430";
 
 const Laptop = ({ children }: { children: React.ReactNode }) => (

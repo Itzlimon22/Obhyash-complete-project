@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 const exams = [
   ["এসএসসি", "বোর্ড প্রস্তুতি · ৯ম-১০ম"],
   ["এইচএসসি", "বোর্ড প্রস্তুতি · ১১শ-১২শ"],

@@ -68,7 +68,7 @@ function StatusBadge({ status }: { status: Invoice["status"] }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-['Anek_Bangla',sans-serif]",
+        "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-sans",
         cfg.bg
       )}
     >
@@ -156,7 +156,7 @@ export default function MySubscriptionPanel({
       <div className="bg-[#12544F] px-5 sm:px-6 py-4 flex items-center gap-3 rounded-t-[20px]">
         <img src="/dashboard-icons/pro_crown.svg" alt="Pro" className="w-7 h-7 object-contain drop-shadow-xs shrink-0" />
         <div>
-          <h2 className="font-['Anek_Bangla',sans-serif] text-base sm:text-lg font-bold text-white">আমার সাবস্ক্রিপশন</h2>
+          <h2 className="font-sans text-base sm:text-lg font-bold text-white">আমার সাবস্ক্রিপশন</h2>
           <p className="text-xs text-emerald-100 font-medium">
             বর্তমান প্ল্যান, ট্রানজেকশন ও ইতিহাস
           </p>
@@ -172,7 +172,7 @@ export default function MySubscriptionPanel({
               key={id}
               onClick={() => setTab(id)}
               className={cn(
-                "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-bold font-['Anek_Bangla',sans-serif] flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-bold font-sans flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 active
                   ? "bg-white dark:bg-[#2C2C2E] text-[#12544F] dark:text-[#2DD4BF] shadow-xs"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white"
@@ -202,7 +202,7 @@ export default function MySubscriptionPanel({
                   <img src="/dashboard-icons/pro_crown.svg" alt="Pro" className="w-7 h-7 object-contain drop-shadow-xs" />
                 </div>
                 <div>
-                  <p className="font-['Anek_Bangla',sans-serif] text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-1">
+                  <p className="font-sans text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-1">
                     এখনো কোনো সাবস্ক্রিপশন নেই
                   </p>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm">
@@ -211,7 +211,7 @@ export default function MySubscriptionPanel({
                 </div>
                 <button
                   onClick={onUpgrade}
-                  className="h-[46px] px-6 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-['Anek_Bangla',sans-serif] font-bold text-sm shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  className="h-[46px] px-6 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-sans font-bold text-sm shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <ArrowUpRight size={16} />
                   <span>এখনই আপগ্রেড করো</span>
@@ -224,7 +224,7 @@ export default function MySubscriptionPanel({
                   <div className="relative z-10">
                     {/* Status row */}
                     <div className="flex items-center justify-between mb-3">
-                      <span className="flex items-center gap-1.5 text-xs font-bold font-['Anek_Bangla',sans-serif] text-[#12544F] dark:text-[#2DD4BF] bg-[#12544F]/10 dark:bg-[#12544F]/25 px-2.5 py-1 rounded-full border border-[#12544F]/20">
+                      <span className="flex items-center gap-1.5 text-xs font-bold font-sans text-[#12544F] dark:text-[#2DD4BF] bg-[#12544F]/10 dark:bg-[#12544F]/25 px-2.5 py-1 rounded-full border border-[#12544F]/20">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         <span>সক্রিয় প্রো প্ল্যান</span>
                       </span>
@@ -232,17 +232,17 @@ export default function MySubscriptionPanel({
                     </div>
 
                     {/* Plan name + price */}
-                    <h3 className="font-['Anek_Bangla',sans-serif] text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
+                    <h3 className="font-sans text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
                       {activeSub.name}
                     </h3>
-                    <p className="font-['Anek_Bangla',sans-serif] text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
+                    <p className="font-sans text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
                       বিলিং সাইকেল: {activeSub.billingCycle}
                     </p>
 
                     {/* Days left indicator */}
                     {daysLeft !== null && (
                       <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-white/[0.08]">
-                        <div className="flex items-center justify-between text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
+                        <div className="flex items-center justify-between text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-1.5 font-sans">
                           <span className="flex items-center gap-1">
                             <Clock size={12} />
                             <span>মেয়াদ বাকি</span>
@@ -262,7 +262,7 @@ export default function MySubscriptionPanel({
 
                     <button
                       onClick={onUpgrade}
-                      className="mt-5 w-full h-[46px] rounded-xl border border-[#12544F] text-[#12544F] dark:text-[#2DD4BF] dark:border-[#12544F]/40 font-['Anek_Bangla',sans-serif] font-bold text-sm hover:bg-[#12544F]/5 dark:hover:bg-[#12544F]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="mt-5 w-full h-[46px] rounded-xl border border-[#12544F] text-[#12544F] dark:text-[#2DD4BF] dark:border-[#12544F]/40 font-sans font-bold text-sm hover:bg-[#12544F]/5 dark:hover:bg-[#12544F]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>প্ল্যান রিনিউ বা পরিবর্তন করুন</span>
                       <ArrowUpRight size={15} />
@@ -278,7 +278,7 @@ export default function MySubscriptionPanel({
         {tab === "history" && (
           <div className="space-y-3">
             {invoices.length === 0 ? (
-              <div className="py-12 text-center text-neutral-400 font-['Anek_Bangla',sans-serif]">
+              <div className="py-12 text-center text-neutral-400 font-sans">
                 <Receipt size={32} className="mx-auto mb-2 opacity-50" />
                 <p className="text-xs font-bold">কোনো পূর্ববর্তী লেনদেন পাওয়া যায়নি।</p>
               </div>
@@ -289,10 +289,10 @@ export default function MySubscriptionPanel({
                   className="p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-between gap-3 shadow-xs"
                 >
                   <div>
-                    <h4 className="font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
+                    <h4 className="font-sans text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
                       {inv.planName || "প্রো সাবস্ক্রিপশন"}
                     </h4>
-                    <p className="font-['Anek_Bangla',sans-serif] text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">
+                    <p className="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">
                       {new Date(inv.date || (inv as any).createdAt || (inv as any).created_at).toLocaleDateString("bn-BD")} • ৳{BanglaNameHelper.toBanglaNumeral(inv.amount)}
                     </p>
                   </div>

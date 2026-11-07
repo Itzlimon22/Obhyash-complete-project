@@ -281,7 +281,7 @@ export default function SubjectCategoryDetailView({
             <ArrowLeft size={18} className="stroke-[2.2]" />
           </button>
 
-          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[16px] sm:text-[17.5px] text-neutral-900 dark:text-white tracking-tight text-center">
+          <h1 className="font-sans font-bold text-[16px] sm:text-[17.5px] text-neutral-900 dark:text-white tracking-tight text-center">
             {displayTitle}
           </h1>
 
@@ -323,7 +323,7 @@ export default function SubjectCategoryDetailView({
 
                 {/* Top Left: Card Title */}
                 <div className="relative z-10 text-left pt-2.5 sm:pt-3 pl-1 sm:pl-1.5">
-                  <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[20px] sm:text-[22px] text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
+                  <h2 className="font-sans font-bold text-[20px] sm:text-[22px] text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
                     {cat.title}
                   </h2>
                 </div>

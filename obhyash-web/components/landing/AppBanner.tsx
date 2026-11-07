@@ -3,7 +3,7 @@
 import React from "react";
 import { GooglePlayIcon } from "./BrandIcons";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 const sans = { fontFamily: "'DM Sans', system-ui, sans-serif" };
 
 const PLAY_STORE_URL =

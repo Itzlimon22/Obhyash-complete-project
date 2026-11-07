@@ -229,7 +229,7 @@ export default function PersonalDetailsPanel({
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="text-[17px] font-bold text-[#111827] dark:text-white font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-[17px] font-bold text-[#111827] dark:text-white font-sans">
               প্রোফাইল ছবি
             </h3>
             <p className="text-[13px] text-[#6B7280] dark:text-[#A3A3A3] mt-0.5 leading-snug">
@@ -238,7 +238,7 @@ export default function PersonalDetailsPanel({
             <button
               type="button"
               onClick={() => setShowAvatarPicker(true)}
-              className="mt-2.5 px-3.5 py-1.5 rounded-[10px] border border-[#12544F] text-[#12544F] dark:text-[#34D399] font-['Anek_Bangla',sans-serif] text-[13px] font-bold flex items-center gap-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors cursor-pointer active:scale-95"
+              className="mt-2.5 px-3.5 py-1.5 rounded-[10px] border border-[#12544F] text-[#12544F] dark:text-[#34D399] font-sans text-[13px] font-bold flex items-center gap-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors cursor-pointer active:scale-95"
             >
               <Camera className="w-3.5 h-3.5" />
               <span>ছবি পরিবর্তন করো</span>
@@ -621,7 +621,7 @@ export default function PersonalDetailsPanel({
           type="button"
           onClick={() => handleSubmit()}
           disabled={isSaving}
-          className="w-full py-4 px-6 rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-bold text-[16px] font-['Anek_Bangla',sans-serif] shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+          className="w-full py-4 px-6 rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-bold text-[16px] font-sans shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
         >
           {isSaving ? (
             <>

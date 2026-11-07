@@ -207,7 +207,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   };
 
   const renderTabs = () => (
-    <div className="flex p-1 bg-neutral-100 dark:bg-[#2C2C2E] rounded-xl mb-5 sticky top-0 z-10 font-['Anek_Bangla',sans-serif] gap-1">
+    <div className="flex p-1 bg-neutral-100 dark:bg-[#2C2C2E] rounded-xl mb-5 sticky top-0 z-10 font-sans gap-1">
       {[
         {
           id: 'details',
@@ -249,7 +249,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-sans">
               {paymentMode === 'instant' ? 'অটোমেটিক পেমেন্ট' : 'ম্যানুয়াল পেমেন্ট (TrxID)'}
             </h3>
           </div>
@@ -272,25 +272,25 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               <div className="space-y-4 animate-fade-in">
                 <div className="flex gap-3">
                   <div className="flex-1 bg-neutral-50 dark:bg-[#2C2C2E]/60 p-3.5 rounded-2xl text-center border border-neutral-100 dark:border-white/[0.08]">
-                    <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase font-['Anek_Bangla',sans-serif]">
+                    <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase font-sans">
                       প্যাকেজ
                     </span>
-                    <div className="text-base font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                    <div className="text-base font-bold text-neutral-900 dark:text-white font-sans">
                       {plan.name}
                     </div>
                   </div>
                   <div className="flex-1 bg-[#12544F]/5 dark:bg-[#092328] p-3.5 rounded-2xl text-center border border-[#12544F]/20 dark:border-[#12544F]/30">
-                    <span className="text-[11px] font-bold text-[#12544F] dark:text-[#2DD4BF] uppercase font-['Anek_Bangla',sans-serif]">
+                    <span className="text-[11px] font-bold text-[#12544F] dark:text-[#2DD4BF] uppercase font-sans">
                       পরিশোধ করতে হবে
                     </span>
-                    <div className="text-base font-bold text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif]">
+                    <div className="text-base font-bold text-[#12544F] dark:text-[#2DD4BF] font-sans">
                       ৳ {plan.price}.00
                     </div>
                   </div>
                 </div>
 
                 {/* Payment Mode Selector */}
-                <div className="flex p-1 bg-neutral-100 dark:bg-[#2C2C2E] rounded-xl border border-neutral-200/80 dark:border-[#3A3A3C] font-['Anek_Bangla',sans-serif] gap-1">
+                <div className="flex p-1 bg-neutral-100 dark:bg-[#2C2C2E] rounded-xl border border-neutral-200/80 dark:border-[#3A3A3C] font-sans gap-1">
                   <button
                     type="button"
                     onClick={() => setPaymentMode('instant')}
@@ -323,7 +323,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                       <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md shadow-black/10">
                         <img src="/icons/automatic_payment.svg" alt="Automatic Payment" className="w-12 h-12 object-contain" />
                       </div>
-                      <h4 className="text-base font-bold text-neutral-900 dark:text-white mb-1 font-['Anek_Bangla',sans-serif]">
+                      <h4 className="text-base font-bold text-neutral-900 dark:text-white mb-1 font-sans">
                         সরাসরি অনলাইন পেমেন্ট
                       </h4>
                       <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-4 max-w-sm mx-auto font-['HindSiliguri',sans-serif] leading-relaxed">
@@ -339,7 +339,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                         type="button"
                         onClick={handleInstantPayment}
                         disabled={isRedirecting}
-                        className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl shadow-sm disabled:opacity-60 flex justify-center items-center gap-2 transition-all active:scale-[0.98] font-['Anek_Bangla',sans-serif] text-[15px] cursor-pointer"
+                        className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl shadow-sm disabled:opacity-60 flex justify-center items-center gap-2 transition-all active:scale-[0.98] font-sans text-[15px] cursor-pointer"
                       >
                         {isRedirecting ? (
                           <>
@@ -358,7 +358,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 ) : (
                   <>
                     <div className="w-full bg-white dark:bg-[#2C2C2E]/40 border border-neutral-200/80 dark:border-white/[0.08] rounded-2xl p-4 sm:p-5 text-center shadow-xs">
-                  <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-3 font-['Anek_Bangla',sans-serif]">
+                  <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-3 font-sans">
                     অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
                   </h4>
                 <div
@@ -373,7 +373,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                       01749591456
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-[#3A3A3C] text-[#12544F] dark:text-[#2DD4BF] text-xs font-bold shadow-xs group-hover:bg-[#12544F]/10 transition-colors font-['Anek_Bangla',sans-serif]">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-[#3A3A3C] text-[#12544F] dark:text-[#2DD4BF] text-xs font-bold shadow-xs group-hover:bg-[#12544F]/10 transition-colors font-sans">
                     কপি
                   </div>
                 </div>
@@ -386,13 +386,13 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider font-['Anek_Bangla',sans-serif]">
+                  <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider font-sans">
                     SAVED PAYMENT METHODS
                   </h4>
                   <button
                     type="button"
                     onClick={() => setIsManageMethodsOpen(true)}
-                    className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] hover:underline flex items-center gap-1 font-['Anek_Bangla',sans-serif] cursor-pointer"
+                    className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] hover:underline flex items-center gap-1 font-sans cursor-pointer"
                   >
                     <span>{localSavedMethods.length === 0 ? 'মেথড যোগ করুন' : 'এডিট / যোগ করুন'}</span>
                   </button>
@@ -439,7 +439,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                                 : 'R'}
                           </div>
                           <div>
-                            <p className="font-bold text-xs text-neutral-800 dark:text-white uppercase font-['Anek_Bangla',sans-serif]">
+                            <p className="font-bold text-xs text-neutral-800 dark:text-white uppercase font-sans">
                               {method.type}
                             </p>
                             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
@@ -448,7 +448,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                           </div>
                         </div>
                         {senderNumber === method.number && (
-                          <span className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif]">
+                          <span className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] font-sans">
                             সিলেক্টেড
                           </span>
                         )}
@@ -469,7 +469,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
               <form onSubmit={handleSubmit} className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif]">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans">
                     পেমেন্ট মেথড (Payment Method)
                   </label>
                   <select
@@ -482,7 +482,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif]">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans">
                     প্রেরকের মোবাইল নম্বর (Your Mobile Number)
                   </label>
                   <input
@@ -495,7 +495,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif]">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans">
                     ট্রানজেকশন আইডি (TrxID)
                   </label>
                   <input
@@ -510,7 +510,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl shadow-sm disabled:opacity-50 flex justify-center items-center gap-2 mt-4 transition-all active:scale-[0.98] font-['Anek_Bangla',sans-serif] text-[15px] cursor-pointer"
+                  className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl shadow-sm disabled:opacity-50 flex justify-center items-center gap-2 mt-4 transition-all active:scale-[0.98] font-sans text-[15px] cursor-pointer"
                 >
                   {isSubmitting ? 'যাচাই করা হচ্ছে...' : 'পেমেন্ট সম্পন্ন করুন'}
                 </button>
@@ -553,7 +553,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                     {item.icon}
                   </div>
                   <div>
-                    <h5 className="font-bold text-sm text-neutral-800 dark:text-white font-['Anek_Bangla',sans-serif]">
+                    <h5 className="font-bold text-sm text-neutral-800 dark:text-white font-sans">
                       {item.title}
                     </h5>
                     <p className="text-xs text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif]">
@@ -565,7 +565,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               <div className="mt-4 pt-1">
                 <button
                   onClick={() => setActiveTab('details')}
-                  className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl shadow-sm flex items-center justify-center transition-all active:scale-[0.98] font-['Anek_Bangla',sans-serif] text-[15px] cursor-pointer"
+                  className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl shadow-sm flex items-center justify-center transition-all active:scale-[0.98] font-sans text-[15px] cursor-pointer"
                 >
                   পেমেন্ট ফর্মে যান
                 </button>
@@ -577,7 +577,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
             <div className="space-y-2.5 animate-fade-in pb-4">
               <div className="p-3 bg-[#12544F]/5 dark:bg-[#092328] border border-[#12544F]/20 dark:border-[#12544F]/30 rounded-xl flex items-center gap-2.5 mb-2">
                 <span className="text-base">💡</span>
-                <p className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif]">
+                <p className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] font-sans">
                   পেমেন্ট সংক্রান্ত যেকোনো প্রশ্নে নিচের উত্তরগুলো দেখে নিন
                 </p>
               </div>
@@ -620,7 +620,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   key={idx}
                   className="group bg-white dark:bg-[#2C2C2E]/40 rounded-xl border border-neutral-200/80 dark:border-white/[0.08] transition-all open:border-[#12544F]/50 open:shadow-xs"
                 >
-                  <summary className="flex justify-between items-center p-3.5 cursor-pointer font-bold text-neutral-800 dark:text-neutral-100 text-xs sm:text-sm select-none font-['Anek_Bangla',sans-serif]">
+                  <summary className="flex justify-between items-center p-3.5 cursor-pointer font-bold text-neutral-800 dark:text-neutral-100 text-xs sm:text-sm select-none font-sans">
                     {faq.q}
                     <svg
                       className="w-4 h-4 text-neutral-400 group-open:text-[#12544F] transition-transform group-open:rotate-180"
@@ -642,7 +642,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('details')}
-                  className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl text-[15px] transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm font-['Anek_Bangla',sans-serif] cursor-pointer"
+                  className="w-full h-[48px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl text-[15px] transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm font-sans cursor-pointer"
                 >
                   <span>পেমেন্ট করতে এগিয়ে যান</span>
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -657,7 +657,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-fade-in">
           <div className="w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-[28px] sm:rounded-[24px] border border-neutral-200/80 dark:border-[#2C2C2E] shadow-2xl flex flex-col max-h-[50vh] overflow-hidden animate-in slide-in-from-bottom duration-300">
             <div className="p-4 px-5 border-b border-neutral-100 dark:border-[#2C2C2E] flex items-center justify-between bg-neutral-50/50 dark:bg-[#1C1C1E]">
-              <h4 className="font-bold text-sm text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              <h4 className="font-bold text-sm text-neutral-900 dark:text-white font-sans">
                 পেমেন্ট মেথড ব্যবস্থাপনা
               </h4>
               <button
@@ -671,7 +671,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               <button
                 type="button"
                 onClick={() => setManageTab('list')}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors font-['Anek_Bangla',sans-serif] ${
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors font-sans ${
                   manageTab === 'list'
                     ? 'bg-[#12544F] text-white shadow-xs'
                     : 'bg-neutral-100 text-neutral-600 dark:bg-[#2C2C2E] dark:text-neutral-400'
@@ -682,7 +682,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               <button
                 type="button"
                 onClick={() => setManageTab('add')}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors font-['Anek_Bangla',sans-serif] ${
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors font-sans ${
                   manageTab === 'add'
                     ? 'bg-[#12544F] text-white shadow-xs'
                     : 'bg-neutral-100 text-neutral-600 dark:bg-[#2C2C2E] dark:text-neutral-400'
@@ -701,7 +701,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                     </p>
                     <button
                       onClick={() => setManageTab('add')}
-                      className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] hover:underline font-['Anek_Bangla',sans-serif]"
+                      className="text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] hover:underline font-sans"
                     >
                       + নতুন মেথড যোগ করুন
                     </button>
@@ -724,7 +724,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                             {m.type === 'bkash' ? 'bK' : 'N'}
                           </div>
                           <div>
-                            <p className="font-bold text-xs text-neutral-800 dark:text-white uppercase font-['Anek_Bangla',sans-serif]">
+                            <p className="font-bold text-xs text-neutral-800 dark:text-white uppercase font-sans">
                               {m.type}
                             </p>
                             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
@@ -744,7 +744,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                               setSenderNumber(m.number || '');
                               setIsManageMethodsOpen(false);
                             }}
-                            className="px-2.5 py-1 text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] hover:bg-[#12544F]/10 rounded-lg transition-colors font-['Anek_Bangla',sans-serif]"
+                            className="px-2.5 py-1 text-xs font-bold text-[#12544F] dark:text-[#2DD4BF] hover:bg-[#12544F]/10 rounded-lg transition-colors font-sans"
                           >
                             ব্যবহার করুন
                           </button>
@@ -763,7 +763,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               ) : (
                 <form onSubmit={handleAddNewMethod} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1 font-['Anek_Bangla',sans-serif]">
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1 font-sans">
                       মেথড সিলেক্ট করুন
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -772,7 +772,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                           key={prov}
                           type="button"
                           onClick={() => setNewMethodType(prov)}
-                          className={`py-2 rounded-xl text-xs font-bold border transition-colors font-['Anek_Bangla',sans-serif] ${
+                          className={`py-2 rounded-xl text-xs font-bold border transition-colors font-sans ${
                             newMethodType === prov
                               ? 'border-[#12544F] bg-[#12544F]/10 text-[#12544F] dark:text-[#2DD4BF]'
                               : 'border-neutral-200/80 dark:border-[#3A3A3C] text-neutral-700 dark:text-neutral-300'
@@ -784,7 +784,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1 font-['Anek_Bangla',sans-serif]">
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1 font-sans">
                       ১১ ডিজিটের মোবাইল নম্বর
                     </label>
                     <input
@@ -799,7 +799,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   <button
                     type="submit"
                     disabled={isSavingMethod}
-                    className="w-full h-[40px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl text-xs shadow-sm disabled:opacity-50 transition-colors font-['Anek_Bangla',sans-serif]"
+                    className="w-full h-[40px] bg-[#12544F] hover:bg-[#0E423E] text-white font-bold rounded-xl text-xs shadow-sm disabled:opacity-50 transition-colors font-sans"
                   >
                     {isSavingMethod ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ ও ব্যবহার করুন'}
                   </button>

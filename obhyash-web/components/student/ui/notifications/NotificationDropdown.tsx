@@ -99,7 +99,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           <div className="mx-auto mt-3 mb-1.5 h-1.5 w-11 rounded-full bg-neutral-300 dark:bg-[#3F3F46] flex-shrink-0" />
 
           {/* Header */}
-          <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-[#2C2C2E] font-['Anek_Bangla',sans-serif]">
+          <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-[#2C2C2E] font-sans">
             <div className="flex justify-between items-center mb-2.5">
               <DialogTitle className="font-bold text-neutral-900 dark:text-white text-base flex items-center gap-2">
                 <div className="p-1.5 rounded-xl bg-[#12544F]/10 text-[#12544F] dark:text-[#34D399]">
@@ -134,7 +134,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             </div>
 
             {/* Tabs (Flutter 1:1) */}
-            <div className="flex gap-5 font-['Anek_Bangla',sans-serif]">
+            <div className="flex gap-5 font-sans">
               {(['unread', 'all'] as const).map((tab) => (
                 <button
                   key={tab}
@@ -167,7 +167,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           />
 
           {/* Footer */}
-          <div className="flex-shrink-0 px-4 py-3.5 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-[#000000] font-['Anek_Bangla',sans-serif]">
+          <div className="flex-shrink-0 px-4 py-3.5 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-[#000000] font-sans">
             <button
               onClick={onViewAll}
               className="w-full py-3 rounded-2xl bg-[#12544F] hover:bg-[#0D3E3A] active:scale-[0.98] text-white text-sm font-bold transition-all duration-150 shadow-xs cursor-pointer select-none"
@@ -204,7 +204,7 @@ function DropdownHeader({
   onClose: () => void;
 }) {
   return (
-    <div className="flex-shrink-0 px-5 pt-4 pb-0 border-b border-neutral-100 dark:border-neutral-800 font-['Anek_Bangla',sans-serif]">
+    <div className="flex-shrink-0 px-5 pt-4 pb-0 border-b border-neutral-100 dark:border-neutral-800 font-sans">
       <div className="flex justify-between items-center mb-3">
         <h3 className="font-bold text-neutral-900 dark:text-white text-base flex items-center gap-2">
           <div className="p-1.5 rounded-xl bg-[#12544F]/10 text-[#12544F] dark:text-[#34D399]">
@@ -237,7 +237,7 @@ function DropdownHeader({
         </div>
       </div>
 
-      <div className="flex gap-6 font-['Anek_Bangla',sans-serif]">
+      <div className="flex gap-6 font-sans">
         {(['unread', 'all'] as const).map((tab) => (
           <button
             key={tab}
@@ -289,7 +289,7 @@ function NotificationList({
           ))}
         </div>
       ) : displayedNotifications.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-10 px-6 text-center font-['Anek_Bangla',sans-serif]">
+        <div className="flex flex-col items-center justify-center py-10 px-6 text-center font-sans">
           <div className="w-12 h-12 mb-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
             {activeTab === 'unread' ? (
               <Bell className="w-5 h-5 text-neutral-400 dark:text-neutral-500" />
@@ -325,7 +325,7 @@ function NotificationList({
 
 function DropdownFooter({ onViewAll }: { onViewAll: () => void }) {
   return (
-    <div className="flex-shrink-0 p-3 border-t border-neutral-100 dark:border-neutral-800 font-['Anek_Bangla',sans-serif]">
+    <div className="flex-shrink-0 p-3 border-t border-neutral-100 dark:border-neutral-800 font-sans">
       <button
         onClick={onViewAll}
         className="w-full py-2.5 rounded-xl bg-[#12544F] hover:bg-[#0D3E3A] text-white text-xs font-bold transition-all active:scale-[0.98] cursor-pointer select-none"

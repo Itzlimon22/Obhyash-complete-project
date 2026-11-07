@@ -101,7 +101,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="flex items-start justify-between gap-2 mb-1">
             <h4
               className={cn(
-                "text-[14px] font-bold leading-snug flex-1 font-['Anek_Bangla',sans-serif] truncate",
+                "text-[14px] font-bold leading-snug flex-1 font-sans truncate",
                 !notification.is_read
                   ? "text-neutral-900 dark:text-white"
                   : "text-neutral-600 dark:text-neutral-400",
@@ -109,7 +109,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             >
               {notification.title}
             </h4>
-            <span className="text-[11px] font-medium text-neutral-400 dark:text-neutral-500 whitespace-nowrap flex-shrink-0 mt-px font-['Anek_Bangla',sans-serif]">
+            <span className="text-[11px] font-medium text-neutral-400 dark:text-neutral-500 whitespace-nowrap flex-shrink-0 mt-px font-sans">
               {getRelativeTime(notification.created_at)}
             </span>
           </div>
@@ -119,7 +119,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
           {/* Unread dot */}
           {!notification.is_read && (
-            <div className="mt-1.5 flex items-center gap-1.5 font-['Anek_Bangla',sans-serif]">
+            <div className="mt-1.5 flex items-center gap-1.5 font-sans">
               <span className="w-1.5 h-1.5 rounded-full bg-[#12544F] dark:bg-[#34D399] flex-shrink-0" />
               <span className="text-[10.5px] font-bold text-[#12544F] dark:text-[#34D399]">
                 নতুন

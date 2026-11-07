@@ -99,7 +99,7 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
             </div>
 
             {/* Title (Flutter: 13px, w600 Anek Bangla) */}
-            <span className="text-[13px] font-semibold font-['Anek_Bangla',sans-serif] text-[#18181B] dark:text-white truncate w-full text-center">
+            <span className="text-[13px] font-semibold font-sans text-[#18181B] dark:text-white truncate w-full text-center">
               {action.title}
             </span>
           </button>

@@ -106,7 +106,7 @@ export default function AcademicCategoryDetailView({
             <ArrowLeft size={18} className="stroke-[2.2]" />
           </button>
 
-          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[16px] sm:text-[17.5px] text-neutral-900 dark:text-white tracking-tight text-center">
+          <h1 className="font-sans font-bold text-[16px] sm:text-[17.5px] text-neutral-900 dark:text-white tracking-tight text-center">
             {displayTitle} - একাডেমিক
           </h1>
 
@@ -124,7 +124,7 @@ export default function AcademicCategoryDetailView({
               </svg>
             </div>
           </div>
-          <h2 className="font-['Anek_Bangla',sans-serif] font-extrabold text-2xl text-neutral-900 dark:text-white mb-2">
+          <h2 className="font-sans font-extrabold text-2xl text-neutral-900 dark:text-white mb-2">
             শীঘ্রই আসছে!
           </h2>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm leading-relaxed mb-6">
@@ -158,7 +158,7 @@ export default function AcademicCategoryDetailView({
 
                 {/* Top Left: Card Title */}
                 <div className="relative z-10 text-left pt-2.5 sm:pt-3 pl-1 sm:pl-1.5">
-                  <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[20px] sm:text-[22px] text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
+                  <h2 className="font-sans font-bold text-[20px] sm:text-[22px] text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
                     {sec.title}
                   </h2>
                 </div>

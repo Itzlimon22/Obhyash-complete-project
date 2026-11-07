@@ -170,7 +170,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="text-[10px] font-semibold text-[#8E8E93] dark:text-[#A3A3A3] tracking-[1.6px] font-sans uppercase">
                     OBHYASH
                   </span>
-                  <span className="text-[17px] font-bold text-[#000000] dark:text-white font-['Anek_Bangla',sans-serif] leading-[1.15] mt-0.5">
+                  <span className="text-[17px] font-bold text-[#000000] dark:text-white font-sans leading-[1.15] mt-0.5">
                     অভ্যাস
                   </span>
                 </div>
@@ -241,7 +241,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </div>
 
                       <span
-                        className={`text-[14px] font-['Anek_Bangla',sans-serif] tracking-[0.15px] truncate ${
+                        className={`text-[14px] font-sans tracking-[0.15px] truncate ${
                           isActive
                             ? "font-semibold text-white"
                             : "font-normal text-[#525252] dark:text-[#E5E5E5]"
@@ -289,7 +289,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[#000000] dark:text-white truncate leading-tight font-['Anek_Bangla',sans-serif]">
+                  <p className="text-[14px] font-semibold text-[#000000] dark:text-white truncate leading-tight font-sans">
                     {user?.name || "Student"}
                   </p>
                   <p className="text-[11px] font-normal text-[#737373] dark:text-[#A3A3A3] truncate leading-tight mt-0.5">

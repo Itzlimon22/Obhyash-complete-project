@@ -45,7 +45,7 @@ export default function Batch({
     <>
       <BackButton onClick={onBack} />
       <Heading title="তোমার ব্যাচ?" />
-      <div className="mt-4 sm:mt-8 grid grid-cols-1 gap-2.5 sm:gap-4 font-['Kalpurush',sans-serif]">
+      <div className="mt-4 sm:mt-8 grid grid-cols-1 gap-2.5 sm:gap-4 font-sans">
         {batches.map((b) => {
           const active = sel === b;
           return (

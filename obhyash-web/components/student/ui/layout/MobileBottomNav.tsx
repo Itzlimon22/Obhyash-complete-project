@@ -256,7 +256,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   {isActive ? item.filledIcon : item.outlineIcon}
                 </div>
                 <span
-                  className={`text-[12px] mt-[3px] tracking-[0.1px] font-['Anek_Bangla',sans-serif] transition-all duration-200 ${
+                  className={`text-[12px] mt-[3px] tracking-[0.1px] font-sans transition-all duration-200 ${
                     isActive ? 'font-bold' : 'font-medium'
                   }`}
                 >

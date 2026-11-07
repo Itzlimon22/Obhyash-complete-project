@@ -299,7 +299,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             </button>
 
             {/* Centered Page Title */}
-            <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[18px] leading-none text-neutral-900 dark:text-white">
+            <h1 className="font-sans font-bold text-[18px] leading-none text-neutral-900 dark:text-white">
               পরীক্ষার ফলাফল
             </h1>
 
@@ -329,7 +329,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             type="button"
             onClick={handleDownloadPaper}
             title="শুধুমাত্র প্রশ্নপত্রের PDF ডাউনলোড করো"
-            className="h-[46px] rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif] font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
+            className="h-[46px] rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-[#12544F] dark:text-[#2DD4BF] font-sans font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
           >
             <Download size={16} />
             <span>প্রশ্নপত্র</span>
@@ -340,7 +340,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             type="button"
             onClick={handleDownloadSolution}
             title="প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো"
-            className="h-[46px] rounded-xl bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F]/30 dark:border-[#12544F]/40 text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif] font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-[#12544F]/15 dark:hover:bg-[#12544F]/30 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
+            className="h-[46px] rounded-xl bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F]/30 dark:border-[#12544F]/40 text-[#12544F] dark:text-[#2DD4BF] font-sans font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-[#12544F]/15 dark:hover:bg-[#12544F]/30 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
           >
             <Check size={16} className="stroke-[3]" />
             <span>ফলাফল ও ব্যাখ্যা</span>
@@ -371,7 +371,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
         {/* ── 5. Answer Review Section Header ── */}
         <div className="pt-1 sm:pt-2">
-          <h3 className="font-['Anek_Bangla',sans-serif] text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-2.5">
+          <h3 className="font-sans text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-2.5">
             উত্তরপত্র পর্যালোচনা
           </h3>
 
@@ -382,7 +382,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('all')}
               className={cn(
-                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer active:scale-95",
+                "px-3.5 py-1.5 rounded-full font-sans text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'all'
                   ? 'bg-[#12544F] text-white shadow-xs'
                   : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
@@ -396,7 +396,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('correct')}
               className={cn(
-                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
+                "px-3.5 py-1.5 rounded-full font-sans text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'correct'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
@@ -411,7 +411,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('wrong')}
               className={cn(
-                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
+                "px-3.5 py-1.5 rounded-full font-sans text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'wrong'
                   ? 'bg-red-600 text-white shadow-xs'
                   : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
@@ -426,7 +426,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('skipped')}
               className={cn(
-                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
+                "px-3.5 py-1.5 rounded-full font-sans text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'skipped'
                   ? 'bg-amber-600 text-white shadow-xs'
                   : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
@@ -441,7 +441,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
         {/* ── 6. Virtualized Question Cards Review List ── */}
         <div className="flex flex-col gap-3 sm:gap-4 mt-1">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif] font-bold">
+            <div className="p-8 text-center rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400 font-sans font-bold">
               এই ফিল্টারে কোনো প্রশ্ন পাওয়া যায়নি।
             </div>
           ) : (
@@ -480,7 +480,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             <button
               type="button"
               onClick={onReexam ? onReexam : () => onRestart()}
-              className="w-full h-[48px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] font-bold text-[16px] flex items-center justify-center gap-2 font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none touch-manipulation"
+              className="w-full h-[48px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] font-bold text-[16px] flex items-center justify-center gap-2 font-sans transition-all cursor-pointer select-none touch-manipulation"
             >
               <RotateCcw size={18} />
               <span>আবার পরীক্ষা দাও</span>

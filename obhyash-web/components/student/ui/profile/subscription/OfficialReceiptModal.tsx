@@ -97,7 +97,7 @@ export default function OfficialReceiptModal({
               <Receipt size={17} />
             </div>
             <div>
-              <h3 className="font-bold text-base text-neutral-900 dark:text-neutral-100 font-['Anek_Bangla',sans-serif]">
+              <h3 className="font-bold text-base text-neutral-900 dark:text-neutral-100 font-sans">
                 অফিসিয়াল পেমেন্ট রিসিট
               </h3>
               <p className="text-xs text-neutral-500 font-mono">ইনভয়েস #{shortId}</p>
@@ -127,7 +127,7 @@ export default function OfficialReceiptModal({
                     alt="Obhyash Logo"
                     className="w-9 h-9 rounded-xl object-cover shadow-sm"
                   />
-                  <div className="px-2.5 py-1 bg-[#004633] text-white font-bold text-base rounded-lg leading-none tracking-wide font-['Anek_Bangla',sans-serif]">
+                  <div className="px-2.5 py-1 bg-[#004633] text-white font-bold text-base rounded-lg leading-none tracking-wide font-sans">
                     অভ্যাস
                   </div>
                   <span className="text-xl font-black tracking-widest text-slate-900">
@@ -248,7 +248,7 @@ export default function OfficialReceiptModal({
                 <ShieldCheck size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#12544F] font-['Anek_Bangla',sans-serif]">
+                <p className="text-xs font-bold text-[#12544F] font-sans">
                   পেমেন্ট নিশ্চিত ও ভেরিফাইড (VERIFIED & PAID)
                 </p>
                 <p className="text-[10px] text-slate-600 font-['HindSiliguri',sans-serif]">
@@ -267,7 +267,7 @@ export default function OfficialReceiptModal({
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#1C1C1E] border-t border-neutral-100 dark:border-[#2C2C2E] flex flex-wrap items-center justify-between gap-2.5">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#2C2C2E] rounded-xl transition-colors font-['Anek_Bangla',sans-serif] cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#2C2C2E] rounded-xl transition-colors font-sans cursor-pointer"
           >
             {copied ? (
               <Check size={14} className="text-[#12544F] dark:text-[#2DD4BF]" />
@@ -280,7 +280,7 @@ export default function OfficialReceiptModal({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-[#2C2C2E] hover:bg-neutral-200 dark:hover:bg-[#3A3A3C] rounded-xl transition-colors font-['Anek_Bangla',sans-serif] cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-[#2C2C2E] hover:bg-neutral-200 dark:hover:bg-[#3A3A3C] rounded-xl transition-colors font-sans cursor-pointer"
             >
               <Printer size={14} />
               <span>প্রিন্ট করুন</span>
@@ -289,7 +289,7 @@ export default function OfficialReceiptModal({
             <button
               onClick={handleDownload}
               disabled={downloading}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] rounded-xl shadow-sm transition-all disabled:opacity-50 font-['Anek_Bangla',sans-serif] cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] rounded-xl shadow-sm transition-all disabled:opacity-50 font-sans cursor-pointer"
             >
               {downloading ? (
                 <Loader2 size={14} className="animate-spin" />

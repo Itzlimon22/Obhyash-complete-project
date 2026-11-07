@@ -857,7 +857,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                   {/* Top-Left: Bengali Subject Name & Paper (Matching Flutter layout without bottom clutter) */}
                   <div className="relative z-10 text-left pt-0.5 pl-0.5">
-                    <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[17px] sm:text-2xl text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.6)]">
+                    <h2 className="font-sans font-bold text-[17px] sm:text-2xl text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.6)]">
                       {item.name}
                     </h2>
                     <p className="font-['HindSiliguri',sans-serif] text-[12px] sm:text-sm font-medium text-white/92 mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
@@ -925,7 +925,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                     {/* 2. Middle: Large Bold Bengali Institute Name (20px, font weight 800) */}
                     <h2
-                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-[17px] sm:text-[20px] leading-[1.1] text-center truncate w-full mt-2 sm:mt-2.5 drop-shadow-xs ${inst.textColor}`}
+                      className={`font-sans font-extrabold text-[17px] sm:text-[20px] leading-[1.1] text-center truncate w-full mt-2 sm:mt-2.5 drop-shadow-xs ${inst.textColor}`}
                     >
                       {inst.name}
                     </h2>

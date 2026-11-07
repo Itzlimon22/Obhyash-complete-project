@@ -68,7 +68,7 @@ const SubjectItem: React.FC<{
           />
           <h4
             className={cn(
-              "font-bold font-['Anek_Bangla',sans-serif] text-sm sm:text-[14.5px] truncate transition-colors",
+              "font-bold font-sans text-sm sm:text-[14.5px] truncate transition-colors",
               isOpen
                 ? "text-[#12544F] dark:text-[#34D399]"
                 : "text-neutral-900 dark:text-neutral-100"
@@ -81,7 +81,7 @@ const SubjectItem: React.FC<{
         <div className="flex items-center gap-2.5 shrink-0">
           <div
             className={cn(
-              "px-2 py-0.5 rounded-lg text-xs font-bold font-['Anek_Bangla',sans-serif] tabular-nums",
+              "px-2 py-0.5 rounded-lg text-xs font-bold font-sans tabular-nums",
               accBadgeClass
             )}
           >
@@ -103,7 +103,7 @@ const SubjectItem: React.FC<{
       {isOpen && (
         <div className="px-3.5 pb-4 pt-1 border-t border-neutral-100 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-900/30">
           {/* 3 Metric Chips: সঠিক, ভুল, স্কিপড */}
-          <div className="grid grid-cols-3 gap-2 py-3 font-['Anek_Bangla',sans-serif]">
+          <div className="grid grid-cols-3 gap-2 py-3 font-sans">
             <div className="bg-white dark:bg-[#151518] p-2.5 rounded-xl border border-neutral-100 dark:border-neutral-800 text-center shadow-2xs">
               <span className="block text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-wider">
                 সঠিক
@@ -150,7 +150,7 @@ const SubjectItem: React.FC<{
 
           {/* Detailed Report Button */}
           {onClick && (
-            <div className="flex justify-center mt-1 font-['Anek_Bangla',sans-serif]">
+            <div className="flex justify-center mt-1 font-sans">
               <button
                 type="button"
                 onClick={(e) => {
@@ -182,7 +182,7 @@ export const SubjectStat: React.FC<SubjectStatProps> = ({
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <BarChart2 className="w-4.5 h-4.5" />
           </div>
-          <h3 className="text-sm sm:text-[15.5px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white">
+          <h3 className="text-sm sm:text-[15.5px] font-bold font-sans text-neutral-900 dark:text-white">
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>
@@ -208,7 +208,7 @@ export const SubjectStat: React.FC<SubjectStatProps> = ({
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <BarChart2 className="w-4.5 h-4.5" />
           </div>
-          <h3 className="text-sm sm:text-[15.5px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white leading-tight">
+          <h3 className="text-sm sm:text-[15.5px] font-bold font-sans text-neutral-900 dark:text-white leading-tight">
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>

@@ -711,7 +711,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         <button
           type="button"
           onClick={() => setViewMode("level")}
-          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-sans font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
             viewMode === "level"
               ? "bg-[#059669] text-white shadow-md shadow-emerald-600/30"
               : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -723,7 +723,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         <button
           type="button"
           onClick={() => setViewMode("college")}
-          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-sans font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
             viewMode === "college"
               ? "bg-[#059669] text-white shadow-md shadow-emerald-600/30"
               : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -735,7 +735,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         <button
           type="button"
           onClick={() => setViewMode("rankings")}
-          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-sans font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
             viewMode === "rankings"
               ? "bg-[#059669] text-white shadow-md shadow-emerald-600/30"
               : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -781,7 +781,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     </div>
 
                     <h4
-                      className={`font-['Anek_Bangla',sans-serif] font-black text-[13.5px] leading-tight ${
+                      className={`font-sans font-black text-[13.5px] leading-tight ${
                         isSelected ? "text-white" : "text-neutral-900 dark:text-neutral-100"
                       }`}
                     >
@@ -808,7 +808,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             {/* Left: User Batch Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-neutral-100 dark:bg-[#1F1F23] border border-neutral-200 dark:border-[#2E2E33] shadow-2xs">
               <GraduationCap size={14} className="text-indigo-500 shrink-0" />
-              <span className="text-[12px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              <span className="text-[12px] font-bold text-neutral-900 dark:text-white font-sans">
                 {currentUser?.batch || "HSC 2026"}
               </span>
             </div>
@@ -860,7 +860,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             <div className="bg-white dark:bg-[#141416] border border-neutral-200/90 dark:border-[#27272A] rounded-2xl p-3 sm:p-4 mb-1 shadow-2xs">
               <div className="flex items-center gap-2 mb-2 px-1">
                 <span className="text-base sm:text-lg">🏆</span>
-                <h3 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                <h3 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-sans">
                   শীর্ষ ৩
                 </h3>
               </div>
@@ -878,7 +878,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       </div>
                     </div>
 
-                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white text-center truncate max-w-[85px] sm:max-w-[110px] font-['Anek_Bangla',sans-serif]">
+                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white text-center truncate max-w-[85px] sm:max-w-[110px] font-sans">
                       {top3Users[1].name.split(" ")[0]}
                     </h4>
                     <span className="text-[11px] font-black text-[#2563EB] dark:text-[#60A5FA] mb-1.5 tabular-nums">
@@ -888,7 +888,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     {/* Stepped platform (height 66px matching Flutter) */}
                     <div className="w-full h-[66px] rounded-t-xl bg-gradient-to-b from-blue-500/25 to-blue-700/5 border-t-[2.5px] border-t-blue-500 border-x border-blue-400/30 flex flex-col items-center justify-center shadow-inner">
                       <span className="text-xl leading-none mb-1">🥈</span>
-                      <span className="text-[11.5px] font-black text-[#2563EB] dark:text-[#60A5FA] font-['Anek_Bangla',sans-serif]">
+                      <span className="text-[11.5px] font-black text-[#2563EB] dark:text-[#60A5FA] font-sans">
                         ২য়
                       </span>
                     </div>
@@ -908,7 +908,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       </div>
                     </div>
 
-                    <h4 className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white text-center truncate max-w-[95px] sm:max-w-[130px] font-['Anek_Bangla',sans-serif]">
+                    <h4 className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white text-center truncate max-w-[95px] sm:max-w-[130px] font-sans">
                       {top3Users[0].name.split(" ")[0]}
                     </h4>
                     <span className="text-[11px] sm:text-xs font-black text-[#D97706] dark:text-[#F59E0B] mb-1.5 tabular-nums">
@@ -918,7 +918,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     {/* Stepped platform (height 86px matching Flutter) */}
                     <div className="w-full h-[86px] rounded-t-xl bg-gradient-to-b from-amber-500/30 to-amber-700/5 border-t-[2.5px] border-t-amber-500 border-x border-amber-400/30 flex flex-col items-center justify-center shadow-inner">
                       <span className="text-2xl leading-none mb-1">🏆</span>
-                      <span className="text-xs font-black text-[#D97706] dark:text-[#F59E0B] font-['Anek_Bangla',sans-serif]">
+                      <span className="text-xs font-black text-[#D97706] dark:text-[#F59E0B] font-sans">
                         ১ম
                       </span>
                     </div>
@@ -937,7 +937,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       </div>
                     </div>
 
-                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white text-center truncate max-w-[80px] sm:max-w-[100px] font-['Anek_Bangla',sans-serif]">
+                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white text-center truncate max-w-[80px] sm:max-w-[100px] font-sans">
                       {top3Users[2].name.split(" ")[0]}
                     </h4>
                     <span className="text-[11px] font-black text-[#EA580C] dark:text-[#FB923C] mb-1.5 tabular-nums">
@@ -947,7 +947,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     {/* Stepped platform (height 52px matching Flutter) */}
                     <div className="w-full h-[52px] rounded-t-xl bg-gradient-to-b from-orange-500/25 to-orange-700/5 border-t-[2.5px] border-t-orange-500 border-x border-orange-400/30 flex flex-col items-center justify-center shadow-inner">
                       <span className="text-lg leading-none mb-1">🥉</span>
-                      <span className="text-[11.5px] font-black text-[#EA580C] dark:text-[#FB923C] font-['Anek_Bangla',sans-serif]">
+                      <span className="text-[11.5px] font-black text-[#EA580C] dark:text-[#FB923C] font-sans">
                         ৩য়
                       </span>
                     </div>
@@ -961,7 +961,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           <div className="bg-white dark:bg-[#141416] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-2xs">
             {/* Card Title Bar */}
             <div className="px-4 py-3 bg-neutral-50 dark:bg-[#18181B] border-b border-neutral-200/90 dark:border-[#27272A] flex items-center justify-between">
-              <h3 className="font-black text-sm sm:text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              <h3 className="font-black text-sm sm:text-base text-neutral-900 dark:text-white font-sans">
                 {currentSelectedLevelInfo.label} র‍্যাঙ্কিং
               </h3>
               <BarChart2 size={16} className="text-neutral-500 dark:text-neutral-400 shrink-0" />
@@ -984,7 +984,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             ) : users.length === 0 ? (
               <div className="p-12 text-center text-neutral-400 flex flex-col items-center gap-2">
                 <Trophy size={36} className="text-neutral-300 dark:text-neutral-700" />
-                <p className="text-base font-bold font-['Anek_Bangla',sans-serif]">
+                <p className="text-base font-bold font-sans">
                   এই স্তরে এখনও কোনো শিক্ষার্থী যুক্ত হয়নি
                 </p>
                 <p className="text-xs">পরীক্ষায় অংশ নিয়ে প্রথম স্থান অর্জন করুন!</p>
@@ -1024,7 +1024,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <h4
-                              className={`text-[13px] sm:text-[14px] font-bold truncate font-['Anek_Bangla',sans-serif] ${
+                              className={`text-[13px] sm:text-[14px] font-bold truncate font-sans ${
                                 isMe
                                   ? "text-red-700 dark:text-red-400 font-extrabold"
                                   : "text-neutral-900 dark:text-white"
@@ -1052,7 +1052,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
                       {/* Right: XP Formatted */}
                       <div className="text-right shrink-0">
-                        <div className="text-[13.5px] sm:text-[14.5px] font-black text-neutral-900 dark:text-neutral-100 font-['Anek_Bangla',sans-serif] tabular-nums">
+                        <div className="text-[13.5px] sm:text-[14.5px] font-black text-neutral-900 dark:text-neutral-100 font-sans tabular-nums">
                           {toBengaliNum(user.xp)} XP
                         </div>
                         <div className="text-[10px] text-neutral-400 font-medium">
@@ -1072,7 +1072,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   type="button"
                   onClick={() => fetchLevelUsers(true)}
                   disabled={isLoadingMore}
-                  className="px-6 py-2 rounded-xl bg-white dark:bg-[#1C1C1E] border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-white font-['Anek_Bangla',sans-serif] font-bold text-xs sm:text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all disabled:opacity-50 cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-6 py-2 rounded-xl bg-white dark:bg-[#1C1C1E] border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-white font-sans font-bold text-xs sm:text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all disabled:opacity-50 cursor-pointer active:scale-95 shadow-2xs"
                 >
                   {isLoadingMore ? "লোড হচ্ছে..." : "আরও লোড করুন"}
                 </button>
@@ -1114,7 +1114,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs sm:text-sm font-black text-neutral-900 dark:text-neutral-100 tabular-nums font-['Anek_Bangla',sans-serif]">
+                  <span className="text-xs sm:text-sm font-black text-neutral-900 dark:text-neutral-100 tabular-nums font-sans">
                     {toBengaliNum(myEffectiveXp)} XP
                   </span>
                 </div>
@@ -1131,7 +1131,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-50 dark:bg-[#0A1F17] border border-emerald-300 dark:border-[#059669] flex items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-xl shrink-0">🏫</span>
-              <h2 className="text-sm sm:text-base font-extrabold text-emerald-800 dark:text-emerald-400 font-['Anek_Bangla',sans-serif] truncate">
+              <h2 className="text-sm sm:text-base font-extrabold text-emerald-800 dark:text-emerald-400 font-sans truncate">
                 {currentUser?.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই"}
               </h2>
             </div>
@@ -1149,7 +1149,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             ) : collegeUsers.length === 0 ? (
               <div className="p-12 text-center text-neutral-400 flex flex-col items-center gap-2">
                 <span className="text-4xl mb-1">🏫</span>
-                <p className="font-bold text-sm sm:text-base font-['Anek_Bangla',sans-serif] text-neutral-700 dark:text-neutral-300">
+                <p className="font-bold text-sm sm:text-base font-sans text-neutral-700 dark:text-neutral-300">
                   তোমার প্রতিষ্ঠান থেকে এখনো কেউ যোগ দেয়নি
                 </p>
                 <p className="text-xs text-neutral-400">বন্ধুদের আমন্ত্রণ জানাও!</p>
@@ -1188,7 +1188,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <h4
-                              className={`text-[13px] sm:text-[14px] font-bold truncate font-['Anek_Bangla',sans-serif] ${
+                              className={`text-[13px] sm:text-[14px] font-bold truncate font-sans ${
                                 isMe
                                   ? "text-red-700 dark:text-red-400 font-extrabold"
                                   : "text-neutral-900 dark:text-white"
@@ -1209,7 +1209,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       </div>
 
                       <div className="text-right shrink-0">
-                        <div className="text-[13.5px] sm:text-[14.5px] font-black text-neutral-900 dark:text-neutral-100 font-['Anek_Bangla',sans-serif] tabular-nums">
+                        <div className="text-[13.5px] sm:text-[14.5px] font-black text-neutral-900 dark:text-neutral-100 font-sans tabular-nums">
                           {toBengaliNum(user.xp)} XP
                         </div>
                       </div>
@@ -1233,7 +1233,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               value={searchCollegeQuery}
               onChange={(e) => setSearchCollegeQuery(e.target.value)}
               placeholder="শিক্ষা প্রতিষ্ঠানের নাম দিয়ে খুঁজুন..."
-              className="w-full pl-9.5 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#141416] border border-neutral-200/90 dark:border-[#27272A] text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#059669]/50 font-['Anek_Bangla',sans-serif] shadow-2xs"
+              className="w-full pl-9.5 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#141416] border border-neutral-200/90 dark:border-[#27272A] text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#059669]/50 font-sans shadow-2xs"
             />
           </div>
 
@@ -1245,7 +1245,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               </div>
             ) : filteredInstituteRankings.length === 0 ? (
               <div className="p-12 text-center text-neutral-400">
-                <p className="font-bold font-['Anek_Bangla',sans-serif]">কোন শিক্ষা প্রতিষ্ঠান পাওয়া যায়নি</p>
+                <p className="font-bold font-sans">কোন শিক্ষা প্রতিষ্ঠান পাওয়া যায়নি</p>
               </div>
             ) : (
               <div className="p-1.5 flex flex-col gap-1">
@@ -1271,7 +1271,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <h4 className="text-[13px] sm:text-[14px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                            <h4 className="text-[13px] sm:text-[14px] font-bold text-neutral-900 dark:text-white truncate font-sans">
                               {inst.institute}
                             </h4>
                             {inst.isMyCollege && (
@@ -1287,7 +1287,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       </div>
 
                       <div className="text-right shrink-0">
-                        <div className="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 font-['Anek_Bangla',sans-serif] tabular-nums">
+                        <div className="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 font-sans tabular-nums">
                           {toBengaliNum(inst.points)} পয়েন্ট
                         </div>
                       </div>

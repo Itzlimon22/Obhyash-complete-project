@@ -79,7 +79,7 @@ export default function Profile({
       <BackButton onClick={onBack} />
       <Heading title="একটি পাসওয়ার্ড সেট করো" />
 
-      <form className="mt-4 sm:mt-6 space-y-2.5 sm:space-y-3.5 font-['Kalpurush',sans-serif]" onSubmit={handleSubmit}>
+      <form className="mt-4 sm:mt-6 space-y-2.5 sm:space-y-3.5 font-sans" onSubmit={handleSubmit}>
         {/* Identifier Display */}
         <div className="flex h-12 sm:h-14 items-center rounded-2xl border border-white/10 bg-[#14161f] px-4 sm:px-5 shadow-[0_3px_0_#0c0e15] sm:shadow-[0_4px_0_#0c0e15]">
           <div className="flex items-center gap-2 text-sm sm:text-base text-zinc-300">

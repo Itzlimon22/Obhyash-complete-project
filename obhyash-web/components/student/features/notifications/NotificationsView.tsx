@@ -247,7 +247,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto py-2 font-sans pb-16">
       {/* ── Top Filter Tabs & Mark All Read Action (1:1 with Flutter) ── */}
-      <div className="py-2.5 flex items-center justify-between gap-2 font-['Anek_Bangla',sans-serif]">
+      <div className="py-2.5 flex items-center justify-between gap-2 font-sans">
         <div className="flex items-center gap-2">
           {/* All Filter Tab */}
           <button
@@ -314,7 +314,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
           ))}
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="py-20 text-center flex flex-col items-center justify-center font-['Anek_Bangla',sans-serif]">
+        <div className="py-20 text-center flex flex-col items-center justify-center font-sans">
           <div className="w-18 h-18 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] flex items-center justify-center text-neutral-400 dark:text-neutral-500 mb-3.5">
             <BellOff className="w-8 h-8" />
           </div>
@@ -365,7 +365,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <h4
                         className={`
-                          text-[15.5px] leading-snug truncate font-['Anek_Bangla',sans-serif]
+                          text-[15.5px] leading-snug truncate font-sans
                           ${
                             notif.is_read
                               ? 'font-semibold text-neutral-700 dark:text-neutral-300'
@@ -386,7 +386,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
                     </p>
 
                     {/* Bottom Status & Quick Action Row */}
-                    <div className="flex items-center justify-between text-xs text-neutral-400 dark:text-[#71717A] font-['Anek_Bangla',sans-serif]">
+                    <div className="flex items-center justify-between text-xs text-neutral-400 dark:text-[#71717A] font-sans">
                       <div className="flex items-center gap-1.5 font-medium">
                         <Clock className="w-3.5 h-3.5" />
                         <span>{formatDateDistance(notif.created_at)}</span>
@@ -424,7 +424,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
 
           {/* Load More Button */}
           {hasMore && (
-            <div className="py-4 text-center font-['Anek_Bangla',sans-serif]">
+            <div className="py-4 text-center font-sans">
               <button
                 type="button"
                 onClick={() => fetchNotifs(page + 1, true)}

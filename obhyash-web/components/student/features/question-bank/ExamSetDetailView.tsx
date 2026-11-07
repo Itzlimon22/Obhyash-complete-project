@@ -1115,7 +1115,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
           >
             <ArrowLeft size={18} strokeWidth={2.2} />
           </button>
-          <h1 className="text-[16px] sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight text-center truncate max-w-[70%]">
+          <h1 className="text-[16px] sm:text-lg font-bold text-neutral-900 dark:text-white font-sans leading-tight text-center truncate max-w-[70%]">
             {examSet.title}
           </h1>
         </div>
@@ -1135,7 +1135,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h2 className="text-[17px] sm:text-[19px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] truncate">
+            <h2 className="text-[17px] sm:text-[19px] font-bold text-neutral-900 dark:text-white font-sans truncate">
               {examSet.title}
             </h2>
           </div>
@@ -1147,7 +1147,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
 
       {/* ── Section: পরীক্ষার তথ্যাবলি (Dynamically updated based on selection) ── */}
       <div className="space-y-2.5">
-        <h3 className="font-bold text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+        <h3 className="font-bold text-base text-neutral-900 dark:text-white font-sans">
           পরীক্ষার তথ্যাবলি
         </h3>
 
@@ -1223,7 +1223,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
       {/* ── Section Header: SSC = subject select, HSC/Admission = mark distribution ── */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+          <h3 className="font-bold text-base text-neutral-900 dark:text-white font-sans">
             {isBoardOrSchool
               ? isWritten
                 ? "বিষয় নির্বাচন (একটি প্রযোজ্য)"

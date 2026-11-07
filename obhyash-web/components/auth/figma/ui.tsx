@@ -26,8 +26,8 @@ export function Logo({ className = '' }: { className?: string }) {
 export function Heading({ title, sub }: { title: string; sub?: ReactNode }) {
   return (
     <div className="text-center">
-      <h1 className="text-xl sm:text-2xl font-bold font-['Kalpurush',sans-serif]">{title}</h1>
-      {sub && <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-zinc-400 font-['Kalpurush',sans-serif]">{sub}</p>}
+      <h1 className="text-xl sm:text-2xl font-bold font-sans">{title}</h1>
+      {sub && <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-zinc-400 font-sans">{sub}</p>}
     </div>
   );
 }
@@ -37,7 +37,7 @@ export function PrimaryButton({ children, loading, ...p }: ButtonHTMLAttributes<
     <button
       {...p}
       disabled={p.disabled || loading}
-      className="mt-3 sm:mt-5 flex h-12 sm:h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#8b1e3f] text-sm sm:text-base font-semibold text-white shadow-[0_4px_0_#4f0f22] sm:shadow-[0_5px_0_#4f0f22] transition-all duration-100 hover:bg-[#9e2549] active:translate-y-[4px] active:shadow-none disabled:cursor-not-allowed disabled:bg-[#22242c] disabled:text-zinc-400 disabled:shadow-[0_4px_0_#121318] disabled:active:translate-y-0 font-['Kalpurush',sans-serif]"
+      className="mt-3 sm:mt-5 flex h-12 sm:h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#8b1e3f] text-sm sm:text-base font-semibold text-white shadow-[0_4px_0_#4f0f22] sm:shadow-[0_5px_0_#4f0f22] transition-all duration-100 hover:bg-[#9e2549] active:translate-y-[4px] active:shadow-none disabled:cursor-not-allowed disabled:bg-[#22242c] disabled:text-zinc-400 disabled:shadow-[0_4px_0_#121318] disabled:active:translate-y-0 font-sans"
     >
       {loading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : children}
     </button>
@@ -49,7 +49,7 @@ type FieldProps = InputHTMLAttributes<HTMLInputElement> & { label: string; error
 export function Field({ label, error, right, icon, ...p }: FieldProps) {
   return (
     <div className="mb-3 sm:mb-4">
-      <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-zinc-300 font-['Kalpurush',sans-serif]">{label}</label>
+      <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium text-zinc-300 font-sans">{label}</label>
       <div className="group relative">
         {icon && (
           <svg className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 transition group-focus-within:text-[#ef4136]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -68,11 +68,11 @@ export function Field({ label, error, right, icon, ...p }: FieldProps) {
         )}
         <input
           {...p}
-          className={`h-12 sm:h-14 w-full rounded-2xl border bg-black/40 ${icon ? 'pl-11 sm:pl-12' : 'pl-4'} pr-4 text-base sm:text-lg text-white outline-none transition placeholder:text-zinc-600 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] ${right ? 'pr-16' : ''} ${error ? 'border-[#ef4136]/70' : 'border-white/10 focus:border-[#ef4136]/60'}`}
+          className={`h-12 sm:h-14 w-full rounded-2xl border bg-black/40 ${icon ? 'pl-11 sm:pl-12' : 'pl-4'} pr-4 text-base sm:text-lg text-white outline-none transition placeholder:text-zinc-600 focus:ring-4 focus:ring-[#ef4136]/15 font-sans ${right ? 'pr-16' : ''} ${error ? 'border-[#ef4136]/70' : 'border-white/10 focus:border-[#ef4136]/60'}`}
         />
         {right && <div className="absolute right-2 top-1/2 -translate-y-1/2">{right}</div>}
       </div>
-      {error && <p className="mt-1.5 text-xs sm:text-sm text-[#ff6b6b] font-['Kalpurush',sans-serif]">{error}</p>}
+      {error && <p className="mt-1.5 text-xs sm:text-sm text-[#ff6b6b] font-sans">{error}</p>}
     </div>
   );
 }
@@ -85,7 +85,7 @@ export function PasswordField(p: Omit<FieldProps, 'type' | 'right' | 'icon'>) {
       icon="lock"
       type={show ? 'text' : 'password'}
       right={
-        <button type="button" onClick={() => setShow(!show)} className="rounded-lg px-2 py-1 text-xs text-zinc-400 hover:text-white font-['Kalpurush',sans-serif]">
+        <button type="button" onClick={() => setShow(!show)} className="rounded-lg px-2 py-1 text-xs text-zinc-400 hover:text-white font-sans">
           {show ? 'লুকাও' : 'দেখাও'}
         </button>
       }
@@ -122,7 +122,7 @@ export function BackButton({ onClick }: { onClick: () => void }) {
 
 export function IdChip({ id, onEdit }: { id: string; onEdit: () => void }) {
   return (
-    <div className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-['Kalpurush',sans-serif]">
+    <div className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-sans">
       <span className="text-zinc-200">{id.includes('@') ? id : toBn(id)}</span>
       <button type="button" onClick={onEdit} className="text-[#ef4136] hover:underline">
         পরিবর্তন

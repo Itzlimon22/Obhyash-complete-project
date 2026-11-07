@@ -391,7 +391,7 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
           <div className="text-[12px] font-semibold tracking-[0.08em] text-[#7A1410] dark:text-[#F87171] uppercase">
             দৈনিক লক্ষ্য
           </div>
-          <h2 className="mt-0.5 text-2xl font-bold text-[#1B1411] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+          <h2 className="mt-0.5 text-2xl font-bold text-[#1B1411] dark:text-white leading-tight font-sans">
             আজকের মিশন
           </h2>
         </div>

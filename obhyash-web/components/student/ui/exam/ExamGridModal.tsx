@@ -40,7 +40,7 @@ export const ExamGridModal: React.FC<ExamGridModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-neutral-100 dark:border-white/[0.08]">
           <div>
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white leading-tight font-sans">
               প্রশ্ন তালিকা ({BanglaNameHelper.toBanglaNumeral(totalQuestions)}টি)
             </h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -56,7 +56,7 @@ export const ExamGridModal: React.FC<ExamGridModalProps> = ({
         </div>
 
         {/* Status Indicators Legend */}
-        <div className="px-5 py-2.5 bg-neutral-50 dark:bg-[#121212] border-b border-neutral-100 dark:border-white/[0.08] flex items-center justify-around text-xs font-bold font-['Anek_Bangla',sans-serif]">
+        <div className="px-5 py-2.5 bg-neutral-50 dark:bg-[#121212] border-b border-neutral-100 dark:border-white/[0.08] flex items-center justify-around text-xs font-bold font-sans">
           <div className="flex items-center gap-1.5 text-[#12544F] dark:text-[#34D399]">
             <div className="w-3.5 h-3.5 rounded-full bg-[#12544F] flex items-center justify-center text-white text-[9px]">
               ✓
@@ -94,7 +94,7 @@ export const ExamGridModal: React.FC<ExamGridModalProps> = ({
                     onClose();
                   }}
                   className={cn(
-                    "aspect-square rounded-xl flex flex-col items-center justify-center text-base font-bold transition-all active:scale-95 relative cursor-pointer font-['Anek_Bangla',sans-serif]",
+                    "aspect-square rounded-xl flex flex-col items-center justify-center text-base font-bold transition-all active:scale-95 relative cursor-pointer font-sans",
                     isAnswered
                       ? "bg-[#12544F] text-white border border-[#12544F] shadow-xs"
                       : "bg-neutral-50 dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200 border border-neutral-200/80 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-neutral-700",
@@ -116,7 +116,7 @@ export const ExamGridModal: React.FC<ExamGridModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 px-4 rounded-xl bg-neutral-100 dark:bg-[#2C2C2E] border border-neutral-200/80 dark:border-[#3A3A3C] hover:bg-neutral-200 dark:hover:bg-[#3A3A3C] text-neutral-800 dark:text-neutral-200 font-bold text-sm transition active:scale-95 cursor-pointer font-['Anek_Bangla',sans-serif]"
+            className="w-full py-3 px-4 rounded-xl bg-neutral-100 dark:bg-[#2C2C2E] border border-neutral-200/80 dark:border-[#3A3A3C] hover:bg-neutral-200 dark:hover:bg-[#3A3A3C] text-neutral-800 dark:text-neutral-200 font-bold text-sm transition active:scale-95 cursor-pointer font-sans"
           >
             বন্ধ করো
           </button>

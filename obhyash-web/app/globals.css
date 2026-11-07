@@ -1,22 +1,24 @@
-@import url("https://fonts.maateen.me/kalpurush/font.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* --- Kalpurush Local & Global Typography --- */
+/* --- Obhyash Dual Font Stack Matching Flutter 1:1 (Inter + Hind Siliguri) --- */
+@font-face {
+  font-family: 'HindSiliguri';
+  src: local('Hind Siliguri'), local('Hind_Siliguri');
+  font-display: swap;
+}
+
+/* Fallback aliases for legacy components requesting Kalpurush or Anek to seamlessly render Hind Siliguri */
 @font-face {
   font-family: 'Kalpurush';
-  src: url('/fonts/Kalpurush.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
+  src: local('Hind Siliguri'), local('Hind_Siliguri');
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Kalpurush';
-  src: url('/fonts/Kalpurush.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
+  font-family: 'Anek Bangla';
+  src: local('Hind Siliguri'), local('Hind_Siliguri');
   font-display: swap;
 }
 
@@ -36,7 +38,7 @@
 .landing-root li,
 .landing-root blockquote,
 .landing-root div {
-  font-family: 'Kalpurush', 'Hind Siliguri', sans-serif;
+  font-family: var(--font-inter), var(--font-hind), 'Hind Siliguri', 'HindSiliguri', sans-serif;
 }
 
 
@@ -146,7 +148,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-inter), var(--font-hind), 'Hind Siliguri', 'HindSiliguri', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-weight: 400;
     font-size: 0.9375rem; /* 15px crisp modern app baseline */
     line-height: 1.5;
@@ -214,34 +216,28 @@ body::after {
 }
 
 .font-hind,
-[class*="font-['HindSiliguri'"],
-[class*="font-[HindSiliguri"] {
-  font-family: var(--font-hind), 'Hind Siliguri', 'HindSiliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-}
-
-/* --- Public, Auth, Landing & Noto Sans Bengali Typography --- */
 .font-sans,
 .font-bengali,
+.font-anek,
+.font-kalpurush,
 .blog-root,
 .font-blog,
 .font-noto,
 .font-noto-bengali,
+[class*="font-['Hind"],
+[class*="font-[Hind"],
+[class*="font-['Kalpurush"],
+[class*="font-[Kalpurush"],
+[class*="font-['Anek"],
+[class*="font-[Anek"],
 [class*="font-['Noto"],
 [class*="font-[Noto"] {
-  font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: var(--font-inter), var(--font-hind), 'Hind Siliguri', 'HindSiliguri', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* Ensure blog content uses Noto Sans Bengali + Inter while preserving KaTeX math and code blocks */
+/* Ensure blog content and rich text use Inter + Hind Siliguri while preserving KaTeX math and code blocks */
 .blog-root :is(h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, label, blockquote, li, td, th):not(.katex *):not(.katex):not(pre *):not(code):not(.font-mono) {
-  font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-/* Override legacy font classes inside blog tree */
-.blog-root .font-hind,
-.blog-root .font-anek,
-.blog-root [class*="font-['Hind"],
-.blog-root [class*="font-['Anek"] {
-  font-family: var(--font-inter), var(--font-noto-sans-bengali), 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: var(--font-inter), var(--font-hind), 'Hind Siliguri', 'HindSiliguri', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* --- Chorcha & Flutter Benchmark Typography Utilities --- */

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 
 type R = {
   q: string;

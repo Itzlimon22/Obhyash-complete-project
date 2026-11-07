@@ -294,7 +294,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const hasBatch = Boolean(user.batch && user.batch.trim().length > 0);
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 py-2 font-['Anek_Bangla',sans-serif] pb-16">
+    <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 py-2 font-sans pb-16">
       {/* ── 1. Profile Card (1:1 with Flutter SettingsView) ── */}
       <div className="rounded-[20px] border border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#18181B] shadow-xs overflow-hidden">
         {/* Deep Green Gradient Header (Matching Flutter 1:1) */}
@@ -506,7 +506,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           onClick={() => setShowLogoutModal(false)}
         >
           <div
-            className="w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] border border-[#E5E7EB] dark:border-[#27272A] p-6 shadow-2xl font-['Anek_Bangla',sans-serif]"
+            className="w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] border border-[#E5E7EB] dark:border-[#27272A] p-6 shadow-2xl font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-[18px] font-bold text-neutral-900 dark:text-white">

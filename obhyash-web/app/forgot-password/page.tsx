@@ -148,7 +148,7 @@ function ForgotPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif]">
+    <div className="min-h-screen bg-[#07080b] text-zinc-100 font-sans">
       <BackButton onClick={() => router.push('/auth/login')} />
       <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-12">
         <Logo />

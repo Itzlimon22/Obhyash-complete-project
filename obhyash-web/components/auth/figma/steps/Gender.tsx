@@ -55,7 +55,7 @@ export default function Gender({
               key={g}
               type="button"
               onClick={() => pick(g)}
-              className={`flex h-16 sm:h-20 items-center justify-center gap-4 rounded-2xl border-2 text-base sm:text-lg font-semibold transition-all duration-100 active:translate-y-[4px] active:shadow-none font-['Kalpurush',sans-serif] ${
+              className={`flex h-16 sm:h-20 items-center justify-center gap-4 rounded-2xl border-2 text-base sm:text-lg font-semibold transition-all duration-100 active:translate-y-[4px] active:shadow-none font-sans ${
                 active
                   ? 'border-[#ef4136]/70 bg-[#8b1e3f]/20 text-white shadow-[0_4px_0_#4f0f22] sm:shadow-[0_5px_0_#4f0f22]'
                   : 'border-white/10 bg-[#16181e] text-zinc-200 shadow-[0_4px_0_#0b0c10] sm:shadow-[0_5px_0_#0b0c10] hover:bg-[#1c1f26]'

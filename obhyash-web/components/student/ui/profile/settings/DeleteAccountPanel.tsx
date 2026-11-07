@@ -99,7 +99,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-[#B91C1C] dark:text-[#FCA5A5] font-['Anek_Bangla',sans-serif]">
+            <h2 className="text-lg sm:text-xl font-bold text-[#B91C1C] dark:text-[#FCA5A5] font-sans">
               অ্যাকাউন্ট মুছে ফেলো (Delete Account)
             </h2>
             <p className="text-xs text-rose-600/80 dark:text-rose-300/70 font-semibold">
@@ -118,7 +118,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
         <div className="p-4 sm:p-5 rounded-[18px] bg-amber-50 dark:bg-[#261505] border border-amber-200 dark:border-amber-900/60 flex items-start gap-3 mb-5 shadow-xs">
           <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div className="text-xs sm:text-sm text-amber-900 dark:text-amber-200 leading-relaxed font-semibold">
-            <span className="font-bold text-amber-700 dark:text-amber-400 block mb-0.5 font-['Anek_Bangla',sans-serif]">
+            <span className="font-bold text-amber-700 dark:text-amber-400 block mb-0.5 font-sans">
               সতর্কতা: তোমার অ্যাকাউন্টে প্রো সাবস্ক্রিপশন সক্রিয় আছে!
             </span>
             অ্যাকাউন্ট মুছে ফেললে তোমার সাবস্ক্রিপশন অবিলম্বে চিরতরে বাতিল হবে এবং এর জন্য কোনো রিফান্ড প্রযোজ্য হবে না।
@@ -128,7 +128,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
 
       {/* ── Consequences Card ── */}
       <div className="bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-[#E5E7EB] dark:border-[#27272A] shadow-xs mb-5">
-        <h3 className="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white mb-3.5 flex items-center gap-2 font-['Anek_Bangla',sans-serif]">
+        <h3 className="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white mb-3.5 flex items-center gap-2 font-sans">
           <ShieldAlert className="w-4.5 h-4.5 text-rose-500" />
           <span>অ্যাকাউন্ট মুছে ফেললে যা ঘটবে:</span>
         </h3>
@@ -150,7 +150,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
 
       {/* ── Confirmation Input Card (1:1 with Flutter) ── */}
       <div className="bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-rose-200 dark:border-rose-900/40 shadow-xs mb-5">
-        <label className="block text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-2 font-['Anek_Bangla',sans-serif]">
+        <label className="block text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-2 font-sans">
           নিশ্চিত করতে নিচের বক্সে বড় হাতের অক্ষরে <span className="font-mono font-black text-[#DC2626] dark:text-[#F87171]">&ldquo;DELETE&rdquo;</span> লিখো:
         </label>
 
@@ -178,7 +178,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
             type="button"
             onClick={handleDelete}
             disabled={isLoading || confirmationText.trim() !== 'DELETE'}
-            className="flex-1 py-3.5 px-5 rounded-[14px] bg-[#740A03] hover:bg-[#5C0802] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm font-['Anek_Bangla',sans-serif] flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
+            className="flex-1 py-3.5 px-5 rounded-[14px] bg-[#740A03] hover:bg-[#5C0802] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm font-sans flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
           >
             {isLoading ? (
               <Loader2 className="w-4.5 h-4.5 animate-spin" />
@@ -193,7 +193,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
               type="button"
               onClick={onBack}
               disabled={isLoading}
-              className="py-3.5 px-6 rounded-[14px] bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-sm font-['Anek_Bangla',sans-serif] hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
+              className="py-3.5 px-6 rounded-[14px] bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-sm font-sans hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
             >
               বাতিল
             </button>

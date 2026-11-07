@@ -48,7 +48,7 @@ export default function Academic({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-3 sm:gap-4 rounded-2xl border-2 px-4 sm:px-5 font-semibold transition-all duration-100 active:translate-y-[4px] active:shadow-none font-['Kalpurush',sans-serif] ${
+      className={`flex items-center gap-3 sm:gap-4 rounded-2xl border-2 px-4 sm:px-5 font-semibold transition-all duration-100 active:translate-y-[4px] active:shadow-none font-sans ${
         size === 'lg' ? 'h-14 sm:h-20 text-base sm:text-lg' : 'h-12 sm:h-16 text-sm sm:text-base'
       } ${
         active
@@ -85,7 +85,7 @@ export default function Academic({
       </div>
       {level && (
         <div key={level} className="animate-step">
-          <p className="mb-2 mt-4 sm:mt-6 text-xs sm:text-sm font-medium text-zinc-300 font-['Kalpurush',sans-serif]">বিভাগ</p>
+          <p className="mb-2 mt-4 sm:mt-6 text-xs sm:text-sm font-medium text-zinc-300 font-sans">বিভাগ</p>
           <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
             {groups.map((g) => (
               <Option key={g} label={g} size="md" active={group === g} onClick={() => pickGroup(g)} />

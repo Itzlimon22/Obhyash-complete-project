@@ -13,7 +13,7 @@ import Testimonials from "./Testimonials";
 import Footer from "./Footer";
 import PhoneMock from "./PhoneMock";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.obhyash.app";
 
@@ -49,7 +49,7 @@ export default function Landing({ onStart }: { onStart: () => void }) {
   return (
     <div
       className="min-h-screen overflow-x-clip bg-[#0a0b0b] text-white landing-root font-kalpurush"
-      style={{ fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" }}
+      style={{ fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" }}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] overflow-hidden">
         <div className="mx-auto h-[600px] w-[min(900px,100vw)] rounded-full bg-[#e5534b]/15 blur-[140px]" />

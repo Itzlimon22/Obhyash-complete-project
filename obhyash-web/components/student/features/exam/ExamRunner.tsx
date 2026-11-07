@@ -379,7 +379,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             type="button"
             onClick={() => setShowSubmitModal(true)}
             disabled={isEvaluating}
-            className="h-[38px] min-h-[38px] px-6 py-[7px] rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-[14.5px] font-['Anek_Bangla',sans-serif] flex items-center justify-center transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+            className="h-[38px] min-h-[38px] px-6 py-[7px] rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-[14.5px] font-sans flex items-center justify-center transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
           >
             {isEvaluating ? 'মূল্যায়ন হচ্ছে...' : 'জমা দাও'}
           </button>
@@ -408,17 +408,17 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             aria-hidden="true"
           />
           <div className="relative w-full max-w-sm bg-white dark:bg-[#1C1C1E] rounded-[24px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in zoom-in-95 duration-200 text-center font-['HindSiliguri',sans-serif]">
-            <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 font-sans">
               খাতা জমা দিবে?
             </h3>
 
             {/* Stats Snapshot Row */}
             <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-around mb-6">
               <div>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 block mb-0.5 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 block mb-0.5 font-sans">
                   উত্তর দেওয়া
                 </span>
-                <span className="text-base sm:text-lg font-bold text-[#10B981] font-['Anek_Bangla',sans-serif]">
+                <span className="text-base sm:text-lg font-bold text-[#10B981] font-sans">
                   {BanglaNameHelper.toBanglaNumeral(answeredCount)}/
                   {BanglaNameHelper.toBanglaNumeral(totalQuestions)}
                 </span>
@@ -427,7 +427,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <div className="w-[1px] h-8 bg-neutral-200 dark:bg-white/[0.08]" />
 
               <div>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 block mb-0.5 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 block mb-0.5 font-sans">
                   বাকি আছে
                 </span>
                 <span
@@ -446,7 +446,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSubmitModal(false)}
-                className="py-2.5 px-4 rounded-[8px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-[0.98] font-semibold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-[0.98] font-semibold text-sm transition cursor-pointer font-sans"
               >
                 না, পরীক্ষা দিবো
               </button>
@@ -454,7 +454,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={confirmSubmit}
-                className="py-2.5 px-4 rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-sm transition cursor-pointer shadow-sm font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-sm transition cursor-pointer shadow-sm font-sans"
               >
                 হ্যাঁ, জমা দাও
               </button>
@@ -476,7 +476,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <AlertTriangle size={28} />
             </div>
 
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2 font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2 font-sans">
               সতর্কতা
             </h3>
 
@@ -489,7 +489,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowExitModal(false)}
-                className="py-2.5 px-4 rounded-[8px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-[0.98] font-semibold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-[0.98] font-semibold text-sm transition cursor-pointer font-sans"
               >
                 চালিয়ে যাও
               </button>
@@ -500,7 +500,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                   setShowExitModal(false);
                   confirmSubmit();
                 }}
-                className="py-2.5 px-4 rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-sm transition cursor-pointer shadow-sm font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-sm transition cursor-pointer shadow-sm font-sans"
               >
                 জমা দাও
               </button>
@@ -517,7 +517,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <AlertTriangle size={28} />
             </div>
 
-            <h3 className="text-xl font-bold text-rose-500 mb-2 font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-xl font-bold text-rose-500 mb-2 font-sans">
               সতর্কতা!
             </h3>
 
@@ -530,7 +530,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             <button
               type="button"
               onClick={() => setShowCheatingWarning(false)}
-              className="w-full py-3 px-4 rounded-[12px] bg-[#DC2626] text-white shadow-[0_4px_0_#991B1B] hover:brightness-105 active:shadow-[0_1px_0_#991B1B] active:translate-y-[3px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+              className="w-full py-3 px-4 rounded-[12px] bg-[#DC2626] text-white shadow-[0_4px_0_#991B1B] hover:brightness-105 active:shadow-[0_1px_0_#991B1B] active:translate-y-[3px] font-bold text-sm transition cursor-pointer font-sans"
             >
               আমি বুঝতে পেরেছি
             </button>

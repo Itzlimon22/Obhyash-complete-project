@@ -65,10 +65,10 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
           </div>
 
           <div className="min-w-0 flex-1">
-            <h4 className="font-['Anek_Bangla',sans-serif] text-base font-bold text-neutral-900 dark:text-white truncate leading-tight">
+            <h4 className="font-sans text-base font-bold text-neutral-900 dark:text-white truncate leading-tight">
               {BanglaNameHelper.formatSubject(subjectName, subjectName)}
             </h4>
-            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-neutral-500 dark:text-neutral-400 font-sans">
               <span className="truncate">{chapterCountLabel}</span>
               {cleanTopics.length > 0 && (
                 <>
@@ -84,7 +84,7 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <div
             className={cn(
-              "px-2.5 py-1 rounded-lg border text-xs font-bold transition flex items-center gap-1 font-['Anek_Bangla',sans-serif]",
+              "px-2.5 py-1 rounded-lg border text-xs font-bold transition flex items-center gap-1 font-sans",
               isExpanded
                 ? "bg-[#12544F]/10 dark:bg-[#12544F]/25 border-[#12544F]/30 text-[#12544F] dark:text-[#2DD4BF]"
                 : "bg-neutral-100 dark:bg-neutral-800 border-neutral-200/80 dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300"
@@ -105,14 +105,14 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
           {/* Chapters List */}
           {cleanChapters.length > 0 ? (
             <div>
-              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider font-['Anek_Bangla',sans-serif]">
+              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider font-sans">
                 অধ্যায়সমূহ ({BanglaNameHelper.toBanglaNumeral(cleanChapters.length)}টি)
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {cleanChapters.map((ch, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 text-xs font-semibold font-['Anek_Bangla',sans-serif]"
+                    className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 text-xs font-semibold font-sans"
                   >
                     {ch}
                   </span>
@@ -128,14 +128,14 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
           {/* Topics List (if any) */}
           {cleanTopics.length > 0 && (
             <div>
-              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider font-['Anek_Bangla',sans-serif]">
+              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider font-sans">
                 টপিকসমূহ ({BanglaNameHelper.toBanglaNumeral(cleanTopics.length)}টি)
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {cleanTopics.map((top, idx) => (
                   <span
                     key={idx}
-                    className="px-2 py-0.5 rounded-md bg-[#12544F]/10 dark:bg-[#12544F]/25 border border-[#12544F]/20 dark:border-[#12544F]/30 text-[#12544F] dark:text-[#2DD4BF] text-[11px] font-medium font-['Anek_Bangla',sans-serif]"
+                    className="px-2 py-0.5 rounded-md bg-[#12544F]/10 dark:bg-[#12544F]/25 border border-[#12544F]/20 dark:border-[#12544F]/30 text-[#12544F] dark:text-[#2DD4BF] text-[11px] font-medium font-sans"
                   >
                     {top}
                   </span>

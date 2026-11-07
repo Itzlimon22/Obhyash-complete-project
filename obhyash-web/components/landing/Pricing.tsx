@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 const pro = [
   "আনলিমিটেড মক টেস্ট ও প্র্যাকটিস",
   "প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান",

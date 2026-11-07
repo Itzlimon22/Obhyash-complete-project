@@ -299,7 +299,7 @@ export const ComplaintView: React.FC = () => {
   return (
     <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Segmented Tab Switcher (1:1 with Flutter _buildTabButton) ── */}
-      <div className="p-1 rounded-[14px] bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] flex items-center mb-4 font-['Anek_Bangla',sans-serif]">
+      <div className="p-1 rounded-[14px] bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] flex items-center mb-4 font-sans">
         {/* New Complaint Tab */}
         <button
           type="button"
@@ -349,7 +349,7 @@ export const ComplaintView: React.FC = () => {
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-xl sm:text-2xl font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
+            <h2 className="text-xl sm:text-2xl font-bold font-sans text-[#0F172A] dark:text-white">
               বার্তা গৃহীত হয়েছে!
             </h2>
             <p className="text-xs sm:text-sm text-[#A3A3A3] max-w-md mx-auto leading-relaxed">
@@ -360,7 +360,7 @@ export const ComplaintView: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="flex-1 py-3 px-5 rounded-[12px] border border-[#CBD5E1] dark:border-[#3F3F46] text-[#0F172A] dark:text-white font-bold font-['Anek_Bangla',sans-serif] text-sm hover:bg-neutral-50 dark:hover:bg-[#27272A] active:scale-[0.98] transition-all cursor-pointer"
+              className="flex-1 py-3 px-5 rounded-[12px] border border-[#CBD5E1] dark:border-[#3F3F46] text-[#0F172A] dark:text-white font-bold font-sans text-sm hover:bg-neutral-50 dark:hover:bg-[#27272A] active:scale-[0.98] transition-all cursor-pointer"
             >
               আরেকটি পাঠাও
             </button>
@@ -371,7 +371,7 @@ export const ComplaintView: React.FC = () => {
                 setActiveTab('my');
                 fetchMyComplaints();
               }}
-              className="flex-1 py-3 px-5 rounded-[12px] bg-[#12544F] text-white font-bold font-['Anek_Bangla',sans-serif] text-sm hover:bg-[#0E4440] active:scale-[0.98] transition-all shadow-xs cursor-pointer"
+              className="flex-1 py-3 px-5 rounded-[12px] bg-[#12544F] text-white font-bold font-sans text-sm hover:bg-[#0E4440] active:scale-[0.98] transition-all shadow-xs cursor-pointer"
             >
               তালিকা দেখো
             </button>
@@ -410,10 +410,10 @@ export const ComplaintView: React.FC = () => {
           {/* Step 1: Category Selection */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <div className="w-6 h-6 rounded-[7px] bg-[#059669] text-white font-bold font-['Anek_Bangla',sans-serif] text-xs flex items-center justify-center shrink-0">
+              <div className="w-6 h-6 rounded-[7px] bg-[#059669] text-white font-bold font-sans text-xs flex items-center justify-center shrink-0">
                 ১
               </div>
-              <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
+              <h3 className="text-base font-bold font-sans text-[#111827] dark:text-white">
                 সমস্যার ধরন বেছে নাও
               </h3>
             </div>
@@ -462,7 +462,7 @@ export const ComplaintView: React.FC = () => {
                       {/* Label + Description */}
                       <div className="flex-1 min-w-0">
                         <h4
-                          className={`text-sm font-bold font-['Anek_Bangla',sans-serif] truncate ${
+                          className={`text-sm font-bold font-sans truncate ${
                             isSelected
                               ? 'text-[#065F46] dark:text-white'
                               : 'text-[#111827] dark:text-white'
@@ -505,15 +505,15 @@ export const ComplaintView: React.FC = () => {
           <div>
             <div className="flex items-center justify-between gap-2 mb-2.5">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-[7px] bg-[#059669] text-white font-bold font-['Anek_Bangla',sans-serif] text-xs flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-[7px] bg-[#059669] text-white font-bold font-sans text-xs flex items-center justify-center shrink-0">
                   ২
                 </div>
-                <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
+                <h3 className="text-base font-bold font-sans text-[#111827] dark:text-white">
                   বিস্তারিত বিবরণ লেখো
                 </h3>
               </div>
               <span
-                className={`text-[11.5px] font-bold font-['Anek_Bangla',sans-serif] ${
+                className={`text-[11.5px] font-bold font-sans ${
                   charCount === 0
                     ? 'text-[#9CA3AF] dark:text-[#71717A]'
                     : charCount < 15
@@ -545,7 +545,7 @@ export const ComplaintView: React.FC = () => {
             type="submit"
             disabled={isLoading || isBlocked}
             className={`
-              w-full h-[52px] rounded-[14px] text-sm sm:text-base font-bold font-['Anek_Bangla',sans-serif] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all shadow-xs cursor-pointer
+              w-full h-[52px] rounded-[14px] text-sm sm:text-base font-bold font-sans flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all shadow-xs cursor-pointer
               ${
                 isBlocked
                   ? 'bg-[#E2E8F0] dark:bg-[#27272A] text-[#94A3B8] dark:text-[#71717A] cursor-not-allowed'
@@ -595,7 +595,7 @@ export const ComplaintView: React.FC = () => {
                 <Inbox className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
+                <h3 className="text-lg font-bold font-sans text-[#0F172A] dark:text-white">
                   কোনো অভিযোগ জমা নেই
                 </h3>
                 <p className="text-xs text-[#A3A3A3]">
@@ -605,7 +605,7 @@ export const ComplaintView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('new')}
-                className="px-5 py-2.5 rounded-[12px] bg-[#12544F] text-white text-xs font-bold font-['Anek_Bangla',sans-serif] flex items-center gap-1.5 mx-auto hover:bg-[#0E4440] active:scale-[0.98] transition-all cursor-pointer shadow-xs"
+                className="px-5 py-2.5 rounded-[12px] bg-[#12544F] text-white text-xs font-bold font-sans flex items-center gap-1.5 mx-auto hover:bg-[#0E4440] active:scale-[0.98] transition-all cursor-pointer shadow-xs"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>নতুন অভিযোগ করো</span>
@@ -636,10 +636,10 @@ export const ComplaintView: React.FC = () => {
                           <TypeIcon className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="text-sm sm:text-[15px] font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white truncate">
+                          <h4 className="text-sm sm:text-[15px] font-bold font-sans text-[#0F172A] dark:text-white truncate">
                             {typeInfo.label}
                           </h4>
-                          <span className="text-[11px] font-medium font-['Anek_Bangla',sans-serif] text-[#A3A3A3] block">
+                          <span className="text-[11px] font-medium font-sans text-[#A3A3A3] block">
                             {new Date(complaint.created_at).toLocaleDateString(
                               'bn-BD',
                               {
@@ -654,7 +654,7 @@ export const ComplaintView: React.FC = () => {
 
                       {/* Status Pill */}
                       <div
-                        className={`px-3 py-1 rounded-full text-xs font-bold font-['Anek_Bangla',sans-serif] flex items-center gap-1 shrink-0 ${statusInfo.bgLight} ${statusInfo.bgDark} ${statusInfo.textColor}`}
+                        className={`px-3 py-1 rounded-full text-xs font-bold font-sans flex items-center gap-1 shrink-0 ${statusInfo.bgLight} ${statusInfo.bgDark} ${statusInfo.textColor}`}
                       >
                         <StatusIcon className="w-3 h-3" />
                         <span>{statusInfo.label}</span>
@@ -670,7 +670,7 @@ export const ComplaintView: React.FC = () => {
                     {complaint.admin_feedback &&
                       complaint.admin_feedback.trim() && (
                         <div className="p-3 rounded-[14px] bg-[#ECFDF5] dark:bg-[#064E3B]/30 border border-[#A7F3D0] dark:border-[#059669]/35 space-y-1">
-                          <div className="flex items-center gap-1.5 text-xs font-bold font-['Anek_Bangla',sans-serif] text-[#065F46] dark:text-[#34D399]">
+                          <div className="flex items-center gap-1.5 text-xs font-bold font-sans text-[#065F46] dark:text-[#34D399]">
                             <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
                             <span>অ্যাডমিন উত্তর:</span>
                           </div>

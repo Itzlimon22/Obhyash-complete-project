@@ -374,7 +374,7 @@ export default function AcademicSectionDetailView({
           </button>
 
           <div className="text-center min-w-0 max-w-[70%]">
-            <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white truncate">
+            <h1 className="font-sans font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white truncate">
               {displayTitle} - {section.title}
             </h1>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
@@ -467,7 +467,7 @@ export default function AcademicSectionDetailView({
             <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-[#1E1E22] flex items-center justify-center mb-3">
               <FileQuestion size={28} className="text-neutral-400" />
             </div>
-            <h3 className="font-['Anek_Bangla',sans-serif] font-bold text-lg text-neutral-800 dark:text-neutral-200 mb-1">
+            <h3 className="font-sans font-bold text-lg text-neutral-800 dark:text-neutral-200 mb-1">
               কোনো প্রশ্ন পাওয়া যায়নি
             </h3>
             <p className="text-xs text-neutral-500 max-w-sm mb-4">

@@ -24,7 +24,7 @@ import QuestionBankHeader from './QuestionBankHeader';
 import Footer from '@/components/landing/Footer';
 import { SubjectColorfulIcon } from './SubjectIcons';
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 
 export interface SubjectChapter {
   id: string;

@@ -288,7 +288,7 @@ export default function AdminCouponsPage() {
 
           <button
             onClick={openCreateModal}
-            className="px-4 py-2.5 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-sm font-['Anek_Bangla',sans-serif] shadow-sm flex items-center gap-2 transition-all cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-sm font-sans shadow-sm flex items-center gap-2 transition-all cursor-pointer"
           >
             <Plus size={18} />
             <span>নতুন কুপন তৈরি করুন</span>
@@ -367,7 +367,7 @@ export default function AdminCouponsPage() {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => setFilterStatus('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-['Anek_Bangla',sans-serif] transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-sans transition-colors ${
               filterStatus === 'all'
                 ? 'bg-[#12544F] text-white'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -377,7 +377,7 @@ export default function AdminCouponsPage() {
           </button>
           <button
             onClick={() => setFilterStatus('active')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-['Anek_Bangla',sans-serif] transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-sans transition-colors ${
               filterStatus === 'active'
                 ? 'bg-emerald-600 text-white'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -387,7 +387,7 @@ export default function AdminCouponsPage() {
           </button>
           <button
             onClick={() => setFilterStatus('inactive')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-['Anek_Bangla',sans-serif] transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-sans transition-colors ${
               filterStatus === 'inactive'
                 ? 'bg-neutral-600 text-white'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -410,7 +410,7 @@ export default function AdminCouponsPage() {
             <div className="w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 mx-auto mb-3">
               <Tag size={24} />
             </div>
-            <h3 className="text-base font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans">
               কোনো কুপন পাওয়া যায়নি
             </h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif] mt-1 max-w-sm mx-auto">
@@ -418,7 +418,7 @@ export default function AdminCouponsPage() {
             </p>
             <button
               onClick={openCreateModal}
-              className="mt-4 px-4 py-2 rounded-xl bg-[#12544F] text-white text-xs font-bold font-['Anek_Bangla',sans-serif] inline-flex items-center gap-1.5"
+              className="mt-4 px-4 py-2 rounded-xl bg-[#12544F] text-white text-xs font-bold font-sans inline-flex items-center gap-1.5"
             >
               <Plus size={15} />
               <span>কুপন তৈরি করুন</span>
@@ -466,7 +466,7 @@ export default function AdminCouponsPage() {
 
                     {/* Name */}
                     <td className="py-4 px-4">
-                      <div className="font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                      <div className="font-bold text-neutral-900 dark:text-white font-sans">
                         {c.name}
                       </div>
                       <div className="text-xs text-neutral-400 font-['HindSiliguri',sans-serif]">
@@ -525,7 +525,7 @@ export default function AdminCouponsPage() {
                     <td className="py-4 px-4">
                       <button
                         onClick={() => handleToggleStatus(c)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold font-['Anek_Bangla',sans-serif] transition-colors cursor-pointer ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold font-sans transition-colors cursor-pointer ${
                           c.is_active
                             ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                             : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-neutral-200 dark:border-neutral-700'
@@ -585,7 +585,7 @@ export default function AdminCouponsPage() {
                   <Tag size={16} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                  <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans">
                     {editingCoupon ? 'কুপন এডিট করুন' : 'নতুন কুপন তৈরি করুন'}
                   </h3>
                   <p className="text-xs text-neutral-400 font-['HindSiliguri',sans-serif]">
@@ -607,7 +607,7 @@ export default function AdminCouponsPage() {
             {/* Modal Form */}
             <form onSubmit={handleSaveCoupon} className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif] mb-1">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans mb-1">
                   কুপন কোড (Coupon Code) *
                 </label>
                 <input
@@ -622,7 +622,7 @@ export default function AdminCouponsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif] mb-1">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans mb-1">
                   অফার বা অ্যাম্বাসেডরের নাম
                 </label>
                 <input
@@ -636,7 +636,7 @@ export default function AdminCouponsPage() {
 
               {/* Price overrides */}
               <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-700/60 space-y-2">
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif]">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans">
                   প্ল্যানভিত্তিক ছাড়ের চূড়ান্ত মূল্য (Fixed Pricing)
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -688,7 +688,7 @@ export default function AdminCouponsPage() {
               {/* Limits & Expiry */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif] mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans mb-1">
                     সর্বোচ্চ ব্যবহার সীমা (ঐচ্ছিক)
                   </label>
                   <input
@@ -700,7 +700,7 @@ export default function AdminCouponsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif] mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans mb-1">
                     মেয়াদ শেষ তারিখ (ঐচ্ছিক)
                   </label>
                   <input
@@ -714,7 +714,7 @@ export default function AdminCouponsPage() {
 
               {/* Status Toggle */}
               <div className="flex items-center justify-between pt-2">
-                <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans">
                   তৈরির সাথে সাথেই সক্রিয় (Active) থাকবে
                 </span>
                 <input
@@ -740,7 +740,7 @@ export default function AdminCouponsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-[#12544F] hover:bg-[#0E423E] text-white text-xs font-bold font-['Anek_Bangla',sans-serif] shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-[#12544F] hover:bg-[#0E423E] text-white text-xs font-bold font-sans shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -766,7 +766,7 @@ export default function AdminCouponsPage() {
               <Trash2 size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              <h3 className="text-base font-bold text-neutral-900 dark:text-white font-sans">
                 কুপন মুছে ফেলতে চান?
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif] mt-1">

@@ -73,7 +73,7 @@ export default function NameInstitution({
                   key={col}
                   type="button"
                   onClick={() => handleSelectCollege(col)}
-                  className="w-full rounded-xl px-4 py-2.5 text-left text-sm text-zinc-200 transition hover:bg-white/10 hover:text-white font-['Kalpurush',sans-serif]"
+                  className="w-full rounded-xl px-4 py-2.5 text-left text-sm text-zinc-200 transition hover:bg-white/10 hover:text-white font-sans"
                 >
                   {col}
                 </button>

@@ -115,7 +115,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
           >
             <ArrowLeft size={20} className="stroke-[2.2]" />
           </button>
-          <h1 className="flex-1 text-center font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-xl text-neutral-900 dark:text-white tracking-tight mr-9">
+          <h1 className="flex-1 text-center font-sans font-bold text-lg sm:text-xl text-neutral-900 dark:text-white tracking-tight mr-9">
             পরীক্ষার নির্দেশাবলী
           </h1>
         </header>
@@ -133,13 +133,13 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                 <div className="w-11 h-11 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/50 flex items-center justify-center shrink-0">
                   <Atom className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h2 className="font-bold text-lg sm:text-[19px] text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                <h2 className="font-bold text-lg sm:text-[19px] text-neutral-900 dark:text-white truncate font-sans">
                   {formattedSubject || 'পদার্থবিজ্ঞান ১ম পত্র'}
                 </h2>
               </div>
 
               {/* Muted green 'মডেল টেস্ট' badge */}
-              <span className="px-3 py-1 rounded-xl bg-[#e8f3ef] dark:bg-[#0c2f25] text-[#12544F] dark:text-[#34D399] text-xs font-bold font-['Anek_Bangla',sans-serif] shrink-0">
+              <span className="px-3 py-1 rounded-xl bg-[#e8f3ef] dark:bg-[#0c2f25] text-[#12544F] dark:text-[#34D399] text-xs font-bold font-sans shrink-0">
                 মডেল টেস্ট
               </span>
             </div>
@@ -151,40 +151,40 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             <div className="grid grid-cols-4 divide-x divide-neutral-100 dark:divide-white/[0.06] text-center">
               {/* Stat 1 */}
               <div className="flex flex-col items-center justify-center px-1">
-                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-sans">
                   সময়সীমা
                 </span>
-                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-['Anek_Bangla',sans-serif]">
+                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-sans">
                   {durationStr} মিনিট
                 </span>
               </div>
 
               {/* Stat 2 */}
               <div className="flex flex-col items-center justify-center px-1">
-                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-sans">
                   মোট প্রশ্ন
                 </span>
-                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-['Anek_Bangla',sans-serif]">
+                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-sans">
                   {totalQStr}টি MCQ
                 </span>
               </div>
 
               {/* Stat 3 */}
               <div className="flex flex-col items-center justify-center px-1">
-                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-sans">
                   নেগেটিভ
                 </span>
-                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-['Anek_Bangla',sans-serif]">
+                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-sans">
                   {negMarkStr}
                 </span>
               </div>
 
               {/* Stat 4 */}
               <div className="flex flex-col items-center justify-center px-1">
-                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
+                <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium mb-1 font-sans">
                   পূর্ণমান
                 </span>
-                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-['Anek_Bangla',sans-serif]">
+                <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-100 font-sans">
                   {totalMarksStr} নম্বর
                 </span>
               </div>
@@ -198,7 +198,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
               <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base sm:text-lg text-[#0f3e37] dark:text-emerald-400 font-['Anek_Bangla',sans-serif]">
+              <h3 className="font-bold text-base sm:text-lg text-[#0f3e37] dark:text-emerald-400 font-sans">
                 গুরুত্বপূর্ণ নির্দেশনাবলী
               </h3>
             </div>
@@ -215,7 +215,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                   <div className="w-[1.5px] h-10 bg-neutral-100 dark:bg-white/[0.08] mt-2" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-sans">
                     সঠিক উত্তর নির্বাচন
                   </h4>
                   <p className="text-xs sm:text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
@@ -234,7 +234,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                   <div className="w-[1.5px] h-10 bg-neutral-100 dark:bg-white/[0.08] mt-2" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-sans">
                     টাইমার ও স্বয়ংক্রিয় সাবমিট
                   </h4>
                   <p className="text-xs sm:text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
@@ -249,7 +249,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                   <AlertTriangle className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-rose-500 dark:text-rose-400 font-['Anek_Bangla',sans-serif]">
+                  <h4 className="font-bold text-sm sm:text-base text-rose-500 dark:text-rose-400 font-sans">
                     অ্যাপ ত্যাগ সতর্কতা
                   </h4>
                   <p className="text-xs sm:text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
@@ -269,7 +269,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             type="button"
             onClick={handleStart}
             disabled={isLoading}
-            className="w-full h-13 rounded-2xl bg-[#0b4d44] hover:bg-[#093e37] active:scale-[0.99] text-white font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 font-['Anek_Bangla',sans-serif] shadow-sm"
+            className="w-full h-13 rounded-2xl bg-[#0b4d44] hover:bg-[#093e37] active:scale-[0.99] text-white font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 font-sans shadow-sm"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

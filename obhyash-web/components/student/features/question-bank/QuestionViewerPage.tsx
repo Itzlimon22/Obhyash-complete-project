@@ -62,7 +62,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
 
             {/* MIDDLE: Title badge */}
             <div className="min-w-0 max-w-[50%] sm:max-w-[60%]">
-              <div className="px-3 py-1 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif] truncate text-center shadow-2xs">
+              <div className="px-3 py-1 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-sans truncate text-center shadow-2xs">
                 {examSet.title}
               </div>
             </div>

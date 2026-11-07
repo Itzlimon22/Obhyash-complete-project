@@ -277,14 +277,14 @@ export const SubscriptionView: React.FC = () => {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-['Anek_Bangla',sans-serif] text-base font-bold text-neutral-900 dark:text-white truncate leading-tight">
+              <h3 className="font-sans text-base font-bold text-neutral-900 dark:text-white truncate leading-tight">
                 {activeSubscription.name}
               </h3>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#12544F]/10 dark:bg-[#12544F]/25 text-[#12544F] dark:text-[#2DD4BF] text-[11px] font-bold border border-[#12544F]/20 shrink-0 font-['Anek_Bangla',sans-serif]">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#12544F]/10 dark:bg-[#12544F]/25 text-[#12544F] dark:text-[#2DD4BF] text-[11px] font-bold border border-[#12544F]/20 shrink-0 font-sans">
                 সক্রিয়
               </span>
             </div>
-            <p className="font-['Anek_Bangla',sans-serif] text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1 flex flex-wrap items-center gap-1.5 font-medium">
+            <p className="font-sans text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1 flex flex-wrap items-center gap-1.5 font-medium">
               <span>মেয়াদ:</span>
               <strong className="text-[#12544F] dark:text-[#2DD4BF] font-bold">
                 {daysRemaining} দিন বাকি
@@ -303,7 +303,7 @@ export const SubscriptionView: React.FC = () => {
       <div className="bg-white dark:bg-[#121212] rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 border border-neutral-200/80 dark:border-white/[0.08] shadow-xs mb-5">
         {/* Header */}
         <div className="text-center mb-5">
-          <h2 className="font-['Anek_Bangla',sans-serif] text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
+          <h2 className="font-sans text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
             তোমার প্ল্যান বেছে নাও
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
@@ -356,7 +356,7 @@ export const SubscriptionView: React.FC = () => {
                     </div>
 
                     <div className="min-w-0">
-                      <h4 className="font-['Anek_Bangla',sans-serif] text-base font-bold text-neutral-900 dark:text-white truncate">
+                      <h4 className="font-sans text-base font-bold text-neutral-900 dark:text-white truncate">
                         {plan.name}
                       </h4>
                     </div>
@@ -365,14 +365,14 @@ export const SubscriptionView: React.FC = () => {
                   {/* Price info */}
                   <div className="text-right shrink-0">
                     {hasDiscount && (
-                      <span className="font-['Anek_Bangla',sans-serif] text-xs text-neutral-400 dark:text-neutral-500 line-through mr-1 font-bold">
+                      <span className="font-sans text-xs text-neutral-400 dark:text-neutral-500 line-through mr-1 font-bold">
                         ৳{plan.price}
                       </span>
                     )}
-                    <span className="font-['Anek_Bangla',sans-serif] text-xl sm:text-2xl font-black text-[#12544F] dark:text-[#2DD4BF]">
+                    <span className="font-sans text-xl sm:text-2xl font-black text-[#12544F] dark:text-[#2DD4BF]">
                       ৳{effectivePrice}
                     </span>
-                    <span className="block font-['Anek_Bangla',sans-serif] text-[11.5px] font-bold text-neutral-500 dark:text-neutral-400">
+                    <span className="block font-sans text-[11.5px] font-bold text-neutral-500 dark:text-neutral-400">
                       /{durationDays} দিন
                     </span>
                   </div>
@@ -389,10 +389,10 @@ export const SubscriptionView: React.FC = () => {
               <Sparkles className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-['Anek_Bangla',sans-serif] font-bold text-[#12544F] dark:text-[#2DD4BF] text-[13px]">
+              <p className="font-sans font-bold text-[#12544F] dark:text-[#2DD4BF] text-[13px]">
                 পূর্বের মেয়াদের সাথে নতুন দিন যোগ হবে ⚡
               </p>
-              <p className="font-['Anek_Bangla',sans-serif] text-neutral-600 dark:text-neutral-300 text-[12px] mt-0.5 leading-relaxed">
+              <p className="font-sans text-neutral-600 dark:text-neutral-300 text-[12px] mt-0.5 leading-relaxed">
                 বর্তমান <strong className="text-[#12544F] dark:text-[#2DD4BF] font-bold">{daysRemaining} দিনের</strong> সাথে নতুন প্ল্যানের{' '}
                 <strong>{selectedPlan.duration_days ?? (selectedPlan as any).durationDays ?? 30} দিন</strong> যুক্ত হয়ে মোট{' '}
                 <strong className="text-[#12544F] dark:text-[#2DD4BF] font-black underline">
@@ -416,7 +416,7 @@ export const SubscriptionView: React.FC = () => {
               }
             }}
             className={cn(
-              "font-['Anek_Bangla',sans-serif] text-sm font-semibold underline underline-offset-4 cursor-pointer transition-colors",
+              "font-sans text-sm font-semibold underline underline-offset-4 cursor-pointer transition-colors",
               appliedCoupon
                 ? "text-red-500 hover:text-red-600"
                 : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -432,10 +432,10 @@ export const SubscriptionView: React.FC = () => {
             <button
               type="button"
               onClick={handlePaymentInitiate}
-              className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] flex items-center justify-center gap-2.5 font-['Anek_Bangla',sans-serif] shadow-sm transition-all cursor-pointer select-none touch-manipulation"
+              className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] flex items-center justify-center gap-2.5 font-sans shadow-sm transition-all cursor-pointer select-none touch-manipulation"
             >
               <span>পেমেন্ট করতে এগিয়ে যান</span>
-              <div className="px-2 py-0.5 rounded-lg bg-white/20 text-white font-['Anek_Bangla',sans-serif] text-sm font-bold flex items-center gap-1.5">
+              <div className="px-2 py-0.5 rounded-lg bg-white/20 text-white font-sans text-sm font-bold flex items-center gap-1.5">
                 {appliedCoupon && (
                   <span className="line-through text-white/60 text-xs">
                     ৳{selectedPlan.price}
@@ -460,7 +460,7 @@ export const SubscriptionView: React.FC = () => {
           <div className="p-1.5 rounded-xl bg-[#12544F]/10 dark:bg-[#12544F]/25 text-[#12544F] dark:text-[#2DD4BF]">
             <Crown className="w-4 h-4" />
           </div>
-          <h3 className="font-['Anek_Bangla',sans-serif] text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
+          <h3 className="font-sans text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
             প্রিমিয়াম প্ল্যানে যা যা থাকছে
           </h3>
         </div>
@@ -505,7 +505,7 @@ export const SubscriptionView: React.FC = () => {
               >
                 <Icon className="w-4 h-4" />
               </div>
-              <span className="font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
+              <span className="font-sans text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
                 {b.label}
               </span>
             </div>
@@ -515,13 +515,13 @@ export const SubscriptionView: React.FC = () => {
 
       {/* ── 5. Comparison Table (1:1 with Flutter) ── */}
       <div className="mb-5">
-        <h3 className="font-['Anek_Bangla',sans-serif] text-center text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-3">
+        <h3 className="font-sans text-center text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-3">
           ফ্রি বনাম প্রিমিয়াম
         </h3>
 
         <div className="bg-white dark:bg-[#121212] rounded-[20px] border border-neutral-200/80 dark:border-white/[0.08] overflow-hidden shadow-xs">
           {/* Table Header */}
-          <div className="grid grid-cols-12 p-3.5 sm:p-4 bg-neutral-50 dark:bg-[#18181B] border-b border-neutral-100 dark:border-white/[0.08] text-xs font-bold text-neutral-600 dark:text-neutral-300 font-['Anek_Bangla',sans-serif]">
+          <div className="grid grid-cols-12 p-3.5 sm:p-4 bg-neutral-50 dark:bg-[#18181B] border-b border-neutral-100 dark:border-white/[0.08] text-xs font-bold text-neutral-600 dark:text-neutral-300 font-sans">
             <div className="col-span-6">ফিচারসমূহ</div>
             <div className="col-span-3 text-center">ফ্রি</div>
             <div className="col-span-3 text-center text-[#12544F] dark:text-[#2DD4BF]">
@@ -537,7 +537,7 @@ export const SubscriptionView: React.FC = () => {
                   {row.label}
                 </div>
 
-                <div className="col-span-3 text-center font-bold text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+                <div className="col-span-3 text-center font-bold text-neutral-500 dark:text-neutral-400 font-sans">
                   {typeof row.free === 'boolean' ? (
                     row.free ? (
                       <Check className="w-4 h-4 text-emerald-600 mx-auto" />
@@ -549,7 +549,7 @@ export const SubscriptionView: React.FC = () => {
                   )}
                 </div>
 
-                <div className="col-span-3 text-center font-bold text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif]">
+                <div className="col-span-3 text-center font-bold text-[#12544F] dark:text-[#2DD4BF] font-sans">
                   {typeof row.pro === 'boolean' ? (
                     <Check className="w-4 h-4 text-emerald-600 mx-auto" />
                   ) : (

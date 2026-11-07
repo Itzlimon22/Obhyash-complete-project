@@ -96,7 +96,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white dark:bg-[#18181B] rounded-t-[28px] sm:rounded-[24px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#27272A] font-['Anek_Bangla',sans-serif] max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md bg-white dark:bg-[#18181B] rounded-t-[28px] sm:rounded-[24px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#27272A] font-sans max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar */}
@@ -108,7 +108,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-[17px] font-bold text-[#B91C1C] dark:text-[#FCA5A5] leading-tight font-['Anek_Bangla',sans-serif]">
+            <h3 className="text-[17px] font-bold text-[#B91C1C] dark:text-[#FCA5A5] leading-tight font-sans">
               অ্যাকাউন্ট মুছে ফেলো (Delete Account)
             </h3>
             <p className="text-[12.5px] text-neutral-500 dark:text-[#94A3B8] mt-0.5 font-['HindSiliguri',sans-serif]">
@@ -129,7 +129,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
         {/* Consequences Bullet Points */}
         <div className="space-y-2 mb-5">
-          <p className="text-[13.5px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+          <p className="text-[13.5px] font-bold text-neutral-900 dark:text-white font-sans">
             অ্যাকাউন্ট মুছে ফেললে যা ঘটবে:
           </p>
           <ul className="space-y-2 text-[12.5px] text-neutral-600 dark:text-[#CBD5E1] leading-relaxed font-['HindSiliguri',sans-serif]">
@@ -150,7 +150,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
         {/* Confirmation Text Box */}
         <div className="space-y-2 mb-5">
-          <label className="block text-[13px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+          <label className="block text-[13px] font-bold text-neutral-900 dark:text-white font-sans">
             নিশ্চিত করতে নিচে &ldquo;DELETE&rdquo; লিখো:
           </label>
           <input

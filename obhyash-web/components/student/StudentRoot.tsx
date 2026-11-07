@@ -1513,7 +1513,7 @@ export default function StudentRoot({
                   type="button"
                   onClick={() => setHistoryTab("exams")}
                   className={cn(
-                    "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                    "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-sans",
                     historyTab === "exams"
                       ? "bg-[#12544F] text-white shadow-xs"
                       : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
@@ -1525,7 +1525,7 @@ export default function StudentRoot({
                   type="button"
                   onClick={() => setHistoryTab("questions")}
                   className={cn(
-                    "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                    "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-sans",
                     historyTab === "questions"
                       ? "bg-[#12544F] text-white shadow-xs"
                       : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"

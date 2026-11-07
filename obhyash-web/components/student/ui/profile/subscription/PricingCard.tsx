@@ -71,7 +71,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     >
       <div
         className={cn(
-          "absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold font-['Anek_Bangla',sans-serif] uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-xs z-20 whitespace-nowrap",
+          "absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold font-sans uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-xs z-20 whitespace-nowrap",
           badgeClasses
         )}
       >
@@ -95,18 +95,18 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             )}
           </div>
 
-          <h3 className="font-['Anek_Bangla',sans-serif] text-base sm:text-lg font-bold text-neutral-900 dark:text-white tracking-wide mb-2">
+          <h3 className="font-sans text-base sm:text-lg font-bold text-neutral-900 dark:text-white tracking-wide mb-2">
             {plan.name}
           </h3>
 
           {/* Pricing Display */}
           <div className="flex flex-col items-center justify-center mb-1">
             {hasDiscount && (
-              <div className="flex items-center gap-1.5 text-xs text-neutral-400 dark:text-neutral-500 line-through font-bold mb-0.5 font-['Anek_Bangla',sans-serif]">
+              <div className="flex items-center gap-1.5 text-xs text-neutral-400 dark:text-neutral-500 line-through font-bold mb-0.5 font-sans">
                 <span>মূল্য: ৳{BanglaNameHelper.toBanglaNumeral(plan.price)}</span>
               </div>
             )}
-            <div className="flex items-start justify-center gap-1 relative font-['Anek_Bangla',sans-serif]">
+            <div className="flex items-start justify-center gap-1 relative font-sans">
               <span className="text-2xl sm:text-3xl font-black text-neutral-400 mt-1">
                 ৳
               </span>
@@ -128,7 +128,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             </div>
           </div>
 
-          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-5 font-['Anek_Bangla',sans-serif]">
+          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-5 font-sans">
             {monthlyText}
           </p>
 
@@ -156,7 +156,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             {plan.price > 0 && !isCurrent && (
               <div className="mb-2.5 flex items-center justify-center">
                 {hasDiscount && discountInfo ? (
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 font-['Anek_Bangla',sans-serif]">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 font-sans">
                     <Tag size={12} className="text-emerald-500 shrink-0" />
                     <span>{discountInfo.code} কুপন যুক্ত (৳{BanglaNameHelper.toBanglaNumeral(discountInfo.discountAmount)} ছাড়)</span>
                     <button
@@ -178,7 +178,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
                       e.stopPropagation();
                       onOpenCouponModal?.();
                     }}
-                    className="inline-flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 hover:text-[#12544F] dark:hover:text-[#2DD4BF] font-bold font-['Anek_Bangla',sans-serif] transition-colors hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 hover:text-[#12544F] dark:hover:text-[#2DD4BF] font-bold font-sans transition-colors hover:underline cursor-pointer"
                   >
                     <Tag size={12} className="text-emerald-500 shrink-0" />
                     <span>কুপন কোড আছে?</span>
@@ -190,7 +190,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             <button
               onClick={onSelect}
               className={cn(
-                "w-full h-[46px] rounded-xl font-['Anek_Bangla',sans-serif] font-bold text-[15px] tracking-[0.2px] transition-all cursor-pointer select-none",
+                "w-full h-[46px] rounded-xl font-sans font-bold text-[15px] tracking-[0.2px] transition-all cursor-pointer select-none",
                 isCurrent
                   ? "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-500 dark:text-neutral-400 border border-neutral-200/80 dark:border-white/[0.08] cursor-default"
                   : buttonClasses

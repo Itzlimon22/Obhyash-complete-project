@@ -600,7 +600,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
                 <School size={18} className="text-[#2563EB]" />
               )}
             </div>
-            <h1 className="text-[17px] sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
+            <h1 className="text-[17px] sm:text-lg font-bold text-neutral-900 dark:text-white font-sans leading-tight">
               {institute.name} প্রশ্নব্যাংক
             </h1>
           </div>
@@ -637,7 +637,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
             >
               {/* Top Row: Title + Type Badge */}
               <div className="flex items-center justify-between gap-2">
-                <h3 className="font-bold text-[15.5px] sm:text-base text-[#0F172A] dark:text-white font-['Anek_Bangla',sans-serif] tracking-tight truncate flex-1">
+                <h3 className="font-bold text-[15.5px] sm:text-base text-[#0F172A] dark:text-white font-sans tracking-tight truncate flex-1">
                   {set.title}
                 </h3>
                 <span

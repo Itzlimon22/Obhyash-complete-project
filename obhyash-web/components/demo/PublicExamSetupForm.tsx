@@ -184,7 +184,7 @@ export default function PublicExamSetupForm({
         <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex flex-col gap-2">
           <label
             htmlFor="public-level-select"
-            className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]"
+            className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 font-sans"
           >
             ক্লাস / পর্যায় নির্বাচন
           </label>
@@ -193,7 +193,7 @@ export default function PublicExamSetupForm({
               id="public-level-select"
               value={selectedLevel}
               onChange={(e) => handleLevelChange(e.target.value as LevelId)}
-              className="w-full appearance-none px-3.5 py-2.5 pr-9 text-sm sm:text-base font-bold rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] outline-none cursor-pointer"
+              className="w-full appearance-none px-3.5 py-2.5 pr-9 text-sm sm:text-base font-bold rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-900 dark:text-white font-sans outline-none cursor-pointer"
             >
               {PUBLIC_LEVELS.map((lvl) => (
                 <option key={lvl.id} value={lvl.id}>
@@ -213,7 +213,7 @@ export default function PublicExamSetupForm({
           <div className="flex items-center justify-between">
             <label
               htmlFor="public-stream-select"
-              className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]"
+              className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 font-sans"
             >
               বিভাগ নির্বাচন (Science, Commerce, Arts)
             </label>
@@ -229,7 +229,7 @@ export default function PublicExamSetupForm({
               value={selectedStream}
               disabled={selectedLevel === 'CLASS_8'}
               onChange={(e) => handleStreamChange(e.target.value as StreamId)}
-              className="w-full appearance-none px-3.5 py-2.5 pr-9 text-sm sm:text-base font-bold rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full appearance-none px-3.5 py-2.5 pr-9 text-sm sm:text-base font-bold rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-900 dark:text-white font-sans outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {PUBLIC_STREAMS.map((str) => (
                 <option key={str.id} value={str.id}>
@@ -251,7 +251,7 @@ export default function PublicExamSetupForm({
             onClick={() => setShowSubjectModal(true)}
             className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-white/[0.16] shadow-xs"
           >
-            <span className="text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-neutral-100">
+            <span className="text-sm sm:text-base font-bold truncate font-sans text-neutral-900 dark:text-neutral-100">
               {selectedSubData ? selectedSubData.label : 'বিষয় নির্বাচন করো...'}
             </span>
             <ChevronDown
@@ -269,7 +269,7 @@ export default function PublicExamSetupForm({
           <div className="flex flex-col gap-3">
             {/* Chapter Dropdown Trigger */}
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-['Anek_Bangla',sans-serif]">
+              <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-sans">
                 অধ্যায়
               </label>
               <button
@@ -277,7 +277,7 @@ export default function PublicExamSetupForm({
                 onClick={() => setShowChapterModal(true)}
                 className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08]"
               >
-                <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400 font-normal">
+                <span className="text-sm sm:text-base truncate font-sans text-neutral-500 dark:text-neutral-400 font-normal">
                   {selectedChapters.size === 0 || selectedChapters.size === availableChapters.length
                     ? 'সব অধ্যায়'
                     : `${selectedChapters.size}টি অধ্যায় নির্বাচিত`}
@@ -291,7 +291,7 @@ export default function PublicExamSetupForm({
 
             {/* Topic Dropdown Trigger (App Install Trigger) */}
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-['Anek_Bangla',sans-serif]">
+              <label className="block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1.5 font-sans">
                 টপিক
               </label>
               <button
@@ -299,7 +299,7 @@ export default function PublicExamSetupForm({
                 onClick={() => setShowTopicLockModal(true)}
                 className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer bg-neutral-50/80 dark:bg-[#18181B] border-neutral-200/90 dark:border-white/[0.08]"
               >
-                <span className="text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif] text-neutral-400 dark:text-neutral-500 font-normal">
+                <span className="text-sm sm:text-base truncate font-sans text-neutral-400 dark:text-neutral-500 font-normal">
                   সব টপিক
                 </span>
                 <ChevronDown
@@ -347,7 +347,7 @@ export default function PublicExamSetupForm({
                     });
                   }}
                   className={cn(
-                    "py-2 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    "py-2 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-sans cursor-pointer",
                     isSelected
                       ? 'bg-[#0b4d44] text-white shadow-xs'
                       : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -388,7 +388,7 @@ export default function PublicExamSetupForm({
                     });
                   }}
                   className={cn(
-                    "py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    "py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-sans cursor-pointer",
                     isSelected
                       ? 'bg-[#0b4d44] text-white shadow-xs'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -408,7 +408,7 @@ export default function PublicExamSetupForm({
         >
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-sans">
                 মোট প্রশ্ন:
               </span>
               <div className="flex items-center justify-between w-40 px-3 py-1.5 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
@@ -424,7 +424,7 @@ export default function PublicExamSetupForm({
                 >
                   −
                 </button>
-                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
+                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-sans">
                   {questionCount} টি
                 </span>
                 <button
@@ -463,7 +463,7 @@ export default function PublicExamSetupForm({
                       setDurationMinutes(cnt);
                     }}
                     className={cn(
-                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-['Anek_Bangla',sans-serif] cursor-pointer",
+                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-sans cursor-pointer",
                       isSelected
                         ? 'bg-[#0b4d44] text-white shadow-xs'
                         : 'bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400'
@@ -484,7 +484,7 @@ export default function PublicExamSetupForm({
         >
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+              <span className="text-sm sm:text-base font-bold text-neutral-800 dark:text-neutral-200 font-sans">
                 মোট সময়:
               </span>
               <div className="flex items-center justify-between w-40 px-3 py-1.5 rounded-xl bg-[#f0f4f9] dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08]">
@@ -496,7 +496,7 @@ export default function PublicExamSetupForm({
                 >
                   −
                 </button>
-                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-['Anek_Bangla',sans-serif]">
+                <span className="text-sm sm:text-base font-bold text-[#0b4d44] dark:text-[#34D399] font-sans">
                   {durationMinutes} মি.
                 </span>
                 <button
@@ -520,7 +520,7 @@ export default function PublicExamSetupForm({
                     type="button"
                     onClick={() => setDurationMinutes(mins)}
                     className={cn(
-                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-['Anek_Bangla',sans-serif] cursor-pointer",
+                      "py-2 rounded-xl text-xs sm:text-sm font-bold text-center transition-all font-sans cursor-pointer",
                       isSelected
                         ? 'bg-[#0b4d44] text-white shadow-xs'
                         : 'bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400'
@@ -552,7 +552,7 @@ export default function PublicExamSetupForm({
                   type="button"
                   onClick={() => {}}
                   className={cn(
-                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-center font-sans cursor-pointer",
                     isSelected
                       ? 'bg-[#0b4d44] text-white shadow-xs'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -569,7 +569,7 @@ export default function PublicExamSetupForm({
         <div className="my-1 px-4 py-2.5 rounded-full bg-[#f2fbf7] dark:bg-[#121f1c] border border-emerald-200/80 dark:border-emerald-800/40 shadow-xs flex items-center justify-around text-center">
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-sky-500 font-bold">?</span>
-            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-sans">
               {questionCount}টি প্রশ্ন
             </span>
           </div>
@@ -578,7 +578,7 @@ export default function PublicExamSetupForm({
 
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-amber-500 font-bold">⏱</span>
-            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-sans">
               {durationMinutes} মিনিট
             </span>
           </div>
@@ -587,7 +587,7 @@ export default function PublicExamSetupForm({
 
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-rose-500 font-bold">⊖</span>
-            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-sans">
               -0.25
             </span>
           </div>
@@ -596,7 +596,7 @@ export default function PublicExamSetupForm({
 
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-purple-500 font-bold">⚡</span>
-            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-sans">
               +50 XP
             </span>
           </div>
@@ -607,7 +607,7 @@ export default function PublicExamSetupForm({
           type="button"
           disabled={isLoading}
           onClick={handleStart}
-          className="w-full py-3.5 rounded-2xl bg-[#0b4d44] hover:bg-[#093e37] active:scale-[0.99] text-white font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 mt-1 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif] shadow-sm disabled:opacity-50"
+          className="w-full py-3.5 rounded-2xl bg-[#0b4d44] hover:bg-[#093e37] active:scale-[0.99] text-white font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 mt-1 mb-6 cursor-pointer font-sans shadow-sm disabled:opacity-50"
         >
           <span>শুরু করো</span>
         </button>
@@ -678,7 +678,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
     <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex flex-col gap-2.5 sm:gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <h2 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+          <h2 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white font-sans">
             {title}
           </h2>
           {tooltip && (
@@ -723,7 +723,7 @@ const SegmentedGroup: React.FC<SegmentedGroupProps> = ({ items, selectedItems, o
             type="button"
             onClick={() => onToggle(item)}
             className={cn(
-              "flex-1 min-w-[65px] py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
+              "flex-1 min-w-[65px] py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 text-center font-sans cursor-pointer",
               isSelected
                 ? 'bg-[#12544F] text-white border border-[#12544F] shadow-xs active:scale-95'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -764,7 +764,7 @@ const StepperControl: React.FC<StepperControlProps> = ({
       >
         <span className="text-base font-bold">−</span>
       </button>
-      <span className="px-2.5 text-sm sm:text-base font-bold text-[#12544F] dark:text-[#34D399] font-['Anek_Bangla',sans-serif] min-w-[55px] text-center">
+      <span className="px-2.5 text-sm sm:text-base font-bold text-[#12544F] dark:text-[#34D399] font-sans min-w-[55px] text-center">
         {value} {unit}
       </span>
       <button
@@ -815,7 +815,7 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
         <div className="px-5 pt-4 pb-3 border-b border-neutral-100 dark:border-white/[0.08]">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white font-sans">
                 বিষয় নির্বাচন করো
               </h3>
               <p className="text-xs text-neutral-500">
@@ -862,7 +862,7 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
                   type="button"
                   onClick={() => onSelect(sub.id)}
                   className={cn(
-                    "w-full flex items-center justify-between p-3 rounded-2xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer group",
+                    "w-full flex items-center justify-between p-3 rounded-2xl border transition-all text-left font-sans cursor-pointer group",
                     isSelected
                       ? 'bg-[#12544F] border-[#12544F] text-white shadow-sm'
                       : 'bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700'
@@ -908,7 +908,7 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
               );
             })
           ) : (
-            <div className="py-10 text-center text-neutral-400 dark:text-neutral-500 font-['Anek_Bangla',sans-serif] text-sm">
+            <div className="py-10 text-center text-neutral-400 dark:text-neutral-500 font-sans text-sm">
               &ldquo;{modalSearch}&rdquo; দিয়ে কোনো বিষয় খুঁজে পাওয়া যায়নি।
             </div>
           )}
@@ -966,7 +966,7 @@ const ChapterMultiSelectModal: React.FC<ChapterMultiSelectModalProps> = ({
       <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in slide-in-from-bottom duration-300">
         <div className="sm:hidden w-10 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mx-auto my-3" />
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-neutral-100 dark:border-white/[0.08]">
-          <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] truncate mr-2">
+          <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-sans truncate mr-2">
             {title}
           </h3>
 
@@ -975,7 +975,7 @@ const ChapterMultiSelectModal: React.FC<ChapterMultiSelectModalProps> = ({
               type="button"
               onClick={toggleSelectAll}
               className={cn(
-                "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition font-['Anek_Bangla',sans-serif] cursor-pointer",
+                "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition font-sans cursor-pointer",
                 isAllSelected
                   ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
                   : 'bg-neutral-100 dark:bg-[#2C2C2E] border-neutral-200 dark:border-[#3A3A3C] text-neutral-700 dark:text-neutral-300'
@@ -996,7 +996,7 @@ const ChapterMultiSelectModal: React.FC<ChapterMultiSelectModalProps> = ({
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
           {items.length === 0 ? (
-            <div className="py-10 text-center text-neutral-400 dark:text-neutral-500 font-['Anek_Bangla',sans-serif] text-sm">
+            <div className="py-10 text-center text-neutral-400 dark:text-neutral-500 font-sans text-sm">
               এই বিষয়ের সকল অধ্যায় সমন্বিত পূর্ণাঙ্গ মডেল টেস্ট অনুষ্ঠিত হবে।
             </div>
           ) : (
@@ -1011,7 +1011,7 @@ const ChapterMultiSelectModal: React.FC<ChapterMultiSelectModalProps> = ({
                   type="button"
                   onClick={() => toggleSelection(id)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
+                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-sans cursor-pointer",
                     isSelected
                       ? 'bg-[#12544F]/10 dark:bg-[#12544F]/20 border-[#12544F] dark:border-[#34D399]/60 text-[#12544F] dark:text-[#34D399]'
                       : 'bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700'
@@ -1042,7 +1042,7 @@ const ChapterMultiSelectModal: React.FC<ChapterMultiSelectModalProps> = ({
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3 px-4 rounded-[14px] bg-[#12544F] text-white shadow-md hover:brightness-105 active:scale-[0.99] font-bold text-base font-['Anek_Bangla',sans-serif] transition cursor-pointer"
+            className="w-full py-3 px-4 rounded-[14px] bg-[#12544F] text-white shadow-md hover:brightness-105 active:scale-[0.99] font-bold text-base font-sans transition cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size === 0 ? 'সব' : currentSelected.size})
           </button>

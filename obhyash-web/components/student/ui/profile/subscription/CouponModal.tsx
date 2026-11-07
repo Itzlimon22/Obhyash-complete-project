@@ -76,7 +76,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
               <Tag size={18} />
             </div>
             <div>
-              <h3 className="text-[16px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+              <h3 className="text-[16px] font-bold text-neutral-900 dark:text-white font-sans">
                 কুপন কোড প্রয়োগ করো
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif]">
@@ -104,7 +104,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
                     {appliedCoupon.code}
                   </span>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#16A34A] text-white font-['Anek_Bangla',sans-serif]">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#16A34A] text-white font-sans">
                   সক্রিয়
                 </span>
               </div>
@@ -113,7 +113,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
               </p>
               <button
                 onClick={handleRemove}
-                className="w-full py-2 bg-white dark:bg-[#1C1C1E] hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-[14px] text-xs font-bold font-['Anek_Bangla',sans-serif] transition-colors"
+                className="w-full py-2 bg-white dark:bg-[#1C1C1E] hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-[14px] text-xs font-bold font-sans transition-colors"
               >
                 কুপন বাতিল / রিমুভ করো
               </button>
@@ -128,7 +128,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
               className="space-y-4"
             >
               <div>
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-['Anek_Bangla',sans-serif] mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 font-sans mb-1.5">
                   কুপন কোড (Coupon Code)
                 </label>
                 <div className="relative">
@@ -167,7 +167,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
               <button
                 type="submit"
                 disabled={!inputCode.trim()}
-                className="w-full h-[48px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] disabled:opacity-50 text-white font-bold text-[15px] font-['Anek_Bangla',sans-serif] shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="w-full h-[48px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] disabled:opacity-50 text-white font-bold text-[15px] font-sans shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <span>কুপন যোগ করো</span>
                 <ArrowRight size={16} />

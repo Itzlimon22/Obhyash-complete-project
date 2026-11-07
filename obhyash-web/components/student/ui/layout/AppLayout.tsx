@@ -218,7 +218,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           type="button"
                           onClick={() => headerSegment.onTabSelect(tab.id)}
                           className={cn(
-                            "h-[30px] px-3 sm:px-4 rounded-[9px] text-[13px] font-['Anek_Bangla',sans-serif] transition-all flex items-center justify-center cursor-pointer",
+                            "h-[30px] px-3 sm:px-4 rounded-[9px] text-[13px] font-sans transition-all flex items-center justify-center cursor-pointer",
                             isActive
                               ? "bg-[#12544F] text-white font-semibold shadow-xs"
                               : "text-[#71717A] dark:text-[#A1A1AA] hover:text-[#0F172A] dark:hover:text-white font-normal"
@@ -241,7 +241,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           className="group flex flex-col items-center cursor-pointer select-none shrink-0"
                         >
                           <span
-                            className={`text-[15.5px] tracking-[-0.2px] font-['Anek_Bangla',sans-serif] transition-colors ${
+                            className={`text-[15.5px] tracking-[-0.2px] font-sans transition-colors ${
                               isActive
                                 ? "font-semibold text-[#0F172A] dark:text-white"
                                 : "font-medium text-[#64748B] dark:text-[#A1A1AA] group-hover:text-[#0F172A] dark:group-hover:text-white"
@@ -263,12 +263,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 ) : !hideTitle ? (
                   centerTitle ? (
                     <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center pointer-events-none px-12 sm:px-16">
-                      <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[17.5px] sm:text-[19px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate pointer-events-auto text-center max-w-[70%]">
+                      <h1 className="font-sans font-bold text-[17.5px] sm:text-[19px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate pointer-events-auto text-center max-w-[70%]">
                         {title}
                       </h1>
                     </div>
                   ) : (
-                    <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
+                    <h1 className="font-sans font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
                       {title}
                     </h1>
                   )
@@ -289,7 +289,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
                   >
                     <Flame size={23} className="fill-[#EF4444] shrink-0" />
-                    <span className="text-[18.5px] font-bold font-['Anek_Bangla',sans-serif] tabular-nums leading-none">
+                    <span className="text-[18.5px] font-bold font-sans tabular-nums leading-none">
                       {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
                     </span>
                   </button>
@@ -324,7 +324,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     title="লেজেন্ডস লিগ দেখুন"
                   >
                     <Crown size={14} className="shrink-0" />
-                    <span className="font-['Anek_Bangla',sans-serif]">লেজেন্ডস লীগ</span>
+                    <span className="font-sans">লেজেন্ডস লীগ</span>
                   </button>
                 </div>
               ) : null}

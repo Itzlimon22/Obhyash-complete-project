@@ -189,13 +189,13 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <Calendar className="w-4.5 h-4.5" />
           </div>
-          <h3 className="text-sm sm:text-[15px] font-bold font-['Anek_Bangla',sans-serif] text-[#18181B] dark:text-white leading-tight">
+          <h3 className="text-sm sm:text-[15px] font-bold font-sans text-[#18181B] dark:text-white leading-tight">
             গত ৩০ দিনের অ্যাক্টিভিটি
           </h3>
         </div>
 
         {/* Streak Badge (Royal Mulberry #601D49, Flutter 1:1) */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#601D49]/15 dark:bg-[#601D49]/25 border border-[#601D49]/30 text-[#601D49] dark:text-[#F472B6] text-xs font-bold font-['Anek_Bangla',sans-serif] shrink-0">
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#601D49]/15 dark:bg-[#601D49]/25 border border-[#601D49]/30 text-[#601D49] dark:text-[#F472B6] text-xs font-bold font-sans shrink-0">
           <span className="text-xs">🔥</span>
           <span>{BanglaNameHelper.toBanglaNumeral(streakCount)} দিন</span>
         </div>

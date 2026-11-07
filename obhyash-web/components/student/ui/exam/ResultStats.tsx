@@ -95,13 +95,13 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               />
 
               {/* Center Percentage */}
-              <span className="absolute font-['Anek_Bangla',sans-serif] font-black text-sm sm:text-base text-neutral-900 dark:text-white">
+              <span className="absolute font-sans font-black text-sm sm:text-base text-neutral-900 dark:text-white">
                 {roundedPercentage}%
               </span>
             </div>
           </div>
 
-          <span className="text-xs sm:text-[13px] font-bold text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif] mt-2">
+          <span className="text-xs sm:text-[13px] font-bold text-neutral-500 dark:text-neutral-400 font-sans mt-2">
             সঠিকতা
           </span>
         </div>
@@ -113,7 +113,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
             <Trophy size={18} />
           </div>
 
-          <div className="flex flex-col items-center my-0.5 font-['Anek_Bangla',sans-serif]">
+          <div className="flex flex-col items-center my-0.5 font-sans">
             <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white leading-tight">
               {finalScore.toFixed(2).replace(/\.00$/, '')}
             </span>
@@ -122,7 +122,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
             </span>
           </div>
 
-          <span className="text-xs sm:text-[13px] font-bold text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+          <span className="text-xs sm:text-[13px] font-bold text-neutral-500 dark:text-neutral-400 font-sans">
             প্রাপ্ত নম্বর
           </span>
         </div>
@@ -134,13 +134,13 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
             <Clock size={18} />
           </div>
 
-          <div className="flex flex-col items-center my-0.5 font-['Anek_Bangla',sans-serif]">
+          <div className="flex flex-col items-center my-0.5 font-sans">
             <span className="text-base sm:text-lg font-black text-neutral-900 dark:text-white leading-tight">
               {formatDuration(timeTaken)}
             </span>
           </div>
 
-          <span className="text-xs sm:text-[13px] font-bold text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
+          <span className="text-xs sm:text-[13px] font-bold text-neutral-500 dark:text-neutral-400 font-sans">
             সময় লেগেছে
           </span>
         </div>
@@ -150,7 +150,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
       <div className="rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden">
         {/* Table Title Header */}
         <div className="px-4 sm:px-5 py-3.5 bg-white dark:bg-[#121212] border-b border-neutral-100 dark:border-white/[0.08]">
-          <h4 className="font-['Anek_Bangla',sans-serif] text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
+          <h4 className="font-sans text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
             ফলাফল বিস্তারিত
           </h4>
         </div>
@@ -164,7 +164,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                 মোট প্রশ্ন
               </span>
-              <span className="font-['Anek_Bangla',sans-serif] font-bold text-neutral-900 dark:text-white">
+              <span className="font-sans font-bold text-neutral-900 dark:text-white">
                 {totalQuestions}
               </span>
             </div>
@@ -174,7 +174,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                 উত্তর দেওয়া হয়েছে
               </span>
-              <span className="font-['Anek_Bangla',sans-serif] font-bold text-neutral-900 dark:text-white">
+              <span className="font-sans font-bold text-neutral-900 dark:text-white">
                 {answeredCount}
               </span>
             </div>
@@ -184,7 +184,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                 উত্তর দেওয়া হয়নি
               </span>
-              <span className="font-['Anek_Bangla',sans-serif] font-bold text-neutral-900 dark:text-white">
+              <span className="font-sans font-bold text-neutral-900 dark:text-white">
                 {skippedCount}
               </span>
             </div>
@@ -197,7 +197,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                 সঠিক উত্তর
               </span>
-              <span className="font-['Anek_Bangla',sans-serif] font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="font-sans font-bold text-emerald-600 dark:text-emerald-400">
                 {correctCount}
               </span>
             </div>
@@ -207,7 +207,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                 ভুল উত্তর
               </span>
-              <span className="font-['Anek_Bangla',sans-serif] font-bold text-red-600 dark:text-red-400">
+              <span className="font-sans font-bold text-red-600 dark:text-red-400">
                 {wrongCount}
               </span>
             </div>
@@ -217,7 +217,7 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
               <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                 নেগেটিভ ({negativeMarking}x)
               </span>
-              <span className="font-['Anek_Bangla',sans-serif] font-bold text-red-600 dark:text-red-400">
+              <span className="font-sans font-bold text-red-600 dark:text-red-400">
                 -{negativeMarksDeduction.toFixed(2)}
               </span>
             </div>
@@ -226,10 +226,10 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
 
         {/* Highlighted Footer Summary Row */}
         <div className="px-4 sm:px-5 py-3.5 bg-white dark:bg-[#121212] border-t border-neutral-100 dark:border-white/[0.08] flex items-center justify-between">
-          <span className="font-['Anek_Bangla',sans-serif] font-bold text-sm sm:text-base text-neutral-900 dark:text-white">
+          <span className="font-sans font-bold text-sm sm:text-base text-neutral-900 dark:text-white">
             মোট প্রাপ্ত নম্বর
           </span>
-          <span className="font-['Anek_Bangla',sans-serif] font-black text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
+          <span className="font-sans font-black text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
             {finalScore.toFixed(2).replace(/\.00$/, '')} / {totalPoints}
           </span>
         </div>

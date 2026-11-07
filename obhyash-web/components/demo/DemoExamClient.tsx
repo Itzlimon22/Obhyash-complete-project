@@ -337,7 +337,7 @@ export default function DemoExamClient() {
 
             <h1
               className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight"
-              style={{ fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" }}
+              style={{ fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" }}
             >
               অনলাইন মডেল টেস্ট
             </h1>

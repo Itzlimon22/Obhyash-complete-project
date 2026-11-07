@@ -99,7 +99,7 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white dark:bg-[#18181B] rounded-t-[28px] sm:rounded-[24px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#27272A] font-['Anek_Bangla',sans-serif] relative"
+        className="w-full max-w-md bg-white dark:bg-[#18181B] rounded-t-[28px] sm:rounded-[24px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#27272A] font-sans relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar */}

@@ -9,7 +9,7 @@ import {
   WhatsAppIcon,
 } from "./BrandIcons";
 
-const display = { fontFamily: "'Kalpurush', 'Hind Siliguri', sans-serif" };
+const display = { fontFamily: "var(--font-inter), var(--font-hind), 'Hind Siliguri', sans-serif" };
 const quick = [
   ["হোম", "/"],
   ["ফিচারসমূহ", "#features"],

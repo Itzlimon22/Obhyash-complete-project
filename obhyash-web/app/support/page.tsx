@@ -100,7 +100,7 @@ export default function SupportPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#07080b] text-zinc-100 font-['Kalpurush',sans-serif]">
+    <div className="min-h-screen bg-[#07080b] text-zinc-100 font-sans">
       <BackButton onClick={() => router.push('/auth/login')} />
       <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-12">
         <div className="w-full animate-step">
@@ -159,7 +159,7 @@ export default function SupportPage() {
             <>
               <Heading title="সাপোর্টে যোগাযোগ" />
 
-              <form onSubmit={handleSubmit} className="mt-8 space-y-4 font-['Kalpurush',sans-serif]">
+              <form onSubmit={handleSubmit} className="mt-8 space-y-4 font-sans">
                 {/* 1. সমস্যার ক্যাটাগরি */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-zinc-300">
@@ -169,7 +169,7 @@ export default function SupportPage() {
                     <select
                       value={issueType}
                       onChange={(e) => setIssueType(e.target.value)}
-                      className="h-14 w-full appearance-none rounded-2xl border border-white/10 bg-black/40 px-5 pr-10 text-base text-white outline-none transition focus:border-[#ef4136]/60 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] cursor-pointer"
+                      className="h-14 w-full appearance-none rounded-2xl border border-white/10 bg-black/40 px-5 pr-10 text-base text-white outline-none transition focus:border-[#ef4136]/60 focus:ring-4 focus:ring-[#ef4136]/15 font-sans cursor-pointer"
                     >
                       <option value="" disabled className="bg-[#14161f] text-zinc-500">
                         ক্যাটাগরি নির্বাচন করো
@@ -212,7 +212,7 @@ export default function SupportPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="০১XXXXXXXXX"
-                      className="h-14 w-full rounded-2xl border border-white/10 bg-black/40 pl-12 pr-4 text-base text-white outline-none transition placeholder:text-zinc-600 focus:border-[#ef4136]/60 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif]"
+                      className="h-14 w-full rounded-2xl border border-white/10 bg-black/40 pl-12 pr-4 text-base text-white outline-none transition placeholder:text-zinc-600 focus:border-[#ef4136]/60 focus:ring-4 focus:ring-[#ef4136]/15 font-sans"
                     />
                   </div>
                 </div>
@@ -227,7 +227,7 @@ export default function SupportPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     rows={4}
                     placeholder="এখানে তোমার সমস্যা বিস্তারিত লিখে পাঠাও (কমপক্ষে ২০ অক্ষর)..."
-                    className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 text-base text-white outline-none transition placeholder:text-zinc-600 focus:border-[#ef4136]/60 focus:ring-4 focus:ring-[#ef4136]/15 font-['Kalpurush',sans-serif] resize-none"
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 text-base text-white outline-none transition placeholder:text-zinc-600 focus:border-[#ef4136]/60 focus:ring-4 focus:ring-[#ef4136]/15 font-sans resize-none"
                   />
                   <p className="mt-1 text-xs text-zinc-500">
                     কমপক্ষে ২০ অক্ষর লিখতে হবে

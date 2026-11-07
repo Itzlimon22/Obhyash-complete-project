@@ -461,7 +461,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       {!controlledTab && (
         <div className="flex items-center justify-between gap-3 mb-3 px-2.5">
           <div className="flex items-center gap-2">
-            <h1 className="font-['Anek_Bangla',sans-serif] text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
+            <h1 className="font-sans text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
               ইতিহাস
             </h1>
           </div>
@@ -470,7 +470,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               type="button"
               onClick={() => handleTabSelect("exams")}
               className={cn(
-                "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-sans",
                 currentTab === "exams"
                   ? "bg-[#12544F] text-white shadow-xs"
                   : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
@@ -482,7 +482,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               type="button"
               onClick={() => handleTabSelect("questions")}
               className={cn(
-                "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-sans",
                 currentTab === "questions"
                   ? "bg-[#12544F] text-white shadow-xs"
                   : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
@@ -592,7 +592,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   : "text-[#6B7280] dark:text-[#A3A3A3]"
               )}
             />
-            <span className="text-[13px] font-bold font-['Anek_Bangla',sans-serif] whitespace-nowrap">
+            <span className="text-[13px] font-bold font-sans whitespace-nowrap">
               {filterDate ? formatChipDate(filterDate) : "তারিখ"}
             </span>
             {filterDate && (
@@ -622,7 +622,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               <div className="w-14 h-14 rounded-full bg-[#12544F] flex items-center justify-center text-white mb-3.5 shadow-md">
                 <FlaskConical size={28} />
               </div>
-              <h3 className="font-['Anek_Bangla',sans-serif] text-base font-semibold text-[#111827] dark:text-white">
+              <h3 className="font-sans text-base font-semibold text-[#111827] dark:text-white">
                 কোনো পরীক্ষা দেওয়া হয়নি
               </h3>
               <p className="font-['HindSiliguri',sans-serif] text-[13px] text-[#A3A3A3] mt-1 max-w-xs">
@@ -636,26 +636,26 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               {/* Center-Aligned 3-Card Stat Row matching Flutter _buildStatCard */}
               <div className="grid grid-cols-3 gap-2 mb-4">
                 <div className="bg-white dark:bg-[#18181B] rounded-[14px] border border-[#E4E4E7] dark:border-[#27272A] p-2 py-3 shadow-xs flex flex-col items-center justify-center text-center">
-                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-sans">
                     {BanglaNameHelper.toBanglaNumeral(totalQuestions)}
                   </span>
-                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-['Anek_Bangla',sans-serif]">
+                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-sans">
                     মোট প্রশ্ন
                   </span>
                 </div>
                 <div className="bg-white dark:bg-[#18181B] rounded-[14px] border border-[#E4E4E7] dark:border-[#27272A] p-2 py-3 shadow-xs flex flex-col items-center justify-center text-center">
-                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-sans">
                     {BanglaNameHelper.toBanglaNumeral(totalCorrect)}
                   </span>
-                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-['Anek_Bangla',sans-serif]">
+                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-sans">
                     সঠিক উত্তর
                   </span>
                 </div>
                 <div className="bg-white dark:bg-[#18181B] rounded-[14px] border border-[#E4E4E7] dark:border-[#27272A] p-2 py-3 shadow-xs flex flex-col items-center justify-center text-center">
-                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-sans">
                     {BanglaNameHelper.toBanglaNumeral(avgScore)}%
                   </span>
-                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-['Anek_Bangla',sans-serif]">
+                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-sans">
                     গড় নম্বর
                   </span>
                 </div>
@@ -663,7 +663,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
               {/* Section Header: Title + Sort Mode Dropdown */}
               <div className="flex items-center justify-between mb-2.5">
-                <h2 className="text-[16px] font-extrabold text-[#111827] dark:text-white font-['Anek_Bangla',sans-serif]">
+                <h2 className="text-[16px] font-extrabold text-[#111827] dark:text-white font-sans">
                   সাম্প্রতিক পরীক্ষাসমূহ
                 </h2>
                 <div className="relative inline-flex items-center">
@@ -671,7 +671,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortMode)}
                     aria-label="পরীক্ষা সাজানোর ক্রম"
-                    className="h-8 pl-2 pr-6 rounded-[8px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] text-xs font-semibold text-neutral-700 dark:text-neutral-300 outline-none cursor-pointer appearance-none font-['Anek_Bangla',sans-serif]"
+                    className="h-8 pl-2 pr-6 rounded-[8px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] text-xs font-semibold text-neutral-700 dark:text-neutral-300 outline-none cursor-pointer appearance-none font-sans"
                   >
                     <option value="date">তারিখ অনুযায়ী</option>
                     <option value="scoreDesc">সর্বোচ্চ স্কোর</option>
@@ -734,7 +734,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-[12.5px] font-semibold text-[#111827] dark:text-white font-['Anek_Bangla',sans-serif]">
+                          <span className="text-[12.5px] font-semibold text-[#111827] dark:text-white font-sans">
                             {BanglaNameHelper.toBanglaNumeral(Math.round(score))}%
                           </span>
                         </div>
@@ -742,7 +742,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
                       {/* Middle: Details Column */}
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <h3 className="font-semibold text-[14px] text-[#111827] dark:text-white truncate leading-[1.25] font-['Anek_Bangla',sans-serif]">
+                        <h3 className="font-semibold text-[14px] text-[#111827] dark:text-white truncate leading-[1.25] font-sans">
                           {label}
                         </h3>
                         <div className="flex items-center gap-1 mt-1 text-[12px] text-[#71717A] dark:text-[#A1A1AA]">
@@ -750,11 +750,11 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                           <span className="truncate">{dateStr}</span>
                         </div>
                         <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                          <div className="px-2 py-0.5 rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium text-[#3F3F46] dark:text-[#E4E4E7] font-['Anek_Bangla',sans-serif]">
+                          <div className="px-2 py-0.5 rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium text-[#3F3F46] dark:text-[#E4E4E7] font-sans">
                             {BanglaNameHelper.toBanglaNumeral(record.correctCount ?? 0)} সঠিক,{" "}
                             {BanglaNameHelper.toBanglaNumeral(record.wrongCount ?? 0)} ভুল
                           </div>
-                          <div className="px-2 py-0.5 rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium text-[#3F3F46] dark:text-[#E4E4E7] flex items-center gap-1 font-['Anek_Bangla',sans-serif]">
+                          <div className="px-2 py-0.5 rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium text-[#3F3F46] dark:text-[#E4E4E7] flex items-center gap-1 font-sans">
                             <Timer size={11} className="shrink-0" />
                             <span>{durationStr}</span>
                           </div>
@@ -790,7 +790,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setExamPageSize((prev) => prev + 20)}
-                    className="w-[230px] h-[46px] rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] hover:border-emerald-500 text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white shadow-xs mx-auto flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 active:scale-95 transition-all cursor-pointer"
+                    className="w-[230px] h-[46px] rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] hover:border-emerald-500 text-sm font-bold font-sans text-[#0F172A] dark:text-white shadow-xs mx-auto flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 active:scale-95 transition-all cursor-pointer"
                   >
                     <ArrowDown size={16} className="text-[#059669] shrink-0" />
                     <span>আরও ২০টি পরীক্ষা লোড করো</span>
@@ -807,7 +807,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               <div className="w-14 h-14 rounded-full bg-[#12544F] flex items-center justify-center text-white mb-3.5 shadow-md">
                 <FlaskConical size={28} />
               </div>
-              <h3 className="font-['Anek_Bangla',sans-serif] text-base font-semibold text-[#111827] dark:text-white">
+              <h3 className="font-sans text-base font-semibold text-[#111827] dark:text-white">
                 কোনো প্রশ্ন পাওয়া যায়নি
               </h3>
               <p className="font-['HindSiliguri',sans-serif] text-[13px] text-[#A3A3A3] mt-1 max-w-xs">
@@ -851,7 +851,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setQuestionPageSize((prev) => prev + 20)}
-                    className="w-[230px] h-[46px] rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] hover:border-emerald-500 text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white shadow-xs mx-auto flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 active:scale-95 transition-all cursor-pointer"
+                    className="w-[230px] h-[46px] rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] hover:border-emerald-500 text-sm font-bold font-sans text-[#0F172A] dark:text-white shadow-xs mx-auto flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 active:scale-95 transition-all cursor-pointer"
                   >
                     <ArrowDown size={16} className="text-[#059669] shrink-0" />
                     <span>আরও ২০টি প্রশ্ন লোড করো</span>
@@ -876,7 +876,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 <Calendar size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-bold text-neutral-900 dark:text-white leading-tight">
+                <h3 className="font-sans text-[17px] font-bold text-neutral-900 dark:text-white leading-tight">
                   তারিখ নির্বাচন করো
                 </h3>
                 <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">
@@ -904,7 +904,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   key={p.days}
                   type="button"
                   onClick={() => handleSelectPreset(p.days)}
-                  className="px-2.5 py-1 rounded-[8px] bg-neutral-100 dark:bg-[#1E1E1E] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer shrink-0 font-['Anek_Bangla',sans-serif]"
+                  className="px-2.5 py-1 rounded-[8px] bg-neutral-100 dark:bg-[#1E1E1E] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer shrink-0 font-sans"
                 >
                   {p.label}
                 </button>
@@ -924,7 +924,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               >
                 <ChevronLeft size={18} />
               </button>
-              <span className="font-['Anek_Bangla',sans-serif] text-sm font-bold text-neutral-800 dark:text-neutral-200">
+              <span className="font-sans text-sm font-bold text-neutral-800 dark:text-neutral-200">
                 {BANGLA_MONTHS[displayedMonth.getMonth()]}{" "}
                 {BanglaNameHelper.toBanglaNumeral(displayedMonth.getFullYear())}
               </span>
@@ -954,7 +954,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               {BANGLA_WEEKDAYS.map((w) => (
                 <span
                   key={w}
-                  className="text-[11px] font-bold text-neutral-400 font-['Anek_Bangla',sans-serif]"
+                  className="text-[11px] font-bold text-neutral-400 font-sans"
                 >
                   {w}
                 </span>
@@ -993,7 +993,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     disabled={isFuture}
                     onClick={() => setTempSelectedDate(dateStr)}
                     className={cn(
-                      "w-8 h-8 rounded-full text-xs font-semibold mx-auto flex items-center justify-center transition-all font-['Anek_Bangla',sans-serif]",
+                      "w-8 h-8 rounded-full text-xs font-semibold mx-auto flex items-center justify-center transition-all font-sans",
                       isSelected
                         ? "bg-[#059669] text-white shadow-xs font-bold"
                         : isToday
@@ -1017,7 +1017,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setFilterDate("");
                   setIsDatePickerOpen(false);
                 }}
-                className="flex-1 h-9 rounded-[10px] text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="flex-1 h-9 rounded-[10px] text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-sans"
               >
                 ফিল্টার মুছুন
               </button>
@@ -1027,7 +1027,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setFilterDate(tempSelectedDate);
                   setIsDatePickerOpen(false);
                 }}
-                className="flex-1 h-9 rounded-[10px] bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="flex-1 h-9 rounded-[10px] bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer font-sans"
               >
                 প্রয়োগ করুন
               </button>
@@ -1044,7 +1044,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               <div className="w-10 h-10 rounded-[10px] bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
                 <Trash2 size={20} />
               </div>
-              <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-extrabold text-neutral-900 dark:text-white leading-tight">
+              <h3 className="font-sans text-[17px] font-extrabold text-neutral-900 dark:text-white leading-tight">
                 পরীক্ষা মুছে ফেলবেন?
               </h3>
             </div>
@@ -1056,7 +1056,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 type="button"
                 disabled={isDeleting}
                 onClick={() => setDeleteExamConfirm(null)}
-                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-sans"
               >
                 বাতিল
               </button>
@@ -1064,7 +1064,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 type="button"
                 disabled={isDeleting}
                 onClick={handleDeleteExam}
-                className="px-4 py-2 rounded-[10px] bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50 font-['Anek_Bangla',sans-serif]"
+                className="px-4 py-2 rounded-[10px] bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50 font-sans"
               >
                 {isDeleting ? "মুছে ফেলা হচ্ছে..." : "মুছে ফেলুন"}
               </button>
@@ -1081,7 +1081,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               <div className="w-10 h-10 rounded-[10px] bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
                 <Trash2 size={20} />
               </div>
-              <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-extrabold text-neutral-900 dark:text-white leading-tight">
+              <h3 className="font-sans text-[17px] font-extrabold text-neutral-900 dark:text-white leading-tight">
                 প্রশ্নটি মুছে ফেলবে?
               </h3>
             </div>
@@ -1092,14 +1092,14 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               <button
                 type="button"
                 onClick={() => setDeleteQuestionConfirm(null)}
-                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-sans"
               >
                 বাতিল
               </button>
               <button
                 type="button"
                 onClick={() => handleDeleteSingleQuestion(deleteQuestionConfirm)}
-                className="px-4 py-2 rounded-[10px] bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs font-['Anek_Bangla',sans-serif]"
+                className="px-4 py-2 rounded-[10px] bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs font-sans"
               >
                 মুছে ফেলো
               </button>

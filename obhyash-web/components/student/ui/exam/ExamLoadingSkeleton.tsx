@@ -42,7 +42,7 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
           <div className="w-4 h-4 border-2 border-emerald-600 dark:border-emerald-400 border-t-transparent rounded-full animate-spin" />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+          <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white leading-tight font-sans">
             প্রশ্নপত্র প্রস্তুত হচ্ছে...
           </h4>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate mt-0.5 font-['HindSiliguri',sans-serif]">

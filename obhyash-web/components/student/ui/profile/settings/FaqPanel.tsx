@@ -118,7 +118,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
           <HelpCircle className="w-7 h-7" />
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-black font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
+        <h2 className="text-xl sm:text-2xl font-black font-sans text-[#0F172A] dark:text-white">
           কীভাবে সাহায্য করতে পারি?
         </h2>
         <p className="text-xs sm:text-sm font-medium text-[#475569] dark:text-[#A1A1AA] mt-1.5 leading-relaxed max-w-md mx-auto">
@@ -135,7 +135,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
               setExpandedIndex(null);
             }}
             placeholder="প্রশ্ন খুঁজুন... (যেমন: ওএমআর, পেমেন্ট, রেজাল্ট)"
-            className="w-full py-3 pl-10 pr-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] text-sm text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-[#71717A] focus:outline-none focus:border-[#059669] shadow-2xs font-['Anek_Bangla',sans-serif] font-medium"
+            className="w-full py-3 pl-10 pr-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] text-sm text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-[#71717A] focus:outline-none focus:border-[#059669] shadow-2xs font-sans font-medium"
           />
           <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
@@ -150,7 +150,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
           <div className="w-8 h-8 rounded-lg bg-[#059669]/10 text-[#059669] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
             <MessageSquare className="w-4 h-4" />
           </div>
-          <h4 className="text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
+          <h4 className="text-sm font-bold font-sans text-[#0F172A] dark:text-white">
             অভিযোগ বক্স
           </h4>
           <p className="text-[11px] font-medium text-[#64748B] dark:text-[#A1A1AA] truncate mt-0.5">
@@ -165,7 +165,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
           <div className="w-8 h-8 rounded-lg bg-[#3B82F6]/10 text-[#3B82F6] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
             <Mail className="w-4 h-4" />
           </div>
-          <h4 className="text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
+          <h4 className="text-sm font-bold font-sans text-[#0F172A] dark:text-white">
             ইমেইল সাপোর্ট
           </h4>
           <p className="text-[11px] font-medium text-[#64748B] dark:text-[#A1A1AA] truncate mt-0.5">
@@ -176,7 +176,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
 
       {/* ── 3. Category Filter Chips (1:1 with Flutter) ── */}
       <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-none">
-        <span className="text-xs font-semibold font-['Anek_Bangla',sans-serif] text-[#475569] dark:text-[#A1A1AA] shrink-0">
+        <span className="text-xs font-semibold font-sans text-[#475569] dark:text-[#A1A1AA] shrink-0">
           ক্যাটাগরি:
         </span>
         <div className="flex gap-1.5">
@@ -190,7 +190,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
                   setSelectedCategory(cat);
                   setExpandedIndex(null);
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer shrink-0 active:scale-95 ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold font-sans transition-all cursor-pointer shrink-0 active:scale-95 ${
                   isSelected
                     ? 'bg-[#12544F] text-white border border-[#12544F] shadow-xs'
                     : 'bg-white dark:bg-[#18181B] text-[#475569] dark:text-[#A1A1AA] border border-[#E2E8F0] dark:border-[#27272A] hover:bg-neutral-50 dark:hover:bg-[#202024]'
@@ -232,7 +232,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
                     <div className="w-6 h-6 rounded-full bg-[#059669]/10 text-[#10B981] flex items-center justify-center font-bold text-xs shrink-0">
                       ?
                     </div>
-                    <span className="text-[14.5px] font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white leading-snug">
+                    <span className="text-[14.5px] font-bold font-sans text-[#0F172A] dark:text-white leading-snug">
                       {item.question}
                     </span>
                   </div>
