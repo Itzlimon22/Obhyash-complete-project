@@ -23,7 +23,14 @@ interface LiveExamSliderProps {
   onExamClick?: (examId: string, category: string) => void;
 }
 
+// Feature flag: set to true to restore the LiveExamSlider on Dashboard in the future
+export const SHOW_LIVE_EXAM_SLIDER = false;
+
 export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ userId, onExamClick }) => {
+  if (!SHOW_LIVE_EXAM_SLIDER) {
+    return null;
+  }
+
   const [exams, setExams] = useState<LiveExamItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);

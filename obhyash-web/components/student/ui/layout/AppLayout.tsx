@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
-import { ArrowLeft, Flame, Crown } from 'lucide-react';
+import { ArrowLeft, Flame, Crown, Award, Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import StreakDialog from '../common/StreakDialog';
@@ -162,6 +162,30 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     }
   }, [user?.id]);
 
+  const isDashboard = activeTab === 'dashboard';
+  const isSetupRoot = activeTab === 'setup' && !onBack;
+  const isQuestionBankRoot = (activeTab === 'question_bank' || activeTab === 'question-bank') && !onBack && headerTabs !== undefined;
+  const isPractice = activeTab === 'practice';
+  const isHistory = activeTab === 'history';
+  const isLeaderboard = activeTab === 'leaderboard';
+  const isLiveExamTab = activeTab === 'live_exam' || activeTab === 'live-exam';
+  const isLeftAligned = isPractice || isHistory;
+
+  const showBackButton = !isDashboard && !isSetupRoot && !isQuestionBankRoot && Boolean(
+    onBack ||
+    (activeTab !== 'profile' && activeTab !== 'setup' && activeTab !== 'question_bank' && activeTab !== 'question-bank')
+  );
+
+  const handleBackNavigation = () => {
+    if (onBack) {
+      onBack();
+    } else if (typeof window !== 'undefined' && ((window.history.state?.idx ?? 0) > 0 || window.history.length > 1)) {
+      window.history.back();
+    } else {
+      onTabChange('dashboard');
+    }
+  };
+
   return (
     <div className="h-[100dvh] min-h-[100dvh] w-full bg-[#FAFAF9] dark:bg-[#000000] flex transition-colors overflow-hidden font-sans">
       {/* ── Sidebar Component ── */}
@@ -184,150 +208,204 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
           <header className="h-[52px] bg-white/95 dark:bg-[#000000] backdrop-blur-xl border-b border-[#F3F4F6] dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
-            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 relative">
-              {/* ── Left / Center: Back Button (when not on dashboard) + (Title OR Header Tabs) ── */}
-              <div className={`flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2 ${headerTabs ? 'justify-center' : ''}`}>
-                {(onBack || (activeTab !== 'dashboard' && activeTab !== 'setup' && activeTab !== 'question_bank' && activeTab !== 'question-bank' && activeTab !== 'profile')) && (
-                  /* Back button on sub-screens matching Flutter minimal arrow */
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (onBack) {
-                        onBack();
-                      } else if (typeof window !== 'undefined' && ((window.history.state?.idx ?? 0) > 0 || window.history.length > 1)) {
-                        window.history.back();
-                      } else {
-                        onTabChange('dashboard');
-                      }
-                    }}
-                    className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0 z-10"
-                    aria-label="Back"
-                    title="ফিরে যাও"
-                  >
-                    <ArrowLeft size={22} className="stroke-[2.2]" />
-                  </button>
-                )}
+            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 relative">
+              {isDashboard ? (
+                /* ── 1. DASHBOARD HEADER (Matching Flutter main_layout.dart lines 660-854) ── */
+                <>
+                  {/* Left: Mobile Drawer Trigger + Full Logo (Hidden on desktop when sidebar is open) */}
+                  <div className="flex items-center gap-2.5">
+                    {/* Mobile Hamburger Drawer Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsSidebarOpen(true)}
+                      className="lg:hidden p-1.5 -ml-1 text-neutral-800 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded-lg transition-colors cursor-pointer"
+                      aria-label="মেনু খুলুন"
+                    >
+                      <Menu size={22} className="stroke-[2.2]" />
+                    </button>
 
-                {headerSegment ? (
-                  <div className="h-9 p-[3px] rounded-xl bg-[#F3F4F6] dark:bg-[#1E1E1E] border border-[#E5E7EB] dark:border-[#2E2E2E] flex items-center select-none shrink-0">
-                    {headerSegment.tabs.map((tab) => {
-                      const isActive = headerSegment.activeTabId === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => headerSegment.onTabSelect(tab.id)}
-                          className={cn(
-                            "h-[30px] px-3 sm:px-4 rounded-[9px] text-[13px] font-sans transition-all flex items-center justify-center cursor-pointer",
-                            isActive
-                              ? "bg-[#12544F] text-white font-semibold shadow-xs"
-                              : "text-[#71717A] dark:text-[#A1A1AA] hover:text-[#0F172A] dark:hover:text-white font-normal"
-                          )}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
+                    {/* Logo (Visible on mobile, or on desktop only when sidebar is collapsed) */}
+                    <div
+                      className={`flex items-center cursor-pointer ${isCollapsed ? 'flex' : 'lg:hidden'}`}
+                      onClick={() => onTabChange('dashboard')}
+                    >
+                      <img
+                        src={isDarkMode ? "/obhyash_full_logo_dark.svg" : "/obhyash_full_logo.svg"}
+                        alt="Obhyash"
+                        className="h-[26px] w-auto max-w-[140px] object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = isDarkMode ? "/obhyash_full_logo_dark.png" : "/obhyash_full_logo.png";
+                        }}
+                      />
+                    </div>
                   </div>
-                ) : headerTabs ? (
-                  <div className="flex items-center justify-center gap-6 min-w-0 overflow-x-auto no-scrollbar py-0.5">
-                    {headerTabs.tabs.map((tab) => {
-                      const isActive = headerTabs.activeTabId === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => headerTabs.onTabSelect(tab.id)}
-                          className="group flex flex-col items-center cursor-pointer select-none shrink-0"
-                        >
-                          <span
-                            className={`text-[15.5px] tracking-[-0.2px] font-sans transition-colors ${
-                              isActive
-                                ? "font-semibold text-[#0F172A] dark:text-white"
-                                : "font-medium text-[#64748B] dark:text-[#A1A1AA] group-hover:text-[#0F172A] dark:group-hover:text-white"
-                            }`}
-                          >
-                            {tab.label}
-                          </span>
-                          <span
-                            className={`w-full h-[3px] rounded-full mt-[3px] transition-all ${
-                              isActive
-                                ? "bg-[#004633] dark:bg-[#10B981]"
-                                : "bg-transparent"
-                            }`}
-                          />
-                        </button>
-                      );
-                    })}
+
+                  {/* Right: Streak + Notification + 1px Divider + User Avatar */}
+                  <div className="flex items-center">
+                    {/* Streak Badge */}
+                    <button
+                      type="button"
+                      onClick={() => setIsStreakDialogOpen(true)}
+                      className="flex items-center gap-1.5 text-[#EF4444] transition-transform active:scale-95 cursor-pointer select-none"
+                      title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
+                    >
+                      <Flame size={23} className="fill-[#EF4444] shrink-0" />
+                      <span className="text-[18.5px] font-bold font-sans tabular-nums leading-none text-[#DC2626] dark:text-[#EF4444]">
+                        {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
+                      </span>
+                    </button>
+
+                    <div className="w-3" />
+
+                    {/* Notification Bell */}
+                    <NotificationBell
+                      unreadCount={unreadCount}
+                      onClick={() => onTabChange('notifications')}
+                      isOpen={false}
+                    />
+
+                    {/* 1px Vertical Divider (Matching Flutter lines 820-827) */}
+                    <div className="w-[1px] h-6 bg-[#E5E5E5] dark:bg-[#27272A] mx-2.5 shrink-0" />
+
+                    {/* Profile Avatar */}
+                    <button
+                      type="button"
+                      onClick={() => onTabChange('settings')}
+                      className="relative flex items-center justify-center rounded-full cursor-pointer shrink-0 transition-transform active:scale-95"
+                      title="প্রোফাইল ও সেটিংস"
+                    >
+                      <UserAvatar
+                        user={user}
+                        size="sm"
+                        showBorder
+                      />
+                    </button>
                   </div>
-                ) : !hideTitle ? (
-                  centerTitle ? (
-                    <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center pointer-events-none px-12 sm:px-16">
-                      <h1 className="font-sans font-bold text-[17.5px] sm:text-[19px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate pointer-events-auto text-center max-w-[70%]">
+                </>
+              ) : (
+                /* ── 2. NON-DASHBOARD HEADERS (Matching Flutter 1:1) ── */
+                <>
+                  {/* Left: Back Button & Optional Left-aligned Title */}
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 z-10">
+                    {showBackButton && (
+                      <button
+                        type="button"
+                        onClick={handleBackNavigation}
+                        className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
+                        aria-label="Back"
+                        title="ফিরে যাও"
+                      >
+                        <ArrowLeft size={22} className="stroke-[2.2]" />
+                      </button>
+                    )}
+
+                    {isLeftAligned && !hideTitle && (
+                      <h1 className="font-sans font-bold text-[19px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
+                        {title}
+                      </h1>
+                    )}
+                  </div>
+
+                  {/* Center: Underline Tabs, Pill Segment, or Centered Title */}
+                  {headerSegment ? (
+                    <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center pointer-events-none">
+                      <div className="h-9 p-[3px] rounded-xl bg-[#F3F4F6] dark:bg-[#1E1E1E] border border-[#E5E7EB] dark:border-[#2E2E2E] flex items-center select-none shrink-0 pointer-events-auto">
+                        {headerSegment.tabs.map((tab) => {
+                          const isActive = headerSegment.activeTabId === tab.id;
+                          return (
+                            <button
+                              key={tab.id}
+                              type="button"
+                              onClick={() => headerSegment.onTabSelect(tab.id)}
+                              className={cn(
+                                "h-[30px] px-3 sm:px-4 rounded-[9px] text-[13px] font-sans transition-all flex items-center justify-center cursor-pointer",
+                                isActive
+                                  ? "bg-[#12544F] text-white font-semibold shadow-xs"
+                                  : "text-[#71717A] dark:text-[#A1A1AA] hover:text-[#0F172A] dark:hover:text-white font-normal"
+                              )}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : headerTabs ? (
+                    <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center pointer-events-none">
+                      <div className="flex items-center justify-center gap-6 min-w-0 overflow-x-auto no-scrollbar py-0.5 pointer-events-auto">
+                        {headerTabs.tabs.map((tab) => {
+                          const isActive = headerTabs.activeTabId === tab.id;
+                          return (
+                            <button
+                              key={tab.id}
+                              type="button"
+                              onClick={() => headerTabs.onTabSelect(tab.id)}
+                              className="group flex flex-col items-center cursor-pointer select-none shrink-0"
+                            >
+                              <span
+                                className={`text-[15.5px] tracking-[-0.2px] font-sans transition-colors ${
+                                  isActive
+                                    ? "font-semibold text-[#0F172A] dark:text-white"
+                                    : "font-medium text-[#64748B] dark:text-[#A1A1AA] group-hover:text-[#0F172A] dark:group-hover:text-white"
+                                }`}
+                              >
+                                {tab.label}
+                              </span>
+                              <span
+                                className={`w-full h-[3px] rounded-full mt-[3px] transition-all ${
+                                  isActive
+                                    ? "bg-[#004633] dark:bg-[#10B981]"
+                                    : "bg-transparent"
+                                }`}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (!isLeftAligned && !hideTitle && title) ? (
+                    <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center pointer-events-none px-14 sm:px-16">
+                      <h1 className="font-sans font-bold text-[18px] sm:text-[19px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate pointer-events-auto text-center max-w-[70%]">
                         {title}
                       </h1>
                     </div>
-                  ) : (
-                    <h1 className="font-sans font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
-                      {title}
-                    </h1>
-                  )
-                ) : null}
-              </div>
+                  ) : null}
 
-              {/* ── Right Section: Matches Flutter 1:1 ── */}
-              {headerRight ? (
-                <div className="flex items-center shrink-0 z-10">{headerRight}</div>
-              ) : activeTab === 'dashboard' ? (
-                /* Dashboard Header Right: Streak + Notification + User Avatar */
-                <div className="flex items-center gap-4 shrink-0">
-                  {/* Streak Badge (Red Flame + Red Bangla Numeral) */}
-                  <button
-                    type="button"
-                    onClick={() => setIsStreakDialogOpen(true)}
-                    className="flex items-center gap-1.5 text-[#EF4444] transition-transform active:scale-95 cursor-pointer select-none"
-                    title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
-                  >
-                    <Flame size={23} className="fill-[#EF4444] shrink-0" />
-                    <span className="text-[18.5px] font-bold font-sans tabular-nums leading-none">
-                      {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
-                    </span>
-                  </button>
-
-                  {/* Notification Bell (Direct navigation to notifications tab, matching Flutter) */}
-                  <NotificationBell
-                    unreadCount={unreadCount}
-                    onClick={() => onTabChange('notifications')}
-                    isOpen={false}
-                  />
-
-                  {/* Profile Avatar (Clean, proportionate and fits well within header) */}
-                  <button
-                    type="button"
-                    onClick={() => onTabChange('settings')}
-                    className="relative flex items-center justify-center rounded-full cursor-pointer shrink-0 transition-transform active:scale-95"
-                    title="প্রোফাইল ও সেটিংস"
-                  >
-                    <UserAvatar
-                      user={user}
-                      size="sm"
-                    />
-                  </button>
-                </div>
-              ) : activeTab === 'leaderboard' ? (
-                /* Leaderboard Header Right: Legends League shortcut matching Flutter */
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => onTabChange('legends-league')}
-                    className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer active:scale-95 shadow-xs shrink-0"
-                    title="লেজেন্ডস লিগ দেখুন"
-                  >
-                    <Crown size={14} className="shrink-0" />
-                    <span className="font-sans">লেজেন্ডস লীগ</span>
-                  </button>
-                </div>
-              ) : null}
+                  {/* Right Section */}
+                  <div className="flex items-center shrink-0 z-10">
+                    {headerRight ? (
+                      headerRight
+                    ) : isLeaderboard ? (
+                      /* Flutter Leaderboard: Pulsing Legends League Shortcut */
+                      <button
+                        type="button"
+                        onClick={() => onTabChange('legends-league')}
+                        className="flex items-center gap-1.5 py-1 px-2 text-[#EF4444] hover:opacity-80 transition-all cursor-pointer active:scale-95 animate-pulse"
+                        title="লেজেন্ডস লিগ দেখুন"
+                      >
+                        <Crown size={16} className="shrink-0 text-[#EF4444]" />
+                        <span className="font-sans font-black text-[15px] tracking-[-0.2px]">
+                          লেজেন্ডস লীগ
+                        </span>
+                      </button>
+                    ) : isLiveExamTab ? (
+                      /* Flutter Live Exam: My Results Shortcut */
+                      <button
+                        type="button"
+                        onClick={() => onTabChange('live_exam_history')}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[9px] bg-[#F1F5F9] dark:bg-[#1E2230] border border-[#CBD5E1] dark:border-[#33374A] text-neutral-800 dark:text-white font-sans text-xs transition-all hover:opacity-85 cursor-pointer active:scale-95"
+                        title="আমার লাইভ পরীক্ষার ফলাফল"
+                      >
+                        <Award size={15} className="shrink-0" />
+                        <span>আমার ফলাফল</span>
+                      </button>
+                    ) : (
+                      <div className="w-[30px]" />
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </header>
         )}

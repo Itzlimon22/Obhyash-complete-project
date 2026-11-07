@@ -81,10 +81,10 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           child: GlobalAnnouncementBanner(),
         ),
 
-        // 1. Clean Minimalist Header (Live Exam Slider)
-        const SliverToBoxAdapter(
-          child: LiveExamSlider(),
-        ),
+        // 1. Clean Minimalist Header (Live Exam Slider) - Hidden per user request, keep for future restore
+        // const SliverToBoxAdapter(
+        //   child: LiveExamSlider(),
+        // ),
 
         // 2. Main Content inside SliverToBoxAdapter
         SliverToBoxAdapter(

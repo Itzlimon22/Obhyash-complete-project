@@ -258,15 +258,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
         {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7) ── */}
         <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-3.5 sm:gap-4.5">
-          {/* 1. Live Exam Announcement / Status Carousel Slider */}
-          <motion.div variants={fadeInUp}>
+          {/* 1. Live Exam Announcement / Status Carousel Slider (Hidden per user request, keep for future restore) */}
+          {/* <motion.div variants={fadeInUp}>
             <LiveExamSlider
               userId={user?.id}
               onExamClick={() => {
                 if (onLiveExamClick) onLiveExamClick();
               }}
             />
-          </motion.div>
+          </motion.div> */}
 
           {/* 3. Primary Action Shortcut Cards Grid */}
           <motion.div variants={fadeInUp}>

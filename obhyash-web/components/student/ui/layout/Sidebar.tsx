@@ -138,9 +138,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         `}
       >
         <div className="flex flex-col h-full overflow-hidden">
-          {/* ── Brand Header (Height 60px matching Flutter, px-4) ── */}
+          {/* ── Brand Header (Height 52px matching Flutter 1:1, px-4) ── */}
           <div
-            className={`h-[60px] flex items-center justify-between ${
+            className={`h-[52px] flex items-center justify-between ${
               isCollapsed ? "px-2 justify-center" : "px-4"
             } border-b border-[#E5E7EB] dark:border-[#1F1F1F] shrink-0`}
           >
@@ -152,8 +152,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
             >
               {isCollapsed ? (
-                /* Collapsed Icon: 36x36 */
-                <div className="w-[36px] h-[36px] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] border border-[#16270E]/70 shadow-xs">
+                /* Collapsed Icon: 32x32 */
+                <div className="w-[32px] h-[32px] rounded-[8px] overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] border border-[#16270E]/70 shadow-xs">
                   <img
                     src="/obhyash_logo.svg"
                     alt="Obhyash Logo"
@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <img
                   src={isDarkMode ? "/obhyash_full_logo_dark.svg" : "/obhyash_full_logo.svg"}
                   alt="Obhyash"
-                  className="h-[34px] sm:h-[36px] w-auto max-w-[170px] object-contain"
+                  className="h-[28px] sm:h-[30px] w-auto max-w-[160px] object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = isDarkMode ? "/obhyash_full_logo_dark.png" : "/obhyash_full_logo.png";

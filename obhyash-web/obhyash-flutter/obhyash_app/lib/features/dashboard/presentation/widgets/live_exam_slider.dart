@@ -101,6 +101,12 @@ class _LiveExamSliderState extends ConsumerState<LiveExamSlider> {
 
   @override
   Widget build(BuildContext context) {
+    // Feature flag: set to true to restore the LiveExamSlider on Dashboard in the future
+    const bool showLiveExamSlider = false;
+    if (!showLiveExamSlider) {
+      return const SizedBox.shrink();
+    }
+
     final isLiveExamsEnabled = ref.watch(isLiveExamsEnabledProvider);
     if (!isLiveExamsEnabled) {
       return const SizedBox.shrink();
