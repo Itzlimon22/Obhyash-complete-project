@@ -145,35 +145,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
             } border-b border-[#E5E7EB] dark:border-[#1F1F1F] shrink-0`}
           >
             <div
-              className="flex items-center gap-3 cursor-pointer group"
+              className="flex items-center cursor-pointer group"
               onClick={() => {
                 onTabChange("dashboard");
                 if (window.innerWidth < 1024) onClose();
               }}
             >
-              {/* Logo: 36x36 with borderRadius 10 matching Flutter */}
-              <div className="w-[36px] h-[36px] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] border border-[#16270E]/70 shadow-xs">
+              {isCollapsed ? (
+                /* Collapsed Icon: 36x36 */
+                <div className="w-[36px] h-[36px] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] border border-[#16270E]/70 shadow-xs">
+                  <img
+                    src="/obhyash_logo.svg"
+                    alt="Obhyash Logo"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/app_logo.png";
+                    }}
+                  />
+                </div>
+              ) : (
+                /* Full Brand Logo */
                 <img
-                  src="/obhyash_logo.svg"
-                  alt="Obhyash Logo"
-                  className="w-full h-full object-cover"
+                  src={isDarkMode ? "/obhyash_full_logo_dark.svg" : "/obhyash_full_logo.svg"}
+                  alt="Obhyash"
+                  className="h-[34px] sm:h-[36px] w-auto max-w-[170px] object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "/app_logo.png";
+                    target.src = isDarkMode ? "/obhyash_full_logo_dark.png" : "/obhyash_full_logo.png";
                   }}
                 />
-              </div>
-
-              {/* Brand Text Column */}
-              {!isCollapsed && (
-                <div className="flex flex-col justify-center text-left leading-none">
-                  <span className="text-[10px] font-semibold text-[#8E8E93] dark:text-[#A3A3A3] tracking-[1.6px] font-sans uppercase">
-                    OBHYASH
-                  </span>
-                  <span className="text-[17px] font-bold text-[#000000] dark:text-white font-sans leading-[1.15] mt-0.5">
-                    অভ্যাস
-                  </span>
-                </div>
               )}
             </div>
 
