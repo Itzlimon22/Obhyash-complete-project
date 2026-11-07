@@ -121,141 +121,141 @@ export class LiveExamRoutineService {
     const routineList = [
       {
         num: "01",
-        date: "5 Nov 2026",
-        dayName: "বৃহস্পতিবার",
+        date: "10 Nov 2026",
+        dayName: "মঙ্গলবার",
         syllabus: "প্রাচীন ও মধ্যযুগে বাংলার ইতিহাস, Noun, Determiners, Article, Number, Gender",
         chapters: ["প্রাচীন ও মধ্যযুগে বাংলার ইতিহাস", "Noun", "Determiners", "Article", "Number", "Gender"]
       },
       {
         num: "02",
-        date: "6 Nov 2026",
-        dayName: "শুক্রবার",
+        date: "11 Nov 2026",
+        dayName: "বুধবার",
         syllabus: "ব্রিটিশ শাসন, ভাষা আন্দোলন, Pronoun & Its Classification, Uses of Pronoun",
         chapters: ["ব্রিটিশ শাসন", "ভাষা আন্দোলন", "Pronoun & Its Classification", "Uses of Pronoun"]
       },
       {
         num: "03",
-        date: "7 Nov 2026",
-        dayName: "শনিবার",
+        date: "12 Nov 2026",
+        dayName: "বৃহস্পতিবার",
         syllabus: "বাংলাদেশের মহান মুক্তিযুদ্ধ, Adjective & Its Classification, Degree of Comparison, Adverb & Its Classification, Inversion, Affirmative & Negative Agreement",
         chapters: ["বাংলাদেশের মহান মুক্তিযুদ্ধ", "Adjective & Its Classification", "Degree of Comparison", "Adverb & Its Classification", "Inversion", "Affirmative & Negative Agreement"]
       },
       {
         num: "04",
-        date: "8 Nov 2026",
-        dayName: "রবিবার",
+        date: "13 Nov 2026",
+        dayName: "শুক্রবার",
         syllabus: "মুক্তিযুদ্ধ পরবর্তী ঘটনা প্রবাহ, বাংলাদেশের সংবিধান, Verb & Its Classification, Gerund, Participle & Verbal Noun, Conjugation of Verbs",
         chapters: ["মুক্তিযুদ্ধ পরবর্তী ঘটনা প্রবাহ", "বাংলাদেশের সংবিধান", "Verb & Its Classification", "Gerund, Participle & Verbal Noun", "Conjugation of Verbs"]
       },
       {
         num: "05",
-        date: "9 Nov 2026",
-        dayName: "সোমবার",
+        date: "14 Nov 2026",
+        dayName: "শনিবার",
         syllabus: "বাংলাদেশের সরকার ব্যবস্থা, জাতীয় সংসদ, আইন ও বিচার বিভাগ, বাংলাদেশের রাজনৈতিক কাঠামো, Preposition & Its Classification, Uses of Some Prepositions",
         chapters: ["বাংলাদেশের সরকার ব্যবস্থা", "জাতীয় সংসদ, আইন ও বিচার বিভাগ", "বাংলাদেশের রাজনৈতিক কাঠামো", "Preposition & Its Classification", "Uses of Some Prepositions"]
       },
       {
         num: "06",
-        date: "10 Nov 2026",
-        dayName: "মঙ্গলবার",
+        date: "15 Nov 2026",
+        dayName: "রবিবার",
         syllabus: "বাংলাদেশের জনতত্ত্ব ও শিক্ষা ব্যবস্থা, Conjunction, Linkers & Interjection, Prefix & Suffix, Identification of Parts of Speech, Same Word but Different Parts of Speech, Transformation of Parts of Speech",
         chapters: ["বাংলাদেশের জনতত্ত্ব ও শিক্ষা ব্যবস্থা", "Conjunction, Linkers & Interjection", "Prefix & Suffix", "Identification of Parts of Speech", "Same Word but Different Parts of Speech", "Transformation of Parts of Speech"]
       },
       {
         num: "07",
-        date: "11 Nov 2026",
-        dayName: "বুধবার",
+        date: "16 Nov 2026",
+        dayName: "সোমবার",
         syllabus: "বাংলাদেশের স্বাস্থ্য ও চিকিৎসা ব্যবস্থা, Phrases & Clauses, Sentence & Its Classification, Transformation of Sentence, Voice, Narration",
         chapters: ["বাংলাদেশের স্বাস্থ্য ও চিকিৎসা ব্যবস্থা", "Phrases & Clauses", "Sentence & Its Classification", "Transformation of Sentence", "Voice", "Narration"]
       },
       {
         num: "08",
-        date: "12 Nov 2026",
-        dayName: "বৃহস্পতিবার",
+        date: "17 Nov 2026",
+        dayName: "মঙ্গলবার",
         syllabus: "বাংলাদেশের প্রাকৃতিক সম্পদ, Right Form of Verbs",
         chapters: ["বাংলাদেশের প্রাকৃতিক সম্পদ", "Right Form of Verbs"]
       },
       {
         num: "09",
-        date: "13 Nov 2026",
-        dayName: "শুক্রবার",
+        date: "18 Nov 2026",
+        dayName: "বুধবার",
         syllabus: "বাংলাদেশের অর্থনীতি, শিল্প ও বাণিজ্য, Sentence Correction",
         chapters: ["বাংলাদেশের অর্থনীতি, শিল্প ও বাণিজ্য", "Sentence Correction"]
       },
       {
         num: "10",
-        date: "14 Nov 2026",
-        dayName: "শনিবার",
+        date: "19 Nov 2026",
+        dayName: "বৃহস্পতিবার",
         syllabus: "বাংলাদেশের প্রতিরক্ষা, যোগাযোগ ব্যবস্থা এবং তথ্য প্রযুক্তি, Tag Question, Sentence Completion",
         chapters: ["বাংলাদেশের প্রতিরক্ষা, যোগাযোগ ব্যবস্থা এবং তথ্য প্রযুক্তি", "Tag Question", "Sentence Completion"]
       },
       {
         num: "11",
-        date: "15 Nov 2026",
-        dayName: "রবিবার",
+        date: "20 Nov 2026",
+        dayName: "শুক্রবার",
         syllabus: "বাংলাদেশের শিল্প, সংস্কৃতি ও সাহিত্য, Analogy, Translation, Literature",
         chapters: ["বাংলাদেশের শিল্প, সংস্কৃতি ও সাহিত্য", "Analogy", "Translation", "Literature"]
       },
       {
         num: "12",
-        date: "16 Nov 2026",
-        dayName: "সোমবার",
+        date: "21 Nov 2026",
+        dayName: "শনিবার",
         syllabus: "বাংলাদেশের বিখ্যাত ব্যক্তিবর্গ, বাংলাদেশের অর্জন, বিভিন্ন চুক্তি ও সনদ, পদক ও পুরস্কার, দিবস, প্রথম, বৃহত্তম ও ক্ষুদ্রতম, Appropriate Preposition",
         chapters: ["বাংলাদেশের বিখ্যাত ব্যক্তিবর্গ", "বাংলাদেশের অর্জন", "বিভিন্ন চুক্তি ও সনদ", "পদক ও পুরস্কার", "দিবস", "প্রথম, বৃহত্তম ও ক্ষুদ্রতম", "Appropriate Preposition"]
       },
       {
         num: "13",
-        date: "17 Nov 2026",
-        dayName: "মঙ্গলবার",
+        date: "22 Nov 2026",
+        dayName: "রবিবার",
         syllabus: "বৈশ্বিক ইতিহাস, Synonym & Antonym (A - L)",
         chapters: ["বৈশ্বিক ইতিহাস", "Synonym & Antonym (A - L)"]
       },
       {
         num: "14",
-        date: "18 Nov 2026",
-        dayName: "বুধবার",
+        date: "23 Nov 2026",
+        dayName: "সোমবার",
         syllabus: "বিশ্ব পরিচিতি, Synonym & Antonym (M - Z)",
         chapters: ["বিশ্ব পরিচিতি", "Synonym & Antonym (M - Z)"]
       },
       {
         num: "15",
-        date: "19 Nov 2026",
-        dayName: "বৃহস্পতিবার",
+        date: "24 Nov 2026",
+        dayName: "মঙ্গলবার",
         syllabus: "বিশ্ব ভৌগোলিক পরিচিতি, Spelling",
         chapters: ["বিশ্ব ভৌগোলিক পরিচিতি", "Spelling"]
       },
       {
         num: "16",
-        date: "20 Nov 2026",
-        dayName: "শুক্রবার",
+        date: "25 Nov 2026",
+        dayName: "বুধবার",
         syllabus: "বৈশ্বিক স্বাস্থ্য ও চিকিৎসা ব্যবস্থা, জাতিসংঘ, জাতিসংঘের অঙ্গ সংগঠন, Idiom & Phrases",
         chapters: ["বৈশ্বিক স্বাস্থ্য ও চিকিৎসা ব্যবস্থা", "জাতিসংঘ, জাতিসংঘের অঙ্গ সংগঠন", "Idiom & Phrases"]
       },
       {
         num: "17",
-        date: "21 Nov 2026",
-        dayName: "শনিবার",
+        date: "26 Nov 2026",
+        dayName: "বৃহস্পতিবার",
         syllabus: "বিশ্বের উল্লেখযোগ্য অর্থনৈতিক জোট ও আর্থিক প্রতিষ্ঠান, অন্যান্য আন্তর্জাতিক, আঞ্চলিক সহযোগীতা সংস্থা, Group Verb",
         chapters: ["বিশ্বের উল্লেখযোগ্য অর্থনৈতিক জোট ও আর্থিক প্রতিষ্ঠান", "অন্যান্য আন্তর্জাতিক, আঞ্চলিক সহযোগীতা সংস্থা", "Group Verb"]
       },
       {
         num: "18",
-        date: "22 Nov 2026",
-        dayName: "রবিবার",
+        date: "27 Nov 2026",
+        dayName: "শুক্রবার",
         syllabus: "আন্তর্জাতিক সামরিক জোট, অস্ত্র নিয়ন্ত্রণ সংস্থা ও নিরস্ত্রীকরণ চুক্তি, বিশ্বের পরিবেশ ইস্যু ও কূটনীতি, Proverb",
         chapters: ["আন্তর্জাতিক সামরিক জোট, অস্ত্র নিয়ন্ত্রণ সংস্থা ও নিরস্ত্রীকরণ চুক্তি", "বিশ্বের পরিবেশ ইস্যু ও কূটনীতি", "Proverb"]
       },
       {
         num: "19",
-        date: "23 Nov 2026",
-        dayName: "সোমবার",
+        date: "28 Nov 2026",
+        dayName: "শনিবার",
         syllabus: "বিশ্বের অন্যান্য গুরুত্বপূর্ণ বিষয়াবলী, One Word Substitution, Foreign Words",
         chapters: ["বিশ্বের অন্যান্য গুরুত্বপূর্ণ বিষয়াবলী", "One Word Substitution", "Foreign Words"]
       },
       {
         num: "20",
-        date: "24 Nov 2026",
-        dayName: "মঙ্গলবার",
+        date: "29 Nov 2026",
+        dayName: "রবিবার",
         syllabus: "বিশ্বের অন্যান্য গুরুত্বপূর্ণ বিষয়াবলী, One Word Substitution, Foreign Words",
         chapters: ["বিশ্বের অন্যান্য গুরুত্বপূর্ণ বিষয়াবলী", "One Word Substitution", "Foreign Words"]
       }

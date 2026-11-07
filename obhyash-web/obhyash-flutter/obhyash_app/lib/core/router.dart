@@ -562,6 +562,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                     },
                   ),
                   GoRoute(
+                    path: 'courses',
+                    builder: (context, state) => const LiveExamMainView(),
+                    routes: [
+                       GoRoute(
+                        path: ':category',
+                        builder: (context, state) {
+                          final category =
+                              state.pathParameters['category'] ?? 'all';
+                          return LiveExamCategoryView(category: category);
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'live_exam',
                     builder: (context, state) => const LiveExamMainView(),
                     routes: [

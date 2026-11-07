@@ -6,6 +6,12 @@ import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 // GKE BATCH MOCK EXAMS & QUESTIONS DATA
 // ==========================================
 
+// Helper to compute November 2026 dates (Month 10 is November in JS)
+const getGkeDate = (day: number, hour: number = 18, minute: number = 0) => {
+  const currentYear = new Date().getFullYear();
+  return new Date(currentYear, 10, day, hour, minute, 0).toISOString();
+};
+
 export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = [
   {
     id: "gke-mt-01",
@@ -17,8 +23,8 @@ export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = 
     total_questions: 25,
     negative_marking: 0.25,
     status: "published",
-    start_time: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // Ongoing now
-    end_time: new Date(Date.now() + 8 * 3600 * 1000).toISOString(),
+    start_time: getGkeDate(10, 18, 0), // Starts 10 November 6:00 PM
+    end_time: getGkeDate(10, 23, 59),
     is_leaderboard_published: true,
     is_answer_published: true,
     created_at: new Date().toISOString(),
@@ -34,8 +40,8 @@ export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = 
     total_questions: 25,
     negative_marking: 0.25,
     status: "published",
-    start_time: new Date(Date.now() + 24 * 3600 * 1000).toISOString(), // Tomorrow
-    end_time: new Date(Date.now() + 32 * 3600 * 1000).toISOString(),
+    start_time: getGkeDate(11, 18, 0), // 11 November
+    end_time: getGkeDate(11, 23, 59),
     is_leaderboard_published: true,
     is_answer_published: true,
     created_at: new Date().toISOString(),
@@ -51,8 +57,8 @@ export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = 
     total_questions: 25,
     negative_marking: 0.25,
     status: "published",
-    start_time: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 56 * 3600 * 1000).toISOString(),
+    start_time: getGkeDate(12, 18, 0), // 12 November
+    end_time: getGkeDate(12, 23, 59),
     is_leaderboard_published: true,
     is_answer_published: true,
     created_at: new Date().toISOString(),
@@ -68,8 +74,8 @@ export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = 
     total_questions: 25,
     negative_marking: 0.25,
     status: "published",
-    start_time: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 80 * 3600 * 1000).toISOString(),
+    start_time: getGkeDate(13, 18, 0), // 13 November
+    end_time: getGkeDate(13, 23, 59),
     is_leaderboard_published: true,
     is_answer_published: true,
     created_at: new Date().toISOString(),
@@ -85,8 +91,8 @@ export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = 
     total_questions: 25,
     negative_marking: 0.25,
     status: "published",
-    start_time: new Date(Date.now() + 96 * 3600 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 104 * 3600 * 1000).toISOString(),
+    start_time: getGkeDate(14, 18, 0), // 14 November
+    end_time: getGkeDate(14, 23, 59),
     is_leaderboard_published: true,
     is_answer_published: true,
     created_at: new Date().toISOString(),
@@ -102,8 +108,8 @@ export const GKE_DEFAULT_EXAMS: (LiveExam & { userAttemptStatus?: string })[] = 
     total_questions: 25,
     negative_marking: 0.25,
     status: "published",
-    start_time: new Date(Date.now() + 120 * 3600 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 128 * 3600 * 1000).toISOString(),
+    start_time: getGkeDate(15, 18, 0), // 15 November
+    end_time: getGkeDate(15, 23, 59),
     is_leaderboard_published: true,
     is_answer_published: true,
     created_at: new Date().toISOString(),

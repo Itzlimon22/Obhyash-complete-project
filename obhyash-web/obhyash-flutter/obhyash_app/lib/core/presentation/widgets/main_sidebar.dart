@@ -49,8 +49,8 @@ class MainSidebar extends StatelessWidget {
         'svg': 'assets/dashboard-icons/exam_pencil.svg',
       },
       {
-        'id': 'live_exam',
-        'label': 'লাইভ পরীক্ষা',
+        'id': 'courses',
+        'label': 'কোর্সসমূহ',
         'icon': LucideIcons.radio,
         'svg': 'assets/dashboard-icons/live_exam.svg',
       },

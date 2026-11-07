@@ -7,7 +7,8 @@ export const STUDENT_ROUTES = {
   dashboard: '/dashboard',
   setup: '/setup',
   exam: '/setup',
-  liveExam: '/live_exam',
+  courses: '/courses',
+  liveExam: '/courses',
   questionBank: '/question-bank',
   questionBankLegacy: '/question_bank',
   history: '/history',
@@ -48,9 +49,11 @@ export function getStudentRouteUrl(tab: string): string {
     case 'setup':
     case 'exam':
       return STUDENT_ROUTES.setup;
+    case 'courses':
+    case 'course':
     case 'live_exam':
     case 'live-exam':
-      return STUDENT_ROUTES.liveExam;
+      return STUDENT_ROUTES.courses;
     case 'question_bank':
     case 'question-bank':
       return STUDENT_ROUTES.questionBank;

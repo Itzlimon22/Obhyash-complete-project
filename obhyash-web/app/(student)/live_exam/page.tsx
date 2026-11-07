@@ -9,7 +9,7 @@ export default async function LiveExamRoutePage() {
       user={userProfile}
       subjects={subjects}
       initialHistory={initialHistory}
-      initialTab="live_exam"
+      initialTab="courses"
     />
   );
 }

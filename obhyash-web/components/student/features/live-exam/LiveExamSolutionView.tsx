@@ -212,7 +212,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   if (isLocked) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title={`${examTitle} - সমাধান`}
         centerTitle={true}
@@ -244,7 +244,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
 
   return (
     <AppLayout
-      activeTab="live_exam"
+      activeTab="courses"
       {...commonLayoutProps}
       title={`${examTitle} - সমাধান`}
       onBack={onBack}

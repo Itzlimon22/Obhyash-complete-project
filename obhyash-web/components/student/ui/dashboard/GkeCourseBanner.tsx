@@ -62,6 +62,11 @@ export const GkeCourseBanner: React.FC<GkeCourseBannerProps> = ({
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
               ভর্তি চলছে
             </span>
+
+            {/* Starting Date Pill */}
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+              পরীক্ষা শুরু ১০ নভেম্বর
+            </span>
           </div>
 
           {/* Heading */}
@@ -71,7 +76,7 @@ export const GkeCourseBanner: React.FC<GkeCourseBannerProps> = ({
 
           {/* Subtitle */}
           <p className="text-xs sm:text-[13px] text-neutral-600 dark:text-neutral-400 font-medium leading-relaxed">
-            মেডিকেল ভর্তি পরীক্ষার ২৫ নম্বরের পূর্ণাঙ্গ প্রস্তুতি • সাধারণ জ্ঞান (১৫) ও ইংরেজি (১০)
+            মেডিকেল ভর্তি পরীক্ষার ২৫ নম্বরের পূর্ণাঙ্গ প্রস্তুতি • মডেল টেস্ট শুরু আগামী ১০ নভেম্বর
           </p>
 
           {/* Feature Highlights Pills */}

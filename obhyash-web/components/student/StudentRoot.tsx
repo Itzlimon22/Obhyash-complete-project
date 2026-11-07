@@ -237,6 +237,8 @@ export default function StudentRoot({
   const validTabs = [
     "dashboard",
     "setup",
+    "courses",
+    "course",
     "live_exam",
     "live-exam",
     "question_bank",
@@ -282,7 +284,7 @@ export default function StudentRoot({
     if (path.startsWith("leaderboard/user/") || path.startsWith("leaderboard/user-profile/")) return "user_profile";
     if (path.startsWith("history/") && path !== "history") return "history_result";
     if (path.startsWith("exam/")) return "exam";
-    if (path === "live-exam" || path === "live_exam") return "live_exam";
+    if (path === "courses" || path === "course" || path === "live-exam" || path === "live_exam") return "courses";
     if (path === "question-bank" || path === "question_bank") return "question_bank";
     if (path === "legends-league" || path === "legends_league") return "legends-league";
     if (path === "account-info" || path === "info") return "account-info";
@@ -1305,7 +1307,7 @@ export default function StudentRoot({
               }}
               onLeaderboardClick={() => handleTabChange("leaderboard")}
               onAnalysisClick={() => handleTabChange("analysis")}
-              onLiveExamClick={() => handleTabChange("live_exam")}
+              onLiveExamClick={() => handleTabChange("courses")}
               onFormulasClick={() => handleTabChange("formulas")}
               onPracticeClick={() => handleTabChange("practice")}
               onBookmarksClick={() => handleTabChange("bookmarks")}
@@ -1345,7 +1347,7 @@ export default function StudentRoot({
         return <InitialLoader />;
       }
 
-      if (activeTab === "live_exam") {
+      if (activeTab === "courses" || activeTab === "live_exam" || activeTab === "live-exam") {
         return (
           <LiveExamView commonLayoutProps={commonLayoutProps} />
         );

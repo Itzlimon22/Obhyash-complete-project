@@ -413,9 +413,9 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
   if (showHistory) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
-        title="আমার লাইভ পরীক্ষার ফলাফল"
+        title="আমার কোর্সের ফলাফল"
         onBack={handleHistoryBack}
       >
         <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 pt-6 pb-28 font-['HindSiliguri']">
@@ -438,9 +438,9 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
 
   return (
     <AppLayout
-      activeTab="live_exam"
+      activeTab="courses"
       {...commonLayoutProps}
-      title="লাইভ মডেল টেস্ট"
+      title="কোর্সসমূহ"
       onBack={() => {
         if (commonLayoutProps?.onBack) {
           commonLayoutProps.onBack();

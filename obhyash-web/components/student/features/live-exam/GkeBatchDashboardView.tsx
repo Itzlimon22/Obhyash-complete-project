@@ -652,6 +652,21 @@ export const GkeBatchDashboardView: React.FC<GkeBatchDashboardViewProps> = ({
           Obhyash themed cards matching sketch
          ───────────────────────────────────────────────────────────── */}
       <section className="px-4 pt-3" aria-labelledby="upcoming-title">
+        {/* Paused / Starting Date Notice Banner */}
+        <div className="mb-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200">
+          <div className="p-1 rounded-lg bg-amber-200/60 dark:bg-amber-900/60 shrink-0 text-amber-800 dark:text-amber-300 mt-0.5">
+            <Clock size={15} />
+          </div>
+          <div className="flex-1">
+            <strong className="block text-[12.5px] font-bold text-amber-950 dark:text-amber-100">
+              মডেল টেস্ট শুরু আগামী ১০ নভেম্বর
+            </strong>
+            <p className="mt-0.5 text-[11px] text-amber-800 dark:text-amber-300/90 leading-relaxed">
+              জিকে ও ইংলিশ স্পেশাল ব্যাচ ০১-এর পরীক্ষা সাময়িকভাবে স্থগিত রয়েছে। আগামী ১০ নভেম্বর ২০২৬ (মঙ্গলবার) সন্ধ্যা ৬:০০ টা থেকে রুটিন অনুযায়ী MT-01 পরীক্ষা শুরু হবে।
+            </p>
+          </div>
+        </div>
+
         <div className="mb-2.5 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#004633] dark:bg-emerald-400" />
@@ -670,13 +685,20 @@ export const GkeBatchDashboardView: React.FC<GkeBatchDashboardViewProps> = ({
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {/* ── CARD 1: TODAY ── */}
+          {/* ── CARD 1: TODAY / UPCOMING ── */}
           <div className="rounded-2xl bg-white dark:bg-[#13151F] border border-[#E2E8F0] dark:border-[#232738] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
-            {/* Red Curved Header Banner */}
-            <div className="bg-[#BE123C] text-white py-2 px-2.5 flex items-center justify-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              <span className="text-xs font-extrabold tracking-wide uppercase">Today (আজ)</span>
-            </div>
+            {/* Curved Header Banner */}
+            {todayExam && now >= new Date(todayExam.start_time) && now <= new Date(todayExam.end_time) ? (
+              <div className="bg-[#BE123C] text-white py-2 px-2.5 flex items-center justify-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <span className="text-xs font-extrabold tracking-wide uppercase">Today (আজ)</span>
+              </div>
+            ) : (
+              <div className="bg-[#004633] text-white py-2 px-2.5 flex items-center justify-center gap-1.5">
+                <Calendar size={13} className="text-emerald-300" />
+                <span className="text-xs font-extrabold tracking-wide uppercase">১০ নভেম্বর শুরু</span>
+              </div>
+            )}
 
             {/* Card Content */}
             <div className="p-3 flex flex-col flex-1 justify-between">
@@ -698,7 +720,7 @@ export const GkeBatchDashboardView: React.FC<GkeBatchDashboardViewProps> = ({
                     <strong className="text-neutral-800 dark:text-neutral-200">
                       {todayExam
                         ? `${BanglaNameHelper.toBanglaNumeral(new Date(todayExam.start_time).getDate())} নভেম্বর`
-                        : "৩ নভেম্বর"}
+                        : "১০ নভেম্বর"}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between text-[10px] font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/60 rounded-lg px-2 py-1">
@@ -714,24 +736,33 @@ export const GkeBatchDashboardView: React.FC<GkeBatchDashboardViewProps> = ({
                 </div>
               </div>
 
-              {/* Action Button: Directly opens real exam details & session */}
+              {/* Action Button: Opens real exam details (countdown & syllabus) */}
               <button
                 type="button"
                 onClick={handleStartToday}
                 className="mt-3 w-full py-2 px-2.5 rounded-xl bg-[#004633] hover:bg-[#003628] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
               >
-                <Zap size={13} className="text-amber-300" />
-                <span>পরীক্ষা দিন</span>
+                {todayExam && now >= new Date(todayExam.start_time) && now <= new Date(todayExam.end_time) ? (
+                  <>
+                    <Zap size={13} className="text-amber-300" />
+                    <span>পরীক্ষা দিন</span>
+                  </>
+                ) : (
+                  <>
+                    <BookOpen size={13} className="text-emerald-300" />
+                    <span>সিলেবাস ও প্রস্তুতি</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
 
-          {/* ── CARD 2: TOMORROW ── */}
+          {/* ── CARD 2: NEXT EXAM ── */}
           <div className="rounded-2xl bg-white dark:bg-[#13151F] border border-[#E2E8F0] dark:border-[#232738] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
             {/* Teal/Brand Curved Header Banner */}
             <div className="bg-[#0F766E] text-white py-2 px-2.5 flex items-center justify-center gap-1.5">
               <Calendar size={13} className="text-teal-200" />
-              <span className="text-xs font-extrabold tracking-wide uppercase">Tomorrow (আগামীকাল)</span>
+              <span className="text-xs font-extrabold tracking-wide uppercase">১১ নভেম্বর (পরবর্তী)</span>
             </div>
 
             {/* Card Content */}
@@ -754,7 +785,7 @@ export const GkeBatchDashboardView: React.FC<GkeBatchDashboardViewProps> = ({
                     <strong className="text-neutral-800 dark:text-neutral-200">
                       {tomorrowExam
                         ? `${BanglaNameHelper.toBanglaNumeral(new Date(tomorrowExam.start_time).getDate())} নভেম্বর`
-                        : "৪ নভেম্বর"}
+                        : "১১ নভেম্বর"}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between text-[10px] font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/60 rounded-lg px-2 py-1">
@@ -770,21 +801,14 @@ export const GkeBatchDashboardView: React.FC<GkeBatchDashboardViewProps> = ({
                 </div>
               </div>
 
-              {/* Action Button: Opens exam details & syllabus */}
+              {/* Action Button: Opens routine */}
               <button
                 type="button"
-                onClick={() => {
-                  const examToOpen = tomorrowExam || allExams[1] || allExams[0];
-                  onSelectExam({
-                    id: examToOpen.id,
-                    title: examToOpen.title,
-                    status: examToOpen.userAttemptStatus === "submitted" ? "taken" : "untaken",
-                  });
-                }}
-                className="mt-3 w-full py-2 px-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all border border-neutral-200/80 dark:border-neutral-700 cursor-pointer active:scale-[0.98]"
+                onClick={onOpenRoutine}
+                className="mt-3 w-full py-2 px-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
               >
-                <BookOpen size={13} className="text-neutral-500 dark:text-neutral-400" />
-                <span>সিলেবাস দেখুন</span>
+                <Calendar size={13} />
+                <span>রুটিন দেখুন</span>
               </button>
             </div>
           </div>

@@ -64,8 +64,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       svg: "/dashboard-icons/exam_pencil.svg",
     },
     {
-      id: "live_exam",
-      label: "লাইভ পরীক্ষা",
+      id: "courses",
+      label: "কোর্সসমূহ",
       icon: Radio,
       svg: "/dashboard-icons/live_exam.svg",
     },
@@ -194,6 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {menuItems.map((item) => {
               const isActive =
                 activeTab === item.id ||
+                (item.id === "courses" && (activeTab === "courses" || activeTab === "live_exam" || activeTab === "live-exam")) ||
                 (item.id === "question_bank" && (activeTab === "question-bank" || activeTab === "question_bank")) ||
                 (item.id === "practice" && activeTab === "bookmarks") ||
                 (item.id === "leaderboard" && (activeTab === "legends-league" || activeTab === "legends_league"));

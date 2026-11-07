@@ -168,7 +168,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const isPractice = activeTab === 'practice';
   const isHistory = activeTab === 'history';
   const isLeaderboard = activeTab === 'leaderboard';
-  const isLiveExamTab = activeTab === 'live_exam' || activeTab === 'live-exam';
+  const isLiveExamTab = activeTab === 'courses' || activeTab === 'course' || activeTab === 'live_exam' || activeTab === 'live-exam';
   const isLeftAligned = isPractice || isHistory;
 
   const showBackButton = !isDashboard && !isSetupRoot && !isQuestionBankRoot && Boolean(

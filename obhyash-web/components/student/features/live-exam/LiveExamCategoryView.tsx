@@ -236,7 +236,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   if (isRoutineOpen) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title="পরীক্ষার রুটিন ও পূর্ণাঙ্গ সিলেবাস"
         onBack={handleRoutineBack}
@@ -254,7 +254,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   if (isHistoryOpen) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title="পরীক্ষার রেকর্ড ও ফলাফল"
         onBack={() => setIsHistoryOpen(false)}
@@ -274,7 +274,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
 
   return (
     <AppLayout
-      activeTab="live_exam"
+      activeTab="courses"
       {...commonLayoutProps}
       title={displayCategoryTitle}
       onBack={onBack}

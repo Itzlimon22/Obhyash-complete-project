@@ -86,9 +86,62 @@ class GkeBatchDashboardWidget extends ConsumerWidget {
       }
     }
 
+    final isLiveNow = todayExam != null &&
+        now.isAfter(todayExam.startTime) &&
+        now.isBefore(todayExam.endTime);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // ── Notice Banner: Exam Paused until 10 Nov ──
+        Container(
+          margin: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2B1D0E) : const Color(0xFFFFFBEB),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isDark ? const Color(0xFF5C3D1D) : const Color(0xFFFDE68A),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                LucideIcons.clock,
+                size: 16,
+                color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'মডেল টেস্ট শুরু আগামী ১০ নভেম্বর',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'জিকে ও ইংলিশ স্পেশাল ব্যাচ ০১-এর মডেল টেস্ট স্থগিত রয়েছে। আগামী ১০ নভেম্বর (মঙ্গলবার) সন্ধ্যা ৬:০০ টা থেকে রুটিন অনুযায়ী পরীক্ষা শুরু হবে।',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309),
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
         // ─────────────────────────────────────────────────────────────
         // 1. TOP ROW: 2 CARDS IN THE SAME ROW ("Today" & "Tomorrow")
         // Matching user's image sketch with Flutter app theme
@@ -97,25 +150,25 @@ class GkeBatchDashboardWidget extends ConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── TODAY'S EXAM CARD ──
+              // ── CARD 1: TODAY / UPCOMING ──
               Expanded(
                 child: _buildTopExamCard(
                   context: context,
                   isDark: isDark,
-                  headerLabel: 'Today',
-                  isToday: true,
+                  headerLabel: isLiveNow ? 'Today' : '১০ নভেম্বর শুরু',
+                  isToday: isLiveNow,
                   code: _extractExamCode(todayExam, 'MT-01'),
                   syllabus: (todayExam != null && todayExam.description.isNotEmpty)
                       ? _cleanSyllabusPreview(todayExam.description)
                       : 'প্রাচীন ও মধ্যযুগে বাংলার ইতিহাস, Noun, Determiners, Article, Number, Gender',
                   dateText: todayExam != null
                       ? '${todayExam.startTime.day} ${_monthName(todayExam.startTime.month)} ${todayExam.startTime.year}'
-                      : '3 Nov 2026',
+                      : '10 Nov 2026',
                   timeText: '6 PM - 12 PM',
                   durationText: todayExam != null
                       ? '${todayExam.durationMinutes} min'
-                      : '60 min',
-                  buttonText: 'পরীক্ষা দিন',
+                      : '30 min',
+                  buttonText: isLiveNow ? 'পরীক্ষা দিন' : 'সিলেবাস ও প্রস্তুতি',
                   onTap: () {
                     if (todayExam != null) {
                       context.push('/live_exam_details/${todayExam.id}', extra: todayExam);
@@ -128,12 +181,12 @@ class GkeBatchDashboardWidget extends ConsumerWidget {
 
               const SizedBox(width: 10),
 
-              // ── TOMORROW'S EXAM CARD ──
+              // ── CARD 2: NEXT EXAM ──
               Expanded(
                 child: _buildTopExamCard(
                   context: context,
                   isDark: isDark,
-                  headerLabel: 'Tomorrow',
+                  headerLabel: '১১ নভেম্বর',
                   isToday: false,
                   code: _extractExamCode(tomorrowExam, 'MT-02'),
                   syllabus: (tomorrowExam != null && tomorrowExam.description.isNotEmpty)
@@ -141,22 +194,18 @@ class GkeBatchDashboardWidget extends ConsumerWidget {
                       : 'ব্রিটিশ শাসন, ভাষা আন্দোলন, Pronoun & Its Classification, Uses of Pronoun',
                   dateText: tomorrowExam != null
                       ? '${tomorrowExam.startTime.day} ${_monthName(tomorrowExam.startTime.month)} ${tomorrowExam.startTime.year}'
-                      : '3 Nov 2026',
+                      : '11 Nov 2026',
                   timeText: '6 PM - 12 PM',
                   durationText: tomorrowExam != null
                       ? '${tomorrowExam.durationMinutes} min'
-                      : '60 min',
-                  buttonText: 'সিলেবাস দেখুন',
+                      : '30 min',
+                  buttonText: 'রুটিন দেখুন',
                   onTap: () {
-                    if (tomorrowExam != null) {
-                      context.push('/live_exam_details/${tomorrowExam.id}', extra: tomorrowExam);
-                    } else {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const LiveExamRoutinePage(categoryTitle: 'GKE'),
-                        ),
-                      );
-                    }
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const LiveExamRoutinePage(categoryTitle: 'GKE'),
+                      ),
+                    );
                   },
                 ),
               ),

@@ -140,13 +140,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return 'formula_detail';
     if (location.contains('/formulas/') && location.split('/').length >= 4)
       return 'formula_chapters';
-    if (location.startsWith('/live_exam/')) {
+    if (location.startsWith('/courses/') || location.startsWith('/live_exam/')) {
       final segs = location.split('/');
       if (segs.length >= 3 && segs[2].isNotEmpty) {
         return 'live_exam_${segs[2]}';
       }
     }
-    if (location.startsWith('/live_exam')) return 'live_exam';
+    if (location.startsWith('/courses') || location.startsWith('/live_exam')) return 'courses';
     if (location.startsWith('/question-bank') ||
         location.startsWith('/question_bank')) {
       return 'question_bank';
@@ -284,8 +284,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'ড্যাশবোর্ড';
       case 'setup':
         return 'পরীক্ষা সেটআপ';
+      case 'courses':
       case 'live_exam':
-        return 'লাইভ পরীক্ষা';
+        return 'কোর্সসমূহ';
       case 'question_bank':
       case 'question-bank':
         return 'প্রশ্ন ব্যাংক';
@@ -360,9 +361,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return;
     }
 
-    if (tab == 'live_exam') {
+    if (tab == 'courses' || tab == 'live_exam') {
       widget.navigationShell.goBranch(0);
-      context.push('/live_exam');
+      context.push('/courses');
       return;
     }
 
@@ -589,6 +590,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   activeTab == 'legends-league' ||
                                   activeTab == 'practice' ||
                                   activeTab == 'analysis' ||
+                                  activeTab == 'courses' ||
                                   activeTab == 'live_exam' ||
                                   activeTab.startsWith('subject_') ||
                                   isSubRoute ||
@@ -981,7 +983,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 ),
                               ),
                             );
-                          } else if (activeTab == 'live_exam') {
+                          } else if (activeTab == 'courses' || activeTab == 'live_exam') {
                             rightWidth = 108.0;
                             rightWidget = InkWell(
                               borderRadius: BorderRadius.circular(10),

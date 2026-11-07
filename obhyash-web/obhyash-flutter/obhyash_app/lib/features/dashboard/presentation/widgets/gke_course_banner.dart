@@ -17,7 +17,7 @@ class GkeCourseBanner extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap ?? () => context.go('/live_exam'),
+          onTap: onTap ?? () => context.go('/courses'),
           borderRadius: BorderRadius.circular(18),
           child: Container(
             decoration: BoxDecoration(
@@ -105,6 +105,27 @@ class GkeCourseBanner extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF451A03).withOpacity(0.4) : const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: const Color(0xFFF59E0B).withOpacity(0.4),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  'শুরু ১০ নভেম্বর',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -124,7 +145,7 @@ class GkeCourseBanner extends StatelessWidget {
 
                           // Subtitle
                           Text(
-                            '২৫ নম্বরের পূর্ণাঙ্গ প্রস্তুতি • সাধারণ জ্ঞান ও ইংরেজি',
+                            '২৫ নম্বরের পূর্ণাঙ্গ প্রস্তুতি • পরীক্ষা শুরু আগামী ১০ নভেম্বর',
                             style: TextStyle(
                               fontSize: 11.5,
                               fontFamily: 'HindSiliguri',

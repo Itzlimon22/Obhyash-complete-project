@@ -596,7 +596,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   if (isViewingLeaderboard) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title={`${exam.title} - মেধা তালিকা`}
         centerTitle={true}
@@ -662,7 +662,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
   return (
     <AppLayout
-      activeTab="live_exam"
+      activeTab="courses"
       {...commonLayoutProps}
       title={exam.title}
       centerTitle={true}

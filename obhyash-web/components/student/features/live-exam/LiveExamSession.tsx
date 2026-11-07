@@ -100,7 +100,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
   if (engine.appState === AppState.ERROR) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title="ত্রুটি"
         onBack={onExit}
@@ -123,7 +123,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
   if (engine.appState === AppState.INSTRUCTIONS) {
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title="পরীক্ষার নির্দেশিকা"
         onBack={onExit}
@@ -190,7 +190,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
 
     return (
       <AppLayout
-        activeTab="live_exam"
+        activeTab="courses"
         {...commonLayoutProps}
         title={`${exam.title} - ফলাফল`}
         onBack={onExit}

@@ -62,7 +62,7 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
       onClick: onAnalysisClick,
     },
     {
-      title: "লাইভ পরীক্ষা",
+      title: "কোর্সসমূহ",
       svgIcon: "/dashboard-icons/live_exam.svg",
       primaryColor: "#740A03",
       lightBg: "bg-[#FEF2F2] dark:bg-[#740A03]/18",
