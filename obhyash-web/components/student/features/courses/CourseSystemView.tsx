@@ -113,46 +113,6 @@ const menuItems: { label: string; icon: IconName; tone: string }[] = [
   { label: "Materials", icon: "book", tone: "bg-[#4F7A35]" },
 ]
 
-function BatchHome({ onOpenCourses }: { onOpenCourses: () => void }) {
-  return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 py-8">
-      <div className="mb-7">
-        <p className="text-sm font-semibold tracking-wide text-[#176B5B]">
-          আমার কোর্স
-        </p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
-          পরীক্ষার ব্যাচ
-        </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
-          প্রস্তুতি চালিয়ে যেতে একটি ব্যাচ বেছে নিন।
-        </p>
-      </div>
-
-      <button
-        className="group flex items-center gap-4 rounded-3xl bg-white p-4 text-left shadow-[0_14px_35px_-25px_rgba(23,107,91,0.65)] ring-1 ring-[#E7F1EE] transition hover:-translate-y-0.5 hover:ring-[#B9D6CF] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#176B5B]"
-        onClick={onOpenCourses}
-        type="button"
-      >
-        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[#2D6F8E] text-white shadow-md">
-          <Icon name="book" />
-        </span>
-        <span className="flex-1">
-          <span className="block text-base font-bold text-slate-900">
-            কোর্স সমূহ
-          </span>
-          <span className="mt-0.5 block text-xs text-slate-500">
-            সব কোর্স দেখুন
-          </span>
-        </span>
-        <Icon
-          className="size-4 rotate-180 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#176B5B]"
-          name="arrow-left"
-        />
-      </button>
-    </main>
-  )
-}
-
 function ExamDashboard({
   courseId,
   courseTitle,
@@ -176,47 +136,48 @@ function ExamDashboard({
 }) {
   const content = getContent(courseId)
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FFFAF3] pb-10">
-      <header className="sticky top-0 z-30 mb-4 flex h-16 items-center justify-center px-14 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-5xl lg:max-w-6xl bg-[#FFFAF3] md:rounded-3xl md:shadow-md md:border md:border-[#EAE3D2]/70 pb-10 md:pb-14">
+      <header className="sticky top-0 z-30 mb-4 flex h-16 md:h-20 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-slate-200/60">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">
           {courseTitle}
         </h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-5" aria-labelledby="upcoming-title">
+      <section className="px-5 md:px-8" aria-labelledby="upcoming-title">
         {/* Paused / Starting Date Notice Banner */}
-        <div className="mb-3.5 p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900">
-          <div className="p-1 rounded-lg bg-amber-200/60 shrink-0 text-amber-800 mt-0.5">
-            <Icon className="size-4" name="clock" />
+        <div className="mb-4 p-3.5 md:p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-xs md:text-sm text-amber-900 shadow-sm">
+          <div className="p-1.5 rounded-xl bg-amber-200/70 shrink-0 text-amber-900 mt-0.5">
+            <Icon className="size-4 md:size-5" name="clock" />
           </div>
           <div className="flex-1">
-            <strong className="block text-[12.5px] font-bold text-amber-950">
+            <strong className="block text-sm md:text-base font-bold text-amber-950">
               মডেল টেস্ট শুরু আগামী ১০ নভেম্বর
             </strong>
-            <p className="mt-0.5 text-[11px] text-amber-800 leading-relaxed">
+            <p className="mt-0.5 text-xs md:text-sm text-amber-800 leading-relaxed">
               মডেল টেস্ট পরীক্ষা সাময়িকভাবে স্থগিত রয়েছে। আগামী ১০ নভেম্বর (মঙ্গলবার) সন্ধ্যা ৬:০০ টা থেকে রুটিন অনুযায়ী MT-01 পরীক্ষা শুরু হবে।
             </p>
           </div>
         </div>
 
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 md:mb-3 flex items-center justify-between">
           <h2
-            className="text-base font-bold text-slate-900"
+            className="text-base md:text-lg font-bold text-slate-900"
             id="upcoming-title"
           >
             আসন্ন পরীক্ষা
           </h2>
-          <span className="text-xs font-medium text-slate-400">এই সপ্তাহ</span>
+          <span className="text-xs md:text-sm font-medium text-slate-400">এই সপ্তাহ</span>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:gap-5">
           {[
             {
               day: "১০ নভেম্বর",
@@ -234,7 +195,7 @@ function ExamDashboard({
             },
           ].map((exam) => (
             <button
-              className={`group flex flex-col rounded-2xl border bg-white p-3.5 text-left shadow-[0_10px_24px_-20px_rgba(23,35,33,0.55)] transition duration-200 hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B] ${
+              className={`group flex flex-col rounded-2xl border bg-white p-3.5 md:p-5 text-left shadow-[0_10px_24px_-20px_rgba(23,35,33,0.55)] transition duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B] ${
                 exam.tone === "today" ? "border-[#CFE3DD]" : "border-[#EDD9CE]"
               }`}
               key={exam.day}
@@ -245,7 +206,7 @@ function ExamDashboard({
             >
               <span className="flex items-center justify-between">
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] md:text-xs font-bold ${
                     exam.tone === "today"
                       ? "bg-[#E3F1ED] text-[#176B5B]"
                       : "bg-[#FBEAE1] text-[#B4552F]"
@@ -256,19 +217,19 @@ function ExamDashboard({
                   )}
                   {exam.day}
                 </span>
-                <span className="text-[11px] font-semibold text-slate-400">
+                <span className="text-[11px] md:text-xs font-semibold text-slate-400">
                   {exam.date}
                 </span>
               </span>
 
-              <span className="mt-3 block text-[22px] font-extrabold leading-none tracking-tight text-slate-900">
+              <span className="mt-3 block text-[22px] md:text-2xl font-extrabold leading-none tracking-tight text-slate-900">
                 {exam.code}
               </span>
-              <span className="mt-2 line-clamp-2 min-h-[2.6rem] text-xs leading-[1.3rem] text-slate-500">
+              <span className="mt-2 line-clamp-2 min-h-[2.6rem] text-xs md:text-sm leading-[1.3rem] text-slate-500">
                 {exam.topics}
               </span>
 
-              <span className="mt-3 flex flex-col gap-1.5 border-t border-dashed border-slate-200 pt-3 text-[11px] font-semibold text-slate-700">
+              <span className="mt-3 flex flex-col gap-1.5 border-t border-dashed border-slate-200 pt-3 text-[11px] md:text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1.5">
                   <Icon className="size-3.5 shrink-0 text-slate-400" name="clock" />
                   সন্ধ্যা ৬টা - রাত ১২টা
@@ -283,17 +244,17 @@ function ExamDashboard({
         </div>
       </section>
 
-      <section className="mt-8 px-5" aria-labelledby="explore-title">
+      <section className="mt-8 md:mt-10 px-5 md:px-8" aria-labelledby="explore-title">
         <h2
-          className="mb-3 text-base font-bold text-slate-900"
+          className="mb-3 md:mb-4 text-base md:text-lg font-bold text-slate-900"
           id="explore-title"
         >
           সব সুবিধা
         </h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {menuItems.map((item) => (
             <button
-              className={`group relative flex min-h-32 flex-col items-start justify-between overflow-hidden rounded-3xl p-4 text-left text-white shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B] ${item.tone}`}
+              className={`group relative flex min-h-32 md:min-h-36 flex-col items-start justify-between overflow-hidden rounded-3xl p-4 md:p-5 text-left text-white shadow-lg transition duration-200 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B] ${item.tone}`}
               key={item.label}
               onClick={
                 item.label === "পরীক্ষা দিন"
@@ -313,13 +274,13 @@ function ExamDashboard({
               type="button"
             >
               <span className="absolute -right-7 -top-7 size-20 rounded-full border-[14px] border-white/15" />
-              <span className="relative flex size-11 items-center justify-center rounded-2xl bg-white/20 ring-1 ring-white/25">
-                <Icon className="size-5.5" name={item.icon} />
+              <span className="relative flex size-11 md:size-12 items-center justify-center rounded-2xl bg-white/20 ring-1 ring-white/25">
+                <Icon className="size-5.5 md:size-6" name={item.icon} />
               </span>
               <span className="relative flex w-full items-center justify-between gap-2">
-                <span className="text-sm font-bold">{item.label}</span>
+                <span className="text-sm md:text-base font-bold">{item.label}</span>
                 <Icon
-                  className="size-4 rotate-180 text-white/75 transition group-hover:translate-x-0.5 group-hover:text-white"
+                  className="size-4 rotate-180 text-white/75 transition group-hover:translate-x-1 group-hover:text-white"
                   name="arrow-left"
                 />
               </span>
@@ -536,26 +497,27 @@ function LeaderboardPage({ courseId, onBack }: { courseId: string; onBack: () =>
   } as const
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#F7F5F0] pb-32">
-      <header className="sticky top-0 z-30 flex bg-[#0E5F63] text-white h-16 items-center justify-center px-14">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#F7F5F0] md:rounded-3xl md:shadow-md md:border md:border-slate-200 overflow-hidden pb-32 md:pb-12">
+      <header className="sticky top-0 z-30 flex bg-[#0E5F63] text-white h-16 md:h-20 items-center justify-between px-5 md:px-8">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#BFEDEA]"
+          className="grid size-10 place-items-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#BFEDEA]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold">Leaderboard</h1>
+        <h1 className="truncate text-lg md:text-xl font-bold">Leaderboard</h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
-      <section className="bg-[#0E5F63] text-white">
-        <div className="px-5 pt-1">
+      <section className="bg-[#0E5F63] text-white px-5 md:px-8 pt-1 pb-6 md:pb-8">
+        <div>
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold tracking-wide text-[#A8E1DD]">
                 {getContent(courseId).short} RANKING
               </p>
-              <h2 className="mt-1 text-2xl font-bold leading-tight text-[#FFF9EC]">
+              <h2 className="mt-1 text-2xl md:text-3xl font-bold leading-tight text-[#FFF9EC]">
                 শীর্ষ শিক্ষার্থী
               </h2>
             </div>
@@ -586,7 +548,7 @@ function LeaderboardPage({ courseId, onBack }: { courseId: string; onBack: () =>
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-3 items-end gap-2">
+          <div className="mt-6 md:mt-8 grid grid-cols-3 items-end gap-3 md:gap-8 max-w-lg mx-auto">
             {podium.map((student) => {
               const style = medal[(student.rank as 1 | 2 | 3)]
               const first = student.rank === 1
@@ -597,15 +559,15 @@ function LeaderboardPage({ courseId, onBack }: { courseId: string; onBack: () =>
                 >
                   <span
                     className={`mx-auto grid place-items-center rounded-full border-2 bg-[#167176] font-bold text-[#FFF9EC] ${style.ring} ${
-                      first ? "size-16 text-lg" : "size-13 text-sm"
+                      first ? "size-16 md:size-20 text-lg md:text-xl" : "size-13 md:size-16 text-sm md:text-base"
                     }`}
                   >
                     {initials(student.name)}
                   </span>
-                  <p className="mt-2 truncate text-xs font-semibold text-[#FFF9EC]">
+                  <p className="mt-2 truncate text-xs md:text-sm font-semibold text-[#FFF9EC]">
                     {student.name}
                   </p>
-                  <p className="line-clamp-2 min-h-7 text-[10px] leading-3.5 text-[#B7DCD9]">
+                  <p className="line-clamp-2 min-h-7 text-[10px] md:text-xs leading-3.5 text-[#B7DCD9]">
                     {student.college}
                   </p>
                   <div
@@ -614,7 +576,7 @@ function LeaderboardPage({ courseId, onBack }: { courseId: string; onBack: () =>
                     <span className="block text-[11px] font-bold opacity-70">
                       {style.label}
                     </span>
-                    <strong className="mt-1.5 block text-2xl leading-none tabular-nums">
+                    <strong className="mt-1.5 block text-2xl md:text-3xl leading-none tabular-nums">
                       {student.score}
                     </strong>
                   </div>
@@ -625,12 +587,12 @@ function LeaderboardPage({ courseId, onBack }: { courseId: string; onBack: () =>
         </div>
       </section>
 
-      <section className="bg-[#F7F5F0] px-5 pt-5">
+      <section className="bg-[#F7F5F0] px-5 md:px-8 pt-5 md:pt-8">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#171A18]">সম্পূর্ণ র‍্যাঙ্কিং</h2>
-          <span className="text-xs font-medium text-[#7B7F78]">গড় নম্বর</span>
+          <h2 className="text-base md:text-lg font-bold text-[#171A18]">সম্পূর্ণ র‍্যাঙ্কিং</h2>
+          <span className="text-xs md:text-sm font-medium text-[#7B7F78]">গড় নম্বর</span>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-[#E4E1D8] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-[#E4E1D8] bg-white shadow-sm">
           <div className="divide-y divide-[#EFEDE7]">
             {students
               .slice(3)
@@ -645,25 +607,25 @@ function LeaderboardPage({ courseId, onBack }: { courseId: string; onBack: () =>
         </div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 mx-auto w-full max-w-[430px] px-4 pb-4">
-        <div className="flex items-center gap-3 rounded-2xl bg-[#0E5F63] px-4 py-3 text-white shadow-[0_10px_28px_rgba(14,95,99,0.24)]">
-          <span className="text-sm font-bold tabular-nums text-[#BFEDEA]">
+      <div className="fixed md:static inset-x-0 bottom-0 mx-auto w-full max-w-[430px] md:max-w-none px-4 md:px-8 pb-4 md:pb-0 md:mt-6">
+        <div className="flex items-center gap-3 rounded-2xl bg-[#0E5F63] px-4 md:px-6 py-3 md:py-4 text-white shadow-[0_10px_28px_rgba(14,95,99,0.24)]">
+          <span className="text-sm md:text-base font-bold tabular-nums text-[#BFEDEA]">
             #{you.rank}
           </span>
-          <span className="grid size-10 place-items-center rounded-full bg-[#DDF5F2] text-xs font-bold text-[#0E5F63]">
+          <span className="grid size-10 md:size-11 place-items-center rounded-full bg-[#DDF5F2] text-xs md:text-sm font-bold text-[#0E5F63]">
             আমি
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-sm font-semibold">আপনার অবস্থান</span>
-            <span className="block truncate text-xs text-[#BFE1DE]">
+            <span className="block text-sm md:text-base font-semibold">আপনার অবস্থান</span>
+            <span className="block truncate text-xs md:text-sm text-[#BFE1DE]">
               {you.college}
             </span>
           </span>
           <span className="text-right">
-            <strong className="block text-lg leading-none tabular-nums">
+            <strong className="block text-lg md:text-xl leading-none tabular-nums">
               {you.score}
             </strong>
-            <span className="text-[10px] text-[#BFE1DE]">avg</span>
+            <span className="text-[10px] md:text-xs text-[#BFE1DE]">avg</span>
           </span>
         </div>
       </div>
@@ -738,19 +700,20 @@ function PracticePage({ courseId, onBack }: { courseId: string; onBack: () => vo
     }`
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#F7F4F1] pb-24">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-center px-14 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#F7F4F1] md:rounded-3xl md:shadow-md md:border md:border-slate-200 pb-24 md:pb-12">
+      <header className="sticky top-0 z-30 flex h-14 md:h-18 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-[#E8E1DC]">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0B4F55]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0B4F55]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">
           Create Mock Exam
         </h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
       <form
@@ -760,281 +723,307 @@ function PracticePage({ courseId, onBack }: { courseId: string; onBack: () => vo
           if (canCreate) setCreated(true)
         }}
       >
-        <section className="mx-5 mt-1 rounded-2xl bg-[#0B4F55] px-4 py-3 text-white">
-          <div className="flex items-end gap-1.5">
-            <strong className="text-2xl font-bold leading-none tabular-nums">
-              {questionCount || "—"}
-            </strong>
-            <span className="pb-0.5 text-xs font-semibold text-[#DDF5F2]">
-              প্রশ্ন
-            </span>
-            <span className="mx-1 pb-0.5 text-[#8CCBC6]">/</span>
-            <strong className="text-2xl font-bold leading-none tabular-nums">
-              {durationMinutes || "—"}
-            </strong>
-            <span className="pb-0.5 text-xs font-semibold text-[#DDF5F2]">
-              মিনিট
-            </span>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {(selectedSubjects.length
-              ? selectedSubjects
-              : ["কোনো বিষয় নেই"]
-            ).map((subject) => (
-              <span
-                className="rounded-full bg-white/12 px-2 py-0.5 text-[10px] font-semibold text-[#E7F8F6]"
-                key={subject}
-              >
-                {subject}
-              </span>
-            ))}
-          </div>
-          <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2 text-[10px] text-[#BDE7E3]">
-            <span>
-              {mode === "Exam Mode" ? "Timer সহ পরীক্ষা" : "সাথে সাথে উত্তর"}
-            </span>
-            <span>
-              {selectedTopics.length ? `${formatBanglaNumber(selectedTopics.length)}টি টপিক · ` : ""}
-              {negativeMarking ? "Negative: 0.25" : "No negative"}
-            </span>
-          </div>
-        </section>
-
-        <div className="mt-3 space-y-2 px-5">
-          <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3">
-            <legend className="sr-only">Subjects</legend>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-bold text-[#211E1C]">বিষয়</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {practiceSubjects.map((subject) => {
-                const active = selectedSubjects.includes(subject)
-                return (
-                  <button
-                    aria-pressed={active}
-                    className={`${optionClass(active)} px-2`}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 px-5 md:px-8 pt-1 md:pt-4">
+          {/* Left Column (Col 7) */}
+          <div className="md:col-span-7 flex flex-col gap-3">
+            <section className="rounded-2xl bg-[#0B4F55] p-4 text-white shadow-sm">
+              <div className="flex items-end gap-1.5">
+                <strong className="text-2xl md:text-3xl font-bold leading-none tabular-nums">
+                  {questionCount || "—"}
+                </strong>
+                <span className="pb-0.5 text-xs md:text-sm font-semibold text-[#DDF5F2]">
+                  প্রশ্ন
+                </span>
+                <span className="mx-1 pb-0.5 text-[#8CCBC6]">/</span>
+                <strong className="text-2xl md:text-3xl font-bold leading-none tabular-nums">
+                  {durationMinutes || "—"}
+                </strong>
+                <span className="pb-0.5 text-xs md:text-sm font-semibold text-[#DDF5F2]">
+                  মিনিট
+                </span>
+              </div>
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {(selectedSubjects.length
+                  ? selectedSubjects
+                  : ["কোনো বিষয় নেই"]
+                ).map((subject) => (
+                  <span
+                    className="rounded-full bg-white/12 px-2.5 py-0.5 text-[11px] font-semibold text-[#E7F8F6]"
                     key={subject}
-                    onClick={() => toggleSubject(subject)}
-                    type="button"
                   >
                     {subject}
-                  </button>
-                )
-              })}
-            </div>
-            {!selectedSubjects.length && (
-              <p className="mt-2 text-xs font-semibold text-[#A1453A]">
-                কমপক্ষে একটি বিষয় বেছে নিন।
-              </p>
-            )}
-          </fieldset>
+                  </span>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-[#BDE7E3]">
+                <span>
+                  {mode === "Exam Mode" ? "Timer সহ পরীক্ষা" : "সাথে সাথে উত্তর"}
+                </span>
+                <span>
+                  {selectedTopics.length ? `${formatBanglaNumber(selectedTopics.length)}টি টপিক · ` : ""}
+                  {negativeMarking ? "Negative: 0.25" : "No negative"}
+                </span>
+              </div>
+            </section>
 
-          <fieldset className="relative rounded-xl border border-[#E8E1DC] bg-white p-3">
-            <legend className="sr-only">Topics</legend>
-            <span className="mb-2 block text-xs font-bold text-[#211E1C]">টপিক</span>
-            <button
-              aria-expanded={topicsOpen}
-              aria-haspopup="listbox"
-              className="flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-[#DDE6E4] bg-[#FCFAF8] px-3 text-left text-xs font-semibold text-[#172321] transition hover:border-[#8CCBC6] disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={!selectedSubjects.length}
-              onClick={() => setTopicsOpen((open) => !open)}
-              type="button"
-            >
-              <span className="truncate">
-                {selectedTopics.length === 0
-                  ? "সব টপিক"
-                  : selectedTopics.length === 1
-                    ? selectedTopics[0].split("::")[1]
-                    : `${formatBanglaNumber(selectedTopics.length)}টি টপিক নির্বাচিত`}
-              </span>
-              <Icon className={`size-4 shrink-0 text-[#5E6F6C] transition ${topicsOpen ? "rotate-90" : "-rotate-90"}`} name="arrow-left" />
-            </button>
+            <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3.5 shadow-sm">
+              <legend className="sr-only">Subjects</legend>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs md:text-sm font-bold text-[#211E1C]">বিষয়</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {practiceSubjects.map((subject) => {
+                  const active = selectedSubjects.includes(subject)
+                  return (
+                    <button
+                      aria-pressed={active}
+                      className={`${optionClass(active)} px-2`}
+                      key={subject}
+                      onClick={() => toggleSubject(subject)}
+                      type="button"
+                    >
+                      {subject}
+                    </button>
+                  )
+                })}
+              </div>
+              {!selectedSubjects.length && (
+                <p className="mt-2 text-xs font-semibold text-[#A1453A]">
+                  কমপক্ষে একটি বিষয় বেছে নিন।
+                </p>
+              )}
+            </fieldset>
 
-            {topicsOpen && (
-              <>
-                <button aria-label="টপিক বন্ধ করুন" className="fixed inset-0 z-40 cursor-default" onClick={() => setTopicsOpen(false)} type="button" />
-                <div className="absolute inset-x-3 top-[calc(100%-0.5rem)] z-50 overflow-hidden rounded-xl border border-[#DDE6E4] bg-white shadow-[0_18px_40px_-16px_rgba(15,35,33,0.35)]" role="listbox" aria-multiselectable="true">
-                  <div className="flex items-center justify-between border-b border-[#EEF1EF] px-3 py-2">
-                    <span className="text-[11px] font-semibold text-[#5E6F6C]">
-                      {selectedTopics.length ? `${formatBanglaNumber(selectedTopics.length)}টি নির্বাচিত` : "কিছু না বাছলে সব টপিক থাকবে"}
-                    </span>
-                    <span className="flex gap-1">
-                      <button className="rounded-md px-2 py-1 text-[11px] font-bold text-[#0B4F55] hover:bg-[#EEF4F3]" onClick={() => update(() => setSelectedTopics(availableTopics))} type="button">সব</button>
-                      <button className="rounded-md px-2 py-1 text-[11px] font-bold text-[#A1453A] hover:bg-[#FBEFEC]" onClick={() => update(() => setSelectedTopics([]))} type="button">মুছুন</button>
-                    </span>
+            <fieldset className="relative rounded-xl border border-[#E8E1DC] bg-white p-3.5 shadow-sm">
+              <legend className="sr-only">Topics</legend>
+              <span className="mb-2 block text-xs md:text-sm font-bold text-[#211E1C]">টপিক</span>
+              <button
+                aria-expanded={topicsOpen}
+                aria-haspopup="listbox"
+                className="flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-[#DDE6E4] bg-[#FCFAF8] px-3 text-left text-xs md:text-sm font-semibold text-[#172321] transition hover:border-[#8CCBC6] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!selectedSubjects.length}
+                onClick={() => setTopicsOpen((open) => !open)}
+                type="button"
+              >
+                <span className="truncate">
+                  {selectedTopics.length === 0
+                    ? "সব টপিক"
+                    : selectedTopics.length === 1
+                      ? selectedTopics[0].split("::")[1]
+                      : `${formatBanglaNumber(selectedTopics.length)}টি টপিক নির্বাচিত`}
+                </span>
+                <Icon className={`size-4 shrink-0 text-[#5E6F6C] transition ${topicsOpen ? "rotate-90" : "-rotate-90"}`} name="arrow-left" />
+              </button>
+
+              {topicsOpen && (
+                <>
+                  <button aria-label="টপিক বন্ধ করুন" className="fixed inset-0 z-40 cursor-default" onClick={() => setTopicsOpen(false)} type="button" />
+                  <div className="absolute inset-x-3 top-[calc(100%-0.5rem)] z-50 overflow-hidden rounded-xl border border-[#DDE6E4] bg-white shadow-[0_18px_40px_-16px_rgba(15,35,33,0.35)]" role="listbox" aria-multiselectable="true">
+                    <div className="flex items-center justify-between border-b border-[#EEF1EF] px-3 py-2">
+                      <span className="text-[11px] font-semibold text-[#5E6F6C]">
+                        {selectedTopics.length ? `${formatBanglaNumber(selectedTopics.length)}টি নির্বাচিত` : "কিছু না বাছলে সব টপিক থাকবে"}
+                      </span>
+                      <span className="flex gap-1">
+                        <button className="rounded-md px-2 py-1 text-[11px] font-bold text-[#0B4F55] hover:bg-[#EEF4F3]" onClick={() => update(() => setSelectedTopics(availableTopics))} type="button">সব</button>
+                        <button className="rounded-md px-2 py-1 text-[11px] font-bold text-[#A1453A] hover:bg-[#FBEFEC]" onClick={() => update(() => setSelectedTopics([]))} type="button">মুছুন</button>
+                      </span>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto py-1">
+                      {selectedSubjects.map((subject) => (
+                        <div key={subject}>
+                          <p className="sticky top-0 bg-white px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wide text-[#8A9693]">{subject}</p>
+                          {(subjectTopics[subject] ?? []).map((topic) => {
+                            const key = topicKey(subject, topic)
+                            const active = selectedTopics.includes(key)
+                            return (
+                              <button aria-selected={active} className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-semibold text-[#2B3634] hover:bg-[#F5F8F7]" key={key} onClick={() => toggleTopic(key)} role="option" type="button">
+                                <span className={`grid size-4 shrink-0 place-items-center rounded border text-[10px] font-black ${active ? "border-[#0B4F55] bg-[#0B4F55] text-white" : "border-[#C8D2D0] bg-white text-transparent"}`}>✓</span>
+                                {topic}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="border-t border-[#EEF1EF] p-2">
+                      <button className="h-9 w-full rounded-lg bg-[#0B4F55] text-xs font-bold text-white hover:bg-[#083E43]" onClick={() => setTopicsOpen(false)} type="button">সম্পন্ন</button>
+                    </div>
                   </div>
-                  <div className="max-h-64 overflow-y-auto py-1">
-                    {selectedSubjects.map((subject) => (
-                      <div key={subject}>
-                        <p className="sticky top-0 bg-white px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wide text-[#8A9693]">{subject}</p>
-                        {(subjectTopics[subject] ?? []).map((topic) => {
-                          const key = topicKey(subject, topic)
-                          const active = selectedTopics.includes(key)
-                          return (
-                            <button aria-selected={active} className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-semibold text-[#2B3634] hover:bg-[#F5F8F7]" key={key} onClick={() => toggleTopic(key)} role="option" type="button">
-                              <span className={`grid size-4 shrink-0 place-items-center rounded border text-[10px] font-black ${active ? "border-[#0B4F55] bg-[#0B4F55] text-white" : "border-[#C8D2D0] bg-white text-transparent"}`}>✓</span>
-                              {topic}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t border-[#EEF1EF] p-2">
-                    <button className="h-9 w-full rounded-lg bg-[#0B4F55] text-xs font-bold text-white hover:bg-[#083E43]" onClick={() => setTopicsOpen(false)} type="button">সম্পন্ন</button>
-                  </div>
+                </>
+              )}
+
+              {selectedTopics.length > 0 && !topicsOpen && (
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  {selectedTopics.map((key) => (
+                    <button className="inline-flex items-center gap-1 rounded-full bg-[#EEF4F3] px-2.5 py-0.5 text-[11px] font-semibold text-[#0B4F55]" key={key} onClick={() => toggleTopic(key)} type="button">
+                      {key.split("::")[1]}
+                      <span aria-hidden="true" className="text-[#5E6F6C]">×</span>
+                    </button>
+                  ))}
                 </div>
-              </>
-            )}
+              )}
+            </fieldset>
+          </div>
 
-            {selectedTopics.length > 0 && !topicsOpen && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                {selectedTopics.map((key) => (
-                  <button className="inline-flex items-center gap-1 rounded-full bg-[#EEF4F3] px-2 py-0.5 text-[10px] font-semibold text-[#0B4F55]" key={key} onClick={() => toggleTopic(key)} type="button">
-                    {key.split("::")[1]}
-                    <span aria-hidden="true" className="text-[#5E6F6C]">×</span>
+          {/* Right Column (Col 5) */}
+          <div className="md:col-span-5 flex flex-col gap-3">
+            <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3.5 shadow-sm">
+              <legend className="sr-only">Questions</legend>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs md:text-sm font-bold text-[#211E1C]">
+                  প্রশ্ন সংখ্যা
+                </span>
+              </div>
+              <div className="grid grid-cols-5 gap-1.5">
+                {["25", "50", "75", "100", "custom"].map((value) => (
+                  <button
+                    className={optionClass(questions === value)}
+                    key={value}
+                    onClick={() => update(() => setQuestions(value))}
+                    type="button"
+                  >
+                    {value === "custom" ? "Custom" : value}
                   </button>
                 ))}
               </div>
-            )}
-          </fieldset>
+              {questions === "custom" && (
+                <input
+                  aria-label="Custom question number"
+                  autoFocus
+                  className="mt-2 h-9 w-full rounded-lg border border-[#BFE1DD] bg-[#FCFAF8] px-3 text-xs font-semibold text-[#172321] outline-none placeholder:text-[#A39791] focus:border-[#0B4F55] focus:ring-3 focus:ring-[#D8EFEC]"
+                  inputMode="numeric"
+                  max="200"
+                  min="1"
+                  onChange={(event) =>
+                    update(() => setCustomQuestions(event.target.value))
+                  }
+                  placeholder="প্রশ্ন সংখ্যা লিখুন"
+                  type="number"
+                  value={customQuestions}
+                />
+              )}
+              {questions === "custom" &&
+                customQuestions &&
+                !hasValidQuestions && (
+                  <p className="mt-2 text-xs font-semibold text-[#A1453A]">
+                    1 থেকে 200-এর মধ্যে লিখুন।
+                  </p>
+                )}
+            </fieldset>
 
-          <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3">
-            <legend className="sr-only">Questions</legend>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-bold text-[#211E1C]">
-                প্রশ্ন সংখ্যা
-              </span>
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              {["25", "50", "75", "100", "custom"].map((value) => (
-                <button
-                  className={optionClass(questions === value)}
-                  key={value}
-                  onClick={() => update(() => setQuestions(value))}
-                  type="button"
-                >
-                  {value === "custom" ? "Custom" : value}
-                </button>
-              ))}
-            </div>
-            {questions === "custom" && (
-              <input
-                aria-label="Custom question number"
-                autoFocus
-                className="mt-2 h-9 w-full rounded-lg border border-[#BFE1DD] bg-[#FCFAF8] px-3 text-xs font-semibold text-[#172321] outline-none placeholder:text-[#A39791] focus:border-[#0B4F55] focus:ring-3 focus:ring-[#D8EFEC]"
-                inputMode="numeric"
-                max="200"
-                min="1"
-                onChange={(event) =>
-                  update(() => setCustomQuestions(event.target.value))
-                }
-                placeholder="প্রশ্ন সংখ্যা লিখুন"
-                type="number"
-                value={customQuestions}
-              />
-            )}
-            {questions === "custom" &&
-              customQuestions &&
-              !hasValidQuestions && (
+            <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3.5 shadow-sm">
+              <legend className="sr-only">Duration</legend>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs md:text-sm font-bold text-[#211E1C]">সময়</span>
+              </div>
+              <div className="grid grid-cols-5 gap-1.5">
+                {["15", "30", "45", "60", "custom"].map((value) => (
+                  <button
+                    className={optionClass(duration === value)}
+                    key={value}
+                    onClick={() => update(() => setDuration(value))}
+                    type="button"
+                  >
+                    {value === "custom" ? "Custom" : value}
+                  </button>
+                ))}
+              </div>
+              {duration === "custom" && (
+                <input
+                  aria-label="Custom duration in minutes"
+                  autoFocus
+                  className="mt-2 h-9 w-full rounded-lg border border-[#BFE1DD] bg-[#FCFAF8] px-3 text-xs font-semibold text-[#172321] outline-none placeholder:text-[#A39791] focus:border-[#0B4F55] focus:ring-3 focus:ring-[#D8EFEC]"
+                  inputMode="numeric"
+                  max="300"
+                  min="1"
+                  onChange={(event) =>
+                    update(() => setCustomDuration(event.target.value))
+                  }
+                  placeholder="মিনিট লিখুন"
+                  type="number"
+                  value={customDuration}
+                />
+              )}
+              {duration === "custom" && customDuration && !hasValidDuration && (
                 <p className="mt-2 text-xs font-semibold text-[#A1453A]">
-                  1 থেকে 200-এর মধ্যে লিখুন।
+                  1 থেকে 300 মিনিটের মধ্যে লিখুন।
                 </p>
               )}
-          </fieldset>
+            </fieldset>
 
-          <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3">
-            <legend className="sr-only">Duration</legend>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-bold text-[#211E1C]">সময়</span>
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              {["15", "30", "45", "60", "custom"].map((value) => (
-                <button
-                  className={optionClass(duration === value)}
-                  key={value}
-                  onClick={() => update(() => setDuration(value))}
-                  type="button"
-                >
-                  {value === "custom" ? "Custom" : value}
-                </button>
-              ))}
-            </div>
-            {duration === "custom" && (
-              <input
-                aria-label="Custom duration in minutes"
-                autoFocus
-                className="mt-2 h-9 w-full rounded-lg border border-[#BFE1DD] bg-[#FCFAF8] px-3 text-xs font-semibold text-[#172321] outline-none placeholder:text-[#A39791] focus:border-[#0B4F55] focus:ring-3 focus:ring-[#D8EFEC]"
-                inputMode="numeric"
-                max="300"
-                min="1"
-                onChange={(event) =>
-                  update(() => setCustomDuration(event.target.value))
-                }
-                placeholder="মিনিট লিখুন"
-                type="number"
-                value={customDuration}
-              />
-            )}
-            {duration === "custom" && customDuration && !hasValidDuration && (
-              <p className="mt-2 text-xs font-semibold text-[#A1453A]">
-                1 থেকে 300 মিনিটের মধ্যে লিখুন।
-              </p>
-            )}
-          </fieldset>
-
-          <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3">
-            <legend className="sr-only">পরীক্ষার ধরন</legend>
-            <span className="mb-2 block text-xs font-bold text-[#211E1C]">
-              পরীক্ষার ধরন
-            </span>
-            <div className="grid grid-cols-2 rounded-lg bg-[#EEF4F3] p-1">
-              {["Exam Mode", "Practice Mode"].map((item) => (
-                <button
-                  className={`rounded-md px-2.5 py-1.5 text-left transition ${
-                    mode === item
-                      ? "bg-white text-[#0B4F55] shadow-[0_1px_3px_rgba(15,23,42,0.12)]"
-                      : "text-[#5E6F6C]"
-                  }`}
-                  key={item}
-                  onClick={() => update(() => setMode(item))}
-                  type="button"
-                >
-                  <span className="block text-xs font-bold">{item}</span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          <div className="flex items-center justify-between rounded-xl border border-[#E8E1DC] bg-white px-3 py-2.5">
-            <span>
-              <span className="block text-xs font-bold text-[#211E1C]">
-                Negative Marking
+            <fieldset className="rounded-xl border border-[#E8E1DC] bg-white p-3.5 shadow-sm">
+              <legend className="sr-only">পরীক্ষার ধরন</legend>
+              <span className="mb-2 block text-xs md:text-sm font-bold text-[#211E1C]">
+                পরীক্ষার ধরন
               </span>
-            </span>
-            <button
-              aria-checked={negativeMarking}
-              aria-label="Negative marking"
-              className={`relative h-6 w-10 rounded-full transition ${
-                negativeMarking ? "bg-[#0B4F55]" : "bg-[#C8D2D0]"
-              }`}
-              onClick={() =>
-                update(() => setNegativeMarking((value) => !value))
-              }
-              role="switch"
-              type="button"
-            >
-              <span
-                className={`absolute top-1 size-4 rounded-full bg-white shadow-sm transition ${
-                  negativeMarking ? "left-5" : "left-1"
+              <div className="grid grid-cols-2 rounded-lg bg-[#EEF4F3] p-1">
+                {["Exam Mode", "Practice Mode"].map((item) => (
+                  <button
+                    className={`rounded-md px-2.5 py-1.5 text-left transition ${
+                      mode === item
+                        ? "bg-white text-[#0B4F55] shadow-[0_1px_3px_rgba(15,23,42,0.12)]"
+                        : "text-[#5E6F6C]"
+                    }`}
+                    key={item}
+                    onClick={() => update(() => setMode(item))}
+                    type="button"
+                  >
+                    <span className="block text-xs font-bold">{item}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <div className="flex items-center justify-between rounded-xl border border-[#E8E1DC] bg-white px-3.5 py-3 shadow-sm">
+              <span>
+                <span className="block text-xs md:text-sm font-bold text-[#211E1C]">
+                  Negative Marking
+                </span>
+              </span>
+              <button
+                aria-checked={negativeMarking}
+                aria-label="Negative marking"
+                className={`relative h-6 w-10 rounded-full transition ${
+                  negativeMarking ? "bg-[#0B4F55]" : "bg-[#C8D2D0]"
                 }`}
-              />
-            </button>
+                onClick={() =>
+                  update(() => setNegativeMarking((value) => !value))
+                }
+                role="switch"
+                type="button"
+              >
+                <span
+                  className={`absolute top-1 size-4 rounded-full bg-white shadow-sm transition ${
+                    negativeMarking ? "left-5" : "left-1"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Desktop Action Box */}
+            <div className="hidden md:block mt-2">
+              {created ? (
+                <p
+                  className="mb-2 rounded-lg bg-[#DDF2EF] px-3 py-2 text-center text-xs font-semibold text-[#0B4F55]"
+                  role="status"
+                >
+                  {questionCount} প্রশ্ন · {durationMinutes} মিনিটের mock exam তৈরি হয়েছে।
+                </p>
+              ) : null}
+              <button
+                className="h-12 w-full rounded-2xl bg-[#0B4F55] text-sm font-bold text-white transition hover:bg-[#083E43] shadow-md disabled:cursor-not-allowed disabled:bg-[#A9C7C4]"
+                disabled={!canCreate}
+                type="submit"
+              >
+                Create Mock Exam
+              </button>
+            </div>
           </div>
         </div>
       </form>
 
-      <div className="fixed inset-x-0 bottom-0 mx-auto w-full max-w-[430px] bg-[#F7F4F1] px-5 pb-4 pt-2">
+      {/* Mobile Fixed Bottom Bar */}
+      <div className="md:hidden fixed inset-x-0 bottom-0 mx-auto w-full max-w-[430px] bg-[#F7F4F1] px-5 pb-4 pt-2">
         {created ? (
           <p
             className="mb-2 rounded-lg bg-[#DDF2EF] px-3 py-1.5 text-center text-[11px] font-semibold text-[#0B4F55]"
@@ -1071,22 +1060,23 @@ function MaterialsPage({ courseId, onBack }: { courseId: string; onBack: () => v
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FFFAF3] pb-10">
-      <header className="sticky top-0 z-30 mb-4 flex h-16 items-center justify-center px-14 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#FFFAF3] md:rounded-3xl md:shadow-md md:border md:border-[#EAE3D2]/70 pb-10 md:pb-14">
+      <header className="sticky top-0 z-30 mb-4 flex h-16 md:h-20 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-slate-200/60">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">Materials</h1>
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">Materials</h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-5">
+      <section className="px-5 md:px-8">
         <div
-          className="grid grid-cols-2 rounded-2xl bg-slate-200/70 p-1"
+          className="grid grid-cols-2 rounded-2xl bg-slate-200/70 p-1 max-w-[430px] md:max-w-xs mx-auto md:mx-0"
           role="tablist"
           aria-label="Materials"
         >
@@ -1096,7 +1086,7 @@ function MaterialsPage({ courseId, onBack }: { courseId: string; onBack: () => v
           ].map(([id, label]) => (
             <button
               aria-selected={activeTab === id}
-              className={`rounded-xl px-3 py-2.5 text-sm font-bold transition ${
+              className={`rounded-xl px-3 py-2.5 text-xs md:text-sm font-bold transition ${
                 activeTab === id
                   ? "bg-white text-[#0F4F43] shadow-sm"
                   : "text-slate-500 hover:text-slate-800"
@@ -1111,35 +1101,35 @@ function MaterialsPage({ courseId, onBack }: { courseId: string; onBack: () => v
           ))}
         </div>
 
-        <div className="mt-4 space-y-3" role="tabpanel">
+        <div className="mt-5 md:mt-8 grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-5" role="tabpanel">
           {materialSheets[activeTab].map((sheet) => (
             <button
-              className="flex w-full items-center gap-3 rounded-3xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:ring-[#E7F1EE]"
+              className="flex w-full items-center gap-3.5 rounded-3xl bg-white p-4 md:p-5 text-left shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-md hover:ring-[#E7F1EE]"
               key={sheet.title}
               type="button"
             >
               <span
-                className={`grid size-11 shrink-0 place-items-center rounded-2xl ${
+                className={`grid size-11 md:size-13 shrink-0 place-items-center rounded-2xl ${
                   activeTab === "solve"
                     ? "bg-[#E7F1EE] text-[#176B5B]"
                     : "bg-[#F4E9EF] text-[#7B3F61]"
                 }`}
               >
                 <Icon
-                  className="size-5"
+                  className="size-5 md:size-6"
                   name={activeTab === "solve" ? "book" : "practice"}
                 />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-bold text-slate-900">
+                <span className="block truncate text-sm md:text-base font-bold text-slate-900">
                   {sheet.title}
                 </span>
-                <span className="mt-0.5 block truncate text-xs text-slate-500">
+                <span className="mt-0.5 block truncate text-xs md:text-sm text-slate-500">
                   {sheet.meta}
                 </span>
               </span>
               <Icon
-                className="size-4 rotate-180 text-slate-300"
+                className="size-4 rotate-180 text-slate-300 transition group-hover:translate-x-1"
                 name="arrow-left"
               />
             </button>
@@ -1390,22 +1380,23 @@ function CoursesPage({
       : courses.filter((course) => course.type === activeTab)
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FFFAF3] pb-10">
-      <header className="sticky top-0 z-30 mb-4 flex h-16 items-center justify-center px-5 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-5xl lg:max-w-6xl bg-[#FFFAF3] md:rounded-3xl md:shadow-md md:border md:border-[#EAE3D2]/70 pb-10 md:pb-14">
+      <header className="sticky top-0 z-30 mb-4 flex h-16 md:h-20 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-slate-200/60">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="text-lg font-bold text-slate-900">কোর্স সমূহ</h1>
+        <h1 className="text-lg md:text-xl font-bold text-slate-900">কোর্স সমূহ</h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-5">
+      <section className="px-5 md:px-8">
         <div
-          className="grid grid-cols-3 rounded-2xl bg-slate-200/70 p-1"
+          className="grid grid-cols-3 rounded-2xl bg-slate-200/70 p-1 max-w-[430px] md:max-w-md mx-auto"
           role="tablist"
           aria-label="Course categories"
         >
@@ -1416,7 +1407,7 @@ function CoursesPage({
           ].map(([id, label]) => (
             <button
               aria-selected={activeTab === id}
-              className={`rounded-xl px-2 py-2.5 text-xs font-bold transition ${
+              className={`rounded-xl px-2 py-2.5 text-xs md:text-sm font-bold transition ${
                 activeTab === id
                   ? "bg-white text-[#0F4F43] shadow-sm"
                   : "text-slate-500 hover:text-slate-800"
@@ -1432,51 +1423,78 @@ function CoursesPage({
         </div>
       </section>
 
-      <section className="mt-4 space-y-3 px-5" role="tabpanel">
+      <section className="mt-4 md:mt-8 px-5 md:px-8" role="tabpanel">
         {visibleCourses.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center">
-            <p className="text-sm font-bold text-slate-800">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 md:py-12 text-center">
+            <p className="text-sm md:text-base font-bold text-slate-800">
               এখনো কোনো কোর্সে এনরোল করেননি
             </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs md:text-sm text-slate-500">
               ফ্রি বা প্রিমিয়াম কোর্স থেকে একটি বেছে নিন।
             </p>
           </div>
         )}
-        {visibleCourses.map((course) => (
-          <button
-            className="group flex w-full items-center gap-4 rounded-3xl bg-white p-3 text-left shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-[#E7F1EE]"
-            key={course.title}
-            onClick={() => onOpenCourse(course.id)}
-            type="button"
-          >
-            <span
-              className={`grid size-16 shrink-0 place-items-center rounded-2xl text-white shadow-md ${course.tone}`}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+          {visibleCourses.map((course) => (
+            <button
+              className="group flex w-full md:flex-col md:justify-between items-center md:items-start gap-4 rounded-3xl bg-white p-3.5 md:p-5 text-left shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-lg hover:ring-[#B9D6CF] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+              key={course.title}
+              onClick={() => onOpenCourse(course.id)}
+              type="button"
             >
-              <Icon className="size-7" name="book" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-base font-bold text-slate-900">
-                {course.title}
-              </span>
-              <span className="mt-1 block truncate text-xs text-slate-500">
-                {course.detail}
-              </span>
-              <span className="mt-2 inline-flex rounded-full bg-[#E7F1EE] px-2.5 py-1 text-[11px] font-bold text-[#0F4F43]">
-                {course.lessons}
-              </span>
-              {enrolledIds.includes(course.id) && (
-                <span className="ml-2 mt-2 inline-flex rounded-full bg-[#EDF3E7] px-2.5 py-1 text-[11px] font-bold text-[#3D5F29]">
-                  এনরোলড
+              <div className="flex md:w-full items-start justify-between gap-3">
+                <span
+                  className={`grid size-16 shrink-0 place-items-center rounded-2xl text-white shadow-md ${course.tone}`}
+                >
+                  <Icon className="size-7" name="book" />
                 </span>
-              )}
-            </span>
-            <Icon
-              className="size-4 rotate-180 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#176B5B]"
-              name="arrow-left"
-            />
-          </button>
-        ))}
+                {enrolledIds.includes(course.id) ? (
+                  <span className="hidden md:inline-flex rounded-full bg-[#EDF3E7] px-3 py-1 text-xs font-bold text-[#3D5F29]">
+                    এনরোলড
+                  </span>
+                ) : (
+                  <span className="hidden md:inline-flex rounded-full bg-[#E7F1EE] px-3 py-1 text-xs font-bold text-[#0F4F43]">
+                    {course.price === 0 ? "ফ্রি" : `৳ ${formatBanglaNumber(course.price)}`}
+                  </span>
+                )}
+              </div>
+
+              <span className="min-w-0 flex-1 md:w-full md:mt-2">
+                <span className="block truncate text-base md:text-lg font-bold text-slate-900">
+                  {course.title}
+                </span>
+                <span className="mt-1 block line-clamp-2 md:line-clamp-none text-xs md:text-sm text-slate-500">
+                  {course.detail}
+                </span>
+                <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                  <span className="inline-flex rounded-full bg-[#E7F1EE] px-2.5 py-1 text-[11px] font-bold text-[#0F4F43]">
+                    {course.lessons}
+                  </span>
+                  {enrolledIds.includes(course.id) && (
+                    <span className="md:hidden inline-flex rounded-full bg-[#EDF3E7] px-2.5 py-1 text-[11px] font-bold text-[#3D5F29]">
+                      এনরোলড
+                    </span>
+                  )}
+                  {course.price > 0 && !enrolledIds.includes(course.id) && (
+                    <span className="md:hidden inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                      ৳ {formatBanglaNumber(course.price)}
+                    </span>
+                  )}
+                </div>
+              </span>
+
+              <div className="hidden md:flex w-full items-center justify-between border-t border-slate-100 pt-3 mt-3 text-xs font-bold text-[#176B5B]">
+                <span>{enrolledIds.includes(course.id) ? "কোর্সে প্রবেশ করুন" : "কোর্স বিবরণী দেখুন"}</span>
+                <Icon className="size-4 rotate-180 transition group-hover:translate-x-1" name="arrow-left" />
+              </div>
+
+              <Icon
+                className="md:hidden size-4 rotate-180 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#176B5B]"
+                name="arrow-left"
+              />
+            </button>
+          ))}
+        </div>
       </section>
     </main>
   )
@@ -1503,101 +1521,147 @@ function CourseDetailPage({
       : `৳ ${formatBanglaNumber(course.price)}`
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FFFAF3] pb-28">
-      <header className="sticky top-0 z-30 mb-4 flex h-16 items-center justify-center px-14 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-5xl lg:max-w-6xl bg-[#FFFAF3] md:rounded-3xl md:shadow-md md:border md:border-[#EAE3D2]/70 pb-28 md:pb-12">
+      <header className="sticky top-0 z-30 mb-4 flex h-16 md:h-20 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-slate-200/60">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">
           কোর্স ডিটেইলস
         </h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-5">
-        <div
-          className={`relative overflow-hidden rounded-[28px] p-5 text-white shadow-lg ${course.tone}`}
-        >
-          <span className="absolute -right-10 -top-12 size-36 rounded-full border-[22px] border-white/10" />
-          <span className="relative grid size-14 place-items-center rounded-2xl bg-white/18 ring-1 ring-white/20">
-            <Icon className="size-7" name="book" />
-          </span>
-          <span className="relative mt-4 inline-flex rounded-full bg-white/18 px-3 py-1 text-[11px] font-bold">
-            {tab === "free" ? "ফ্রি কোর্স" : "প্রিমিয়াম কোর্স"}
-          </span>
-          <h2 className="relative mt-2 text-2xl font-extrabold">
-            {course.title}
-          </h2>
-          <p className="relative mt-1 text-sm text-white/80">{course.detail}</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-8 px-5 md:px-8">
+        {/* Left Column: Course Main Details & Content (Col 7) */}
+        <div className="md:col-span-7 flex flex-col gap-4">
+          <div
+            className={`relative overflow-hidden rounded-[28px] p-5 md:p-6 text-white shadow-lg ${course.tone}`}
+          >
+            <span className="absolute -right-10 -top-12 size-36 rounded-full border-[22px] border-white/10" />
+            <span className="relative grid size-14 place-items-center rounded-2xl bg-white/18 ring-1 ring-white/20">
+              <Icon className="size-7" name="book" />
+            </span>
+            <span className="relative mt-4 inline-flex rounded-full bg-white/18 px-3 py-1 text-[11px] md:text-xs font-bold">
+              {tab === "free" ? "ফ্রি কোর্স" : "প্রিমিয়াম কোর্স"}
+            </span>
+            <h2 className="relative mt-2 text-2xl md:text-3xl font-extrabold">
+              {course.title}
+            </h2>
+            <p className="relative mt-1 text-sm md:text-base text-white/80">{course.detail}</p>
+          </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {[
-            [formatBanglaNumber(getContent(course.id).modelTests), "মডেল টেস্ট"],
-            [
-              formatBanglaNumber(course.students + (enrolled ? 1 : 0)),
-              "এনরোলড",
-            ],
-            ["৩ মাস", "মেয়াদ"],
-          ].map(([value, label]) => (
-            <div
-              className="rounded-2xl bg-white p-3 text-center shadow-sm ring-1 ring-slate-100"
-              key={label}
-            >
-              <strong className="block text-base text-slate-900">
-                {value}
-              </strong>
-              <span className="mt-0.5 block text-[11px] font-semibold text-slate-500">
-                {label}
-              </span>
+          <div className="rounded-3xl bg-white p-5 md:p-6 shadow-sm ring-1 ring-slate-100">
+            <h3 className="text-base md:text-lg font-bold text-slate-900">কোর্সে যা থাকছে</h3>
+            <div className="mt-3.5 space-y-3">
+              {getContent(course.id).features.map((feature) => (
+                <div
+                  className="flex items-center gap-3 text-sm md:text-base font-semibold text-slate-700"
+                  key={feature}
+                >
+                  <span className="grid size-6 place-items-center rounded-full bg-[#EDF3E7] text-xs font-black text-[#3D5F29]">
+                    ✓
+                  </span>
+                  {feature}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className="mt-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-          <h3 className="text-base font-bold text-slate-900">কোর্সে যা থাকছে</h3>
-          <div className="mt-3 space-y-2.5">
-            {getContent(course.id).features.map((feature) => (
-              <div
-                className="flex items-center gap-3 text-sm font-semibold text-slate-700"
-                key={feature}
-              >
-                <span className="grid size-6 place-items-center rounded-full bg-[#EDF3E7] text-xs font-black text-[#3D5F29]">
-                  ✓
-                </span>
-                {feature}
-              </div>
-            ))}
+          <div className="flex items-center gap-3 rounded-2xl border border-[#EAD19C] bg-[#FBF1DD] p-4 md:p-5">
+            <span className="grid size-11 md:size-12 shrink-0 place-items-center rounded-xl bg-white text-[#87580B] shadow-sm">
+              <Icon className="size-5 md:size-6" name="calendar" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm md:text-base font-bold text-slate-900">
+                কোর্স রুটিন
+              </span>
+              <span className="mt-0.5 block text-xs md:text-sm text-slate-600">
+                ক্লাস ও পরীক্ষার সময়সূচি
+              </span>
+            </span>
+            <a
+              className="rounded-xl bg-[#176B5B] px-3.5 md:px-5 py-2.5 text-xs md:text-sm font-bold text-white transition hover:bg-[#0F4F43]"
+              download={`${course.title}-routine.txt`}
+              href={`data:text/plain;charset=utf-8,${encodeURIComponent(`${course.title} রুটিন\n\nপ্রতিদিন - ডেইলি এক্সাম, সন্ধ্যা ৬টা\nশনি, সোম, বুধ - মডেল টেস্ট, সন্ধ্যা ৬টা থেকে রাত ১২টা\nশুক্রবার - উইকলি এক্সাম ও রিভিউ, রাত ৮টা\n\nবিষয়: ${getContent(course.id).subjects.map((item) => item.name).join(", ")}`)}`}
+            >
+              ডাউনলোড
+            </a>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-3 rounded-2xl border border-[#EAD19C] bg-[#FBF1DD] p-4">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-[#87580B]">
-            <Icon className="size-5" name="calendar" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-sm font-bold text-slate-900">
-              কোর্স রুটিন
-            </span>
-            <span className="mt-0.5 block text-xs text-slate-600">
-              ক্লাস ও পরীক্ষার সময়সূচি
-            </span>
-          </span>
-          <a
-            className="rounded-xl bg-[#176B5B] px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-[#0F4F43]"
-            download={`${course.title}-routine.txt`}
-            href={`data:text/plain;charset=utf-8,${encodeURIComponent(`${course.title} রুটিন\n\nপ্রতিদিন - ডেইলি এক্সাম, সন্ধ্যা ৬টা\nশনি, সোম, বুধ - মডেল টেস্ট, সন্ধ্যা ৬টা থেকে রাত ১২টা\nশুক্রবার - উইকলি এক্সাম ও রিভিউ, রাত ৮টা\n\nবিষয়: ${getContent(course.id).subjects.map((item) => item.name).join(", ")}`)}`}
-          >
-            ডাউনলোড
-          </a>
-        </div>
-      </section>
+        {/* Right Column: Stats & Desktop Enrollment Box (Col 5) */}
+        <div className="md:col-span-5 flex flex-col gap-4">
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              [formatBanglaNumber(getContent(course.id).modelTests), "মডেল টেস্ট"],
+              [
+                formatBanglaNumber(course.students + (enrolled ? 1 : 0)),
+                "এনরোলড",
+              ],
+              ["৩ মাস", "মেয়াদ"],
+            ].map(([value, label]) => (
+              <div
+                className="rounded-2xl bg-white p-3 md:p-4 text-center shadow-sm ring-1 ring-slate-100"
+                key={label}
+              >
+                <strong className="block text-base md:text-lg text-slate-900">
+                  {value}
+                </strong>
+                <span className="mt-0.5 block text-[11px] md:text-xs font-semibold text-slate-500">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
 
-      <div className="fixed inset-x-0 bottom-0 mx-auto flex w-full max-w-[430px] items-center justify-between gap-3 rounded-t-2xl border border-b-0 border-slate-200 bg-white/95 py-4 pl-8 pr-5 shadow-[0_-10px_28px_-24px_rgba(23,32,51,0.45)] backdrop-blur">
+          {/* Desktop Enrollment Card */}
+          <div className="hidden md:flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 sticky top-28">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              কোর্স ফি ও অ্যাক্সেস
+            </span>
+            <div className="mt-2 flex items-baseline justify-between">
+              <strong className="text-3xl font-black text-slate-900">{price}</strong>
+              {course.price > 0 && !enrolled && (
+                <span className="text-xs font-bold text-[#0E7A55] bg-[#E7F8F0] px-2.5 py-1 rounded-full">
+                  ১০% ছাড়ের সুযোগ
+                </span>
+              )}
+            </div>
+
+            <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+              এনরোল করার সাথে সাথে সব মডেল টেস্ট, সলভ শিট, প্র্যাকটিস সেশন এবং লিডারবোর্ডে আনলিমিটেড অ্যাক্সেস পেয়ে যাবেন।
+            </p>
+
+            <button
+              className={`mt-6 w-full rounded-2xl py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 ${
+                enrolled ? "bg-[#4F7A35] hover:bg-[#3D5F29]" : "bg-[#176B5B] hover:bg-[#0F4F43]"
+              }`}
+              onClick={enrolled ? onOpenDashboard : onEnroll}
+              type="button"
+            >
+              {enrolled
+                ? "পরীক্ষা ড্যাশবোর্ড খুলুন"
+                : course.price === 0
+                  ? "এখনই ফ্রিতে এনরোল করুন"
+                  : "কোর্সটি কিনুন"}
+            </button>
+
+            <div className="mt-4 border-t border-slate-100 pt-3 flex items-center justify-around text-xs text-slate-500">
+              <span className="flex items-center gap-1">✓ ইনস্ট্যান্ট অ্যাক্সেস</span>
+              <span className="flex items-center gap-1">✓ ৩ মাস মেয়াদ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Fixed Bottom Bar */}
+      <div className="md:hidden fixed inset-x-0 bottom-0 mx-auto flex w-full max-w-[430px] items-center justify-between gap-3 rounded-t-2xl border border-b-0 border-slate-200 bg-white/95 py-4 pl-8 pr-5 shadow-[0_-10px_28px_-24px_rgba(23,32,51,0.45)] backdrop-blur">
         <div className="min-w-24">
           <span className="block text-[11px] font-semibold text-slate-500">
             মূল্য
@@ -1680,7 +1744,7 @@ function UddoktaPayGateway({
     "h-12 w-full rounded-xl border border-[#D8DEE8] bg-white px-4 text-center text-base font-semibold tracking-wider text-[#1B2433] outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-[#A0A9B8] focus:border-[#1B2433]"
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-[#EEF1F5]">
+    <main className="mx-auto flex min-h-screen w-full max-w-[430px] md:max-w-lg md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-slate-200 overflow-hidden flex-col bg-[#EEF1F5]">
       <div className="bg-[#FFF4D6] px-4 py-1.5 text-center text-[11px] font-semibold text-[#7A5A0B]">
         ডেমো পেমেন্ট গেটওয়ে · কোনো টাকা কাটা হবে না
       </div>
@@ -1879,12 +1943,12 @@ function CheckoutPage({
 
   if (status === "success") {
     return (
-      <main className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-[#F6F7F4] px-5 pb-6 pt-16">
+      <main className="mx-auto flex min-h-screen w-full max-w-[430px] md:max-w-xl md:my-8 flex-col bg-[#F6F7F4] md:bg-white md:rounded-3xl md:shadow-lg md:border md:border-[#E1E6E2] px-5 md:p-8 pb-6 pt-16 md:pt-8">
         <div className="flex flex-1 flex-col items-center text-center">
           <span className="grid size-20 place-items-center rounded-full bg-[#DDF2EE] text-[#0E5F63]">
             <Icon className="size-10" name="check-circle" />
           </span>
-          <h1 className="mt-5 text-xl font-bold text-[#172321]">কেনা সম্পন্ন হয়েছে</h1>
+          <h1 className="mt-5 text-xl md:text-2xl font-bold text-[#172321]">কেনা সম্পন্ন হয়েছে</h1>
           <p className="mt-2 text-sm text-[#5E6F6C]">{course.title} কোর্সটি এখন আপনার কোর্সে যোগ হয়েছে।</p>
           <dl className="mt-6 w-full divide-y divide-[#EEF1EF] rounded-2xl border border-[#E1E6E2] bg-white text-sm">
             {[
@@ -1908,7 +1972,7 @@ function CheckoutPage({
           </dl>
           <p className="mt-3 text-[11px] text-[#8A9693]">এটি একটি ডেমো পেমেন্ট, কোনো টাকা কাটা হয়নি।</p>
         </div>
-        <button className="h-12 w-full rounded-full bg-[#0E5F63] text-sm font-bold text-white hover:bg-[#0A4C50]" onClick={onOpenDashboard} type="button">
+        <button className="h-12 w-full rounded-full bg-[#0E5F63] text-sm font-bold text-white hover:bg-[#0A4C50] transition shadow-md mt-4" onClick={onOpenDashboard} type="button">
           পরীক্ষা ড্যাশবোর্ড খুলুন
         </button>
       </main>
@@ -1916,73 +1980,90 @@ function CheckoutPage({
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#F6F7F4] pb-32">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-center bg-[#F6F7F4] px-14">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#F6F7F4] md:rounded-3xl md:shadow-md md:border md:border-[#E1E6E2] pb-32 md:pb-12">
+      <header className="sticky top-0 z-30 flex h-16 md:h-20 items-center justify-between bg-inherit px-5 md:px-8 md:border-b md:border-[#E1E6E2]">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">চেকআউট</h1>
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">চেকআউট</h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <div className="space-y-3 px-5 pt-1">
-        <section className="rounded-2xl border border-[#E1E6E2] bg-white p-4">
-          <h2 className="mb-3 text-sm font-bold text-[#172321]">অর্ডার সারাংশ</h2>
-          <div className="flex items-center gap-3">
-            <span className={`grid size-12 shrink-0 place-items-center rounded-xl text-white ${course.tone}`}>
-              <Icon className="size-6" name="book" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-bold text-[#172321]">{course.title}</span>
-              <span className="mt-0.5 block truncate text-xs text-[#6F7B78]">{course.detail}</span>
-            </span>
-            <strong className="shrink-0 text-base text-[#172321]">৳ {formatBanglaNumber(course.price)}</strong>
-          </div>
-          <dl className="mt-4 space-y-2 border-t border-[#EEF1EF] pt-3 text-xs">
-            {includes.map(([label, value]) => (
-              <div className="flex justify-between gap-4" key={label}>
-                <dt className="text-[#6F7B78]">{label}</dt>
-                <dd className="text-right font-semibold text-[#172321]">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        <section className="rounded-2xl border border-[#E1E6E2] bg-white p-4">
-          <h2 className="mb-3 text-sm font-bold text-[#172321]">কুপন কোড</h2>
-          <div className="flex gap-2">
-            <input aria-label="Coupon code" className={`${inputClass} uppercase`} onChange={(event) => setCoupon(event.target.value)} placeholder="যেমন GKE10" value={coupon} />
-            <button className="h-11 shrink-0 rounded-xl border border-[#0E5F63] px-4 text-sm font-bold text-[#0E5F63] disabled:opacity-40" disabled={!coupon.trim()} onClick={applyCoupon} type="button">
-              প্রয়োগ
-            </button>
-          </div>
-          {appliedCoupon && <p className="mt-2 text-xs font-semibold text-[#0E7A55]">GKE10 প্রয়োগ হয়েছে, ১০% ছাড়</p>}
-          {couponError && <p className="mt-2 text-xs font-semibold text-[#B44A3C]">{couponError}</p>}
-        </section>
-
-        <section className="rounded-2xl border border-[#E1E6E2] bg-white p-4 text-sm">
-          <div className="flex justify-between text-[#4B5B58]">
-            <span>কোর্স মূল্য</span>
-            <span>৳ {formatBanglaNumber(course.price)}</span>
-          </div>
-          {discount > 0 && (
-            <div className="mt-2 flex justify-between text-[#0E7A55]">
-              <span>ছাড়</span>
-              <span>− ৳ {formatBanglaNumber(discount)}</span>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-8 px-5 md:px-8 pt-1 md:pt-6">
+        {/* Left Column (Col 7) */}
+        <div className="md:col-span-7 flex flex-col gap-4">
+          <section className="rounded-2xl border border-[#E1E6E2] bg-white p-4 md:p-6 shadow-sm">
+            <h2 className="mb-3 text-sm md:text-base font-bold text-[#172321]">অর্ডার সারাংশ</h2>
+            <div className="flex items-center gap-3">
+              <span className={`grid size-12 md:size-14 shrink-0 place-items-center rounded-xl text-white shadow-sm ${course.tone}`}>
+                <Icon className="size-6 md:size-7" name="book" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm md:text-base font-bold text-[#172321]">{course.title}</span>
+                <span className="mt-0.5 block truncate text-xs md:text-sm text-[#6F7B78]">{course.detail}</span>
+              </span>
+              <strong className="shrink-0 text-base md:text-lg text-[#172321]">৳ {formatBanglaNumber(course.price)}</strong>
             </div>
-          )}
-          <div className="mt-3 flex justify-between border-t border-[#EEF1EF] pt-3 font-bold text-[#172321]">
-            <span>মোট</span>
-            <span>৳ {formatBanglaNumber(total)}</span>
-          </div>
-        </section>
+            <dl className="mt-4 space-y-2.5 border-t border-[#EEF1EF] pt-3 text-xs md:text-sm">
+              {includes.map(([label, value]) => (
+                <div className="flex justify-between gap-4" key={label}>
+                  <dt className="text-[#6F7B78]">{label}</dt>
+                  <dd className="text-right font-semibold text-[#172321]">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className="rounded-2xl border border-[#E1E6E2] bg-white p-4 md:p-6 shadow-sm">
+            <h2 className="mb-3 text-sm md:text-base font-bold text-[#172321]">কুপন কোড</h2>
+            <div className="flex gap-2">
+              <input aria-label="Coupon code" className={`${inputClass} uppercase`} onChange={(event) => setCoupon(event.target.value)} placeholder="যেমন GKE10" value={coupon} />
+              <button className="h-11 shrink-0 rounded-xl border border-[#0E5F63] px-5 text-sm font-bold text-[#0E5F63] hover:bg-[#E7F8F0] transition disabled:opacity-40" disabled={!coupon.trim()} onClick={applyCoupon} type="button">
+                প্রয়োগ
+              </button>
+            </div>
+            {appliedCoupon && <p className="mt-2 text-xs md:text-sm font-semibold text-[#0E7A55]">GKE10 প্রয়োগ হয়েছে, ১০% ছাড়</p>}
+            {couponError && <p className="mt-2 text-xs md:text-sm font-semibold text-[#B44A3C]">{couponError}</p>}
+          </section>
+        </div>
+
+        {/* Right Column (Col 5) */}
+        <div className="md:col-span-5 flex flex-col gap-4">
+          <section className="rounded-2xl border border-[#E1E6E2] bg-white p-4 md:p-6 shadow-sm text-sm">
+            <h2 className="mb-3 text-sm md:text-base font-bold text-[#172321]">পেমেন্ট বিবরণী</h2>
+            <div className="flex justify-between text-[#4B5B58]">
+              <span>কোর্স মূল্য</span>
+              <span>৳ {formatBanglaNumber(course.price)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="mt-2 flex justify-between text-[#0E7A55]">
+                <span>ছাড় (১০%)</span>
+                <span>− ৳ {formatBanglaNumber(discount)}</span>
+              </div>
+            )}
+            <div className="mt-3 flex justify-between border-t border-[#EEF1EF] pt-3 text-base font-extrabold text-[#172321]">
+              <span>সর্বমোট</span>
+              <span className="text-[#0E5F63]">৳ {formatBanglaNumber(total)}</span>
+            </div>
+
+            {/* Desktop Pay Button */}
+            <div className="hidden md:block mt-6">
+              <button className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#0E5F63] text-sm font-bold text-white transition hover:bg-[#0A4C50] shadow-md disabled:cursor-not-allowed disabled:bg-[#A9C7C4]" disabled={!canPay} onClick={pay} type="button">
+                ৳ {formatBanglaNumber(total)} পরিশোধ করুন
+              </button>
+              <p className="mt-3 text-center text-xs text-[#8A9693]">ডেমো পেমেন্ট · কোনো টাকা কাটা হবে না</p>
+            </div>
+          </section>
+        </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 mx-auto w-full max-w-[430px] border-t border-[#E1E6E2] bg-white px-5 pb-4 pt-3">
+      {/* Mobile Fixed Bottom Bar */}
+      <div className="md:hidden fixed inset-x-0 bottom-0 mx-auto w-full max-w-[430px] border-t border-[#E1E6E2] bg-white px-5 pb-4 pt-3">
         <button className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#0E5F63] text-sm font-bold text-white transition hover:bg-[#0A4C50] disabled:cursor-not-allowed disabled:bg-[#A9C7C4]" disabled={!canPay} onClick={pay} type="button">
           ৳ {formatBanglaNumber(total)} পরিশোধ করুন
         </button>
@@ -2048,53 +2129,54 @@ function ExamHistoryPage({ courseId, onBack }: { courseId: string; onBack: () =>
   const months = [...new Set(items.map((item) => item.month))]
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#F6F7F4] pb-10">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-center bg-[#F6F7F4] px-14">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#F6F7F4] md:rounded-3xl md:shadow-md md:border md:border-[#E1E6E2] pb-10 md:pb-14">
+      <header className="sticky top-0 z-30 flex h-16 md:h-20 items-center justify-between bg-inherit px-5 md:px-8 md:border-b md:border-[#E1E6E2]">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0E5F63]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0E5F63]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">পরীক্ষার ইতিহাস</h1>
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">পরীক্ষার ইতিহাস</h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-5 pt-1">
-        <div className="rounded-[20px] bg-[#0E5F63] p-4 text-white">
+      <section className="px-5 md:px-8 pt-1 md:pt-4">
+        <div className="rounded-[20px] md:rounded-3xl bg-[#0E5F63] p-4 md:p-6 text-white shadow-md">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs text-[#BDE7E3]">গড় ফল</p>
-              <p className="mt-1 text-3xl font-bold leading-none tabular-nums">{average}%</p>
+              <p className="text-xs md:text-sm text-[#BDE7E3]">গড় ফল</p>
+              <p className="mt-1 text-3xl md:text-4xl font-bold leading-none tabular-nums">{average}%</p>
             </div>
-            <div className="flex gap-5 text-right">
+            <div className="flex gap-5 md:gap-8 text-right">
               <div>
-                <p className="text-xs text-[#BDE7E3]">পরীক্ষা</p>
-                <p className="mt-1 text-lg font-bold leading-none tabular-nums">{examHistory.length}</p>
+                <p className="text-xs md:text-sm text-[#BDE7E3]">পরীক্ষা</p>
+                <p className="mt-1 text-lg md:text-2xl font-bold leading-none tabular-nums">{examHistory.length}</p>
               </div>
               <div>
-                <p className="text-xs text-[#BDE7E3]">সেরা</p>
-                <p className="mt-1 text-lg font-bold leading-none tabular-nums">{best}%</p>
+                <p className="text-xs md:text-sm text-[#BDE7E3]">সেরা</p>
+                <p className="mt-1 text-lg md:text-2xl font-bold leading-none tabular-nums">{best}%</p>
               </div>
             </div>
           </div>
-          <div className="mt-5 flex h-16 items-end gap-2" aria-label="সাম্প্রতিক ফলাফল">
+          <div className="mt-5 md:mt-7 flex h-16 md:h-20 items-end gap-2" aria-label="সাম্প্রতিক ফলাফল">
             {trend.map((item) => {
               const value = percentOf(item)
               return (
                 <div className="flex flex-1 flex-col items-center gap-1" key={item.id}>
-                  <span className="text-[9px] tabular-nums text-[#BDE7E3]">{value}</span>
+                  <span className="text-[9px] md:text-xs tabular-nums text-[#BDE7E3]">{value}</span>
                   <span className={`w-full rounded-md ${item.id === examHistory[0].id ? "bg-white" : "bg-white/30"}`} style={{ height: `${Math.max(value - 40, 8) * 0.7}px` }} />
                 </div>
               )
             })}
           </div>
-          <p className="mt-2 text-[10px] text-[#9FD3CE]">শেষ {examHistory.length}টি পরীক্ষার ফল</p>
+          <p className="mt-2 text-[10px] md:text-xs text-[#9FD3CE]">শেষ {examHistory.length}টি পরীক্ষার ফল</p>
         </div>
       </section>
 
-      <div className="no-scrollbar mt-5 flex gap-2 overflow-x-auto px-5" role="tablist" aria-label="History filter">
+      <div className="no-scrollbar mt-5 flex gap-2 overflow-x-auto px-5 md:px-8" role="tablist" aria-label="History filter">
         {(
           [
             ["all", "সব"],
@@ -2105,7 +2187,7 @@ function ExamHistoryPage({ courseId, onBack }: { courseId: string; onBack: () =>
         ).map(([id, label]) => (
           <button
             aria-selected={filter === id}
-            className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition ${filter === id ? "bg-[#172321] text-white" : "bg-white text-[#4B5B58] ring-1 ring-[#E1E6E2]"}`}
+            className={`shrink-0 rounded-full px-4 py-2 text-xs md:text-sm font-semibold transition ${filter === id ? "bg-[#172321] text-white" : "bg-white text-[#4B5B58] ring-1 ring-[#E1E6E2]"}`}
             key={id}
             onClick={() => setFilter(id)}
             role="tab"
@@ -2116,7 +2198,7 @@ function ExamHistoryPage({ courseId, onBack }: { courseId: string; onBack: () =>
         ))}
       </div>
 
-      <div className="mt-2 px-5">
+      <div className="mt-2 px-5 md:px-8">
         {months.map((month) => (
           <section key={month}>
             <h2 className="pb-2 pt-4 text-xs font-semibold text-[#6F7B78]">{month}</h2>
@@ -2223,20 +2305,21 @@ function AttendExamPage({ courseId, onBack }: { courseId: string; onBack: () => 
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#F8FAFC] pb-8">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-center border-b border-[#E5E7EB] bg-white px-14">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#F8FAFC] md:rounded-3xl md:shadow-md md:border md:border-slate-200 pb-8 md:pb-12">
+      <header className="sticky top-0 z-30 flex h-16 md:h-20 items-center justify-between border-b border-[#E5E7EB] bg-white px-5 md:px-8">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-4 grid size-10 place-items-center rounded-full text-[#111827] hover:bg-black/5"
+          className="grid size-10 place-items-center rounded-full text-[#111827] hover:bg-black/5"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
         <h1 className="truncate text-xl font-bold text-[#111827]">লাইভ এক্সাম</h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <div className="flex items-center justify-between gap-3 px-3 py-5">
+      <div className="flex items-center justify-between gap-3 px-5 md:px-8 py-5">
         <div
           className="flex rounded-full border border-[#E2E8F0] bg-white p-1"
           role="tablist"
@@ -2249,7 +2332,7 @@ function AttendExamPage({ courseId, onBack }: { courseId: string; onBack: () => 
           ].map(([id, label]) => (
             <button
               aria-selected={filter === id}
-              className={`rounded-full px-3 py-2 text-sm font-bold transition ${
+              className={`rounded-full px-3.5 py-2 text-sm font-bold transition ${
                 filter === id ? "bg-[#03543F] text-white" : "text-[#64748B]"
               }`}
               key={id}
@@ -2262,7 +2345,7 @@ function AttendExamPage({ courseId, onBack }: { courseId: string; onBack: () => 
           ))}
         </div>
         <a
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-2 text-sm font-bold text-[#1D4ED8]"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-sm font-bold text-[#1D4ED8] hover:bg-[#DBEAFE] transition"
           download={`${content.short}-exam-routine.txt`}
           href={`data:text/plain;charset=utf-8,${encodeURIComponent(`${content.category} লাইভ এক্সাম রুটিন\n\nDaily Exam - প্রতিদিন সন্ধ্যা ৬টা\nWeekly Exam - শুক্রবার সন্ধ্যা ৬টা`)}`}
         >
@@ -2271,15 +2354,15 @@ function AttendExamPage({ courseId, onBack }: { courseId: string; onBack: () => 
         </a>
       </div>
 
-      <section className="space-y-3 px-3">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-5 px-5 md:px-8">
         {exams.map((exam) => {
           const view = statusView[exam.status]
           return (
             <article
-              className="rounded-2xl border border-[#E2E8F0] bg-white p-4"
+              className="rounded-2xl border border-[#E2E8F0] bg-white p-4 md:p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               key={exam.title}
             >
-              <h2 className="text-lg font-bold text-[#111827]">{exam.title}</h2>
+              <h2 className="text-lg md:text-xl font-bold text-[#111827]">{exam.title}</h2>
               <div className="mt-3 flex items-center justify-between text-sm text-[#374151]">
                 <span className="flex items-center gap-2">
                   <Icon className="size-5 text-[#DC2626]" name="clock" />
@@ -2301,7 +2384,7 @@ function AttendExamPage({ courseId, onBack }: { courseId: string; onBack: () => 
                 </span>
                 {exam.status === "ongoing" ? (
                   <button
-                    className="rounded-full bg-[#03543F] px-4 py-1.5 text-sm font-bold text-white"
+                    className="rounded-full bg-[#03543F] px-4 py-1.5 text-sm font-bold text-white hover:bg-[#023E2E] transition shadow-sm"
                     type="button"
                   >
                     {view.action}
@@ -2339,54 +2422,55 @@ function ModelTestsPage({
 }) {
   const count = getContent(courseId).modelTests
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FFFAF3] pb-10">
-      <header className="sticky top-0 z-30 mb-4 flex h-16 items-center justify-center px-14 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-5xl lg:max-w-6xl bg-[#FFFAF3] md:rounded-3xl md:shadow-md md:border md:border-[#EAE3D2]/70 pb-10 md:pb-14">
+      <header className="sticky top-0 z-30 mb-4 flex h-16 md:h-20 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-slate-200/60">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">
           Model Tests
         </h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-4" aria-labelledby="model-tests-title">
-        <div className="mb-4 flex items-end justify-between px-1">
+      <section className="px-5 md:px-8" aria-labelledby="model-tests-title">
+        <div className="mb-5 md:mb-6 flex items-end justify-between px-1">
           <div>
             <h2
-              className="text-base font-bold text-slate-900"
+              className="text-base md:text-xl font-bold text-slate-900"
               id="model-tests-title"
             >
               All Model Tests
             </h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs md:text-sm text-slate-500">
               চালিয়ে যেতে একটি টেস্ট বেছে নিন
             </p>
           </div>
-          <span className="rounded-full bg-[#E7F1EE] px-3 py-1 text-xs font-bold text-[#176B5B]">
+          <span className="rounded-full bg-[#E7F1EE] px-3.5 py-1 text-xs md:text-sm font-bold text-[#176B5B]">
             {count} Tests
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
           {Array.from({ length: count }, (_, index) => {
             const number = String(index + 1).padStart(2, "0")
             return (
               <button
                 aria-label={`Model Test ${index + 1}`}
-                className={`group relative flex aspect-[1.05] flex-col items-center justify-center overflow-hidden rounded-3xl text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B] ${modelTestTones[index % modelTestTones.length]}`}
+                className={`group relative flex aspect-[1.05] flex-col items-center justify-center overflow-hidden rounded-3xl text-white shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B] ${modelTestTones[index % modelTestTones.length]}`}
                 key={number}
                 onClick={() => onOpenTest(number)}
                 type="button"
               >
                 <span className="absolute -right-5 -top-5 size-14 rounded-full border-[10px] border-white/15" />
-                <span className="relative text-[10px] font-bold uppercase tracking-wider text-white/75">
+                <span className="relative text-[10px] md:text-xs font-bold uppercase tracking-wider text-white/75">
                   Model Test
                 </span>
-                <span className="relative mt-1 text-2xl font-extrabold leading-none">
+                <span className="relative mt-1 text-2xl md:text-3xl font-extrabold leading-none">
                   {number}
                 </span>
               </button>
@@ -2431,163 +2515,168 @@ function ModelTestDetailPage({
   )
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[430px] bg-[#FFFAF3] pb-10">
-      <header className="sticky top-0 z-30 mb-4 flex h-16 items-center justify-center px-14 bg-inherit">
+    <main className="mx-auto min-h-screen w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl bg-[#FFFAF3] md:rounded-3xl md:shadow-md md:border md:border-[#EAE3D2]/70 pb-10 md:pb-14">
+      <header className="sticky top-0 z-30 mb-4 flex h-16 md:h-20 items-center justify-between px-5 md:px-8 bg-inherit md:border-b md:border-slate-200/60">
         <button
           aria-label="পেছনে যান"
-          className="absolute left-3 grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+          className="grid size-10 place-items-center rounded-full text-slate-800 transition hover:bg-black/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
           onClick={onBack}
           type="button"
         >
           <Icon className="size-6" name="arrow-left" />
         </button>
-        <h1 className="truncate text-lg font-bold text-slate-900">
+        <h1 className="truncate text-lg md:text-xl font-bold text-slate-900">
           MT-{number}
         </h1>
+        <div className="size-10 hidden md:block" aria-hidden="true" />
       </header>
 
-      <section className="px-5">
-        <article className="overflow-hidden rounded-3xl bg-white shadow-[0_18px_38px_-28px_rgba(23,107,91,0.65)] ring-1 ring-[#E7F1EE]">
-          <div className="relative overflow-hidden bg-[#2D6F8E] px-4 py-3.5 text-white">
-            <span className="absolute -right-10 -top-12 size-28 rounded-full border-[18px] border-white/10" />
-            <span className="relative inline-flex rounded-full bg-white/18 px-2.5 py-0.5 text-[10px] font-bold ring-1 ring-white/20">
-              {content.category}
-            </span>
-            <h2 className="relative mt-1.5 text-lg font-extrabold">
-              {content.short} Model Test {number}
-            </h2>
-            <div className="relative mt-3 grid grid-cols-3 gap-1.5 text-center">
-              {[
-                [String(total), "Questions"],
-                [String(total), "Marks"],
-                [`${content.duration} min`, "Duration"],
-              ].map(([value, label]) => (
-                <span
-                  className="rounded-xl bg-white/15 px-1.5 py-1.5 ring-1 ring-white/15"
-                  key={label}
-                >
-                  <strong className="block text-sm leading-none">
-                    {value}
-                  </strong>
-                  <span className="mt-0.5 block text-[9px] font-semibold text-white/75">
-                    {label}
-                  </span>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-3.5">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900">
-                বিষয়ভিত্তিক প্রশ্ন
-              </h3>
-              <span className="text-xs font-semibold text-slate-400">
-                Total {total}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-8 px-5 md:px-8">
+        {/* Left Column (Col 6) */}
+        <div className="md:col-span-6 flex flex-col gap-4">
+          <article className="overflow-hidden rounded-3xl bg-white shadow-[0_18px_38px_-28px_rgba(23,107,91,0.65)] ring-1 ring-[#E7F1EE]">
+            <div className="relative overflow-hidden bg-[#2D6F8E] px-4 md:px-6 py-4 md:py-5 text-white">
+              <span className="absolute -right-10 -top-12 size-28 rounded-full border-[18px] border-white/10" />
+              <span className="relative inline-flex rounded-full bg-white/18 px-2.5 py-0.5 text-[10px] md:text-xs font-bold ring-1 ring-white/20">
+                {content.category}
               </span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {subjectBreakdown.map((item) => (
-                <div
-                  className="flex items-center gap-2 rounded-xl bg-slate-50 px-2.5 py-1.5"
-                  key={item.subject}
-                >
+              <h2 className="relative mt-2 text-lg md:text-xl font-extrabold">
+                {content.short} Model Test {number}
+              </h2>
+              <div className="relative mt-3.5 grid grid-cols-3 gap-2 text-center">
+                {[
+                  [String(total), "Questions"],
+                  [String(total), "Marks"],
+                  [`${content.duration} min`, "Duration"],
+                ].map(([value, label]) => (
                   <span
-                    className={`size-2 shrink-0 rounded-full ${item.color}`}
-                  />
-                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-700">
-                    {item.subject}
+                    className="rounded-xl bg-white/15 px-2 py-2 ring-1 ring-white/15"
+                    key={label}
+                  >
+                    <strong className="block text-sm md:text-base leading-none">
+                      {value}
+                    </strong>
+                    <span className="mt-1 block text-[10px] font-semibold text-white/75">
+                      {label}
+                    </span>
                   </span>
-                  <span className="text-xs font-extrabold text-slate-900">
-                    {item.questions} Q
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button
-                className="rounded-xl bg-[#176B5B] px-3 py-2.5 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
-                type="button"
-              >
-                Start Exam
-              </button>
-              <button
-                className="rounded-xl border border-[#B9D6CF] bg-[#E7F1EE] px-3 py-2.5 text-sm font-bold text-[#0F4F43] transition hover:-translate-y-0.5 hover:bg-[#E7F1EE] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
-                type="button"
-              >
-                Practice
-              </button>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section className="mt-6 px-5">
-        <div
-          className="grid grid-cols-2 rounded-2xl bg-slate-200/70 p-1"
-          role="tablist"
-          aria-label="মডেল টেস্ট কার্যক্রম"
-        >
-          {[
-            ["attempts", "My Attempts"],
-            ["leaderboard", "Leaderboard"],
-          ].map(([id, label]) => (
-            <button
-              aria-selected={activeTab === id}
-              className={`rounded-xl px-3 py-2.5 text-sm font-bold transition ${
-                activeTab === id
-                  ? "bg-white text-[#0F4F43] shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
-              key={id}
-              onClick={() => setActiveTab(id as "attempts" | "leaderboard")}
-              role="tab"
-              type="button"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 space-y-3" role="tabpanel">
-          {activeTab === "attempts" ? (
-            attempts.map((attempt) => (
-              <div
-                className="flex items-center justify-between rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100"
-                key={attempt.title}
-              >
-                <div>
-                  <p className="text-sm font-bold text-slate-900">
-                    {attempt.title}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {attempt.date} · {attempt.time}
-                  </p>
-                </div>
-                <span className="rounded-full bg-[#EDF3E7] px-3 py-1.5 text-sm font-extrabold text-[#4F7A35]">
-                  {Math.round((attempt.score / 100) * total)}/{total}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] bg-[#F9FAFB] px-4 py-2 text-xs font-semibold text-[#6B7280]">
-                <span>র‍্যাঙ্ক ও শিক্ষার্থী</span>
-                <span>নম্বর</span>
-              </div>
-              <div className="divide-y divide-[#F0F1F2]">
-                {leaderboard.map((student) => (
-                  <LeaderboardRow
-                    key={student.name}
-                    scoreLabel="score"
-                    student={student}
-                  />
                 ))}
               </div>
             </div>
-          )}
+
+            <div className="p-4 md:p-6">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm md:text-base font-bold text-slate-900">
+                  বিষয়ভিত্তিক প্রশ্ন
+                </h3>
+                <span className="text-xs md:text-sm font-semibold text-slate-400">
+                  Total {total}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {subjectBreakdown.map((item) => (
+                  <div
+                    className="flex items-center gap-2 rounded-xl bg-slate-50 px-2.5 py-2"
+                    key={item.subject}
+                  >
+                    <span
+                      className={`size-2 shrink-0 rounded-full ${item.color}`}
+                    />
+                    <span className="min-w-0 flex-1 truncate text-xs md:text-sm font-semibold text-slate-700">
+                      {item.subject}
+                    </span>
+                    <span className="text-xs md:text-sm font-extrabold text-slate-900">
+                      {item.questions} Q
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <button
+                  className="rounded-xl bg-[#176B5B] px-3 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#0F4F43] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+                  type="button"
+                >
+                  Start Exam
+                </button>
+                <button
+                  className="rounded-xl border border-[#B9D6CF] bg-[#E7F1EE] px-3 py-3 text-sm font-bold text-[#0F4F43] transition hover:-translate-y-0.5 hover:bg-[#D7EBE6] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#176B5B]"
+                  type="button"
+                >
+                  Practice
+                </button>
+              </div>
+            </div>
+          </article>
         </div>
-      </section>
+
+        {/* Right Column (Col 6) */}
+        <div className="md:col-span-6 flex flex-col gap-4">
+          <div
+            className="grid grid-cols-2 rounded-2xl bg-slate-200/70 p-1"
+            role="tablist"
+            aria-label="মডেল টেস্ট কার্যক্রম"
+          >
+            {[
+              ["attempts", "My Attempts"],
+              ["leaderboard", "Leaderboard"],
+            ].map(([id, label]) => (
+              <button
+                aria-selected={activeTab === id}
+                className={`rounded-xl px-3 py-2.5 text-xs md:text-sm font-bold transition ${
+                  activeTab === id
+                    ? "bg-white text-[#0F4F43] shadow-sm"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+                key={id}
+                onClick={() => setActiveTab(id as "attempts" | "leaderboard")}
+                role="tab"
+                type="button"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3" role="tabpanel">
+            {activeTab === "attempts" ? (
+              attempts.map((attempt) => (
+                <div
+                  className="flex items-center justify-between rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100"
+                  key={attempt.title}
+                >
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">
+                      {attempt.title}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {attempt.date} · {attempt.time}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-[#EDF3E7] px-3 py-1.5 text-sm font-extrabold text-[#4F7A35]">
+                    {Math.round((attempt.score / 100) * total)}/{total}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#E5E7EB] bg-[#F9FAFB] px-4 py-2 text-xs font-semibold text-[#6B7280]">
+                  <span>র‍্যাঙ্ক ও শিক্ষার্থী</span>
+                  <span>নম্বর</span>
+                </div>
+                <div className="divide-y divide-[#F0F1F2]">
+                  {leaderboard.map((student) => (
+                    <LeaderboardRow
+                      key={student.name}
+                      scoreLabel="score"
+                      student={student}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </main>
   )
 }
@@ -2642,7 +2731,7 @@ export default function CourseSystemView({ commonLayoutProps }: CourseSystemView
   }, [])
 
   const goBack = () => {
-    if (page === "" || page === "#courses") {
+    if (page === "" || page === "#courses" || page === "#") {
       if (commonLayoutProps?.onBack) {
         commonLayoutProps.onBack()
         return
@@ -2742,7 +2831,7 @@ export default function CourseSystemView({ commonLayoutProps }: CourseSystemView
       />
     )
   }
-  if (page === "#courses") {
+  if (page === "#courses" || page === "" || page === "#") {
     return (
       <CoursesPage
         enrolledIds={enrolledIds}
@@ -2768,5 +2857,15 @@ export default function CourseSystemView({ commonLayoutProps }: CourseSystemView
     window.location.replace(`#course-dashboard-${activeCourseId}`)
     return null
   }
-  return <BatchHome onOpenCourses={() => (window.location.hash = "courses")} />
+  return (
+    <CoursesPage
+      enrolledIds={enrolledIds}
+      onBack={goBack}
+      onOpenCourse={(id) =>
+        (window.location.hash = enrolledIds.includes(id)
+          ? `course-dashboard-${id}`
+          : `course-${id}`)
+      }
+    />
+  )
 }

@@ -37,7 +37,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = (props) => {
         }
       }}
     >
-      <div className="w-full max-w-4xl mx-auto px-1 sm:px-4 py-2 font-['HindSiliguri',sans-serif]">
+      <div className="w-full max-w-6xl mx-auto px-1 sm:px-4 lg:px-6 py-2 sm:py-4 font-['HindSiliguri',sans-serif]">
         <CourseSystemView commonLayoutProps={props.commonLayoutProps} />
       </div>
     </AppLayout>
