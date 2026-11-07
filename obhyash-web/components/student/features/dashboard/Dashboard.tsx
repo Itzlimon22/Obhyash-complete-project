@@ -13,6 +13,7 @@ import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 // Dashboard Components
 import GlobalAnnouncementBanner from "@/components/student/ui/common/GlobalAnnouncementBanner";
 import LiveExamSlider from "@/components/student/ui/dashboard/LiveExamSlider";
+import GkeCourseBanner from "@/components/student/ui/dashboard/GkeCourseBanner";
 import DashboardActionGrid from "@/components/student/ui/dashboard/DashboardActionGrid";
 import DailyStreakCard from "@/components/student/ui/dashboard/DailyStreakCard";
 import DailyQuestsCard from "@/components/student/ui/dashboard/DailyQuestsCard";
@@ -478,7 +479,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
         {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7) ── */}
         <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-3.5 sm:gap-4.5">
-          {/* 1. Live Exam Announcement / Status Carousel Slider (Hidden per user request, keep for future restore) */}
+          {/* 1. Medical GKE Course Promo Banner (Obhyash Brand Theme) */}
+          <motion.div variants={fadeInUp}>
+            <GkeCourseBanner
+              onBannerClick={() => {
+                if (onLiveExamClick) onLiveExamClick();
+              }}
+            />
+          </motion.div>
+
+          {/* Previous LiveExamSlider hidden per user request, keep for future restore */}
           {/* <motion.div variants={fadeInUp}>
             <LiveExamSlider
               userId={user?.id}

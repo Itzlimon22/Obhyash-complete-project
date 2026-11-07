@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <!-- Obhyash Brand Viridian Deep Gradient -->
+    <linearGradient id="medGkeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12544F" />
+      <stop offset="100%" stop-color="#004633" />
+    </linearGradient>
+    <linearGradient id="medGkeBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#0D3B2F" />
+    </linearGradient>
+    <filter id="shadowMedGke" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#041E18" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Base 3D Bottom Depth Shadow -->
+  <rect x="6" y="8" width="88" height="84" rx="26" fill="#041E18" />
+
+  <!-- Main 3D Viridian Tile -->
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#medGkeBg)" stroke="url(#medGkeBorder)" stroke-width="3" filter="url(#shadowMedGke)" />
+  
+  <!-- Subtle Glass Highlight Arc -->
+  <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.2" />
+
+  <!-- Center Artwork: Medical Caduceus / Stethoscope + GK & English Book -->
+  <g id="medGraphic" transform="translate(50, 49)">
+    <!-- Open Book Base (for GK & English) -->
+    <path d="M -22 8 C -14 6 -6 7 0 11 C 6 7 14 6 22 8 C 22 18 16 22 0 25 C -16 22 -22 18 -22 8 Z" fill="#0A2A22" opacity="0.6" />
+    <path d="M -22 6 C -14 4 -6 5 0 9 C 6 5 14 4 22 6 C 21 16 15 20 0 22 C -15 20 -21 16 -22 6 Z" fill="#E6F0EC" />
+    <path d="M 0 9 L 0 22" stroke="#12544F" stroke-width="1.5" stroke-linecap="round" />
+    <!-- Book Page Lines -->
+    <path d="M -16 10 C -11 9 -7 9 -4 11" stroke="#12544F" stroke-width="1.2" stroke-linecap="round" opacity="0.7" />
+    <path d="M -16 14 C -11 13 -7 13 -4 15" stroke="#12544F" stroke-width="1.2" stroke-linecap="round" opacity="0.7" />
+    <path d="M 4 11 C 7 9 11 9 16 10" stroke="#12544F" stroke-width="1.2" stroke-linecap="round" opacity="0.7" />
+    <path d="M 4 15 C 7 13 11 13 16 14" stroke="#12544F" stroke-width="1.2" stroke-linecap="round" opacity="0.7" />
+
+    <!-- Stethoscope Arch & Earpieces -->
+    <!-- Binaural Tubes -->
+    <path d="M -13 -22 C -13 -13 -7 -5 0 -5 C 7 -5 13 -13 13 -22" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+    <!-- Ear tips -->
+    <circle cx="-13" cy="-22" r="2.5" fill="#34D399" />
+    <circle cx="13" cy="-22" r="2.5" fill="#34D399" />
+    
+    <!-- Stethoscope Tube Down to Chestpiece -->
+    <path d="M 0 -5 C 0 1 8 0 8 7 C 8 13 2 15 2 18" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" />
+    
+    <!-- Chestpiece (Diaphragm + Bell) -->
+    <circle cx="2" cy="18" r="5" fill="#12544F" stroke="#FFFFFF" stroke-width="2" />
+    <circle cx="2" cy="18" r="2.2" fill="#34D399" />
+
+    <!-- Medical Red Cross Emblem (small badge on top) -->
+    <circle cx="0" cy="-14" r="7.5" fill="#FFFFFF" />
+    <rect x="-1.5" y="-19" width="3" height="10" rx="1.2" fill="#BE123C" />
+    <rect x="-5" y="-15.5" width="10" height="3" rx="1.2" fill="#BE123C" />
+  </g>
+</svg>
+

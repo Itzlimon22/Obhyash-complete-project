@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import { ExamResult, UserProfile } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import LiveExamSlider from "./LiveExamSlider";
+import GkeCourseBanner from "./GkeCourseBanner";
 import DashboardActionGrid from "./DashboardActionGrid";
 import DailyStreakCard from "./DailyStreakCard";
 import DailyQuestsCard from "./DailyQuestsCard";
@@ -68,7 +69,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-0 sm:px-2 py-1.5 sm:py-2 flex flex-col gap-3.5 sm:gap-4 font-['HindSiliguri']">
-      {/* 1. Live Exam Announcement / Countdown Slider (Hidden per user request, keep for future restore) */}
+      {/* 1. Medical GKE Course Promo Banner (Obhyash Brand Theme) */}
+      <GkeCourseBanner
+        onBannerClick={() => {
+          if (onLiveExamClick) onLiveExamClick();
+        }}
+      />
+
+      {/* Previous LiveExamSlider hidden per user request, keep for future restore */}
       {/* <LiveExamSlider
         onExamClick={(examId, cat) => {
           if (onLiveExamClick) onLiveExamClick();

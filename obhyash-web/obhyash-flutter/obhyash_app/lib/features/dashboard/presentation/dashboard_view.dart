@@ -9,6 +9,7 @@ import 'widgets/daily_streak_card.dart';
 import 'widgets/daily_quests_card.dart';
 import 'widgets/subject_stat_card.dart';
 import 'widgets/live_exam_slider.dart';
+import 'widgets/gke_course_banner.dart';
 import '../providers/dashboard_providers.dart';
 import '../domain/models.dart';
 import '../services/streak_service.dart';
@@ -81,7 +82,15 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           child: GlobalAnnouncementBanner(),
         ),
 
-        // 1. Clean Minimalist Header (Live Exam Slider) - Hidden per user request, keep for future restore
+        // 1. Medical GKE Course Promo Banner (Obhyash Brand Theme)
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
+            child: GkeCourseBanner(),
+          ),
+        ),
+
+        // Previous LiveExamSlider hidden per user request, keep for future restore
         // const SliverToBoxAdapter(
         //   child: LiveExamSlider(),
         // ),
