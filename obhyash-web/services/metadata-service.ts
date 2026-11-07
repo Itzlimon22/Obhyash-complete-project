@@ -142,7 +142,10 @@ export const getSubjects = async (
 
         // For HSC students, exclude SSC subjects and plain "গণিত" (General Math is only SSC)
         if (isHscContext) {
-          if (subName === 'গণিত' || subName === 'ssc সাধারণ গণিত' || subId === 'ssc_math') {
+          if (subName === 'গণিত' || subName.includes('সাধারণ গণিত') || subName.startsWith('ssc ') || subId.startsWith('ssc_') || subId.startsWith('ssc-') || subId === 'ssc_math') {
+            return false;
+          }
+          if (subName.includes('বাংলাদেশ ও বিশ্বপরিচয়') || subId.includes('bgs')) {
             return false;
           }
           if (subStream.includes('ssc') && !subStream.includes('hsc')) {
@@ -150,6 +153,14 @@ export const getSubjects = async (
           }
           // Pure admission subjects (like mental ability, GK) should only appear if stream is Admission
           if (stream && stream.toLowerCase() === 'hsc' && subStream.includes('admission') && !subStream.includes('hsc')) {
+            return false;
+          }
+        } else {
+          // For SSC students, exclude HSC subjects and 1st/2nd papers
+          if (subStream.includes('hsc') && !subStream.includes('ssc')) {
+            return false;
+          }
+          if (subId.startsWith('hsc_') || subId.startsWith('hsc-') || subName.includes('১ম পত্র') || subName.includes('২য় পত্র') || subName.includes('২য় পত্র')) {
             return false;
           }
         }
@@ -169,12 +180,12 @@ export const getSubjects = async (
         return true;
       });
 
-      // Deduplicate subjects by name/id
+      // Deduplicate subjects by clean name or id
       const uniqueSubjects = new Map<string, Subject>();
       filteredData.forEach((s: Subject) => {
-        const key = s.id || s.name || '';
-        if (key && !uniqueSubjects.has(key)) {
-          uniqueSubjects.set(key, s);
+        const cleanName = (s.name || s.name_en || s.id || '').trim();
+        if (cleanName && !uniqueSubjects.has(cleanName)) {
+          uniqueSubjects.set(cleanName, s);
         }
       });
 

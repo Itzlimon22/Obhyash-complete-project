@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { ExamResult, UserProfile } from "@/lib/types";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import LiveExamSlider from "./LiveExamSlider";
 import DashboardActionGrid from "./DashboardActionGrid";
 import DailyStreakCard from "./DailyStreakCard";
@@ -42,26 +43,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const subjectData: SubjectData[] = useMemo(() => {
     const subjectsMap: Record<
       string,
-      { correct: number; wrong: number; skipped: number; total: number }
+      { id: string; name: string; correct: number; wrong: number; skipped: number; total: number }
     > = {};
 
     history.forEach((exam) => {
-      const subjectKey = exam.subject || "সাধারণ";
-      if (!subjectsMap[subjectKey]) {
-        subjectsMap[subjectKey] = { correct: 0, wrong: 0, skipped: 0, total: 0 };
+      const canonicalName = BanglaNameHelper.formatSubject(exam.subject, exam.subjectLabel) || "সাধারণ";
+      if (!subjectsMap[canonicalName]) {
+        subjectsMap[canonicalName] = { id: exam.subject || "", name: canonicalName, correct: 0, wrong: 0, skipped: 0, total: 0 };
       }
 
-      subjectsMap[subjectKey].correct += exam.correctCount || 0;
-      subjectsMap[subjectKey].wrong += exam.wrongCount || 0;
-      subjectsMap[subjectKey].total += exam.totalQuestions || 0;
-      subjectsMap[subjectKey].skipped +=
-        (exam.totalQuestions || 0) - (exam.correctCount || 0) - (exam.wrongCount || 0);
+      subjectsMap[canonicalName].correct += exam.correctCount || 0;
+      subjectsMap[canonicalName].wrong += exam.wrongCount || 0;
+      subjectsMap[canonicalName].total += exam.totalQuestions || 0;
+      subjectsMap[canonicalName].skipped += Math.max(
+        0,
+        (exam.totalQuestions || 0) - (exam.correctCount || 0) - (exam.wrongCount || 0)
+      );
     });
 
-    return Object.entries(subjectsMap).map(([name, stats]) => ({
-      name,
-      ...stats,
-    }));
+    return Object.values(subjectsMap);
   }, [history]);
 
   const effectiveUser = currentUser || user;

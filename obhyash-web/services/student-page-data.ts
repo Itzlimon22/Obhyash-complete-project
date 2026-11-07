@@ -39,7 +39,56 @@ export async function getStudentPageData(): Promise<{
     }
   }
 
-  const subjects = subjectsData || [];
+  // Filter and deduplicate subjects accurately for the user's stream & division
+  const rawSubjects = subjectsData || [];
+  const userStream = (dbProfile?.stream || dbProfile?.level || dbProfile?.batch || '').toLowerCase();
+  const isSscUser = userStream.includes('ssc');
+  const userDiv = (dbProfile?.division || dbProfile?.group || '').toLowerCase();
+
+  const seenSubjectNames = new Set<string>();
+  const subjects = rawSubjects.filter((s: any) => {
+    const sId = (s.id || '').toLowerCase();
+    const sName = (s.name || s.name_en || '').toLowerCase();
+    const sStream = (s.stream || s.level || '').toLowerCase();
+    const sDiv = (s.division || s.group || '').toLowerCase();
+
+    if (sId === 'hsc_math_general') return false;
+
+    // Stream filtering: SSC vs HSC
+    if (isSscUser) {
+      if (sStream.includes('hsc') && !sStream.includes('ssc')) return false;
+      if (sId.startsWith('hsc_') || sId.startsWith('hsc-')) return false;
+      if (sName.includes('১ম পত্র') || sName.includes('২য় পত্র') || sName.includes('২য় পত্র')) return false;
+    } else {
+      // Default to HSC / Admission
+      if (sStream.includes('ssc') && !sStream.includes('hsc')) return false;
+      if (sId.startsWith('ssc_') || sId.startsWith('ssc-') || sName.startsWith('ssc ')) return false;
+      if (sName === 'গণিত' || sName.includes('সাধারণ গণিত') || sId === 'ssc_math') return false;
+      if (sName.includes('বাংলাদেশ ও বিশ্বপরিচয়') || sId.includes('bgs')) return false;
+    }
+
+    // Division filtering
+    if (userDiv.includes('science') || userDiv.includes('বিজ্ঞান')) {
+      if (sDiv && sDiv !== 'general' && sDiv !== 'compulsory' && !sDiv.includes('science') && !sDiv.includes('বিজ্ঞান')) {
+        return false;
+      }
+    } else if (userDiv.includes('humanities') || userDiv.includes('arts') || userDiv.includes('মানবিক')) {
+      if (sDiv && sDiv !== 'general' && sDiv !== 'compulsory' && !sDiv.includes('humanities') && !sDiv.includes('মানবিক') && !sDiv.includes('arts')) {
+        return false;
+      }
+    } else if (userDiv.includes('business') || userDiv.includes('commerce') || userDiv.includes('ব্যবসায়')) {
+      if (sDiv && sDiv !== 'general' && sDiv !== 'compulsory' && !sDiv.includes('business') && !sDiv.includes('commerce') && !sDiv.includes('ব্যবসায়')) {
+        return false;
+      }
+    }
+
+    // Deduplicate by clean subject name
+    const cleanName = (s.name || s.name_en || s.id || '').trim();
+    if (cleanName && seenSubjectNames.has(cleanName)) return false;
+    if (cleanName) seenSubjectNames.add(cleanName);
+
+    return true;
+  });
 
   const initialHistory: ExamResult[] = (examResultsData || []).map((data: any) => {
     const rawLabel = data.subject_label || data.subject;
